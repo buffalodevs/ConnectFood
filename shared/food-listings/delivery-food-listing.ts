@@ -1,4 +1,4 @@
-import { FoodListingUser, FoodListingUnits } from './food-listing';
+import { FoodListingUser } from './food-listing';
 
 
 /**
@@ -22,6 +22,7 @@ export class DeliveryFoodListing {
         public totalWeight?: number,
         public donorInfo?: FoodListingUser,     // Driving distance and time here is from driver to donor!
         public receiverInfo?: FoodListingUser,  // Driving distance and time here is from donor to receiver!
-        public unitsInfo?: FoodListingUnits
+        public claimedUnitsCount?: number,
+        public unitsLabel?: string
     ) { }
 }

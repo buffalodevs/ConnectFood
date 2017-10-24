@@ -3,17 +3,34 @@
 
 
 <!-- This is the Food Listings (generated via loop) -->
-<ng-container *ngFor="let delivery of deliveries; let i = index">
+<ng-container *ngFor="let deliveryFoodListing of listData; let i = index">
 
     <div class="deliver-container">
 
         <div class="deliver-img-container">
-            <img *ngIf="deliveryFoodListing.imgUrl != null" [src]="deliveryFoodListing.imgUrl"/>
+
+            <agm-map [latitude]="lat" [longitude]="lng">
+                
+                <!--<agm-map-marker *ngFor="let m of markers; let i = index" (markerClick)="clickedMarker(m.label, i)"
+                 [latitude]="m.lat" [longitude]="m.lng" [label]="m.label" [markerDraggable]="m.draggable" (dragEnd)="markerDragEnd(m, $event)">
+                    
+                    <agm-map-info-window>
+                    <strong>InfoWindow content</strong>
+                    </agm-map-info-window>
+                    
+                </agm-map-marker>
+                
+                <agm-map-circle [latitude]="lat + 0.3" [longitude]="lng" [radius]="5000" [fillColor]="'red'" [circleDraggable]="true" [editable]="true">
+                </agm-map-circle>-->
+        
+            </agm-map>
+
+            <!--<img *ngIf="deliveryFoodListing.imgUrl != null" [src]="deliveryFoodListing.imgUrl"/>-->
         </div>
 
-        <div [ngClass]="{ 'deliver-contents': (foodListing.imgUrl != null) }">
+        <div [ngClass]="{ 'deliver-contents': (deliveryFoodListing.imgUrl != null) }">
             <h4 class="link-content deliver-title space-bottom">
-                <a (click)="showDetails(i)" title="Click for Details">{{ foodListing.foodTitle }}</a>
+                <a (click)="showDetails(i)" title="Click for Details">{{ deliveryFoodListing.foodTitle }}</a>
             </h4>
 
             <div class="row small-description">
@@ -22,18 +39,11 @@
                 
                     <div class="space-bottom">
                         <b>Donor</b><br>
-                        <span class="inline-block">{{ deliveryFoodListing.donorOrganizationName }}</span><br>
-                        <span>{{ deliveryFoodListing.donorOrganizationAddress }}</span><br>
+                        <span class="inline-block">{{ deliveryFoodListing.donorInfo.organizationName }}</span><br>
+                        <span>{{ deliveryFoodListing.donorInfo.address }}</span><br>
                         <span>
-                            {{ deliveryFoodListing.donorOrganizationCity }}, {{ deliveryFoodListing.donorOrganizationState }}
+                            {{ deliveryFoodListing.donorInfo.city }}, {{ deliveryFoodListing.donorInfo.state }}
                         </span>
-                    </div>
-
-                    <div class="space-bottom">
-                        <b>Total Driving Distance:</b>
-                        <div class="inline-block">
-                            {{ deliveryFoodListing.donorDrivingDistance + deliveryFoodListing.donorToReceiverDrivingDistance }}
-                        </div>
                     </div>
 
                 </div>
@@ -42,16 +52,30 @@
 
                     <div class="space-bottom">
                         <b>Receiver</b><br>
-                        <span class="inline-block">{{ deliveryFoodListing.receiverOrganizationName }}</span><br>
-                        <span>{{ deliveryFoodListing.receiverOrganizationAddress }}</span><br>
+                        <span class="inline-block">{{ deliveryFoodListing.receiverInfo.organizationName }}</span><br>
+                        <span>{{ deliveryFoodListing.receiverInfo.address }}</span><br>
                         <span>
-                            {{ deliveryFoodListing.receiverOrganizationCity }}, {{ deliveryFoodListing.receiverOrganizationState }}
+                            {{ deliveryFoodListing.receiverInfo.city }}, {{ deliveryFoodListing.receiverInfo.state }}
                         </span>
                     </div>
 
                 </div>
 
-            </div>            
+                <div class="col-lg-12">
+                    <b>Total Driving Distance:</b>
+                    <div class="inline-block">
+                        {{ Math.round(deliveryFoodListing.donorInfo.drivingDistance + deliveryFoodListing.receiverInfo.drivingDistance * 100) / 100 }} miles
+                    </div>
+                </div>
+
+                <div class="col-lg-12">
+                    <b>Total Driving Time:</b>
+                    <div class="inline-block">
+                        {{ Math.round(deliveryFoodListing.donorInfo.drivingTime + deliveryFoodListing.receiverInfo.drivingTime * 100) / 100 }} minutes
+                    </div>
+                </div>
+
+            </div>
         </div>
 
     </div>

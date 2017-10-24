@@ -12,7 +12,7 @@ import { SlickListResponse } from '../../../client/src/app/slick-list/slick-list
 /**
  * The expected request for the get food listings operation. Should be sent from the client to the server.
  */
-export class GetFoodListingsRequest extends SlickListRequest<FoodListingsFilters> {
+export class GetFoodListingsRequest extends SlickListRequest <FoodListingsFilters> {
 
     constructor(
         /**
@@ -28,7 +28,7 @@ export class GetFoodListingsRequest extends SlickListRequest<FoodListingsFilters
 /**
  * The expected response from the get food listings operation. Should be sent form the server to the client.
  */
-export class GetFoodListingsResponse extends SlickListResponse<FoodListing> {
+export class GetFoodListingsResponse extends SlickListResponse <FoodListing> {
 
     constructor(
         /**

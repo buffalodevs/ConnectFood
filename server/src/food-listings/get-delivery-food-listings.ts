@@ -19,7 +19,7 @@ import { DateFormatter } from "./../../../shared/common-util/date-formatter";
 export function getDeliveryFoodListings(filters: DeliveryFoodListingsFilters, myAppUserKey: number, myGPSCoordinate: GPSCoordinate): Promise<DeliveryFoodListing[]> {
    
     // Build our prepared statement.
-    let queryString: string = 'SELECT * FROM getDeliveryFoodListings($1, $2, $3, null, $4, $5, $6);';
+    let queryString: string = 'SELECT * FROM getDeliveryFoodListings($1, $2, $3, $4, $5, $6);';
     let queryArgs: any[] = [ myAppUserKey, filters.retrievalOffset, filters.retrievalAmount,
                              filters.maxDistance, filters.maxTotalWeight, filters.myScheduledDeliveries ];
 
@@ -110,21 +110,27 @@ function getDrivingDistancesToDonors(deliveryFoodListings: DeliveryFoodListing[]
  * @param deliveryFoodListings The Delivery Food Listing objects that have been retreived but have not yet had donor to receiver distance information filled in yet.
  * @param donorGPSCoordinates The GPS Coordinates of the donors.
  * @param receiverGPSCoordinates The GPS Coordinates of the receivers.
+ * @param index Should not be provided by external call to this function!!! Used to keep track of index in recursvie function calls (internally ONLY)!
  * @return A promise that resolves to the Delivery Food Listings array that was passed in, but with added filled in donor-to-receiver distance data.
  */
 function getDrivingDistancesFromReceiversToDonors(deliveryFoodListings: DeliveryFoodListing[], donorGPSCoordinates: GPSCoordinate[],
-                                                  receiverGPSCoordinates: GPSCoordinate[]): Promise<DeliveryFoodListing[]>
+                                                  receiverGPSCoordinates: GPSCoordinate[], index: number = 0): Promise<DeliveryFoodListing[]>
 {
-    // TODO: Look for a way to do this in batch (multiple separate network requests are inefficient).
-    for (let i: number = 0; i < deliveryFoodListings.length; i++) {
-        
-        let index: number = i; // Must record unique index for this for loop iteration in local scope when referring to it in Promise (callback)!
-        
-        getDrivingDistances(donorGPSCoordinates[i], [receiverGPSCoordinates[i]])
-            .then((distances: number[]) => {
-                deliveryFoodListings[index].receiverInfo.drivingDistance = distances[0];
-            })
-    }
+    // Ensure that we do not have an empty list.
+    if (deliveryFoodListings.length === 0)  return Promise.resolve(deliveryFoodListings);
 
-    return Promise.resolve(deliveryFoodListings);
+    // TODO: Look for a way to do this in batch (multiple separate network requests are inefficient). 
+    return getDrivingDistances(donorGPSCoordinates[index], [receiverGPSCoordinates[index]])
+        .then((distances: number[]) => {
+            
+            deliveryFoodListings[index].receiverInfo.drivingDistance = distances[0];
+
+            // If we have recursively gone through the whole list.
+            if (++index === deliveryFoodListings.length) {
+                return deliveryFoodListings;
+            }
+            else {
+                return getDrivingDistancesFromReceiversToDonors(deliveryFoodListings, donorGPSCoordinates, receiverGPSCoordinates, index);
+            }
+        });
 }

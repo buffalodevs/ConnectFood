@@ -21,10 +21,10 @@ export class RoutePreprocessService implements CanActivate {
     /**
      * List of login restricted routes. User must be logged in to visit these pages!
      */
-    private static readonly LOGIN_RESTRICTED_ROUTES: string[] = ['/donate', '/receive', '/appUserInfo', '/cart'];
+    private static readonly LOGIN_RESTRICTED_ROUTES: string[] = ['/donate', '/receive', '/deliver', '/cart', '/appUserInfo'];
 
 
-    constructor(
+    constructor (
         private requestService: RequestService,
         private router: Router,
         private dialogService: DialogService,

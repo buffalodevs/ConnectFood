@@ -41,10 +41,6 @@ import { AutoFocusDirective } from './common-util/auto-focus.directive';
 
 
 const appRoutes: Routes = [
-    /*{
-        path: 'login', // This can be both modal popup and its own page!
-        component: LoginComponent
-    },*/
     {
         path: '',
         pathMatch: 'full',
@@ -58,7 +54,10 @@ const appRoutes: Routes = [
     {
         path: 'donate',
         component: DonateComponent,
-        canActivate: [RoutePreprocessService]
+        canActivate: [RoutePreprocessService],
+        resolve: {
+            foodTypes: FoodTypesService
+        }
     },
     {
         path: 'receive',
@@ -68,6 +67,11 @@ const appRoutes: Routes = [
         resolve: {
             foodTypes: FoodTypesService
         }
+    },
+    {
+        path: 'deliver',
+        component: DeliverComponent,
+        canActivate: [RoutePreprocessService]
     },
     {
         path: 'cart',
@@ -89,6 +93,7 @@ const appRoutes: Routes = [
         canActivate: [RoutePreprocessService]
     }
 ];
+
 
 @NgModule({
     declarations: [
@@ -116,6 +121,9 @@ const appRoutes: Routes = [
     imports: [
         NgbModule.forRoot(),
         RouterModule.forRoot(appRoutes),
+        AgmCoreModule.forRoot({
+            apiKey: 'AIzaSyALtc09EAL5qMDDV5UveWbxhAJqo6WV12g'
+        }),
         BrowserModule,
         BrowserAnimationsModule,
         BootstrapModalModule,

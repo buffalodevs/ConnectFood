@@ -5,31 +5,36 @@ import { FoodWebResponse } from '../../message-protocol/food-web-response';
 import { DeliveryFoodListing } from "../../food-listings/delivery-food-listing";
 export { DeliveryFoodListing };
 
+import { SlickListResponse } from '../../../client/src/app/slick-list/slick-list-message/slick-list-response';
+import { SlickListRequest } from '../../../client/src/app/slick-list/slick-list-message/slick-list-request';
+
 
 /**
  * The expected request for the get delivery food listings operation. Should be sent from the client to the server.
  */
-export class GetDeliveryFoodListingsRequest {
+export class GetDeliveryFoodListingsRequest extends SlickListRequest<DeliveryFoodListingsFilters> {
 
-    constructor(
+    constructor (
         /**
          * Filters to use when getting food listings.
          */
         public filters: DeliveryFoodListingsFilters
-    ) { }
+    ) {
+        super(filters);
+    }
 }
 
 
 /**
  * The expected response from the get food listings operation. Should be sent form the server to the client.
  */
-export class GetDeliveryFoodListingsResponse extends FoodWebResponse {
+export class GetDeliveryFoodListingsResponse extends SlickListResponse <DeliveryFoodListing> {
 
-    constructor(
+    constructor (
         /**
          * The delivery food listings that were retrieved during the server operation.
          */
-        public deliveryFoodListings?: DeliveryFoodListing[],
+        public dataList?: DeliveryFoodListing[],
         /**
          * Indicates whether or not the operation on the back end was successful.
          */
@@ -48,6 +53,6 @@ export class GetDeliveryFoodListingsResponse extends FoodWebResponse {
          */
         public signupConfirmRequired: boolean = false
     ) {
-        super(success, message, loginRequired, signupConfirmRequired);
+        super(dataList, success, message, loginRequired, signupConfirmRequired);
     }
 }

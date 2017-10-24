@@ -5,7 +5,8 @@
     font-size: 18px;
 }
 
-.deliver-img-container img {
+.deliver-img-container {
+    width: 300px;
     max-width: 100%;
 }
 
@@ -19,6 +20,11 @@
 
 .small-description {
     font-size: 16px;
+}
+
+agm-map {
+    height: 300px;
+    width: 100%;
 }
 
 /* Medium to large screens only (desktop) */

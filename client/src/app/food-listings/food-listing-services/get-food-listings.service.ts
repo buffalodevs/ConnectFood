@@ -10,7 +10,7 @@ import { FoodListing } from '../../../../../shared/food-listings/food-listing';
 
 
 @Injectable()
-export class GetFoodListingsService extends GetListingsService<FoodListing, FoodListingsFilters> {
+export class GetFoodListingsService extends GetListingsService <FoodListing, FoodListingsFilters> {
     
     public constructor (
         requestService: RequestService

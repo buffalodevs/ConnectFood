@@ -45,22 +45,28 @@ BEGIN
                 'claimedFoodListingKey',    ClaimedFoodListing.claimedFoodListingKey,
                 'deliveryFoodListingKey',   DeliveryFoodListing.deliveryFoodListingKey,
                 'foodTitle',                FoodListing.foodTitle,
-                'donorOrganizationName',    DonorOrganization.name,
-                'donorAddress',             DonorContact.address,
-                'donorCity',                DonorContact.city,
-                'donorState',               DonorContact.state,
-                'donorZip',                 DonorContact.zip,
-                'donorPhone',               DonorContact.phone,
-                'donorLastName',            DonorAppUser.lastName,
-                'donorFirstName',           DonorAppUser.firstName,
-                'receiverOrganizationName', ReceiverOrganization.name,
-                'receiverAddress',          ReceiverContact.address,
-                'receiverCity',             ReceiverContact.city,
-                'receiverState',            ReceiverContact.state,
-                'receiverZip',              ReceiverContact.zip,
-                'receiverPhone',            ReceiverContact.phone,
-                'receiverLastName',         ReceiverAppUser.lastName,
-                'receiverFirstName',        ReceiverAppUser.firstName,
+                -- @ts-sql class="FoodListingUser" file="/shared/food-listings/food-listing.ts"
+                'donorInfo',                JSON_BUILD_OBJECT (
+                                                'organizationName', DonorOrganization.name,
+                                                'address',          DonorContact.address,
+                                                'city',             DonorContact.city,
+                                                'state',            DonorContact.state,
+                                                'zip',              DonorContact.zip,
+                                                'phone',            DonorContact.phone,
+                                                'lastName',         DonorAppUser.lastName,
+                                                'firstName',        DonorAppUser.firstName
+                                            ),
+                -- @ts-sql class="FoodListingUser" file="/shared/food-listings/food-listing.ts"
+                'receiverInfo',             JSON_BUILD_OBJECT (
+                                                'organizationName', ReceiverOrganization.name,
+                                                'address',          ReceiverContact.address,
+                                                'city',             ReceiverContact.city,
+                                                'state',            ReceiverContact.state,
+                                                'zip',              ReceiverContact.zip,
+                                                'phone',            ReceiverContact.phone,
+                                                'lastName',         ReceiverAppUser.lastName,
+                                                'firstName',        ReceiverAppUser.firstName
+                                            ),
                 'foodDescription',          FoodListing.foodDescription,
                 'perishable',               FoodListing.perishable,
                 'availableUntilDate',       FoodListing.availableUntilDate,
@@ -69,12 +75,12 @@ BEGIN
                 'imgUrl',                   FoodListing.imgUrl,
                 'totalWeight',              FoodListing.totalWeight
             ) AS deliveryFoodListing,
-            -- ts-sql class="GPSCoordinate" file="/shared/common-util/geocode.ts"
+            -- @ts-sql class="GPSCoordinate" file="/shared/common-util/geocode.ts"
             JSON_BUILD_OBJECT (
                 'latitude',     ST_Y(DonorContact.gpsCoordinate::GEOMETRY),
                 'longitude',    ST_X(DonorContact.gpsCoordinate::GEOMETRY)    
             ) AS donorGPSCoordinate,
-            -- ts-sql class="GPSCoordinate" file="/shared/common-util/geocode.ts"
+            -- @ts-sql class="GPSCoordinate" file="/shared/common-util/geocode.ts"
             JSON_BUILD_OBJECT (
                 'latitude',     ST_Y(ReceiverContact.gpsCoordinate::GEOMETRY),
                 'longitude',    ST_X(ReceiverContact.gpsCoordinate::GEOMETRY)
