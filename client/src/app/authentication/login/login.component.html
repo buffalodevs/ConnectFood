@@ -17,7 +17,7 @@
         <form ngNativeValidate *ngIf="!displayRecoveryResponseMessage" class="modal-body" (ngSubmit)="loginUser($event)" id="login-form" [formGroup]="loginForm">
             <div>
                 <md-form-field>
-                    <input mdInput placeholder="email" name="email" appAutoFocus formControlName="email" type="text" spellcheck="false" required>
+                    <input mdInput placeholder="email" name="email" AutoFocus formControlName="email" type="text" spellcheck="false" required>
                 </md-form-field>
 
                 <md-form-field *ngIf="!forgotPassword">

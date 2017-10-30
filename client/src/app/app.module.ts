@@ -38,6 +38,7 @@ import { SessionDataService } from "./common-util/session-data.service";
 import { FoodTypesService } from './food-listings/food-types/food-types.service';
 import { DateFormatterPipe } from "./common-util/date-formatter.pipe";
 import { AutoFocusDirective } from './common-util/auto-focus.directive';
+import { DefaultImgDirective } from './common-util/default-img.directive';
 
 
 const appRoutes: Routes = [
@@ -114,6 +115,7 @@ const appRoutes: Routes = [
         CartComponent,
         AppUserInfoComponent,
         AutoFocusDirective,
+        DefaultImgDirective,
         FoodListingDialogComponent,
         DeliverComponent,
         DeliverDialogComponent
