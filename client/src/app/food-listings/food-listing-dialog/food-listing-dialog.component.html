@@ -4,7 +4,7 @@
     <slick-list-item slick-list-dialog-body [includeDivider]="false">
                     
         <ng-container slick-list-item-left>
-            <img *ngIf="selectedFoodListing?.imgUrl != null" [src]="selectedFoodListing?.imgUrl"/>
+            <img [src]="(selectedFoodListing?.imgUrl != null) ? selectedFoodListing?.imgUrl : defaultImgUrl" onerror="this.src=DEFAULT_IMG_URL; this.onerror=null;"/>
         </ng-container>
         
         <div slick-list-item-right-body class="row">

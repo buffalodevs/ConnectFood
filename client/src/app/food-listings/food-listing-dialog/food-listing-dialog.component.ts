@@ -23,6 +23,10 @@ export class FoodListingDialogComponent extends AbstractSlickListDialog {
      * Determines if this dialog is displaying Food Listing info for a Donor's Cart. Default is false.
      */
     @Input() private isDonatedCart: boolean = false;
+    /**
+     * Default replacement image URL if one is not provided or if the provided one does not exist.
+     */
+    @Input() private defaultImgUrl: string = null;
 
     /**
      * This is a shadow of the slickListDialog member in AbstractSlickListDialog.

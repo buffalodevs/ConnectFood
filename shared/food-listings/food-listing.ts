@@ -1,3 +1,6 @@
+import { GPSCoordinate } from "../common-util/geocode";
+
+
 /**
  * Container for Food Listing Donor data.
  */
@@ -9,6 +12,7 @@ export class FoodListingUser {
         public city?: string,
         public state?: string,
         public zip?: number,
+        public gpsCoordinate: GPSCoordinate = new GPSCoordinate(),
         public drivingDistance?: number,
         public drivingTime?: number,
         public phone?: string,

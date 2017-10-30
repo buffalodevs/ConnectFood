@@ -5,7 +5,7 @@
 <slick-list-item *ngFor="let foodListing of listData; let i = index">
 
     <ng-container slick-list-item-left>
-        <img *ngIf="foodListing.imgUrl != null" [src]="foodListing.imgUrl"/>
+        <img [src]="(foodListing.imgUrl != null) ? foodListing.imgUrl : DEFAULT_IMG_URL" onerror="this.src=DEFAULT_IMG_URL; this.onerror=null;"/>
     </ng-container>
     
     <ng-container slick-list-item-right-header>
@@ -56,7 +56,8 @@
 
 <!-- This is our modal dialog's contents. It is separated into its own (child) component.
      Simply pass down transcluded HTML into this child component here! -->
-<food-listing-dialog #FoodListingDialogComponent [selectedFoodListing]="getSelectedListing()" [isClaimedCart]="isClaimedCart" [isDonatedCart]="isDonatedCart">
+<food-listing-dialog #FoodListingDialogComponent [selectedFoodListing]="getSelectedListing()"
+ [isClaimedCart]="isClaimedCart" [isDonatedCart]="isDonatedCart" [defaultImgUrl]="DEFAULT_IMG_URL">
 
     <ng-container food-listing-dialog-footer>
         <ng-content select="[food-listing-dialog-footer]"></ng-content>

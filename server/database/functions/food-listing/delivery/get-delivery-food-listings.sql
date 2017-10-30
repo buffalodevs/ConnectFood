@@ -15,10 +15,7 @@ RETURNS TABLE
 (
     claimedFoodListingKey   ClaimedFoodListing.claimedFoodListingKey%TYPE,
     deliveryFoodListingKey  DeliveryFoodListing.deliveryFoodListingKey%TYPE,
-    deliveryFoodListing     JSON,
-    -- GPS Coordinates used to query Google Maps for very percise driving distances and times.
-    donorGPSCoordinate      JSON,
-    receiverGPSCoordinate   JSON
+    deliveryFoodListing     JSON
 )
 AS $$
     DECLARE _maxDistanceMeters INTEGER DEFAULT NULL;
@@ -52,6 +49,11 @@ BEGIN
                                                 'city',             DonorContact.city,
                                                 'state',            DonorContact.state,
                                                 'zip',              DonorContact.zip,
+                                                -- @ts-sql class="GPSCoordinate" file="/shared/common-util/geocode.ts"
+                                                'gpsCoordinate',    JSON_BUILD_OBJECT (
+                                                                        'latitude',     ST_Y(DonorContact.gpsCoordinate::GEOMETRY),
+                                                                        'longitude',    ST_X(DonorContact.gpsCoordinate::GEOMETRY)    
+                                                                    ),
                                                 'phone',            DonorContact.phone,
                                                 'lastName',         DonorAppUser.lastName,
                                                 'firstName',        DonorAppUser.firstName
@@ -63,6 +65,11 @@ BEGIN
                                                 'city',             ReceiverContact.city,
                                                 'state',            ReceiverContact.state,
                                                 'zip',              ReceiverContact.zip,
+                                                -- @ts-sql class="GPSCoordinate" file="/shared/common-util/geocode.ts"
+                                                'gpsCoordinate',    JSON_BUILD_OBJECT (
+                                                                        'latitude',     ST_Y(DonorContact.gpsCoordinate::GEOMETRY),
+                                                                        'longitude',    ST_X(DonorContact.gpsCoordinate::GEOMETRY)    
+                                                                    ),
                                                 'phone',            ReceiverContact.phone,
                                                 'lastName',         ReceiverAppUser.lastName,
                                                 'firstName',        ReceiverAppUser.firstName
@@ -74,17 +81,7 @@ BEGIN
                 'unitsLabel',               FoodListing.unitsLabel,
                 'imgUrl',                   FoodListing.imgUrl,
                 'totalWeight',              FoodListing.totalWeight
-            ) AS deliveryFoodListing,
-            -- @ts-sql class="GPSCoordinate" file="/shared/common-util/geocode.ts"
-            JSON_BUILD_OBJECT (
-                'latitude',     ST_Y(DonorContact.gpsCoordinate::GEOMETRY),
-                'longitude',    ST_X(DonorContact.gpsCoordinate::GEOMETRY)    
-            ) AS donorGPSCoordinate,
-            -- @ts-sql class="GPSCoordinate" file="/shared/common-util/geocode.ts"
-            JSON_BUILD_OBJECT (
-                'latitude',     ST_Y(ReceiverContact.gpsCoordinate::GEOMETRY),
-                'longitude',    ST_X(ReceiverContact.gpsCoordinate::GEOMETRY)
-            ) AS receiverGPSCoordinate
+            ) AS deliveryFoodListing
     FROM        FoodListing
     INNER JOIN  AppUser AS DonorAppUser                 ON FoodListing.donatedByAppUserKey = DonorAppUser.appUserKey
     INNER JOIN  ContactInfo AS DonorContact             ON DonorAppUser.appUserKey = DonorContact.appUserKey

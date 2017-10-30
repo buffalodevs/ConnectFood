@@ -20,6 +20,8 @@ import { AbstractSlickListDialog } from '../slick-list/slick-list-dialog/abstrac
 })
 export class FoodListingsComponent extends AbstractSlickList <FoodListing, FoodListingsFilters> {
 
+    private readonly DEFAULT_IMG_URL = './../../assets/IconImg.png';
+
     /**
      * Title of the Food Listings. Default is 'Food Listings'.
      */

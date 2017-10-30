@@ -24,7 +24,6 @@ export class SessionData {
     constructor(
         public appUserInfo:         AppUserInfo = new AppUserInfo(),
         public appUserKey?:         number,
-        public gpsCoordinate:       GPSCoordinate = new GPSCoordinate(),
         public signupVerified?:     boolean
     ) { }
 

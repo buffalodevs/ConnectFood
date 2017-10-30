@@ -3,7 +3,7 @@ import { query, QueryResult } from '../database-util/connection-pool';
 import { fixNullQueryArgs, toPostgresArray } from './../database-util/prepared-statement-util';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../logging/sql-logger';
 
-import { getDrivingDistances, GPSCoordinate } from '../../../shared/common-util/geocode';
+import { getDrivingDistances, GPSCoordinate } from '../common-util/geocode';
 import { FoodListingsFilters, LISTINGS_STATUS } from '../../../shared/food-listings/food-listings-filters';
 import { FoodListing } from "../../../shared/food-listings/food-listing";
 import { DateFormatter } from "../../../shared/common-util/date-formatter";

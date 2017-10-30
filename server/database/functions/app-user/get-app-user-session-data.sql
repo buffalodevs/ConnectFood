@@ -39,14 +39,14 @@ AS $$
                                             'city',             ContactInfo.city,
                                             'state',            ContactInfo.state,
                                             'zip',              ContactInfo.zip,
+                                            -- @ts-sql class="gpsCoordinate" file="/shared/common-util/geocode.ts"
+                                            'gpsCoordinate',    JSON_BUILD_OBJECT (
+                                                                    'latitude',         ST_Y(ContactInfo.gpsCoordinate::GEOMETRY),
+                                                                    'longitude',        ST_X(ContactInfo.gpsCoordinate::GEOMETRY)
+                                                                ),
                                             'phone',            ContactInfo.phone,
                                             'isDonor',          AppUser.isDonor,
                                             'isReceiver',       AppUser.isReceiver
-                                        ),
-                -- @ts-sql class="gpsCoordinate" file="/shared/common-util/geocode.ts"
-                'gpsCoordinate',       JSON_BUILD_OBJECT (
-                                            'latitude',         ST_Y(ContactInfo.gpsCoordinate::GEOMETRY),
-                                            'longitude',        ST_X(ContactInfo.gpsCoordinate::GEOMETRY)
                                         ),
                 'signupVerified',       (UnverifiedAppUser.appUserKey IS NULL),
                 'verificationToken',    UnverifiedAppUser.verificationToken

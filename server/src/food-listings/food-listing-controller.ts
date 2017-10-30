@@ -24,7 +24,7 @@ export function handleGetFoodListings(request: Request, response: Response): voi
     let getFoodListingsRequest: GetFoodListingsRequest = request.body;
     let sessionData: SessionData = SessionData.loadSessionData(request);
 
-    getFoodListings(getFoodListingsRequest.filters, sessionData.appUserKey, sessionData.gpsCoordinate)
+    getFoodListings(getFoodListingsRequest.filters, sessionData.appUserKey, sessionData.appUserInfo.gpsCoordinate)
         .then((foodListings: FoodListing[]) => {
             response.send(new GetFoodListingsResponse(foodListings, true, 'Food Listings Successfully Retrieved'));
         })
@@ -41,7 +41,7 @@ export function handleGetDeliveryFoodListings(request: Request, response: Respon
     let getDeliveryFoodListingsRequest: GetDeliveryFoodListingsRequest = request.body;
     let sessionData: SessionData = SessionData.loadSessionData(request);
 
-    getDeliveryFoodListings(getDeliveryFoodListingsRequest.filters, sessionData.appUserKey, sessionData.gpsCoordinate)
+    getDeliveryFoodListings(getDeliveryFoodListingsRequest.filters, sessionData.appUserKey, sessionData.appUserInfo.gpsCoordinate)
         .then((deliveryFoodListings: DeliveryFoodListing[]) => {
             response.send(new GetDeliveryFoodListingsResponse(deliveryFoodListings, true, 'Delivery Food Listings Successfully Retrieved'));
         })

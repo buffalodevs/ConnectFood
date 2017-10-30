@@ -3,7 +3,7 @@ import { query, QueryResult } from './../database-util/connection-pool';
 import { fixNullQueryArgs, toPostgresArray } from './../database-util/prepared-statement-util';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
 
-import { getDrivingDistances, GPSCoordinate } from './../../../shared/common-util/geocode';
+import { getDrivingDistances, GPSCoordinate } from './../common-util/geocode';
 import { DeliveryFoodListingsFilters } from './../../../shared/food-listings/delivery-food-listings-filters';
 import { DeliveryFoodListing } from "./../../../shared/food-listings/delivery-food-listing";
 import { DateFormatter } from "./../../../shared/common-util/date-formatter";
@@ -47,19 +47,15 @@ export function getDeliveryFoodListings(filters: DeliveryFoodListingsFilters, my
 function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate): Promise<DeliveryFoodListing[]> {
 
     let deliveryFoodListings: DeliveryFoodListing[] = [];
-    let donorGPSCoordinates: GPSCoordinate[] = [];
-    let receiverGPSCoordinates: GPSCoordinate[] = [];
 
     // Go through each row of the database output (each row corresponds to a Food Listing).
     for (let i: number = 0; i < rows.length; i++) {
 
         // Insert returned data into result arrays.
         deliveryFoodListings.push(rows[i].deliveryfoodlisting);
-        donorGPSCoordinates.push(rows[i].donorgpscoordinate);
-        receiverGPSCoordinates.push(rows[i].receivergpscoordinate);
     }
 
-    return getFullTripDrivingDistances(deliveryFoodListings, myGPSCoordinate, donorGPSCoordinates, receiverGPSCoordinates);
+    return getFullTripDrivingDistances(deliveryFoodListings, myGPSCoordinate);
 }
 
 
@@ -72,12 +68,21 @@ function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate): Promi
  * @param receivergpscoordinates The GPS Coordinates of the receivers.
  * @return A promise that resolves to the Delivery Food Listings array that was passed in with filled in distance data.
  */
-function getFullTripDrivingDistances(deliveryFoodListings: DeliveryFoodListing[], myGPSCoordinate: GPSCoordinate,
-                                     donorGPSCoordinates: GPSCoordinate[], receivergpscoordinates: GPSCoordinate[]): Promise<DeliveryFoodListing[]>
+function getFullTripDrivingDistances(deliveryFoodListings: DeliveryFoodListing[], myGPSCoordinate: GPSCoordinate): Promise<DeliveryFoodListing[]>
 {
+    let donorGPSCoordinates: Array<GPSCoordinate> = new Array<GPSCoordinate>();
+    let receiverGPSCoordinates: Array<GPSCoordinate> = new Array<GPSCoordinate>();
+
+    // First, extract a list of Donor & Receiver GPS Coordinates from deliveryFoodListings results.
+    for (let i: number = 0; i < deliveryFoodListings.length; i++) {
+        donorGPSCoordinates.push(deliveryFoodListings[i].donorInfo.gpsCoordinate);
+        receiverGPSCoordinates.push(deliveryFoodListings[i].receiverInfo.gpsCoordinate);
+    }
+
+    // Next calculate and store Deliverer to Donor and Donor to Receiver driving distances.
     return getDrivingDistancesToDonors(deliveryFoodListings, myGPSCoordinate, donorGPSCoordinates)
         .then((deliveryFoodListings: DeliveryFoodListing[]) => {
-            return getDrivingDistancesFromReceiversToDonors(deliveryFoodListings, donorGPSCoordinates, receivergpscoordinates);
+            return getDrivingDistancesFromReceiversToDonors(deliveryFoodListings, donorGPSCoordinates, receiverGPSCoordinates);
         });
 }
 
