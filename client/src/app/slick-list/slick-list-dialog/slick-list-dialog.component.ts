@@ -10,7 +10,7 @@ import { AbstractSlickListDialog } from './abstract-slick-list-dialog';
     templateUrl: './slick-list-dialog.component.html',
     styleUrls: ['./slick-list-dialog.component.css']
 })
-export class SlickListDialogComponent extends AbstractSlickListDialog {
+export class SlickListDialogComponent {
 
     @Input() private header;
 
@@ -22,7 +22,6 @@ export class SlickListDialogComponent extends AbstractSlickListDialog {
     public constructor (
         private modalService: NgbModal
     ) {
-        super();
         this.modalDialogContainerRef = null;
     }
 

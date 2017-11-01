@@ -223,6 +223,7 @@ BEGIN
                                             'state',               DonorContact.state,
                                             'zip',                 DonorContact.zip,
                                             'phone',               DonorContact.phone,
+                                            'email',               DonorAppUser.email,
                                             'lastName',            DonorAppUser.lastName,
                                             'firstName',           DonorAppUser.firstName
                                         ),

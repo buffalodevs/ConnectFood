@@ -3,7 +3,6 @@ import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { Observable } from "rxjs/Observable";
 
 import { AbstractSlickList } from './../slick-list/abstract-slick-list';
-import { SlickListDialogComponent } from '../slick-list/slick-list-dialog/slick-list-dialog.component';
 import { GetFoodListingsService } from './food-listing-services/get-food-listings.service';
 
 import { FoodListing } from '../../../../shared/food-listings/food-listing';
@@ -35,7 +34,7 @@ export class FoodListingsComponent extends AbstractSlickList <FoodListing, FoodL
      */
     @Input() private isDonatedCart: boolean = false;
 
-    @ViewChild('FoodListingDialogComponent') protected slickListDialog: AbstractSlickListDialog;
+    @ViewChild('FoodListingDialogComponent') protected slickListDialog: AbstractSlickListDialog <FoodListing>;
 
 
     public constructor (

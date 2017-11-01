@@ -55,6 +55,7 @@ BEGIN
                                                                         'longitude',    ST_X(DonorContact.gpsCoordinate::GEOMETRY)    
                                                                     ),
                                                 'phone',            DonorContact.phone,
+                                                'email',            DonorAppUser.email,
                                                 'lastName',         DonorAppUser.lastName,
                                                 'firstName',        DonorAppUser.firstName
                                             ),
@@ -67,10 +68,11 @@ BEGIN
                                                 'zip',              ReceiverContact.zip,
                                                 -- @ts-sql class="GPSCoordinate" file="/shared/common-util/geocode.ts"
                                                 'gpsCoordinate',    JSON_BUILD_OBJECT (
-                                                                        'latitude',     ST_Y(DonorContact.gpsCoordinate::GEOMETRY),
-                                                                        'longitude',    ST_X(DonorContact.gpsCoordinate::GEOMETRY)    
+                                                                        'latitude',     ST_Y(ReceiverContact.gpsCoordinate::GEOMETRY),
+                                                                        'longitude',    ST_X(ReceiverContact.gpsCoordinate::GEOMETRY)    
                                                                     ),
                                                 'phone',            ReceiverContact.phone,
+                                                'email',            ReceiverAppUser.email,
                                                 'lastName',         ReceiverAppUser.lastName,
                                                 'firstName',        ReceiverAppUser.firstName
                                             ),

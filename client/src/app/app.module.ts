@@ -24,6 +24,7 @@ import { SignupComponent } from './authentication/signup/signup.component';
 import { BannerComponent } from './banner/banner.component';
 import { SlickLeftPanelComponent } from './slick-left-panel/slick-left-panel.component';
 import { SlickListModule } from './slick-list/slick-list.module';
+import { SlickMapComponent } from './slick-map/slick-map.component';
 import { FoodListingsFiltersComponent } from './food-listings/food-listings-filters/food-listings-filters.component';
 import { FoodListingsComponent } from './food-listings/food-listings.component';
 import { FoodTypesComponent } from './food-listings/food-types/food-types.component';
@@ -109,6 +110,7 @@ const appRoutes: Routes = [
         DateFormatterPipe,
         BannerComponent,
         SlickLeftPanelComponent,
+        SlickMapComponent,
         FoodListingsFiltersComponent,
         FoodListingsComponent,
         FoodTypesComponent,

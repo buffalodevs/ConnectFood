@@ -1,4 +1,4 @@
-SELECT      Receiver.appUserKey AS receiverKey,
+/* SELECT      Receiver.appUserKey AS receiverKey,
             ReceiverContactInfo.address AS receiverAddress,
             Donor.appUserKey AS donorKey,
             DonorContactInfo.address AS donorAddress,
@@ -9,4 +9,7 @@ INNER JOIN  ContactInfo ReceiverContactInfo ON Receiver.appUserKey = ReceiverCon
 INNER JOIN  AppUser Donor                   ON Donor.appUserKey <> Receiver.appUserKey
 INNER JOIN  ContactInfo DonorContactInfo    ON Donor.appUserKey = DonorContactInfo.appUserKey
 WHERE       Receiver.appUserKey = 1
-  AND       ST_DWITHIN(ReceiverContactInfo.gpsCoordinate, DonorContactInfo.gpsCoordinate, 29731.67);
+  AND       ST_DWITHIN(ReceiverContactInfo.gpsCoordinate, DonorContactInfo.gpsCoordinate, 29731.67); */
+
+
+SELECT totalWeight, foodListingKey FROM FoodListing;

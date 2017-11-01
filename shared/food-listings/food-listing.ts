@@ -1,10 +1,11 @@
+import { Address } from '../authentication/app-user-info';
 import { GPSCoordinate } from "../common-util/geocode";
 
 
 /**
  * Container for Food Listing Donor data.
  */
-export class FoodListingUser {
+export class FoodListingUser implements Address {
 
     public constructor (
         public organizationName?: string,
@@ -16,6 +17,7 @@ export class FoodListingUser {
         public drivingDistance?: number,
         public drivingTime?: number,
         public phone?: string,
+        public email?: string,
         public lastName?: string,
         public firstName?: string
     ) { }

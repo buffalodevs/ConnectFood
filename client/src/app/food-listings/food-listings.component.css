@@ -1,18 +1,3 @@
-.food-listing-container {
-    margin-left: 10px;
-    min-height: 300px;
-    text-align: left;
-    font-size: 18px;
-}
-
-.food-listing-img-container img {
-    max-width: 100%;
-}
-
-.food-listing-title {
-    display: table;
-}
-
 #food-types-container {
     max-width: 300px;
 }
@@ -21,31 +6,10 @@
     margin-bottom: 15px;
 }
 
-.small-description {
-    font-size: 16px;
-}
-
 #right-body-col1 {
     max-width: 300px; 
 }
 
 img {
     max-width: 100%;
-}
-
-/* Medium to large screens only (desktop) */
-@media (min-width: 768px) {
-
-    .food-listing-img-container {
-        float: left;
-    }
-
-    .food-listing-img-container img {
-        display: block;
-    }
-
-    .food-listing-contents {
-        margin-left: 320px;
-    }
-
 }

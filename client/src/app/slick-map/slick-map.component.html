@@ -1,0 +1,8 @@
+<agm-map [latitude]="gpsCenterCoordinate.latitude" [longitude]="gpsCenterCoordinate.longitude" [zoom]="zoom">
+
+    <agm-marker *ngFor="let address of addresses; let i = index;"
+     [latitude]="address.gpsCoordinate.latitude" [longitude]="address.gpsCoordinate.longitude" [label]="intToLetter(i)"
+     [title]="addressNames[i] + '\n' + address.address + '\n' + address.city + ',' + address.state + ' ' + address.zip">
+    </agm-marker>
+
+</agm-map>

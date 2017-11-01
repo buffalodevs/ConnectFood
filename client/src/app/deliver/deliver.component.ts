@@ -1,35 +1,35 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { AbstractSlickList } from '../slick-list/abstract-slick-list';
 import { GetDeliveryFoodListingsService } from './get-delivery-food-listings.service';
+import { DeliveryFoodListingUtilService } from './delivery-food-listing-util.service';
+import { AbstractSlickListDialog } from '../slick-list/slick-list-dialog/abstract-slick-list-dialog';
 
 import { DeliveryFoodListing } from '../../../../shared/food-listings/delivery-food-listing';
 import { DeliveryFoodListingsFilters } from '../../../../shared/food-listings/delivery-food-listings-filters';
+import { GPSCoordinate } from '../../../../shared/common-util/geocode';
+import { Address } from '../../../../shared/authentication/app-user-info';
 
 
 @Component({
     selector: 'app-deliver',
     templateUrl: './deliver.component.html',
     styleUrls: ['./deliver.component.css'],
-    providers: [GetDeliveryFoodListingsService]
+    providers: [
+        GetDeliveryFoodListingsService,
+        DeliveryFoodListingUtilService
+    ]
 })
-export class DeliverComponent extends AbstractSlickList<DeliveryFoodListing, DeliveryFoodListingsFilters> implements OnInit {
+export class DeliverComponent extends AbstractSlickList <DeliveryFoodListing, DeliveryFoodListingsFilters> implements OnInit {
 
-    /**
-     * Set to enable static Math methods to be used in template!
-     */
-    private Math: Math;
-  
-    // initial center position for the map
-    private lat: number = 51.673858;
-    private lng: number = 7.815982;
+    @ViewChild('DeliverDialogComponent') protected slickListDialog: AbstractSlickListDialog <DeliveryFoodListing>;
 
 
-    constructor (
-        getDeliveryFoodListingsService: GetDeliveryFoodListingsService
+    public constructor (
+        private getDeliveryFoodListingsService: GetDeliveryFoodListingsService,
+        private deliveryFoodListingUtilService: DeliveryFoodListingUtilService
     ) {
         super(getDeliveryFoodListingsService, '/foodListings/getDeliveryFoodListings');
-        this.Math = Math;
     }
 
 
@@ -46,15 +46,5 @@ export class DeliverComponent extends AbstractSlickList<DeliveryFoodListing, Del
      */
     private onFiltersUpdate(filters: DeliveryFoodListingsFilters): void {
         this.refreshList(filters);
-    }
-
-
-    private clickedMarker(label: string, index: number): void {
-        console.log(`clicked the marker: ${label || index}`)
-    }
-  
-
-    private mapClicked($event: MouseEvent): void {
-        
     }
 }

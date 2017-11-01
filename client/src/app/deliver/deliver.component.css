@@ -1,45 +1,11 @@
-.deliver-container {
-    margin-left: 10px;
-    min-height: 300px;
-    text-align: left;
-    font-size: 18px;
-}
-
-.deliver-img-container {
-    width: 300px;
-    max-width: 100%;
-}
-
-.deliver-title {
-    display: table;
-}
-
 .space-bottom {
     margin-bottom: 15px;
 }
 
-.small-description {
-    font-size: 16px;
+#right-body-col1 {
+    max-width: 300px;
 }
 
-agm-map {
-    height: 300px;
-    width: 100%;
-}
-
-/* Medium to large screens only (desktop) */
-@media (min-width: 768px) {
-
-    .deliver-img-container {
-        float: left;
-    }
-
-    .deliver-img-container img {
-        display: block;
-    }
-
-    .deliver-contents {
-        margin-left: 320px;
-    }
-
+img {
+    max-width: 100%;
 }

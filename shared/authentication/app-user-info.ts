@@ -1,10 +1,19 @@
 import { GPSCoordinate } from '../common-util/geocode';
 
 
+export interface Address {
+    address?: string;
+    city?: string;
+    state?: string;
+    zip?: number;
+    gpsCoordinate?: GPSCoordinate;
+}
+
+
 /**
  * Encapsulates information pertaining to an AppUser that is shared between client and server.
  */
-export class AppUserInfo {
+export class AppUserInfo implements Address {
     
     constructor (
         public email?: string,

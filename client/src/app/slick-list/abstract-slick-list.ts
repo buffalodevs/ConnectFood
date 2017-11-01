@@ -10,7 +10,7 @@ export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilt
     protected listData: Array<LIST_T>;
     protected selectedListIndex: number;
 
-    protected slickListDialog: AbstractSlickListDialog;
+    protected slickListDialog: AbstractSlickListDialog <LIST_T>;
 
 
     /**
@@ -66,7 +66,7 @@ export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilt
 
         // If we wish to display the dialog and we have one set, then open it.
         if (!noDisplayDialog && this.slickListDialog != null) {
-            this.slickListDialog.open();
+            this.slickListDialog.open(this.getSelectedListing());
         }
     }
 

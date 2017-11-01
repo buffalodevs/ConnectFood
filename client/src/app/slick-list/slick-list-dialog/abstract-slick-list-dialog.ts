@@ -1,20 +1,24 @@
+import { SlickListDialogComponent } from "./slick-list-dialog.component";
+
 /**
  * Handles implementations of opening and closing dialog. Simply need to assign an actual implementation of SlickListDialogInterface to slickListDialog member.
  * This can be done by redeclaring it in the child as a view child (and the view child can be SlickListDialogComponent).
  */
-export abstract class AbstractSlickListDialog {
+export abstract class AbstractSlickListDialog<LIST_T> {
 
-    protected slickListDialog: AbstractSlickListDialog; 
+    protected slickListDialog: SlickListDialogComponent;
+    protected dialogData: LIST_T;
 
     
-    protected constructor()
-    { }
+    protected constructor() {}
 
 
     /**
      * Displays the listing details modal dialog.
+     * @param dialogData The data to display in the dialog.
      */
-    public open(): void {
+    public open(dialogData: LIST_T): void {
+        this.dialogData = dialogData;
         if (this.slickListDialog != null)  this.slickListDialog.open();
     }
 

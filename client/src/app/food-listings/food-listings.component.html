@@ -56,8 +56,7 @@
 
 <!-- This is our modal dialog's contents. It is separated into its own (child) component.
      Simply pass down transcluded HTML into this child component here! -->
-<food-listing-dialog #FoodListingDialogComponent [selectedFoodListing]="getSelectedListing()"
- [isClaimedCart]="isClaimedCart" [isDonatedCart]="isDonatedCart" [defaultImgUrl]="DEFAULT_IMG_URL">
+<food-listing-dialog #FoodListingDialogComponent [isClaimedCart]="isClaimedCart" [isDonatedCart]="isDonatedCart" [defaultImgUrl]="DEFAULT_IMG_URL">
 
     <ng-container food-listing-dialog-footer>
         <ng-content select="[food-listing-dialog-footer]"></ng-content>
