@@ -5,9 +5,9 @@ import { DialogService } from "ng2-bootstrap-modal";
 
 import { RequestService, Response } from './request.service';
 import { SessionDataService } from './session-data.service';
-import { LoginComponent } from '../authentication/login/login.component'
+import { LoginComponent } from '../../authentication/login/login.component'
 
-import { LoginResponse } from './../../../../shared/authentication/login-message';
+import { LoginResponse } from './../../../../../shared/authentication/login-message';
 
 
 /**

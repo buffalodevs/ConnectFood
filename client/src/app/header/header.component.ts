@@ -3,7 +3,7 @@ import { DialogService } from "ng2-bootstrap-modal";
 import { Observable } from "rxjs/Observable";
 
 import { LoginComponent } from '../authentication/login/login.component';
-import { SessionDataService } from '../common-util/session-data.service';
+import { SessionDataService } from '../common-util/services/session-data.service';
 import { LogoutService } from '../authentication/logout/logout.service';
 
 

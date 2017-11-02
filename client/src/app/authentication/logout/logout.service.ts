@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Router } from '@angular/router';
 
-import { RequestService } from "../../common-util/request.service";
-import { SessionDataService } from '../../common-util/session-data.service';
+import { RequestService } from "../../common-util/services/request.service";
+import { SessionDataService } from '../../common-util/services/session-data.service';
 
 @Injectable()
 export class LogoutService {

@@ -34,10 +34,6 @@ export class FoodListingsFiltersComponent implements OnInit {
         this.addControl('availableAfterDate', new FormControl(this.defaultAvailableAfterDateNow ? new Date() : null));
         this.addControl('perishable', new FormControl(true));
         this.addControl('notPerishable', new FormControl(true));
-
-        this.quantityVals = ["Car", "Van", "Truck"];
-        this.tFrameVals = ["0-6 Days", "6-12 Days", "12+ Days"];
-        this.distVals = ["0-6 Miles", "6-12 Miles", "12+ Miles"];
     }
 
 

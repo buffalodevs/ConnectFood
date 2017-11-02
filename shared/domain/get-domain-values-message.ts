@@ -1,19 +1,27 @@
-import { FoodWebResponse } from '../../message-protocol/food-web-response';
+import { FoodWebResponse } from '../message-protocol/food-web-response';
 
 
-// No request since this message does not require a request payload.
+export class GetDomainValuesRequest {
+
+    public constructor (
+        /**
+         * The name of the domain of which to get the values of.
+         */
+        public domainName: string
+    ) { }
+}
 
 
 /**
- * The expected response from the server after the get food types operation.
+ * The expected response from the server after the get domain values operation.
  */
-export class GetFoodTypesResponse extends FoodWebResponse {
+export class GetDomainValuesResponse extends FoodWebResponse {
 
-    constructor(
+    public constructor (
         /**
-         * A list of food types retrieved on the server.
+         * A list of domain values retrieved on the server.
          */
-        public foodTypes?: string[],
+        public domainValues?: string[],
         /**
          * Indicates whether or not the operation on the back end was successful.
          */

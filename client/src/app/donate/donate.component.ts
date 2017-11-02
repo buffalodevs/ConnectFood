@@ -4,7 +4,7 @@ import { ImageCropperComponent, CropperSettings } from 'ng2-img-cropper';
 import { Observable } from 'rxjs/Observable';
 
 import { AddRemoveFoodListingService } from "../food-listings/food-listing-services/add-remove-food-listing.service";
-import { DateFormatterPipe } from "../common-util/date-formatter.pipe"
+import { DateFormatterPipe } from "../common-util/pipes/date-formatter.pipe"
 
 import { FoodTypesComponent } from "../food-listings/food-types/food-types.component";
 

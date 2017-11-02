@@ -7,7 +7,7 @@ import { FoodListingsFiltersComponent } from "../food-listings/food-listings-fil
 import { FoodListingsComponent } from "../food-listings/food-listings.component";
 import { ClaimFoodListingService } from "../food-listings/food-listing-services/claim-unclaim-food-listing.service";
 import { AddRemoveFoodListingService } from "../food-listings/food-listing-services/add-remove-food-listing.service";
-import { SessionDataService } from '../common-util/session-data.service';
+import { SessionDataService } from '../common-util/services/session-data.service';
 
 import { FoodListing } from "../../../../shared/food-listings/food-listing";
 import { FoodListingsFilters, LISTINGS_STATUS } from "../../../../shared/food-listings/food-listings-filters";

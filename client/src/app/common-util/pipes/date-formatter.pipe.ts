@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { DateFormatter } from '../../../../shared/common-util/date-formatter';
+import { DateFormatter } from '../../../../../shared/common-util/date-formatter';
 
 
 @Pipe({

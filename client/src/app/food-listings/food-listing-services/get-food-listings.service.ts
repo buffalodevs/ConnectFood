@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import { GetListingsService } from '../../slick-list/get-listings.service';
-import { RequestService } from '../../common-util/request.service';
+import { RequestService } from '../../common-util/services/request.service';
 
 import { FoodListingsFilters, GetFoodListingsRequest } from '../../../../../shared/food-listings/message/get-food-listings-message';
 import { FoodListing } from '../../../../../shared/food-listings/food-listing';

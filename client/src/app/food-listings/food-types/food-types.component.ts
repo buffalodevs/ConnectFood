@@ -205,6 +205,29 @@ export class FoodTypesComponent implements OnInit, ControlValueAccessor {
 
 
     /**
+     * Determines the preferrable number of columns based on the number of display Food Types and the max number of columns configured.
+     * @return the preferred number of columns.
+     */
+    private calcNumColumns(): number {
+        const numDisplayFoodTypes: number = this.isCondesnedDisplayOnlyMode() ? this.getSelectedFoodTypes().length
+                                                                              : this.foodTypes.length;
+        const numDivisions: number = Math.ceil(numDisplayFoodTypes / this.maxElementsPerColumn);
+        // If max number of columns exceeds the number of divisions, then set it to number of divisions, otherwise max number of columns.
+        return (numDivisions < this.maxNumColumns) ? numDivisions
+                                                   : this.maxNumColumns;
+    }
+
+
+    /**
+     * Determines if this component is configured for condesned display only mode.
+     * @return true if it is, false if not.
+     */
+    private isCondesnedDisplayOnlyMode(): boolean {
+        return (this.displayOnly && this.condensedDisplay);
+    }
+
+
+    /**
      * Creates an array/range containing incremental integers representing the Food Types array indexes of all Food Types that
      * should be placed in a given column.
      * @param column The column that the numeric range shall be generated for (columns are zero based!).
@@ -238,28 +261,5 @@ export class FoodTypesComponent implements OnInit, ControlValueAccessor {
         }
 
         return range;
-    }
-
-
-    /**
-     * Determines if this component is configured for condesned display only mode.
-     * @return true if it is, false if not.
-     */
-    private isCondesnedDisplayOnlyMode(): boolean {
-        return (this.displayOnly && this.condensedDisplay);
-    }
-
-
-    /**
-     * Determines the preferrable number of columns based on the number of display Food Types and the max number of columns configured.
-     * @return the preferred number of columns.
-     */
-    private calcNumColumns(): number {
-        const numDisplayFoodTypes: number = this.isCondesnedDisplayOnlyMode() ? this.getSelectedFoodTypes().length
-                                                                              : this.foodTypes.length;
-        const numDivisions: number = Math.ceil(numDisplayFoodTypes / this.maxElementsPerColumn);
-        // If max number of columns exceeds the number of divisions, then set it to number of divisions, otherwise max number of columns.
-        return (numDivisions < this.maxNumColumns) ? numDivisions
-                                                   : this.maxNumColumns;
     }
 }

@@ -12,4 +12,4 @@ WHERE       Receiver.appUserKey = 1
   AND       ST_DWITHIN(ReceiverContactInfo.gpsCoordinate, DonorContactInfo.gpsCoordinate, 29731.67); */
 
 
-SELECT totalWeight, foodListingKey FROM FoodListing;
+SELECT vehicleType FROM FoodListing;

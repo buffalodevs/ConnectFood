@@ -32,14 +32,17 @@ import { FoodListingDialogComponent } from './food-listings/food-listing-dialog/
 import { AppUserInfoComponent } from './authentication/app-user-info/app-user-info.component';
 import { DeliverComponent } from './deliver/deliver.component';
 import { DeliverDialogComponent } from './deliver/deliver-dialog/deliver-dialog.component';
+import { DeliveryFoodListingsFiltersComponent } from './deliver/delivery-food-listings-filters/delivery-food-listings-filters.component';
 
-import { RequestService } from './common-util/request.service';
-import { RoutePreprocessService } from './common-util/route-preprocess.service';
-import { SessionDataService } from "./common-util/session-data.service";
+import { RequestService } from './common-util/services/request.service';
+import { RoutePreprocessService } from './common-util/services/route-preprocess.service';
+import { SessionDataService } from "./common-util/services/session-data.service";
+import { GetDomainValuesService } from './common-util/services/get-domain-values.service';
 import { FoodTypesService } from './food-listings/food-types/food-types.service';
-import { DateFormatterPipe } from "./common-util/date-formatter.pipe";
-import { AutoFocusDirective } from './common-util/auto-focus.directive';
-import { DefaultImgDirective } from './common-util/default-img.directive';
+import { VehicleTypesService } from './deliver/vehicle-types/vehicle-types.service';
+import { DateFormatterPipe } from "./common-util/pipes/date-formatter.pipe";
+import { AutoFocusDirective } from './common-util/directives/auto-focus.directive';
+import { DefaultImgDirective } from './common-util/directives/default-img.directive';
 
 
 const appRoutes: Routes = [
@@ -57,8 +60,10 @@ const appRoutes: Routes = [
         path: 'donate',
         component: DonateComponent,
         canActivate: [RoutePreprocessService],
+        // Make sure that we get the FoodTypes and VehicleTypes from the back end before routing to the donor interface!
         resolve: {
-            foodTypes: FoodTypesService
+            foodTypes: FoodTypesService,
+            vehicleTypes: VehicleTypesService
         }
     },
     {
@@ -73,7 +78,11 @@ const appRoutes: Routes = [
     {
         path: 'deliver',
         component: DeliverComponent,
-        canActivate: [RoutePreprocessService]
+        canActivate: [RoutePreprocessService],
+        // Make sure that we get the VehicleTypes from the back end before routing to the delivery interface!
+        resolve: {
+            vehicleTypes: VehicleTypesService
+        }
     },
     {
         path: 'cart',
@@ -120,7 +129,8 @@ const appRoutes: Routes = [
         DefaultImgDirective,
         FoodListingDialogComponent,
         DeliverComponent,
-        DeliverDialogComponent
+        DeliverDialogComponent,
+        DeliveryFoodListingsFiltersComponent
     ],
     imports: [
         NgbModule.forRoot(),
@@ -150,7 +160,9 @@ const appRoutes: Routes = [
         RequestService,
         SessionDataService,
         RoutePreprocessService,
-        FoodTypesService
+        GetDomainValuesService,
+        FoodTypesService,
+        VehicleTypesService
     ]
 })
 export class AppModule { }

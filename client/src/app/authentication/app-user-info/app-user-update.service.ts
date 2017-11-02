@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { RequestService, Response } from '../../common-util/request.service';
+import { RequestService, Response } from '../../common-util/services/request.service';
 
 import { UpdateAppUserRequest } from '../../../../../shared/authentication/update-app-user-message';
 import { AppUserInfo } from "../../../../../shared/authentication/app-user-info";

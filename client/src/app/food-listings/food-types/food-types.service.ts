@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router/router';
-import { Observable, ObservableInput } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 
-import { RequestService, Response } from "../../common-util/request.service";
-
-import { GetFoodTypesResponse } from '../../../../../shared/food-listings/message/get-food-types-message';
+import { GetDomainValuesService } from '../../common-util/services/get-domain-values.service';
 
 
 /**
@@ -13,10 +11,9 @@ import { GetFoodTypesResponse } from '../../../../../shared/food-listings/messag
 @Injectable()
 export class FoodTypesService implements Resolve<string[]> {
 
-    // We will cache any Food Types that come back from the server so we only need to contact server once!
-    private static foodTypesCache: string[] = null;
-
-    constructor(private requestService: RequestService) {}
+    public constructor (
+        private getDomainValuesService: GetDomainValuesService
+    ) {}
 
 
     /**
@@ -33,35 +30,7 @@ export class FoodTypesService implements Resolve<string[]> {
      * @return An observable object that resolves to an array of food type strings.
      */
     public getFoodTypes(): Observable<string[]> {
-
-        // If we do not have cached Food Types, then we will contact the server.
-        if (FoodTypesService.foodTypesCache === null) {
-            let observer: Observable<Response> = this.requestService.get('/foodListings/getFoodTypes');
-
-            return observer.map((response: Response) => {
-
-                let getFoodTypesResponse: GetFoodTypesResponse = response.json();
-                console.log(getFoodTypesResponse.message);
-
-                if (getFoodTypesResponse.success) {
-                    FoodTypesService.foodTypesCache = getFoodTypesResponse.foodTypes;
-                    return getFoodTypesResponse.foodTypes;
-                }
-                
-                // On failure, simply goto catch callback below!
-                throw new Error(getFoodTypesResponse.message);
-            })
-            .catch((err: any, caught: Observable<string[]>) => {
-                console.log(err);
-                // Simply fill the Food Types with dummy data for now if cannot properly communicate with the server.
-                FoodTypesService.foodTypesCache = ['Food Type 1', 'Food Type 2', 'Food Type 3'];
-                return Observable.of(FoodTypesService.foodTypesCache);
-            });
-        }
-        // Else, we do have cached Food Types, and we have no need of contacting the server.
-        else {
-            return Observable.of(FoodTypesService.foodTypesCache);
-        }
+        return this.getDomainValuesService.getDomainValues('FoodType');
     }
 
     

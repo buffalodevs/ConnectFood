@@ -5,10 +5,10 @@ import { Http, Headers, Response, RequestOptionsArgs } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { DialogService } from "ng2-bootstrap-modal";
 
-import { SessionDataService } from "../common-util/session-data.service";
-import { LoginComponent } from '../authentication/login/login.component'
+import { SessionDataService } from "./session-data.service";
+import { LoginComponent } from '../../authentication/login/login.component'
 
-import { FoodWebResponse } from "../../../../shared/message-protocol/food-web-response";
+import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
 import { Observer } from "rxjs/Observer";
 
 export { Response };

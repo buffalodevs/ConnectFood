@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { RequestService, Response } from "../../common-util/request.service";
-import { SessionDataService } from "../../common-util/session-data.service";
+import { RequestService, Response } from "../../common-util/services/request.service";
+import { SessionDataService } from "../../common-util/services/session-data.service";
 
 import { AppUserInfo } from "../../../../../shared/authentication/app-user-info";
 import { SignupRequest } from "../../../../../shared/authentication/signup-message";

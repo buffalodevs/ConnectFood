@@ -4,8 +4,8 @@ import { Observable } from "rxjs/Observable";
 import { Subscription } from "rxjs/Subscription";
 
 import { AppUserUpdateService } from "./app-user-update.service";
-import { SessionDataService } from "../../common-util/session-data.service";
-import { FoodWebBusyConfig } from "../../common-util/food-web-busy-config";
+import { SessionDataService } from "../../common-util/services/session-data.service";
+import { FoodWebBusyConfig } from "../../common-util/etc/food-web-busy-config";
 
 import { AppUserInfo } from "../../../../../shared/authentication/app-user-info";
 import { Validation } from "../../../../../shared/common-util/validation";

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http, Headers, Response, RequestOptionsArgs } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
-import { SessionDataService } from '../../common-util/session-data.service';
+import { SessionDataService } from '../../common-util/services/session-data.service';
 
 import { LoginRequest, LoginResponse } from '../../../../../shared/authentication/login-message';
 import { FoodWebResponse } from '../../../../../shared/message-protocol/food-web-response';

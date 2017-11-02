@@ -25,8 +25,8 @@ import { handleAddFoodListing,
          handleGetFoodListings,
          handleGetDeliveryFoodListings,
          handleClaimFoodListing,
-         handleUnclaimFoodListing,
-         handleGetFoodTypes } from './food-listings/food-listing-controller';
+         handleUnclaimFoodListing } from './food-listings/food-listing-controller';
+import { handleGetDomainValues } from './domain/domain-controller';
 
 
 // Configure paths to client JS files and public resource files (such as images).
@@ -61,7 +61,10 @@ app.post('/foodListings/getFoodListings',           SessionData.ensureSessionAct
 app.post('/foodListings/getDeliveryFoodListings',   SessionData.ensureSessionActive, handleGetDeliveryFoodListings);
 app.post('/foodListings/claimFoodListing',          SessionData.ensureSessionActive, handleClaimFoodListing);
 app.post('/foodListings/unclaimFoodListing',        SessionData.ensureSessionActive, handleUnclaimFoodListing);
-app.get( '/foodListings/getFoodTypes',              handleGetFoodTypes);
+
+
+// Domain Controller.
+app.post('/domain/getDomainValues',                 handleGetDomainValues);
 
 
 // Public Resource Route Handler (for local image hosting).

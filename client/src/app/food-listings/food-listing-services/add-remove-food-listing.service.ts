@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { RequestService, Response } from "../../common-util/request.service";
+import { RequestService, Response } from "../../common-util/services/request.service";
 
 import { FoodListingUpload } from "./../../../../../shared/food-listings/food-listing-upload";
 import { AddFoodListingRequest, AddFoodListingResponse } from "./../../../../../shared/food-listings/message/add-food-listing-message";
