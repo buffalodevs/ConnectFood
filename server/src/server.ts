@@ -19,7 +19,7 @@ import { handleLoginRequest,
          handleSignupRequest,
          handleUpdateAppUserRequest,
          handleSignupVerification,
-         handlePasswordRecovery } from './authentication/authentication-controller';
+         handlePasswordRecovery } from './app-user/app-user-controller';
 import { handleAddFoodListing,
          handleRemoveFoodListing,
          handleGetFoodListings,
@@ -44,14 +44,14 @@ app.set('port', (process.env.PORT || 5000));
 module.exports = app; // Make available for mocha testing suites.
 
 
-// Authentication Controller Routes.
-app.post('/authentication/login',                   handleLoginRequest);
-app.get( '/authentication/logout',                  handleLogoutRequest);
-app.get( '/authentication/reAuthenticate',          handleReAuthenticateRequest);
-app.post('/authentication/signup',                  handleSignupRequest);
-app.get( '/authentication/verify',                  handleSignupVerification);
-app.post('/authentication/recoverPassword',         handlePasswordRecovery);
-app.post('/authentication/updateAppUser',           SessionData.ensureSessionActive, handleUpdateAppUserRequest);
+// app-user Controller Routes.
+app.post('/appUser/login',                          handleLoginRequest);
+app.get( '/appUser/logout',                         handleLogoutRequest);
+app.get( '/appUser/reAuthenticate',                 handleReAuthenticateRequest);
+app.post('/appUser/signup',                         handleSignupRequest);
+app.get( '/appUser/verify',                         handleSignupVerification);
+app.post('/appUser/recoverPassword',                handlePasswordRecovery);
+app.post('/appUser/updateAppUser',                  SessionData.ensureSessionActive, handleUpdateAppUserRequest);
 
 
 // Food Listing Controller Routes.

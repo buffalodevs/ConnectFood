@@ -1,4 +1,4 @@
-import { Address } from '../authentication/app-user-info';
+import { Address } from '../app-user/app-user-info';
 import { GPSCoordinate } from "../common-util/geocode";
 
 

@@ -6,7 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { DialogService } from "ng2-bootstrap-modal";
 
 import { SessionDataService } from "./session-data.service";
-import { LoginComponent } from '../../authentication/login/login.component'
+import { LoginComponent } from '../../app-user/login/login.component'
 
 import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
 import { Observer } from "rxjs/Observer";

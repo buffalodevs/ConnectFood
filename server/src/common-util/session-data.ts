@@ -8,7 +8,7 @@ import { RedisStoreOptions } from 'connect-redis';
 import { GPSCoordinate } from '../../../shared/common-util/geocode';
 
 import { FoodWebResponse } from "./../../../shared/message-protocol/food-web-response";
-import { AppUserInfo } from './../../../shared/authentication/app-user-info';
+import { AppUserInfo } from './../../../shared/app-user/app-user-info';
 
 export { AppUserInfo };
 

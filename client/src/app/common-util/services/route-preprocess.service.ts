@@ -5,9 +5,9 @@ import { DialogService } from "ng2-bootstrap-modal";
 
 import { RequestService, Response } from './request.service';
 import { SessionDataService } from './session-data.service';
-import { LoginComponent } from '../../authentication/login/login.component'
+import { LoginComponent } from '../../app-user/login/login.component'
 
-import { LoginResponse } from './../../../../../shared/authentication/login-message';
+import { LoginResponse } from './../../../../../shared/app-user/login-message';
 
 
 /**
@@ -42,7 +42,7 @@ export class RoutePreprocessService implements CanActivate {
     public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
 
         // Check with server to check if we are logged in!
-        let observer: Observable<Response> = this.requestService.get('/authentication/reAuthenticate')
+        let observer: Observable<Response> = this.requestService.get('/appUser/reAuthenticate')
 
         // Finally, check the response from the server and react appropriately.
         return observer.map((response: Response): boolean => {

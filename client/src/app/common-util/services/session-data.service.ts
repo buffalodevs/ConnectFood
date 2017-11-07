@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { AppUserInfo } from "./../../../../../shared/authentication/app-user-info";
+import { AppUserInfo } from "./../../../../../shared/app-user/app-user-info";
 
 
 @Injectable()

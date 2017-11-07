@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 
 import { GPSCoordinate } from '../../../../shared/common-util/geocode';
-import { Address } from '../../../../shared/authentication/app-user-info';
+import { Address } from '../../../../shared/app-user/app-user-info';
 
 
 @Component({

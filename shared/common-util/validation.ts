@@ -1,4 +1,4 @@
-import { AppUserInfo } from "../authentication/app-user-info";
+import { AppUserInfo } from "../app-user/app-user-info";
 
 /**
  * Validation definitions that can commonly be used by front end angular forms and back end node logic.
