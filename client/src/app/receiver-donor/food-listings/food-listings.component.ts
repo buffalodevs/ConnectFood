@@ -2,13 +2,13 @@ import { Component, Input, ViewChild } from '@angular/core';
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { Observable } from "rxjs/Observable";
 
-import { AbstractSlickList } from './../slick-filtered-list/slick-list/abstract-slick-list';
-import { AbstractSlickListDialog } from '../slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
+import { AbstractSlickList } from './../../slick-filtered-list/slick-list/abstract-slick-list';
+import { AbstractSlickListDialog } from '../../slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
 import { GetFoodListingsService } from './food-listing-services/get-food-listings.service';
 
-import { FoodListing } from '../../../../shared/food-listings/food-listing';
-import { FoodListingsFilters } from "../../../../shared/food-listings/food-listings-filters";
-import { GetFoodListingsRequest } from '../../../../shared/food-listings/message/get-food-listings-message';
+import { FoodListing } from '../../../../../shared/food-listings/food-listing';
+import { FoodListingsFilters } from "../../../../../shared/food-listings/food-listings-filters";
+import { GetFoodListingsRequest } from '../../../../../shared/food-listings/message/get-food-listings-message';
 
 
 @Component({

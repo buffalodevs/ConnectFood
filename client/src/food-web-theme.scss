@@ -145,13 +145,32 @@ $food-web-inverted-theme:   mat-light-theme($food-web-accent, $food-web-primary,
 
 /* =========== Define app-wide styles for Angular Material components =========== */
 
+@-webkit-keyframes greenPulse {
+    0% { -webkit-box-shadow: 0px 0px 20px 3px #D1F5D1 inset; }
+    50% { -webkit-box-shadow: 0px 0px 35px 6px lightgreen inset; }
+    100% { -webkit-box-shadow: 0px 0px 20px 3px #D1F5D1 inset; }
+}
+
+@keyframes greenPulse {
+    0% { box-shadow: 0px 0px 20px 3px #D1F5D1 inset; }
+    50% { box-shadow: 0px 0px 35px 6px lightgreen inset; }
+    100% { box-shadow: 0px 0px 20px 3px #D1F5D1 inset; }
+}
+
+.green-glow {
+    /* Green Pulse inset shadow animation */
+    -webkit-animation: greenPulse 5s infinite !important;
+    animation: greenPulse 5s infinite !important;
+}
+
 /* Default styling for all Angular Material raised buttons */
 button.mat-raised-button.mat-primary {
     vertical-align: middle;
     border: 1px solid lightgray;
-    box-shadow: none;
     border-radius: 10%;
-    outline: none; 
+    outline: none;
+    -webkit-box-shadow: 0px 0px 5px 1px #D1F5D1 inset;
+    box-shadow: 0px 0px 5px 1px #D1F5D1 inset;
 }
 
 /* Background transition between hover and unhover */
@@ -177,6 +196,15 @@ button.mat-raised-button.mat-primary:active, button.mat-icon-button:active {
     -o-transition: none;
     box-shadow: none;
     background-color: mat-color($food-web-accent);
+}
+
+.warn-button {
+    -webkit-box-shadow: 0px 0px 5px 0px #FFC1C1 inset !important;
+    box-shadow: 0px 0px 5px 0px #FFC1C1 inset !important;
+}
+
+.warn-button:active {
+    background-color: mat-color($food-web-warn) !important;
 }
 
 button.mat-icon-button {

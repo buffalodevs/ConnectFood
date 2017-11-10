@@ -28,11 +28,6 @@
     outline: none;
 }
 
-.button-shadow {
-    -webkit-box-shadow: 5px 0 5px -2px #888 !important;
-    box-shadow: 5px 0 5px -2px #888 !important;
-}
-
 @media only screen and (max-width: 991px) {
 
     #slick-left-panel {

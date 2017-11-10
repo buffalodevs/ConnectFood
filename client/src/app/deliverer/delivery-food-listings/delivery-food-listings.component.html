@@ -5,6 +5,10 @@
 <!-- This is the Delivery Food Listings (generated via loop) -->
 <slick-list-item *ngFor="let deliveryFoodListing of listData; let i = index;">
 
+    <ng-container slick-list-item-header>
+        <a (click)="selectListing(i)" title="Click for Details">{{ deliveryFoodListing.foodTitle }}</a>
+    </ng-container>
+
     <ng-container slick-list-item-left>
 
         <slick-map #SlickMapComponent [addresses]="[ deliveryFoodListing.donorInfo, deliveryFoodListing.receiverInfo ]"
@@ -72,10 +76,10 @@
 
 <!-- This is our modal popup. It is separated into its own (child) component.
      Simply pass down transcluded HTML into this child component here! -->
-<deliver-dialog #DeliverDialogComponent>
+<delivery-food-listing-dialog #DeliveryFoodListingDialogComponent>
 
     <ng-container delivery-food-listing-dialog-footer>
         <ng-content select="[delivery-food-listing-dialog-footer]"></ng-content>
     </ng-container>
 
-</deliver-dialog>
+</delivery-food-listing-dialog>

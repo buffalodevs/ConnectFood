@@ -3,10 +3,10 @@ import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { NgbModule, NgbModal, ModalDismissReasons, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from "rxjs/Observable";
 
-import { FoodListingsFiltersComponent } from "../food-listings-filters/food-listings-filters.component";
-import { FoodListingsComponent } from "../food-listings.component";
-import { ClaimFoodListingService } from "../food-listing-services/claim-unclaim-food-listing.service";
-import { AddRemoveFoodListingService } from "../food-listing-services/add-remove-food-listing.service";
+import { FoodListingsFiltersComponent } from "../food-listings/food-listings-filters/food-listings-filters.component";
+import { FoodListingsComponent } from "../food-listings/food-listings.component";
+import { ClaimFoodListingService } from "../food-listings/food-listing-services/claim-unclaim-food-listing.service";
+import { AddRemoveFoodListingService } from "../food-listings/food-listing-services/add-remove-food-listing.service";
 import { SessionDataService } from '../../common-util/services/session-data.service';
 
 import { FoodListing } from "../../../../../shared/food-listings/food-listing";
@@ -17,7 +17,7 @@ import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 @Component({
     selector: 'app-cart',
     templateUrl: './cart.component.html',
-    styleUrls: ['./cart.component.css'],
+    styleUrls: ['./cart.component.css', '../../slick-filtered-list/slick-filtered-list.component.css'],
     providers: [
         SessionDataService,
         ClaimFoodListingService,

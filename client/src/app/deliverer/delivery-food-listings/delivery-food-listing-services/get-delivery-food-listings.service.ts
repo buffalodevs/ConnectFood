@@ -2,11 +2,11 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { GetListingsService } from '../../slick-filtered-list/slick-list/get-listings.service';
-import { RequestService } from '../../common-util/services/request.service';
+import { GetListingsService } from '../../../slick-filtered-list/slick-list/get-listings.service';
+import { RequestService } from '../../../common-util/services/request.service';
 
-import { DeliveryFoodListingsFilters, GetDeliveryFoodListingsRequest } from '../../../../../shared/food-listings/message/get-delivery-food-listings-message';
-import { DeliveryFoodListing } from '../../../../../shared/food-listings/delivery-food-listing';
+import { DeliveryFoodListingsFilters, GetDeliveryFoodListingsRequest } from '../../../../../../shared/food-listings/message/get-delivery-food-listings-message';
+import { DeliveryFoodListing } from '../../../../../../shared/food-listings/delivery-food-listing';
 
 
 @Injectable()

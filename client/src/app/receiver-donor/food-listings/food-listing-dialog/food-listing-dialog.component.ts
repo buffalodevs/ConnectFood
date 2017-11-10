@@ -1,9 +1,10 @@
 import { Component, Input, ViewChild } from '@angular/core';
 
-import { AbstractSlickListDialog } from '../../slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
-import { SlickListDialogComponent } from '../../slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component';
+import { AbstractSlickListDialog } from '../../../slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
+import { SlickListDialogComponent } from '../../../slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component';
+import { ResponsiveService } from '../../../common-util/services/responsive.service';
 
-import { FoodListing } from './../../../../../shared/food-listings/food-listing';
+import { FoodListing } from './../../../../../../shared/food-listings/food-listing';
 
 
 @Component({
@@ -33,7 +34,9 @@ export class FoodListingDialogComponent extends AbstractSlickListDialog <FoodLis
     @ViewChild('SlickListDialogComponent') protected slickListDialog: SlickListDialogComponent; 
 
 
-    public constructor() {
+    public constructor (
+        private responsiveService: ResponsiveService
+    ) {
         super();
     }
 }

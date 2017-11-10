@@ -65,7 +65,7 @@ export class SlickLeftPanelComponent {
     private toggleIntoView(slickLeftPanel: HTMLElement, slickLeftPanelButton: HTMLElement): void {
         // The toggle-into-view css class contains the translation.
         slickLeftPanel.classList.add('toggle-into-view');
-        slickLeftPanelButton.classList.remove('button-shadow');
+        slickLeftPanelButton.classList.remove('green-glow');
         slickLeftPanelButton.style.right = '0px';
         window.onclick = this.handleClickOutsidePanel.bind(this, slickLeftPanel, slickLeftPanelButton);
     }
@@ -79,7 +79,7 @@ export class SlickLeftPanelComponent {
     private toggleOutOfView(slickLeftPanel: HTMLElement, slickLeftPanelButton: HTMLElement): void {
         window.onclick = null;
         slickLeftPanel.classList.remove('toggle-into-view');
-        slickLeftPanelButton.classList.add('button-shadow');
+        //slickLeftPanelButton.classList.add('green-glow');
         slickLeftPanelButton.style.right = '-' + slickLeftPanelButton.offsetWidth + 'px';
     }
 

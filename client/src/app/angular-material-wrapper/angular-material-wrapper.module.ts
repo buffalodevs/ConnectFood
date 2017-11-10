@@ -11,13 +11,19 @@ import { MdStepperModule,
          MdDatepickerModule,
          MdNativeDateModule,
          MdTooltipModule,
+         MdExpansionModule,
          DateAdapter,
          NativeDateAdapter,
          MD_DATE_FORMATS,
          MD_NATIVE_DATE_FORMATS } from '@angular/material';
 
+import { SlickExpansionPanelComponent } from './slick-expansion-panel/slick-expansion-panel.component';
+
 
 @NgModule({
+    declarations: [
+        SlickExpansionPanelComponent
+    ],
     imports: [
         CommonModule,
         MdStepperModule,
@@ -29,7 +35,8 @@ import { MdStepperModule,
         MdSelectModule,
         MdButtonModule,
         MdDatepickerModule,
-        MdNativeDateModule
+        MdNativeDateModule,
+        MdExpansionModule
     ],
     exports: [
         MdStepperModule,
@@ -41,7 +48,8 @@ import { MdStepperModule,
         MdSelectModule,
         MdButtonModule,
         MdDatepickerModule,
-        MdNativeDateModule
+        MdNativeDateModule,
+        SlickExpansionPanelComponent
     ],
     providers: [
         { provide: DateAdapter, useClass: NativeDateAdapter },

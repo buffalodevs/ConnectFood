@@ -9,9 +9,9 @@ import { SlickFilteredListModule } from '../slick-filtered-list/slick-filtered-l
 import { CommonFoodListingDomainsModule } from '../domain/common-food-listing-domains.module';
 import { ImageCropperModule } from 'ng2-img-cropper';
 
-import { FoodListingsFiltersComponent } from './food-listings-filters/food-listings-filters.component';
-import { FoodListingDialogComponent } from './food-listing-dialog/food-listing-dialog.component';
-import { FoodListingsComponent } from './food-listings.component';
+import { FoodListingsFiltersComponent } from './food-listings/food-listings-filters/food-listings-filters.component';
+import { FoodListingDialogComponent } from './food-listings/food-listing-dialog/food-listing-dialog.component';
+import { FoodListingsComponent } from './food-listings/food-listings.component';
 import { DonateComponent } from './donate/donate.component';
 import { ReceiveComponent } from './receive/receive.component';
 import { CartComponent } from './cart/cart.component';

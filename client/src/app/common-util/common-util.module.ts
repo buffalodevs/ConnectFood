@@ -12,6 +12,7 @@ import { RequestService } from './services/request.service';
 import { RoutePreprocessService } from './services/route-preprocess.service';
 import { SessionDataService } from './services/session-data.service';
 import { GetDomainValuesService } from '../domain/get-domain-values.service';
+import { ResponsiveService } from './services/responsive.service';
 
 
 @NgModule({
@@ -36,7 +37,8 @@ import { GetDomainValuesService } from '../domain/get-domain-values.service';
         GeocodeService,
         RequestService,
         RoutePreprocessService,
-        SessionDataService
+        SessionDataService,
+        ResponsiveService
     ]
 })
 export class CommonUtilModule { }

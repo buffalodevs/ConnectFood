@@ -1,9 +1,9 @@
 import { Component, OnInit, Input, Output, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormControl } from '@angular/forms';
 
-import { FoodTypesComponent } from "../../domain/food-types/food-types.component";
+import { FoodTypesComponent } from "../../../domain/food-types/food-types.component";
 
-import { FoodListingsFilters } from "../../../../../shared/food-listings/food-listings-filters";
+import { FoodListingsFilters } from "../../../../../../shared/food-listings/food-listings-filters";
 
 
 @Component({

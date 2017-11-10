@@ -1,0 +1,13 @@
+<md-expansion-panel #panel [expanded]="initExpanded()" (opened)="removeGreenGlow(panelHeader._element.nativeElement)" [style.min-height]="getMinHeight(panel)">
+
+    <md-expansion-panel-header #panelHeader [ngClass]="{ 'green-glow': !initExpanded() }">
+        <md-panel-title>
+            <ng-content select="[md-panel-title]"></ng-content>
+        </md-panel-title>
+
+        <ng-content select="[md-expansion-panel-header]"></ng-content>
+    </md-expansion-panel-header>
+
+    <ng-content></ng-content>
+
+</md-expansion-panel>

@@ -2,9 +2,9 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Observable } from "rxjs/Observable";
 
-import { FoodListingsComponent } from "../food-listings.component";
-import { FoodListingsFiltersComponent } from "../food-listings-filters/food-listings-filters.component";
-import { ClaimFoodListingService } from "../food-listing-services/claim-unclaim-food-listing.service";
+import { FoodListingsComponent } from "../food-listings/food-listings.component";
+import { FoodListingsFiltersComponent } from "../food-listings/food-listings-filters/food-listings-filters.component";
+import { ClaimFoodListingService } from "../food-listings/food-listing-services/claim-unclaim-food-listing.service";
 
 import { FoodListing } from "../../../../../shared/food-listings/food-listing";
 import { FoodListingsFilters, LISTINGS_STATUS } from "../../../../../shared/food-listings/food-listings-filters";
@@ -13,15 +13,15 @@ import { FoodListingsFilters, LISTINGS_STATUS } from "../../../../../shared/food
 @Component({
     selector: 'app-receive',
     templateUrl: './receive.component.html',
-    styleUrls: ['./receive.component.css'],
+    styleUrls: ['./receive.component.css', '../../slick-filtered-list/slick-filtered-list.component.css'],
     providers: [ClaimFoodListingService]
 })
 export class ReceiveComponent implements OnInit {
 
-    @ViewChild('foodListingsFilters') private foodListingsFilters: FoodListingsFiltersComponent;
+    @ViewChild('foodListingsFilters') private foodListingsFiltersComponent: FoodListingsFiltersComponent;
     @ViewChild('foodListings') private foodListingsComponent: FoodListingsComponent;
 
-    private minFiltersWidth: string;
+    private readonly minFiltersWidth: string;
 
 
     constructor(
@@ -35,7 +35,7 @@ export class ReceiveComponent implements OnInit {
      * Executes after all input bindings have been established but before view children have been fully initialized.
      */
     public ngOnInit(): void {
-        this.foodListingsFilters.addControl('matchAvailability', new FormControl(true));
+        this.foodListingsFiltersComponent.addControl('matchAvailability', new FormControl(true));
     }
 
 
@@ -44,8 +44,8 @@ export class ReceiveComponent implements OnInit {
      */
     public ngAfterViewInit(): void {
         // First, trigger a refresh by manually invoking update function.
-        this.onFiltersUpdate(this.foodListingsFilters.value);
-        this.foodListingsFilters.valueChanges.subscribe(this.onFiltersUpdate.bind(this));
+        this.onFiltersUpdate(this.foodListingsFiltersComponent.value);
+        this.foodListingsFiltersComponent.valueChanges.subscribe(this.onFiltersUpdate.bind(this));
     }
 
 

@@ -1,13 +1,17 @@
 #slick-list-item-left {
     max-width: 100%;
     width: 320px;
+    margin-bottom: 15px;
+}
+
+#slick-list-item-header {
+    text-align: left;
 }
 
 #slick-list-item-right {
-    margin-left: 10px;
-    min-height: 300px;
     text-align: left;
     font-size: 18px;
+    margin-bottom: 15px;
 }
 
 #slick-list-item-right-header {
@@ -20,10 +24,6 @@
 
 #slick-list-item-bottom {
     width: 100%;
-}
-
-.space-bottom {
-    margin-bottom: 15px;
 }
 
 .link-content {
@@ -44,5 +44,6 @@
 
     #slick-list-item-right {
         margin-left: 330px;
+        min-height: 300px;
     }
 }

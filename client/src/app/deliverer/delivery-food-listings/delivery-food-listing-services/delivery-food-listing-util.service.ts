@@ -1,6 +1,6 @@
 "use strict";
 import { Injectable } from '@angular/core';
-import { DeliveryFoodListing } from '../../../../../shared/food-listings/delivery-food-listing';
+import { DeliveryFoodListing } from '../../../../../../shared/food-listings/delivery-food-listing';
 
 
 @Injectable()
