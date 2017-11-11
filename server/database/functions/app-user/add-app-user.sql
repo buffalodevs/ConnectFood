@@ -29,14 +29,13 @@ RETURNS TABLE
 )
 AS $$
     DECLARE _appUserKey         AppUser.appUserKey%TYPE;
-    DECLARE _verificationToken  UnverifiedAppUser.verificationToken%TYPE;
 BEGIN
 
     -- First, ensure that email does not already exist (fail fast)!
-    IF EXISTS(
-        SELECT 1
-        FROM AppUser
-        WHERE email = _email
+    IF EXISTS (
+        SELECT  1
+        FROM    AppUser
+        WHERE   email = _email
     )
     THEN
         RAISE EXCEPTION 'Duplicate email provided';
@@ -75,8 +74,8 @@ BEGIN
         VALUES      (_appUserKey, _organizationName);
     END IF;
 
-    -- Add the new user to table of unverified app users (needs email verification) and grab generated verification token for email.
-    _verificationToken := (SELECT * FROM addUnverifiedAppUser (_appUserKey));
+    -- Add the new user to table of unverified app users (needs email verification).
+    PERFORM addUnverifiedAppUser(_appUserKey);
 
     RETURN QUERY
     SELECT * FROM getAppUserSessionData(_appUserKey);

@@ -41,7 +41,7 @@ export function query(text: string, values: Array<any> = null) : Promise<QueryRe
  * This is used to grab a connection from the underlying connection pool.
  * You are expected to release the conneciton back into the pool to make it available for others to use when you are done with it.
  * To do this, call release() on the connection object returned by this method.
- * @return A Promise that will provide a client or connection object on success that can have queries exected on it.
+ * @return A Promise that will provide a client or connection object on success that can have queries executed on it.
  */ 
 export function connect() : Promise<Client> {
     return pool.connect();
