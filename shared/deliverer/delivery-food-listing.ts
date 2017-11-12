@@ -1,4 +1,4 @@
-import { FoodListingUser } from './food-listing';
+import { FoodListingUser } from '../receiver-donor/food-listing';
 
 
 /**

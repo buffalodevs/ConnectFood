@@ -23,9 +23,10 @@ import { handleLoginRequest,
 import { handleAddFoodListing,
          handleRemoveFoodListing,
          handleGetFoodListings,
-         handleGetDeliveryFoodListings,
          handleClaimFoodListing,
-         handleUnclaimFoodListing } from './food-listings/food-listing-controller';
+         handleUnclaimFoodListing } from './receiver-donor/receiver-donor-controller';
+import { handleGetDeliveryFoodListings,
+         handleClaimDeliveryFoodListing } from './deliverer/deliverer-controller';
 import { handleGetDomainValues } from './domain/domain-controller';
 
 
@@ -45,26 +46,29 @@ module.exports = app; // Make available for mocha testing suites.
 
 
 // app-user Controller Routes.
-app.post('/appUser/login',                          handleLoginRequest);
-app.get( '/appUser/logout',                         handleLogoutRequest);
-app.get( '/appUser/reAuthenticate',                 handleReAuthenticateRequest);
-app.post('/appUser/signup',                         handleSignupRequest);
-app.get( '/appUser/verify',                         handleSignupVerification);
-app.post('/appUser/recoverPassword',                handlePasswordRecovery);
-app.post('/appUser/updateAppUser',                  SessionData.ensureSessionActive, handleUpdateAppUserRequest);
+app.post('/appUser/login',                              handleLoginRequest);
+app.get( '/appUser/logout',                             handleLogoutRequest);
+app.get( '/appUser/reAuthenticate',                     handleReAuthenticateRequest);
+app.post('/appUser/signup',                             handleSignupRequest);
+app.get( '/appUser/verify',                             handleSignupVerification);
+app.post('/appUser/recoverPassword',                    handlePasswordRecovery);
+app.post('/appUser/updateAppUser',                      SessionData.ensureSessionActive, handleUpdateAppUserRequest);
 
 
-// Food Listing Controller Routes.
-app.post('/foodListings/addFoodListing',            SessionData.ensureSessionActive, handleAddFoodListing);
-app.post('/foodListings/removeFoodListing',         SessionData.ensureSessionActive, handleRemoveFoodListing);
-app.post('/foodListings/getFoodListings',           SessionData.ensureSessionActive, handleGetFoodListings);
-app.post('/foodListings/getDeliveryFoodListings',   SessionData.ensureSessionActive, handleGetDeliveryFoodListings);
-app.post('/foodListings/claimFoodListing',          SessionData.ensureSessionActive, handleClaimFoodListing);
-app.post('/foodListings/unclaimFoodListing',        SessionData.ensureSessionActive, handleUnclaimFoodListing);
+// Receiver-Donor Controller Routes.
+app.post('/receiverDonor/getFoodListings',              SessionData.ensureSessionActive, handleGetFoodListings);
+app.post('/receiverDonor/donor/addFoodListing',         SessionData.ensureSessionActive, handleAddFoodListing);
+app.post('/receiverDonor/donor/removeFoodListing',      SessionData.ensureSessionActive, handleRemoveFoodListing);
+app.post('/receiverDonor/receiver/claimFoodListing',    SessionData.ensureSessionActive, handleClaimFoodListing);
+app.post('/receiverDonor/receiver/unclaimFoodListing',  SessionData.ensureSessionActive, handleUnclaimFoodListing);
+
+
+// Deliverer Controller Routes.
+app.post('/deliverer/getDeliveryFoodListings',          SessionData.ensureSessionActive, handleGetDeliveryFoodListings);
 
 
 // Domain Controller.
-app.post('/domain/getDomainValues',                 handleGetDomainValues);
+app.post('/domain/getDomainValues',                     handleGetDomainValues);
 
 
 // Public Resource Route Handler (for local image hosting).

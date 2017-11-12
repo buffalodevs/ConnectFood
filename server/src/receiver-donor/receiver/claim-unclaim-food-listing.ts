@@ -1,7 +1,7 @@
 'use strict'
-import { connect, query, Client, QueryResult } from '../database-util/connection-pool';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../logging/sql-logger';
-import { FoodListing } from './food-listing';
+import { connect, query, Client, QueryResult } from '../../database-util/connection-pool';
+import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
+import { FoodListing } from '../food-listing';
 
 
 export function claimFoodListing(foodListingKey: number, claimedByAppUserKey: number): Promise<void> {

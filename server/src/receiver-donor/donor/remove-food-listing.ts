@@ -1,6 +1,6 @@
 'use strict';
-import { connect, query, Client, QueryResult } from '../database-util/connection-pool';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../logging/sql-logger';
+import { connect, query, Client, QueryResult } from '../../database-util/connection-pool';
+import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 
 
 /**

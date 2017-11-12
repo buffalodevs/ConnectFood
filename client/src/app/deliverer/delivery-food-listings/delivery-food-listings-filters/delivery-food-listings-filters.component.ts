@@ -3,7 +3,7 @@ import { FormGroup, FormControl, AbstractControl } from '@angular/forms';
 
 import { VehicleTypesService } from '../../../domain/vehicle-types/vehicle-types.service';
 
-import { DeliveryFoodListingsFilters } from '../../../../../../shared/food-listings/delivery-food-listings-filters';
+import { DeliveryFoodListingsFilters } from '../../../../../../shared/deliverer/delivery-food-listings-filters';
 
 
 @Component({

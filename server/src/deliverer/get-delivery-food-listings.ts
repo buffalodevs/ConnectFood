@@ -4,8 +4,8 @@ import { fixNullQueryArgs, toPostgresArray } from './../database-util/prepared-s
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
 
 import { getDrivingDistances, GPSCoordinate } from './../common-util/geocode';
-import { DeliveryFoodListingsFilters } from './../../../shared/food-listings/delivery-food-listings-filters';
-import { DeliveryFoodListing } from "./../../../shared/food-listings/delivery-food-listing";
+import { DeliveryFoodListingsFilters } from './../../../shared/deliverer/delivery-food-listings-filters';
+import { DeliveryFoodListing } from "./../../../shared/deliverer/delivery-food-listing";
 import { DateFormatter } from "./../../../shared/common-util/date-formatter";
 
 

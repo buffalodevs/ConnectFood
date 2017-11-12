@@ -3,7 +3,7 @@ import { FormGroup, AbstractControl, FormControl } from '@angular/forms';
 
 import { FoodTypesComponent } from "../../../domain/food-types/food-types.component";
 
-import { FoodListingsFilters } from "../../../../../../shared/food-listings/food-listings-filters";
+import { FoodListingsFilters } from "../../../../../../shared/receiver-donor/food-listings-filters";
 
 
 @Component({

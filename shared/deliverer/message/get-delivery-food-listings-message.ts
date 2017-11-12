@@ -1,24 +1,24 @@
-import { FoodListingsFilters } from '../../food-listings/food-listings-filters';
-export { FoodListingsFilters };
+import { DeliveryFoodListingsFilters } from '../delivery-food-listings-filters';
+export { DeliveryFoodListingsFilters };
 
 import { FoodWebResponse } from '../../message-protocol/food-web-response';
-import { FoodListing } from "../../food-listings/food-listing";
-export { FoodListing };
+import { DeliveryFoodListing } from "../delivery-food-listing";
+export { DeliveryFoodListing };
 
-import { SlickListRequest } from '../../../client/src/app/slick-filtered-list/slick-list/slick-list-message/slick-list-request';
 import { SlickListResponse } from '../../../client/src/app/slick-filtered-list/slick-list/slick-list-message/slick-list-response';
+import { SlickListRequest } from '../../../client/src/app/slick-filtered-list/slick-list/slick-list-message/slick-list-request';
 
 
 /**
- * The expected request for the get food listings operation. Should be sent from the client to the server.
+ * The expected request for the get delivery food listings operation. Should be sent from the client to the server.
  */
-export class GetFoodListingsRequest extends SlickListRequest <FoodListingsFilters> {
+export class GetDeliveryFoodListingsRequest extends SlickListRequest<DeliveryFoodListingsFilters> {
 
-    constructor(
+    constructor (
         /**
          * Filters to use when getting food listings.
          */
-        public filters: FoodListingsFilters
+        public filters: DeliveryFoodListingsFilters
     ) {
         super(filters);
     }
@@ -28,13 +28,13 @@ export class GetFoodListingsRequest extends SlickListRequest <FoodListingsFilter
 /**
  * The expected response from the get food listings operation. Should be sent form the server to the client.
  */
-export class GetFoodListingsResponse extends SlickListResponse <FoodListing> {
+export class GetDeliveryFoodListingsResponse extends SlickListResponse <DeliveryFoodListing> {
 
-    constructor(
+    constructor (
         /**
-         * The food listings that were retrieved during the server operation.
+         * The delivery food listings that were retrieved during the server operation.
          */
-        public dataList?: Array<FoodListing>,
+        public dataList?: DeliveryFoodListing[],
         /**
          * Indicates whether or not the operation on the back end was successful.
          */

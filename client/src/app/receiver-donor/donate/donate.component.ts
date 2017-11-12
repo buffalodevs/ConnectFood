@@ -4,12 +4,12 @@ import { ImageCropperComponent, CropperSettings } from 'ng2-img-cropper';
 import { Observable } from 'rxjs/Observable';
 import { MdHorizontalStepper } from '@angular/material';
 
-import { AddRemoveFoodListingService } from "../food-listings/food-listing-services/add-remove-food-listing.service";
+import { AddFoodListingService } from "../food-listings/food-listing-services/add-food-listing.service";
 import { DateFormatterPipe } from "../../common-util/pipes/date-formatter.pipe"
 
 import { FoodTypesComponent } from "../../domain/food-types/food-types.component";
 
-import { FoodListingUpload } from "../../../../../shared/food-listings/food-listing-upload";
+import { FoodListingUpload } from "../../../../../shared/receiver-donor/food-listing-upload";
 import { Validation } from '../../../../../shared/common-util/validation';
 
 
@@ -17,7 +17,7 @@ import { Validation } from '../../../../../shared/common-util/validation';
     moduleId: module.id,
     selector: 'app-donate',
     templateUrl: 'donate.component.html',
-    providers: [AddRemoveFoodListingService],
+    providers: [AddFoodListingService],
     styleUrls: ['donate.component.css']
 })
 export class DonateComponent implements OnInit {
@@ -36,7 +36,7 @@ export class DonateComponent implements OnInit {
 
     public constructor(
         private formBuilder: FormBuilder,
-        private addRemoveFoodListingService: AddRemoveFoodListingService,
+        private addFoodListingService: AddFoodListingService,
         private dateFormatter: DateFormatterPipe
     ) {
         // Want to force validators to process on submit. Non-text fields will only validate on submit too!
@@ -170,7 +170,7 @@ export class DonateComponent implements OnInit {
     private submitDonation(value: FoodListingUpload, valid: boolean , stepper: MdHorizontalStepper): void {
         
         let self: DonateComponent = this;
-        let observer: Observable<number> = this.addRemoveFoodListingService.addFoodListing(value, this.image);
+        let observer: Observable<number> = this.addFoodListingService.addFoodListing(value, this.image);
 
         observer.subscribe(
             (foodListingKey: number) => {

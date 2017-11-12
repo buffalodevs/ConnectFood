@@ -6,9 +6,8 @@ import { AbstractSlickList } from './../../slick-filtered-list/slick-list/abstra
 import { AbstractSlickListDialog } from '../../slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
 import { GetFoodListingsService } from './food-listing-services/get-food-listings.service';
 
-import { FoodListing } from '../../../../../shared/food-listings/food-listing';
-import { FoodListingsFilters } from "../../../../../shared/food-listings/food-listings-filters";
-import { GetFoodListingsRequest } from '../../../../../shared/food-listings/message/get-food-listings-message';
+import { FoodListing } from '../../../../../shared/receiver-donor/food-listing';
+import { FoodListingsFilters } from "../../../../../shared/receiver-donor/food-listings-filters";
 
 
 @Component({
@@ -40,6 +39,6 @@ export class FoodListingsComponent extends AbstractSlickList <FoodListing, FoodL
     public constructor (
         getFoodListingsService: GetFoodListingsService
     ) {
-        super(getFoodListingsService, '/foodListings/getFoodListings');
+        super(getFoodListingsService, '/receiverDonor/getFoodListings');
     }
 }

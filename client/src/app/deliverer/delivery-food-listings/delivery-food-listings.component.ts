@@ -5,8 +5,8 @@ import { AbstractSlickListDialog } from '../../slick-filtered-list/slick-list/sl
 import { GetDeliveryFoodListingsService } from './delivery-food-listing-services/get-delivery-food-listings.service';
 import { DeliveryFoodListingUtilService } from './delivery-food-listing-services/delivery-food-listing-util.service';
 
-import { DeliveryFoodListing } from '../../../../../shared/food-listings/delivery-food-listing';
-import { DeliveryFoodListingsFilters } from '../../../../../shared/food-listings/delivery-food-listings-filters';
+import { DeliveryFoodListing } from '../../../../../shared/deliverer/delivery-food-listing';
+import { DeliveryFoodListingsFilters } from '../../../../../shared/deliverer/delivery-food-listings-filters';
 import { GPSCoordinate } from '../../../../../shared/common-util/geocode';
 import { Address } from '../../../../../shared/app-user/app-user-info';
 
@@ -25,6 +25,6 @@ export class DeliveryFoodListingsComponent extends AbstractSlickList <DeliveryFo
         private getDeliveryFoodListingsService: GetDeliveryFoodListingsService,
         private deliveryFoodListingUtilService: DeliveryFoodListingUtilService // Static methods referenced in html template
     ) {
-        super(getDeliveryFoodListingsService, '/foodListings/getDeliveryFoodListings');
+        super(getDeliveryFoodListingsService, '/deliverer/getDeliveryFoodListings');
     }
 }

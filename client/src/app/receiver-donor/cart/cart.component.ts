@@ -5,12 +5,11 @@ import { Observable } from "rxjs/Observable";
 
 import { FoodListingsFiltersComponent } from "../food-listings/food-listings-filters/food-listings-filters.component";
 import { FoodListingsComponent } from "../food-listings/food-listings.component";
-import { ClaimFoodListingService } from "../food-listings/food-listing-services/claim-unclaim-food-listing.service";
-import { AddRemoveFoodListingService } from "../food-listings/food-listing-services/add-remove-food-listing.service";
+import { ManageFoodListingService } from "../food-listings/food-listing-services/manage-food-listing.service";
 import { SessionDataService } from '../../common-util/services/session-data.service';
 
-import { FoodListing } from "../../../../../shared/food-listings/food-listing";
-import { FoodListingsFilters, LISTINGS_STATUS } from "../../../../../shared/food-listings/food-listings-filters";
+import { FoodListing } from "../../../../../shared/receiver-donor/food-listing";
+import { FoodListingsFilters, LISTINGS_STATUS } from "../../../../../shared/receiver-donor/food-listings-filters";
 import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 
 
@@ -20,8 +19,7 @@ import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
     styleUrls: ['./cart.component.css', '../../slick-filtered-list/slick-filtered-list.component.css'],
     providers: [
         SessionDataService,
-        ClaimFoodListingService,
-        AddRemoveFoodListingService
+        ManageFoodListingService
     ]
 })
 export class CartComponent implements OnInit {
@@ -36,8 +34,7 @@ export class CartComponent implements OnInit {
 
     public constructor (
         private sessionDataService: SessionDataService,
-        private claimFoodListingService: ClaimFoodListingService,
-        private addRemoveFoodListingService: AddRemoveFoodListingService
+        private manageFoodListingService: ManageFoodListingService
     ) { }
 
 
@@ -87,7 +84,7 @@ export class CartComponent implements OnInit {
     private unclaimSelectedFoodListing(): void {
         if (confirm('Are you sure you want to unclaim the food?\nThis cannot be undone.')) {
             let selectedFoodListing: FoodListing = this.foodListingsComponent.getSelectedListing();
-            let observer: Observable<void> = this.claimFoodListingService.unclaimFoodListing(selectedFoodListing.foodListingKey);
+            let observer: Observable<void> = this.manageFoodListingService.unclaimFoodListing(selectedFoodListing.foodListingKey);
 
             observer.subscribe(
                 () => {
@@ -103,7 +100,7 @@ export class CartComponent implements OnInit {
 
     private removeSelectedFoodListing(): void {
         let selectedFoodListing: FoodListing = this.foodListingsComponent.getSelectedListing();
-        let observer: Observable<void> = this.addRemoveFoodListingService.removeFoodListing(selectedFoodListing.foodListingKey);
+        let observer: Observable<void> = this.manageFoodListingService.removeFoodListing(selectedFoodListing.foodListingKey);
 
         observer.subscribe(
             () => {

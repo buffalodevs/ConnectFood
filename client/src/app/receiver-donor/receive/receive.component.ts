@@ -4,17 +4,17 @@ import { Observable } from "rxjs/Observable";
 
 import { FoodListingsComponent } from "../food-listings/food-listings.component";
 import { FoodListingsFiltersComponent } from "../food-listings/food-listings-filters/food-listings-filters.component";
-import { ClaimFoodListingService } from "../food-listings/food-listing-services/claim-unclaim-food-listing.service";
+import { ManageFoodListingService } from "../food-listings/food-listing-services/manage-food-listing.service";
 
-import { FoodListing } from "../../../../../shared/food-listings/food-listing";
-import { FoodListingsFilters, LISTINGS_STATUS } from "../../../../../shared/food-listings/food-listings-filters";
+import { FoodListing } from "../../../../../shared/receiver-donor/food-listing";
+import { FoodListingsFilters, LISTINGS_STATUS } from "../../../../../shared/receiver-donor/food-listings-filters";
 
 
 @Component({
     selector: 'app-receive',
     templateUrl: './receive.component.html',
     styleUrls: ['./receive.component.css', '../../slick-filtered-list/slick-filtered-list.component.css'],
-    providers: [ClaimFoodListingService]
+    providers: [ManageFoodListingService]
 })
 export class ReceiveComponent implements OnInit {
 
@@ -25,7 +25,7 @@ export class ReceiveComponent implements OnInit {
 
 
     constructor(
-        private claimFoodListingService: ClaimFoodListingService
+        private claimFoodListingService: ManageFoodListingService
     ) {
         this.minFiltersWidth = '262px';
     }

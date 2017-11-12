@@ -5,7 +5,7 @@ import { Observable } from "rxjs/Observable";
 import { DeliveryFoodListingsComponent } from '../delivery-food-listings/delivery-food-listings.component';
 import { DeliveryFoodListingsFiltersComponent } from '../delivery-food-listings/delivery-food-listings-filters/delivery-food-listings-filters.component';
 
-import { DeliveryFoodListingsFilters } from '../../../../../shared/food-listings/delivery-food-listings-filters';
+import { DeliveryFoodListingsFilters } from '../../../../../shared/deliverer/delivery-food-listings-filters';
 
 
 @Component({

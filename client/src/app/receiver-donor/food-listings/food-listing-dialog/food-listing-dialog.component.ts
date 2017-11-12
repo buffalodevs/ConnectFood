@@ -4,7 +4,7 @@ import { AbstractSlickListDialog } from '../../../slick-filtered-list/slick-list
 import { SlickListDialogComponent } from '../../../slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component';
 import { ResponsiveService } from '../../../common-util/services/responsive.service';
 
-import { FoodListing } from './../../../../../../shared/food-listings/food-listing';
+import { FoodListing } from './../../../../../../shared/receiver-donor/food-listing';
 
 
 @Component({

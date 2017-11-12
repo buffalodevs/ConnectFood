@@ -3,7 +3,7 @@ import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { AbstractSlickListDialog } from '../../../slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
 import { DeliveryFoodListingUtilService } from '../delivery-food-listing-services/delivery-food-listing-util.service';
 
-import { DeliveryFoodListing } from '../../../../../../shared/food-listings/delivery-food-listing';
+import { DeliveryFoodListing } from '../../../../../../shared/deliverer/delivery-food-listing';
 import { SlickListDialogComponent } from '../../../slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component';
 
 
