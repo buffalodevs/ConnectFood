@@ -64,6 +64,7 @@ export class ReceiveComponent implements OnInit {
      * Claims the currently selected Food Listing.
      */
     private claimSelectedFoodListing(): void {
+        
         let selectedFoodListing: FoodListing = this.foodListingsComponent.getSelectedListing();
         let observer: Observable<void> = this.claimFoodListingService.claimFoodListing(selectedFoodListing.foodListingKey);
         

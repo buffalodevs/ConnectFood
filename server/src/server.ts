@@ -26,7 +26,9 @@ import { handleAddFoodListing,
          handleClaimFoodListing,
          handleUnclaimFoodListing } from './receiver-donor/receiver-donor-controller';
 import { handleGetDeliveryFoodListings,
-         handleClaimDeliveryFoodListing } from './deliverer/deliverer-controller';
+         handleClaimDeliveryFoodListing, 
+         handleUnclaimDeliveryFoodListing, 
+         handleGetPossibleDeliveryTimes } from './deliverer/deliverer-controller';
 import { handleGetDomainValues } from './domain/domain-controller';
 
 
@@ -65,6 +67,9 @@ app.post('/receiverDonor/receiver/unclaimFoodListing',  SessionData.ensureSessio
 
 // Deliverer Controller Routes.
 app.post('/deliverer/getDeliveryFoodListings',          SessionData.ensureSessionActive, handleGetDeliveryFoodListings);
+app.post('/deliverer/claimDeliveryFoodListing',         SessionData.ensureSessionActive, handleClaimDeliveryFoodListing);
+app.post('/deliverer/unclaimDeliveryFoodListing',       SessionData.ensureSessionActive, handleUnclaimDeliveryFoodListing);
+app.post('/deliverer/getPossibleDeliveryTimes',         SessionData.ensureSessionActive, handleGetPossibleDeliveryTimes)
 
 
 // Domain Controller.

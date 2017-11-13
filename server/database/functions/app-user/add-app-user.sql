@@ -16,8 +16,8 @@ CREATE OR REPLACE FUNCTION addAppUser
     _phone                  ContactInfo.phone%TYPE,
     _isDonor                AppUser.isDonor%TYPE,
     _isReceiver             AppUser.isReceiver%TYPE,
-    _availabilityTimeRanges TimeRange[]                 DEFAULT NULL, -- See TimeRange type definition in app-user-availability.sql!
-                                                                      -- **** TODO: Get rid of DEFAULT NULL once we fully implement signup with time ranges!!!
+    -- @ts-sql class="TimeRange" file="/shared/availability/time-range.ts"
+    _availabilityTimeRanges JSON[]                      DEFAULT NULL,
     _organizationName       Organization.name%TYPE      DEFAULT NULL
 )
 -- Returns the new App User's information.

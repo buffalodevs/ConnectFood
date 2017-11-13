@@ -68,4 +68,5 @@ psql --set=sslmode=require -h $server -p $port -d $database -U $username \
     -f functions/food-listing/delivery/mark-food-listing-pick-up.sql \
     -f functions/food-listing/delivery/mark-food-listing-drop-off.sql \
     -f functions/food-listing/delivery/get-delivery-state.sql \
-    -f functions/food-listing/delivery/get-delivery-food-listings.sql
+    -f functions/food-listing/delivery/get-delivery-food-listings.sql \
+    -f functions/food-listing/delivery/get-possible-delivery-times.sql

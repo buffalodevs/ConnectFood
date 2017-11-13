@@ -25,7 +25,7 @@ RETURNS TABLE
     donorGPSCoordinate  JSON
 )
 AS $$
-    DECLARE _currentWeekday      INTEGER; -- [0, 6] index of the current weekday.
+    DECLARE _currentWeekday      INTEGER; -- [0, 6] range representing days of week.
     DECLARE _queryBase           VARCHAR(2000);
     DECLARE _queryFilters        VARCHAR(2000);
     DECLARE _queryGroupAndSort   VARCHAR(2000);
@@ -40,6 +40,8 @@ BEGIN
                             AND _myDonatedItemsOnly <> TRUE
                             AND _myClaimedItemsOnly <> TRUE);
 
+    -- Should only be used in Receive tab! Must make sure that Food Listing will be available after Receiver's availablility dates.
+    -- So, we must convert Receiver's availability dates to be relative to the current date to check this!
     IF (_matchAvailability = TRUE)
     THEN
 
@@ -58,7 +60,7 @@ BEGIN
 
         INSERT INTO RelativeAvailabilityDates
         SELECT      appUserAvailabilityKey,
-                    CURRENT_DATE + INTERVAL '1' day * ((weekday - _currentWeekday) % 7)
+                    CURRENT_DATE + INTERVAL '1' day * ((CAST((SELECT EXTRACT(DOW FROM startTime)) AS INTEGER) - _currentWeekday) % 7)
         FROM        AppUserAvailability
         WHERE       appUserKey = _appUserKey;
         
@@ -130,7 +132,6 @@ BEGIN
         -- NOTE: We may not want to simply find an overlap in time range here!
         --       For example, it may be unrealistic to think that a single overlap of only 1/2 hour is enough to get food from Donor to Receiver!
         _queryFilters := _queryFilters || '
-            AND DonorAvailability.weekday = ReceiverAvailability.weekday
             AND DonorAvailability.startTime < ReceiverAvailability.endTime
             AND DonorAvailability.endTime > ReceiverAvailability.startTime
             AND RelativeAvailabilityDates.relativeAvailableDate <= FoodListing.availableUntilDate
@@ -269,7 +270,7 @@ GROUP BY FoodListing.foodListingKey;
 
 --SELECT * FROM FoodListingFoodTypeMap;
 
-SELECT * FROM getFoodListings(1, 0, 1000, NULL, NULL, NULL, NULL, TRUE, FALSE, FALSE, TRUE);
+--SELECT * FROM getFoodListings(1, 0, 1000, NULL, NULL, NULL, NULL, TRUE, FALSE, FALSE, TRUE);
 --SELECT * FROM RelativeAvailabilityDates;
 
 /*

@@ -1,9 +1,17 @@
-/**
- * Basic format for responses from the server. All responses should follow this interface!
- */
-export class FoodWebResponse {
-    
+import { FoodWebResponse } from '../../message-protocol/food-web-response';
+import { TimeRange } from '../../app-user/time-range';
+
+
+// NOTE: ManageDeliveryFoodListingRequest used for the Request message!
+
+
+export class GetPossibleDeliveryTimesResponse extends FoodWebResponse {
+
     public constructor (
+        /**
+         * Time ranges representing possible delivery times.
+         */
+        public possibleDeliveryTimes: TimeRange[],
         /**
          * Indicates whether or not the operation on the back end was successful.
          */
@@ -21,5 +29,7 @@ export class FoodWebResponse {
          * Indicates if there is a need for the user to have their signup confirmed before performing certain functionality.
          */
         public signupConfirmRequired: boolean = false
-    ) { }
+    ) {
+        super(success, message, loginRequired, signupConfirmRequired);
+    }
 }

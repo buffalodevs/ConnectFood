@@ -50,7 +50,7 @@ export function toPostgresArray(jsArr: Array<any>): string {
             postgresArrStr += jsArr[i] + ', ';
         }
 
-        postgresArrStr = postgresArrStr.substr(0, postgresArrStr.length - 2) + " }";
+        postgresArrStr = postgresArrStr.substr(0, postgresArrStr.length - 2) + ' }';
     }
     
     return postgresArrStr;

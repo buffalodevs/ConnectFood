@@ -6,11 +6,11 @@ SELECT dropFunction ('updateAvailability');
 CREATE OR REPLACE FUNCTION updateAvailability
 (
     _appUserKey     AppUserAvailability.appUserKey%TYPE,
-    _timeRanges     TimeRange[] -- See TimeRange type definition in app-user-availability.sql!
+    -- @ts-sql class="TimeRange" file="/shared/app-user/time-range.ts"
+    _timeRanges     JSON[]
 )
 RETURNS VOID
 AS $$
-    DECLARE _weekday    AppUserAvailability.weekday%TYPE;
     DECLARE _startTime  AppUserAvailability.startTime%TYPE;
     DECLARE _endTime    AppUserAvailability.endTime%TYPE;
 BEGIN
@@ -24,14 +24,13 @@ BEGIN
     FOR i IN array_lower(_timeRanges, 1) .. array_upper(_timeRanges, 1)
     LOOP
 
-        -- Convert time in TEXT format to time in INTEGER/TIME format.
-        _weekday := weekdayTextToInt(_timeRanges[i].weekday);
-        _startTime := TO_TIMESTAMP(_timeRanges[i].startTime, 'hh12:mi AM');
-        _endTime := TO_TIMESTAMP(_timeRanges[i].endTime, 'hh12:mi AM');
+        -- Convert time in TEXT format to time in TIMESTAMP format.
+        _startTime := TO_TIMESTAMP(_timeRanges[i]->>'startTime', 'MM/DD/YYYY hh12:mi AM');
+        _endTime := TO_TIMESTAMP(_timeRanges[i]->>'endTime', 'MM/DD/YYYY hh12:mi AM');
 
         -- Perform the insert.
-        INSERT INTO AppUserAvailability (appUserKey, weekday, startTime, endTime)
-        VALUES      (_appUserKey, _weekday, _startTime, _endTime);
+        INSERT INTO AppUserAvailability (appUserKey, startTime, endTime)
+        VALUES      (_appUserKey, _startTime, _endTime);
 
     END LOOP;
     
@@ -39,11 +38,10 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-
---SELECT * FROM updateAvailability(2, '{"(Saturday, 12:00 PM, 2:00 PM)"}'::TimeRange[]);
 /*
+SELECT * FROM updateAvailability( 1, array[JSON_BUILD_OBJECT('startTime', '11/12/2017 10:00 AM', 'endTime', '11/12/2017 1:00 PM')] );
+
 SELECT  AppUser.email,
-        AppUserAvailability.weekday,
         appUserAvailability.startTime,
         appUserAvailability.endTime
 FROM AppUser
