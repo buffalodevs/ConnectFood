@@ -12,12 +12,13 @@ import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web
 @Injectable()
 export class SignupService {
 
-    constructor(
+    public constructor (
         private requestService: RequestService,
         private sessionDataService: SessionDataService
     ) { }
 
-    signup(appUserSignupInfo: AppUserInfo, password: string) {
+    
+    public signup(appUserSignupInfo: AppUserInfo, password: string): Observable<FoodWebResponse> {
 
         let body: SignupRequest = new SignupRequest(appUserSignupInfo, password);
         let observer: Observable<Response> = this.requestService.post('/appUser/signup', body);

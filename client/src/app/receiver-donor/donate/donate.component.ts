@@ -167,9 +167,8 @@ export class DonateComponent implements OnInit {
      * @param valid The valid state of the donation form.
      * @param event The form submit event.
      */
-    private submitDonation(value: FoodListingUpload, valid: boolean , stepper: MdHorizontalStepper): void {
+    private submitDonation(value: FoodListingUpload, valid: boolean, stepper: MdHorizontalStepper): void {
         
-        let self: DonateComponent = this;
         let observer: Observable<number> = this.addFoodListingService.addFoodListing(value, this.image);
 
         observer.subscribe(

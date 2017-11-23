@@ -1,27 +1,42 @@
-#signup-error {
+.signup-error {
 	text-align: center;
     color: red;
     font-weight: bold;
     font-size: 20px;
 }
 
-label, md-radio-group {
+md-radio-group {
+    font-size: 20px;
     font-weight: bold;
-    font-size: 22px;
 }
 
 h2 {
     font-weight: bold;
 }
 
-.button-md {
-    margin-left: 15px;
+.space-bottom {
+    margin-bottom: 15px;
 }
 
-md-input-container, md-select {
+.limit-width {
+    max-width: 410px;
+}
+
+:host ::ng-deep mat-step-header {
+    cursor: pointer;
+    cursor: hand;
+}
+
+:host ::ng-deep .mat-horizontal-stepper-header-container {
+    margin-bottom: 70px;
+}
+
+@media only screen and (max-width: 767px) {
+    :host ::ng-deep .mat-step-label {
+        display: none;
+    }
+}
+
+:host ::ng-deep md-input-container {
     width: 100%;
-}
-
-md-select {
-    margin-bottom: 20px;
 }

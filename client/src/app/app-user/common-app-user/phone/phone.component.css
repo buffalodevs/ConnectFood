@@ -1,0 +1,27 @@
+#phone-label {
+    color: gray;
+    margin-right: 5px;
+}
+
+#phone-form {
+    white-space: nowrap;
+    overflow-x: scroll;
+}
+
+.phone-3digits {
+    width: 30px;
+}
+
+.phone-4digits {
+    width: 40px;
+}
+
+input, .phone-3digits, .phone-4digits {
+    text-align: center;
+}
+
+.phone-hyphen {
+    font-weight: bold;
+    margin-left: 7px;
+    margin-right: 7px;
+}

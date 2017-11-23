@@ -1,17 +1,21 @@
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common'
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BusyModule } from 'angular2-busy';
+import { BusyModule } from 'angular2-busy';;
 
 import { CommonUtilModule } from '../common-util/common-util.module';
 import { AngularMaterialWrapperModule } from '../angular-material-wrapper/angular-material-wrapper.module';
+import { SlickInputGroupModule } from '../slick-input-group/slick-input-group.module';
+import { SlickWeekdaySchedulerModule } from '../slick-weekday-scheduler/slick-weekday-scheduler.module';
 
+import { PhoneComponent } from './common-app-user/phone/phone.component';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
 import { AppUserInfoComponent } from './app-user-info/app-user-info.component';
 
 import { RoutePreprocessService } from '../common-util/services/route-preprocess.service';
-import { CommonModule } from '@angular/common';
+import { AppUserConstantsService } from './app-user-constants.service';
 
 
 const appUserRoutes: Routes = [
@@ -30,6 +34,7 @@ const appUserRoutes: Routes = [
 
 @NgModule({
     declarations: [
+        PhoneComponent,
         LoginComponent,
         SignupComponent,
         AppUserInfoComponent
@@ -41,10 +46,15 @@ const appUserRoutes: Routes = [
         ReactiveFormsModule,
         BusyModule,
         CommonUtilModule,
-        AngularMaterialWrapperModule
+        AngularMaterialWrapperModule,
+        SlickInputGroupModule,
+        SlickWeekdaySchedulerModule
     ],
     entryComponents: [
         LoginComponent
+    ],
+    providers: [
+        AppUserConstantsService
     ]
 })
-export class AppUserModule { }
+export class AppUserModule {}

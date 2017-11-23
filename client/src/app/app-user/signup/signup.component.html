@@ -1,114 +1,150 @@
-<div *ngIf="!signupComplete" class="container">
+<form [formGroup]="signupForm" class="container" *ngIf="!signupComplete">
 
-    <form ngNativeValidate (submit)="signupUser($event)">
-        <h2 class="center-text">What Type of User Are You</h2>
-        <hr>
-        <md-radio-group class="row center-text" required>
-            <div class="col-md-6">
-                <md-radio-button name="accountType" value="business" (click)="setAppUserType('business')">
-                    Business
-                </md-radio-button>
-            </div>
-            <div class="col-md-6">
-                <md-radio-button name="accountType" value="personal" (click)="setAppUserType('personal')">
-                    Personal
-                </md-radio-button>
-            </div>
-        </md-radio-group>
+    <md-horizontal-stepper #stepper [linear]="true">
 
-        <ng-container *ngIf="appUserTypeSelected">
-            <br><br><br><br>
+        <md-step [stepControl]="signupForm.get('primary.appUserType')" [formGroup]="signupForm.get('primary')" label="User Type">
 
-            <h2 class="center-text">What Will You Be Doing</h2>
+            <h3 class="center-text">What Type of User Are You</h3>
             <hr>
-            <md-radio-group class="row center-text" required>
-                <div class="col-md-4">
-                    <md-radio-button name="accountFunction" value="donor" (click)="setAppUserFunction('donor')">
-                        Donating
+
+            <md-radio-group class="row center-text space-bottom" (change)="stepper.next()" formControlName="appUserType">
+
+                <div class="col-md-4" *ngFor="let typeKey of appUserConstants.APP_USER_TYPE_KEYS; let i = index">
+                    <md-radio-button name="accountType" [value]="appUserConstants.APP_USER_TYPE_VALS[i]">
+                        {{ typeKey }}
                     </md-radio-button>
                 </div>
-                <div class="col-md-4">
-                    <md-radio-button name="accountFunction" value="receiver" (click)="setAppUserFunction('receiver')">
-                        Receiving
-                    </md-radio-button>
-                </div>
-                <div class="col-md-4">
-                    <md-radio-button name="accountFunction" value="both" (click)="setAppUserFunction('both')">
-                        Both
-                    </md-radio-button>
-                </div>
+
             </md-radio-group>
-            <br><br><br><br>
-        </ng-container>
 
-        <ng-container *ngIf="appUserTypeSelected && appUserFunctionSelected">
-            <h2 class="center-text">Credentials and Contact Info</h2>
+            <button #appUserTypeNext *ngIf="signupForm.get('primary.appUserType').value != null"
+                md-raised-button color="primary" class="button-md" mdStepperNext>Next</button>
+
+        </md-step>
+
+        
+        <md-step [stepControl]="signupForm.get('primary')" [formGroup]="signupForm.get('primary')" label="Primary Info">
+
+            <!-- Next, get the user's primary information -->
+            <h3 class="center-text">Identification and Password</h3>
             <hr>
+
             <div class="row">
+
                 <div class="col-md-6">
-                    <md-input-container class="form-group">
-                        <input mdInput [placeholder]="emailLabel" type="email" name="username" [(ngModel)]="appUserSignupInfo.email" required autocomplete="off">
-                    </md-input-container>
+                    <div class="limit-width">
 
-                    <md-input-container class="form-group">
-                        <input mdInput placeholder="Password" type="password" name="password" [(ngModel)]="password" required autocomplete="new-password">
-                    </md-input-container>
+                        <md-input-container class="form-group">
+                            <input mdInput [placeholder]="adminPreStr + ' Email'" type="email" name="username" formControlName="email" autocomplete="off">
+                        </md-input-container>
 
-                    <md-input-container class="form-group" *ngIf="isBusiness">
-                        <input mdInput placeholder="Organization Name" name="organizationName" [(ngModel)]="appUserSignupInfo.organizationName" required>
-                    </md-input-container>
+                        <md-input-container class="form-group" *ngIf="isOrganization()">
+                            <input mdInput placeholder="Organization Name" name="organizationName" formControlName="organizationName">
+                        </md-input-container>
 
-                    <md-input-container class="form-group">
-                        <input mdInput [placeholder]="firstNameLabel" name="fname" [(ngModel)]="appUserSignupInfo.firstName" required>
-                    </md-input-container>
+                        <div class="row">
 
-                    <md-input-container class="form-group">
-                        <input mdInput [placeholder]="lastNameLabel" name="lname" [(ngModel)]="appUserSignupInfo.lastName" required>
-                    </md-input-container>
+                            <md-input-container class="form-group col-md-6">
+                                <input mdInput [placeholder]="adminPreStr + ' First Name'" name="fname" formControlName="firstName">
+                            </md-input-container>
+
+                            <md-input-container class="form-group col-md-6">
+                                <input mdInput [placeholder]="adminPreStr + ' Last Name'" name="lname" formControlName="lastName">
+                            </md-input-container>
+
+                        </div>
+                    
+                    </div>
                 </div>
 
                 <div class="col-md-6">
-                    <md-input-container class="form-group">
-                        <input mdInput placeholder="Street Address" name="address" [(ngModel)]="appUserSignupInfo.address" required>
-                    </md-input-container>
+                    <div class="limit-width">
 
-                    <md-input-container class="form-group">
-                        <input mdInput placeholder="City" name="city" [(ngModel)]="appUserSignupInfo.city" required>
-                    </md-input-container>
+                        <md-input-container class="form-group">
+                            <input mdInput placeholder="Password" type="password" name="password" formControlName="password" autocomplete="new-password">
+                        </md-input-container>
 
-                    <div class="form-group">
-                        <md-select name="state" placeholder="State" [(ngModel)]="appUserSignupInfo.state" required>
-                            <md-option *ngFor="let stateStr of stateList" [value]="stateStr">{{stateStr}}</md-option>
-                        </md-select>
+                        <md-input-container class="form-group">
+                            <input mdInput placeholder="Confirm Password" type="password" name="password" formControlName="confirmPassword" autocomplete="new-password">
+                        </md-input-container>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <button md-raised-button color="primary" class="button-md warn-button" type="button" mdStepperPrevious>Back</button>
+            <button md-raised-button color="primary" class="button-md" (click)="validate.set('primary', true)" mdStepperNext>Next</button>
+
+        </md-step>
+
+        <md-step [stepControl]="signupForm.get('addressPhone')" [formGroup]="signupForm.get('addressPhone')" label="Address & Phone">
+
+            <!-- Then, get the user's contact information -->
+            <h3 class="center-text">Address and Phone</h3>
+            <hr>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="limit-width">
+
+                        <md-input-container class="form-group">
+                            <input mdInput placeholder="Street Address" name="address" formControlName="address">
+                        </md-input-container>
+
+                        <div class="row">
+
+                            <md-input-container class="form-group col-md-5">
+                                <input mdInput placeholder="City" name="city" formControlName="city">
+                            </md-input-container>
+
+                            <slick-auto-complete-input [autoCompleteData]="appUserConstants.STATE_LIST" placeholder="State" [selectOnBlur]="true"
+                                [mustMatchAutoComplete]="true" class="col-md-3" [inputControl]="signupForm.get('addressPhone.state')"></slick-auto-complete-input>
+
+                            <md-input-container id="zip" class="form-group col-md-4">
+                                <input mdInput placeholder="Zip" name="zip" [InputFilter]="appUserConstants.DYNAMIC_ZIP_REGEX" formControlName="zip">
+                            </md-input-container>
+
+                        </div>
                     </div>
 
-                    <md-input-container class="form-group">
-                        <input mdInput placeholder="ZIP Code" name="zip" maxlength="5" [(ngModel)]="appUserSignupInfo.zip" required>
-                    </md-input-container>
-                    
-                    <md-input-container class="form-group">
-                        <input mdInput placeholder="Phone" name="phone" [(ngModel)]="appUserSignupInfo.phone" minlength="12" maxlength="12" required>
-                    </md-input-container>
                 </div>
 
-                <button md-raised-button color="primary" class="button-md" type="submit">Submit</button>
+                <div class="col-md-6">
+                    <phone required="true" [validate]="validate.get('addressPhone')" formControlName="phone"></phone>
+                </div>
+
             </div>
-        </ng-container>
-    </form>
-    <div *ngIf="signupError != null" id="signup-error">{{signupError}}</div>
-</div>
+
+            <button md-raised-button color="primary" class="button-md warn-button" type="button" mdStepperPrevious>Back</button>
+            <button md-raised-button color="primary" class="button-md" (click)="validate.set('addressPhone', true)" mdStepperNext>Next</button>
+
+        </md-step>
+
+        <md-step [stepControl]="signupForm" [formGroup]="signupForm" label="Availability">
+
+            <!-- Then, get the user's weekly availability information -->
+            <h3 class="center-text">Weekly Availability</h3>
+            <hr>
+
+            <slick-weekday-scheduler [validate]="validate.get('availability')" formControlName="availability"></slick-weekday-scheduler>
+
+            <button md-raised-button color="primary" class="button-md warn-button" type="button" mdStepperPrevious>Back</button>
+            <button md-raised-button color="primary" class="button-md" type="submit" (click)="signupUser($event, signupForm.value, signupForm.valid)">Submit</button>
+
+        </md-step>
+
+    </md-horizontal-stepper>
+
+    <div class="signup-error" *ngIf="signupError != null">{{ signupError }}</div>
+
+</form>
 
 
-<div *ngIf="signupComplete" class="container">
-    <p>
-        Thank-you for joining Food Web!
-    </p>
+<!-- Last, display the signup confirmation dialog -->
+<div class="container" *ngIf="signupComplete">
+    <p>Thank-you for joining Food Web!</p>
     <br>
-    
-    <p *ngIf="isBusiness">
-        We will contact you by phone to verify your signup. Please allow up to 2 business days to receive a call from us.
-    </p>
-    <p *ngIf="!isBusiness">
-        A confirmation link will be sent to you via email. Please follow the link to confirm your signup.
-    </p>
+    <p>A confirmation link will be sent to you via email. Please follow the link to confirm your signup.</p>
 </div>

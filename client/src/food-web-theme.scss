@@ -15,7 +15,7 @@ $darker-primary:   300;
 $food-web-primary: mat-palette($mat-grey, 50, $lighter-primary, $darker-primary);
 
 $lighter-accent:   A100;
-$darker-accent:    A400;
+$darker-accent:    500;
 $food-web-accent:  mat-palette($mat-green, 200, $lighter-accent, $darker-accent);
 
 $food-web-warn:    mat-palette($mat-red);
@@ -40,6 +40,8 @@ $food-web-inverted-theme:   mat-light-theme($food-web-accent, $food-web-primary,
 @include mat-form-field-theme($food-web-inverted-theme);
 @include mat-input-theme($food-web-inverted-theme);
 @include mat-select-theme($food-web-inverted-theme);
+@include mat-stepper-theme($food-web-inverted-theme);
+@include mat-tabs-theme($food-web-inverted-theme);
 
 
 

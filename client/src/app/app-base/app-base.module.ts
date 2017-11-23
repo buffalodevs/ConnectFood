@@ -39,4 +39,4 @@ const appBaseRoutes: Routes = [
         FooterComponent
     ]
 })
-export class AppBaseModule { }
+export class AppBaseModule {}

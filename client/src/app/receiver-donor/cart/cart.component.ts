@@ -10,7 +10,7 @@ import { SessionDataService } from '../../common-util/services/session-data.serv
 
 import { FoodListing } from "../../../../../shared/receiver-donor/food-listing";
 import { FoodListingsFilters, LISTINGS_STATUS } from "../../../../../shared/receiver-donor/food-listings-filters";
-import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
+import { AppUserInfo, AppUserType } from "../../../../../shared/app-user/app-user-info";
 
 
 @Component({
@@ -26,7 +26,6 @@ export class CartComponent implements OnInit {
 
     // Need to declare LISTINGS_STATUS enum inside component to be used in the HTML template!
     private readonly LISTINGS_STATUS: typeof LISTINGS_STATUS = LISTINGS_STATUS;
-    private isDonorAndReceiver: boolean;
 
     @ViewChild('foodListingsFilters') private foodListingsFiltersComponent: FoodListingsFiltersComponent;
     @ViewChild('foodListings') private foodListingsComponent: FoodListingsComponent;
@@ -38,15 +37,13 @@ export class CartComponent implements OnInit {
     ) { }
 
 
+    /**
+     * Retrieves user data from session storage to determine initial cart type and mutability of cart type.
+     */
     public ngOnInit(): void {
         const appUserInfo: AppUserInfo = this.sessionDataService.getAppUserSessionData();
 
-        /**
-         *  Retrieves user data from session storage to 
-         *  determine initial cart type and mutability of cart type
-         */
-        this.isDonorAndReceiver = (appUserInfo.isReceiver && appUserInfo.isDonor);
-        if (appUserInfo.isReceiver) {
+        if (appUserInfo.appUserType === AppUserType.Receiver) {
             // If both receiver and donor, then default to receiver mode!
             this.foodListingsFiltersComponent.addControl('listingsStatus', new FormControl(LISTINGS_STATUS.myClaimedListings));
         } 

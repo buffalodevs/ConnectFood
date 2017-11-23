@@ -1,6 +1,13 @@
 import { GPSCoordinate } from '../common-util/geocode';
 
 
+export enum AppUserType {
+    Receiver,
+    Donor,
+    Driver
+}
+
+
 export interface Address {
     address?: string;
     city?: string;
@@ -15,8 +22,9 @@ export interface Address {
  */
 export class AppUserInfo implements Address {
     
-    constructor (
+    public constructor (
         public email?: string,
+        public appUserType?: AppUserType,
         public organizationName?: string,
         public lastName?: string,
         public firstName?: string,
@@ -25,8 +33,6 @@ export class AppUserInfo implements Address {
         public state?: string,
         public zip?: number,
         public gpsCoordinate: GPSCoordinate = new GPSCoordinate(),
-        public phone?: string,
-        public isDonor?: boolean,
-        public isReceiver?: boolean
+        public phone?: string
     ) { }
 }

@@ -1,0 +1,22 @@
+<span *ngIf="includeLabel" id="phone-label">Phone:</span>
+
+<slick-input-group #phoneForm id="phone-form" [formGroup]="phoneForm" [validate]="validate"
+ concatPattern="`areaCode`-`first3`-`last4`" [validators]="groupValidators" [formControl]="phoneControl">
+
+    <md-input-container class="phone-3digits" [floatPlaceholder]="floatPlaceholder">
+        <input mdInput placeholder="###" [InputFilter]="appUserConstants.DYNAMIC_PHONE_3DIGITS" formControlName="areaCode">
+    </md-input-container>
+
+    <span class="phone-hyphen">-</span>
+
+    <md-input-container class="phone-3digits" [floatPlaceholder]="floatPlaceholder">
+        <input mdInput placeholder="###" [InputFilter]="appUserConstants.DYNAMIC_PHONE_3DIGITS" formControlName="first3">
+    </md-input-container>
+
+    <span class="phone-hyphen">-</span>
+    
+    <md-input-container class="phone-4digits" [floatPlaceholder]="floatPlaceholder">
+        <input mdInput placeholder="####" [InputFilter]="appUserConstants.DYNAMIC_PHONE_4DIGITS" formControlName="last4">
+    </md-input-container>
+
+</slick-input-group>

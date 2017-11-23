@@ -1,0 +1,47 @@
+#wrapper {
+    display: inline-block;
+    font-size: 18px;
+}
+
+#start-time-form, #end-time-form {
+    white-space: nowrap;
+}
+
+#to-separator {
+    font-weight: bold;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+md-input-container {
+    max-width: 30px;
+}
+
+md-input-container, :host ::ng-deep input {
+    text-align: center;
+}
+
+:host ::ng-deep #am-pm {
+    width: 30px;
+    text-align: center;
+    padding-left: 10px;
+}
+
+/* Get rid of bulky spacing around input boxes */
+:host ::ng-deep .mat-form-field-infix {
+    padding: 0px;
+    border: none;
+}
+:host ::ng-deep .mat-form-field-wrapper {
+    padding-bottom: 0px;
+}
+
+/* Ensure placeholder is not pushed down */
+:host ::ng-deep .mat-form-field-placeholder {
+    position: initial !important;
+}
+
+/* Fix underline position after getting rid of bulk around input fields */
+:host ::ng-deep .mat-form-field-underline {
+    bottom: initial;
+}

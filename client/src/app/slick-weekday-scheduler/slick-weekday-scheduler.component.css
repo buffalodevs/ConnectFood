@@ -1,0 +1,57 @@
+#container {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.time-range-container {
+    position: relative;
+    display: table;
+    background-color: rgb(247, 247, 239);
+    border: 1px solid lightgray;
+    padding-left: 5px;
+    padding-right: 40px;
+    padding-top: 20px;
+    padding-bottom: 15px;
+    margin-top: 5px;
+}
+
+.remove-button {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    line-height: 25px;
+    font-size: 25px;
+    margin: 0px;
+    padding: 0px;
+    vertical-align: middle;
+    text-align: center;
+    outline: none !important;
+    border: none;
+    font-weight: bold;
+    color: red;
+    background-color: inherit;
+    display: none;
+}
+
+.time-range-container:hover .remove-button {
+    display: initial; 
+}
+
+.add-container {
+    margin-top: 7px;
+    display: table; /* Necessary so that add link will not span whole width of div, but content width only. */
+}
+
+.add-button {
+    border-radius: 50%;
+    color: white;
+    border: none;
+    outline: none;
+}
+
+.add-span {
+    padding-left: 5px;
+}

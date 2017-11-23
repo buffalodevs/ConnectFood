@@ -1,3 +1,23 @@
+class WallClockTime {
+
+    public constructor (
+        public hours?: number,
+        public minutes?: number,
+        public amOrPm?: string
+    ) {}
+
+
+    /**
+     * Gets the wall clock time hours [0, 12] in millitary time hours [0, 23].
+     * @return The wall clock time hours in millitary time scale.
+     */
+    public getMillitaryHours(): number {
+        return (this.amOrPm.toUpperCase() === 'AM') ? this.hours + ( (this.hours === 12) ? -12 : 0)
+                                                    : this.hours + ( (this.hours === 12) ? 0 : 12 );
+    }
+}
+
+
 export class DateFormatter {
 
     // All timestamps for weekdays are based on date 11/12/2017 (Sunday).
@@ -44,18 +64,27 @@ export class DateFormatter {
     /**
      * Gets the wall clock time string (hh:mm ['AM' | 'PM']) for a given date.
      * @param date The date to get the wall clock time string from.
+     * @param discardSeconds Set to false if seconds should be included. Default is true for discard seconds.
      * @return The wall clock time string for the given date.
      */
-    public static dateToWallClockString(date: Date): string {
+    public static dateToWallClockString(date: Date, discardSeconds: boolean = true): string {
+
+        let wallClockString: string = '';
 
         if (date != null) {
+            
             // Check to see if we are in fact passed a Date object (may have been stringified in JSON response)!
             date = DateFormatter.ensureIsDate(date);
 
-            return ( DateFormatter.getWallClockHours(date) + ':' + date.getMinutes() + ' ' + DateFormatter.getWallClockAmOrPm(date) );
+            wallClockString = date.toLocaleTimeString();
+
+            if (discardSeconds) {
+                let localTimeStringSplits: string[] = wallClockString.split(/:\d{2} /);
+                wallClockString = (localTimeStringSplits[0] + ' ' + localTimeStringSplits[1]);
+            }
         }
 
-        return '';
+        return wallClockString;
     }
 
 
@@ -72,7 +101,7 @@ export class DateFormatter {
 
             const millitaryHours: number = date.getHours();
             return (millitaryHours > 12) ? (millitaryHours - 12)
-                                        : millitaryHours;
+                                         : millitaryHours;
         }
 
         return null;
@@ -91,10 +120,54 @@ export class DateFormatter {
             date = DateFormatter.ensureIsDate(date);
 
             return (date.getHours() > 12) ? 'PM'
-                                        : 'AM';
+                                          : 'AM';
         }
 
         return '';
+    }
+
+
+    /**
+     * Sets the wall clock time for a given date based on a given wall clock time string (hh:mm ['AM' | 'PM']).
+     * @param date The date to set the time of.
+     * @param time The time string of format: /^([1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/.
+     * @return The input date with its time set. If an invalid time string is provided, then null is returned!
+     */
+    public static setWallClockTimeForDate(date: Date, time: string): Date {
+
+        if (!DateFormatter.isWallClockFormat(time))  return null;
+
+        let timeDate: Date = new Date(date.valueOf());
+        let wallClockTime: WallClockTime = DateFormatter.parseWallClockTime(time);
+
+        timeDate.setHours(wallClockTime.getMillitaryHours(), wallClockTime.minutes, 0, 0);        
+        return timeDate;
+    }
+
+
+    /**
+     * Checks if a given string is in a proper wall clock format: /^([1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/
+     */
+    public static isWallClockFormat(time: string): boolean {
+        return (/^([1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/).test(time);
+    }
+
+
+    /**
+     * Parses and extracts wall clock time data from a given correctly formatted wall clock time string.
+     * @param time The time string to extract the wall clock time information from.
+     * @return The wall clock time data.
+     */
+    private static parseWallClockTime(time: string): WallClockTime {
+
+        let hoursMinuntesSplit: string[] = time.split(':');
+        let wallClockTime: WallClockTime = new WallClockTime();
+
+        wallClockTime.hours =  Number.parseInt(hoursMinuntesSplit[0]);
+        wallClockTime.minutes = Number.parseInt(hoursMinuntesSplit[1].substr(0, 2));
+        wallClockTime.amOrPm = time.substr(time.length - 2).toUpperCase();
+
+        return wallClockTime;
     }
 
 
@@ -167,5 +240,17 @@ export class DateFormatter {
 
         const dateDay: number = ( DateFormatter.REF_DATE_DAY + DateFormatter.convertWeekdayStringToInt(weekday) );
         return new Date(DateFormatter.REF_DATE_MONTH + '/' + dateDay + '/' + DateFormatter.REF_DATE_YEAR + ' ' + time);
+    }
+
+
+    /**
+     * Gets the date for a given weekday. The date is for the week of 11/12/2017 and is used meerly to signify a weekday and time in compact form.
+     * @param weekday The weekday string ['Sunday', 'Saturday'] (non-case sensitive).
+     * @return The weekday date.
+     */
+    public static getDateForWeekday(weekday: string): Date {
+
+        const dateDay: number = DateFormatter.convertWeekdayStringToInt(weekday);
+        return new Date('' + DateFormatter.REF_DATE_MONTH + '/' + (DateFormatter.REF_DATE_DAY + dateDay) + '/' + DateFormatter.REF_DATE_YEAR);
     }
 }

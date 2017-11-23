@@ -10,14 +10,14 @@ export class TimeRange {
         /**
          * The start time of the time range.
          */
-        public startTime: Date,
+        public startTime?: Date,
         /**
          * The end time of the time range.
          */
-        public endTime: Date
+        public endTime?: Date
     ) {
         // Ensure that we are given actual date objects and not date string equivalents, and convert strings to objects if possible.
-        this.startTime = DateFormatter.ensureIsDate(startTime);
-        this.endTime = DateFormatter.ensureIsDate(endTime);
+        if (startTime != null)  this.startTime = DateFormatter.ensureIsDate(startTime);
+        if (endTime != null)    this.endTime = DateFormatter.ensureIsDate(endTime);
     }
 }

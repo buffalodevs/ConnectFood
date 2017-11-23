@@ -6,9 +6,10 @@ import { Client, QueryResult } from 'pg';
 import { hashPassword } from './password-util';
 import { GPSCoordinate, getGPSCoordinate } from '../../../shared/common-util/geocode';
 import { fixNullQueryArgs } from "./../database-util/prepared-statement-util";
+import { SessionData, AppUserInfo } from '../common-util/session-data';
 
 import { Validation } from '../../../shared/common-util/validation';
-import { SessionData, AppUserInfo } from '../common-util/session-data';
+import { AppUserType } from '../../../shared/app-user/app-user-info';
 
 let nodemailer = require("nodemailer-promise");
 require('dotenv');
@@ -123,8 +124,8 @@ function addOrUpdateAppUser(appUserSignupInfo: AppUserInfo, hashedPassword: stri
                                   appUserSignupInfo.state,
                                   appUserSignupInfo.zip,
                                   appUserSignupInfo.phone,
-                                  appUserSignupInfo.isDonor,
-                                  appUserSignupInfo.isReceiver,
+                                  (appUserSignupInfo.appUserType === AppUserType.Donor),
+                                  (appUserSignupInfo.appUserType === AppUserType.Receiver),
                                   null, // TODO: Availability times.
                                   appUserSignupInfo.organizationName ];
     
@@ -177,16 +178,18 @@ function handleResult(addOrUpdateResult: QueryResult, isUpdate: boolean): Promis
  * Sends a signup verification email to a new user's email.
  * @param appUserSignupInfo The app user signup information.
  * @param verificationToken The verification token to be sent via email.
+ * @return A promise that resolves to the new user's session data on success.
  */
 function sendVerificationEmail(sessionData: SessionData, verificationToken: string): Promise<SessionData> {
 
-    const isOrganization: boolean = (sessionData.appUserInfo.organizationName != null);
+    /*const isOrganization: boolean = (sessionData.appUserInfo.organizationName != null);
     return (isOrganization ? sendOrganizationEmail(sessionData, verificationToken)
-                           : sendUserEmail(sessionData, verificationToken));
+                           : sendUserEmail(sessionData, verificationToken));*/
+    return sendUserEmail(sessionData, verificationToken);
 }
 
 
-function sendOrganizationEmail(sessionData: SessionData, verificationToken: string) : Promise<SessionData> {
+/*function sendOrganizationEmail(sessionData: SessionData, verificationToken: string) : Promise<SessionData> {
 
     let verificationLink = 'http://connect-food.herokuapp.com/appUser/verify?appUserKey='
                          + sessionData.appUserKey + '&verificationToken=' + verificationToken;
@@ -216,7 +219,7 @@ function sendOrganizationEmail(sessionData: SessionData, verificationToken: stri
             console.log(err);
             throw new Error('Sorry, unable to send signup verification email');
         });
-}
+}*/
 
 
 function sendUserEmail(sessionData: SessionData, verificationToken: string) : Promise<SessionData> {

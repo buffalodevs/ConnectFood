@@ -1,4 +1,7 @@
+import { FormGroup, AbstractControl, ValidatorFn } from "@angular/forms";
 import { AppUserInfo } from "../app-user/app-user-info";
+import { ObjectManipulation } from "./object-manipulation";
+
 
 /**
  * Validation definitions that can commonly be used by front end angular forms and back end node logic.
@@ -21,6 +24,11 @@ export class Validation {
     public static readonly PHONE_REGEX: RegExp = /^\d{3}\-\d{3}\-\d{4}$/;
 
     /**
+     * Regular expression used for verifying that the state input is in a correct format.
+     */
+    public static readonly STATE_REGEX: RegExp = /^[a-zA-Z]{2}$/;
+
+    /**
      * Regular expression used for verifying 5 digit ZIP codes.
      */
     public static readonly ZIP_REGEX: RegExp = /^\d{5}$/;
@@ -29,6 +37,7 @@ export class Validation {
      * Regular expression used for verifying date string (mm/dd/yyyy) format.
      */
     public static readonly DATE_REGEX: RegExp = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+
     
     /**
      * Checks if an email string is in the correct format.
@@ -36,9 +45,9 @@ export class Validation {
      * @return true if it is, false if not.
      */
     public static emailValidator(email: string): boolean {
-        // RFC 2822 compliant regex
-        return email.match(Validation.EMAIL_REGEX).length != null;
+        return Validation.EMAIL_REGEX.test(email);
     }
+
      
     /**
      * Checks if a password string is in the correct format.
@@ -46,10 +55,9 @@ export class Validation {
      * @return true if it is, false if not.
      */
     public static passwordValidator(password: string): boolean {
-        // {6,20}           - Assert password is between 6 and 20 characters
-        // (?=.*[0-9])      - Assert a string has at least one number
-        return password.match(Validation.PASSWORD_REGEX).length != null;
+        return Validation.PASSWORD_REGEX.test(password);
     }
+
 
     /**
      * Checks if a 7 digit phone number with dashes (string) is in the correct format.
@@ -57,8 +65,14 @@ export class Validation {
      * @return true if it is, false if not.
      */
     public static phoneValidator(phone: string): boolean {
-        return phone.match(Validation.PHONE_REGEX).length != null;
+        return Validation.PHONE_REGEX.test(phone);
     }
+
+
+    public static stateValidator(state: string): boolean {
+        return Validation.STATE_REGEX.test(state);
+    }
+
 
     /**
      * Checks if a 5 digit ZIP code is in the correct format.
@@ -66,16 +80,17 @@ export class Validation {
      * @return true if it is, false if not.
      */
     public static zipValidator(zip: string): boolean {
-        return zip.match(Validation.ZIP_REGEX).length != null;
+        return Validation.ZIP_REGEX.test(zip);
     }
 
+    
     /**
      * Checks if a date string is in the correct (mm/dd/yyyy) format.
      * @param date The date string to check.
      * @return true if it is, false if not.
      */
     public static dateValidator(date: string): boolean {
-        return date.match(Validation.DATE_REGEX) != null;    
+        return Validation.DATE_REGEX.test(date);    
     }
 
 
