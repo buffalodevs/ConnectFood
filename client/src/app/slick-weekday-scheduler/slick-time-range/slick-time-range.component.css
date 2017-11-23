@@ -13,6 +13,10 @@
     margin-right: 15px;
 }
 
+#err-msg {
+    margin-top: 5px;
+}
+
 md-input-container {
     max-width: 30px;
 }

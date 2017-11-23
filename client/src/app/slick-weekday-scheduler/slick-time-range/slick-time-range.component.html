@@ -38,4 +38,8 @@
 
     </slick-input-group>
 
+    <div id="err-msg" class="warn-foreground" *ngIf="timeRangeForm.errors != null">
+        <span>{{ validationService.errorMsgFor(timeRangeForm) }}</span>
+    </div>
+
 </div>

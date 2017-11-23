@@ -1,10 +1,11 @@
 import { Component, OnInit, Input, forwardRef, OnChanges, SimpleChanges, SimpleChange } from '@angular/core';
-import { ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, FormControl, Validators, ValidatorFn } from '@angular/forms';
+import { ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, FormControl, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
 
 import { ValidationService } from '../../common-util/services/validation.service';
 
 import { DateFormatter } from '../../../../../shared/common-util/date-formatter';
 import { TimeRange } from '../../../../../shared/app-user/time-range';
+import { SlickTimeRangeValidationService } from './validation/slick-time-range-validation.service';
 
 
 @Component({
@@ -16,7 +17,8 @@ import { TimeRange } from '../../../../../shared/app-user/time-range';
             provide: NG_VALUE_ACCESSOR,
             useExisting: forwardRef(() => SlickTimeRangeComponent),
             multi: true
-        }
+        },
+        SlickTimeRangeValidationService
     ]
 })
 export class SlickTimeRangeComponent implements OnInit, OnChanges, ControlValueAccessor {
@@ -44,15 +46,15 @@ export class SlickTimeRangeComponent implements OnInit, OnChanges, ControlValueA
     private onChange: (timeRange: TimeRange) => void;
 
 
-    public constructor(
-        private validationService: ValidationService
+    public constructor (
+        private formBuilder: FormBuilder,
+        private validationService: SlickTimeRangeValidationService
     ) {
 
         this.HH_REG_EXP = /^([2-9]|1[0-2]?)$/;
         this.MM_REG_EXP = /^([0-5][0-9]?)$/;
 
         this.calendarDateBase = new Date(); // Default Now for Base Calendar Date.
-        this.timeRangeForm = new FormGroup({});
         this.onChange = (timeRange: TimeRange) => {}; // If not bound to by parent component, then swallow all changes here!
     }
 
@@ -60,8 +62,10 @@ export class SlickTimeRangeComponent implements OnInit, OnChanges, ControlValueA
     public ngOnInit(): void {
 
         this.calendarDateBase = DateFormatter.ensureIsDate(this.calendarDateBase);
-        this.timeRangeForm.addControl('startTime', new FormControl(null, [ Validators.required ]));
-        this.timeRangeForm.addControl('endTime', new FormControl(null, [ Validators.required ]));
+        this.timeRangeForm = this.formBuilder.group({
+            'startTime':    [null, Validators.required],
+            'endTime':      [null, Validators.required]
+        }, { validator: this.validationService.timeOrder() });
 
         // Set required validators for contained Slick Input Group controls.
         this.groupValidators = [
