@@ -53,7 +53,7 @@ export class SlickWeekdaySchedulerComponent implements OnInit, OnChanges, Contro
         this.displayMode = false;
         this.allowAdd = true;
         this.allowRemove = true;
-        this.timeRangesForm = new FormGroup({});
+        this.timeRangesForm = new FormGroup({}, this.validationService.requireAtLeastOneField());
         this.onChange = (value: TimeRange[]) => {}; // If contained model is not bound to by parent, then swallow all changes here!
     }
 

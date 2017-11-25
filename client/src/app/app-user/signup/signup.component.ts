@@ -5,18 +5,24 @@ import { Observable } from 'rxjs/Observable';
 
 import { SignupService } from './signup.service'
 import { AppUserConstantsService } from '../app-user-constants.service';
-import { ValidationService, Validation } from '../../common-util/services/validation.service';
+import { Validation } from '../../common-util/services/validation.service';
+import { AppUserValidationService } from '../common-app-user/app-user-validation.service';
 
 import { AppUserInfo, AppUserType } from "../../../../../shared/app-user/app-user-info";
 import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
 import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
+import { AbstractControl } from '@angular/forms/src/model';
+import { SignupErrors } from '../../../../../shared/app-user/signup-message';
 
 
 @Component({
     selector: 'app-signup',
     templateUrl: './signup.component.html',
     styleUrls: ['./signup.component.css'],
-    providers: [SignupService]
+    providers: [
+        SignupService,
+        AppUserValidationService
+    ]
 })
 export class SignupComponent implements OnInit {
 
@@ -36,7 +42,7 @@ export class SignupComponent implements OnInit {
     public constructor (
         private router: Router,
         private formBuilder: FormBuilder,
-        private validationService: ValidationService,
+        private signupValidationService: AppUserValidationService,
         private signupService: SignupService,
         private appUserConstants: AppUserConstantsService
     ) {
@@ -63,7 +69,7 @@ export class SignupComponent implements OnInit {
                 'lastName':         [null, Validators.required],
                 'password':         [null, [Validators.required, Validators.pattern(Validation.PASSWORD_REGEX)]],
                 'confirmPassword':  [null, [Validators.required, Validators.pattern(Validation.PASSWORD_REGEX)]]
-            }, { validator: this.validationService.confirmPasswordEqual() }),
+            }, { validator: this.signupValidationService.confirmPasswordEqual() }),
 
             'addressPhone': this.formBuilder.group({
                 'address':          [null, Validators.required],
@@ -96,11 +102,11 @@ export class SignupComponent implements OnInit {
 
         if (this.isOrganization()) {
             this.adminPreStr = 'Admin';
-            this.validationService.setValidatorsAndRefresh(organizationNameControl, [Validators.required]);
+            this.signupValidationService.setValidatorsAndRefresh(organizationNameControl, [Validators.required]);
         }
         else {
             this.adminPreStr = '';
-            this.validationService.setValidatorsAndRefresh(organizationNameControl, null);
+            this.signupValidationService.setValidatorsAndRefresh(organizationNameControl, null);
         }
     }
 
@@ -115,17 +121,35 @@ export class SignupComponent implements OnInit {
 
 
     /**
+     * Determines if a given control has any error(s).
+     * @param controlPath The path of the control relative to the base signupForm.
+     * true if an error(s) exist, false if not.
+     */
+    private hasError(controlPath: string): boolean {
+        return ( this.signupForm.get(controlPath).errors != null );
+    }
+
+
+    /**
+     * Generates an error message for a given control (assuming the control has an error).
+     * @param controlPath The path of the control relative to the base signupForm.
+     * @return The error message for the given control.
+     */
+    private errorMsgFor(controlPath: string): string {
+        return this.signupValidationService.errorMsgFor(this.signupForm.get(controlPath), controlPath);
+    }
+
+
+    /**
      * Invoked on final form submission. Sends signup data to the server if the form is valid.
      * @param value The value of the form.
      * @param valid The valid state of the form.
      */
-    private signupUser(event: Event, value: any, valid: boolean): void {
-
-        event.preventDefault();
+    private signupUser(value: any, valid: boolean): void {
 
         // Force validation in availability form portion and check validity of entire form before submission.
         this.validate.set('availability', true);
-        if (!valid) return;
+        if (!valid)  return;
 
         let appUserInfo: AppUserInfo = new AppUserInfo();
         let password: string = value.primary.password;
@@ -133,30 +157,41 @@ export class SignupComponent implements OnInit {
         // Copy form values to AppUserInfo object.
         ObjectManipulation.shallowCopy(value.primary, appUserInfo);
         ObjectManipulation.shallowCopy(value.addressPhone, appUserInfo);
-        // appUserInfo.availability = value.availability;
+        appUserInfo.availability = value.availability;
 
         let observer: Observable<FoodWebResponse> = this.signupService.signup(appUserInfo, password);
 
         observer.subscribe (
-
-            // When we have no errors connecting to server.
-            (signupResponse: FoodWebResponse) => {
-
-                if (signupResponse.success) {
-                    this.signupError = null;
-                    this.signupComplete = true;
-                    scroll(0, 0);
-                }
-                else {
-                    this.signupError = signupResponse.message;
-                }
-            },
-
+            this.handleSignupUserResponse.bind(this),
             // When we have errors connecting to server.
             (err: Error) => {
                 this.signupError = 'Error: could not communication with server';
                 console.log(err);
             }
         );
+    }
+
+
+    /**
+     * Handles the signup response from the server.
+     * @param signupResponse The signup response from the server.
+     */
+    private handleSignupUserResponse(signupResponse: FoodWebResponse): void {
+
+        if (signupResponse.success) {
+            this.signupError = null;
+            this.signupComplete = true;
+            scroll(0, 0);
+        }
+        else {
+            this.signupError = signupResponse.message;
+
+            if (this.signupError === SignupErrors.DUPLICATE_EMAIL) {
+                // TODO: Goto primary info tab.
+            }
+            else if (this.signupError === SignupErrors.INVALID_ADDRESS) {
+                // TODO: Goto address & phone tab.
+            }
+        }
     }
 }

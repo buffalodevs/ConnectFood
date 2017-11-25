@@ -5,7 +5,8 @@ import * as geocoder from 'geocoder';
  * Container for latitude and longitude GPS Coordinates.
  */
 export class GPSCoordinate {
-    constructor(
+
+    public constructor (
         public latitude?: number,
         public longitude?: number
     ) { }
@@ -51,7 +52,7 @@ function geocode(fullAddress: string, resolve: (value?: GPSCoordinate) => void, 
         
         // On over query limit (retry).
         if (data.status === 'OVER_QUERY_LIMIT') {
-            console.log('Geocoder over query limit, retrying now.')
+            console.log('Geocoder over query limit, retrying now.');
             return geocode(fullAddress, resolve, reject);
         }
 

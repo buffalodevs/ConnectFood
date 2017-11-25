@@ -1,4 +1,7 @@
 import { GPSCoordinate } from '../common-util/geocode';
+import { TimeRange } from './time-range';
+
+export { TimeRange };
 
 
 export enum AppUserType {
@@ -33,6 +36,7 @@ export class AppUserInfo implements Address {
         public state?: string,
         public zip?: number,
         public gpsCoordinate: GPSCoordinate = new GPSCoordinate(),
-        public phone?: string
+        public phone?: string,
+        public availability?: TimeRange[]
     ) { }
 }

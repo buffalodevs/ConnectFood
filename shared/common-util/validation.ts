@@ -38,6 +38,11 @@ export class Validation {
      */
     public static readonly DATE_REGEX: RegExp = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
 
+    /**
+     * Regular expression used for verifying wall clock time string (hh:mm [AM|PM]) format.
+     */
+    public static readonly TIME_REGEX: RegExp = /^\d{1,2}\:\d{2} [AaPp][Mm]$/;
+
     
     /**
      * Checks if an email string is in the correct format.
@@ -95,12 +100,23 @@ export class Validation {
 
 
     /**
+     * Checks if a time string is in the correct (hh:mm [AM|PM]) format (non-case sensitive).
+     * @param time The time string to check.
+     * @return true if it is, false if not.
+     */
+    public static timeValidator(time: string): boolean {
+        return Validation.TIME_REGEX.test(time);
+    }
+
+
+    /**
      * Validates given app user information and password.
      * @param appUserInfo The app user info to validate.
      * @param password The password to validate.
      * @return On successful validation, null. On unsuccess, then an error is returned.
      */
     public static validateAppUserInfo(appUserInfo: AppUserInfo, password: string): Error {
+
         if (appUserInfo.email != null && !Validation.emailValidator(appUserInfo.email)) {
             return new Error('Provided email not in correct format.');
         }
@@ -110,7 +126,7 @@ export class Validation {
         }
 
         if (appUserInfo.zip != null && !Validation.zipValidator(appUserInfo.zip.toString())) {
-            return new Error('Incorrect ZIP code format. The ZIP code must contain exactly 5 numbers.');
+            return new Error('Incorrect ZIP code format. The ZIP code must contain exactly 5 digits.');
         }
 
         return null;

@@ -1,18 +1,13 @@
-#container {
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
 .time-range-container {
     position: relative;
     display: table;
     background-color: rgb(247, 247, 239);
     border: 1px solid lightgray;
-    padding-left: 5px;
-    padding-right: 40px;
-    padding-top: 20px;
+    padding-left: 3px;
+    padding-right: 25px;
+    padding-top: 15px;
     padding-bottom: 15px;
-    margin-top: 5px;
+    text-align: center;
 }
 
 .remove-button {
@@ -54,4 +49,8 @@
 
 .add-span {
     padding-left: 5px;
+}
+
+#err-msg {
+    padding-left: 15px;
 }

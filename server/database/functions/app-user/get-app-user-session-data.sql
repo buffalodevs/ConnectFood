@@ -48,7 +48,6 @@ AS $$
                                             'isDonor',          AppUser.isDonor,
                                             'isReceiver',       AppUser.isReceiver
                                         ),
-                'signupVerified',       (UnverifiedAppUser.appUserKey IS NULL),
                 'verificationToken',    UnverifiedAppUser.verificationToken
             )
     FROM AppUser

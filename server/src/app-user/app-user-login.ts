@@ -8,11 +8,11 @@ import { SessionData, AppUserInfo } from "../common-util/session-data";
 /**
  * Performs the login for a given user.
  * @param email The email (username) of the user.
- * @param password The password of the user.
+ * @param password The (plain text) password of the user.
  * @return A promise where on success it will provide the primary AppUser information of the logged in user.
  */
 export function login(email: string, password: string): Promise<SessionData> {
-    // First grab a connection so that we can exectue multiple queries with it.
+
     return getAppUserInfo(email)
         .then((getAppUserInfoResult: QueryResult) => {
             return analyzeGetAppUserInfoResult(email, password, getAppUserInfoResult);
@@ -31,8 +31,10 @@ export function login(email: string, password: string): Promise<SessionData> {
  * @return A promise with the query result. The query result should simply contain one row information pertaining to the App User.
  */
 function getAppUserInfo(email: string): Promise<QueryResult> {
+
     let queryString: string = `SELECT * FROM getAppUserSessionData(NULL, $1, TRUE);`;
     let queryArgs: Array<string> = [email];
+
     logSqlQueryExec(queryString, queryArgs);
     return query(queryString, queryArgs);
 }
@@ -44,13 +46,15 @@ function getAppUserInfo(email: string): Promise<QueryResult> {
  * @param email The email (username) of the user that the password is being hashed for.
  * @param password The plain text password that is to be hashed.
  * @param getAppUserInfoResult The query result that on success should contain a single row with the App User info.
- * @return A promise that on success will give a string containing the primary app user info.
+ * @return A promise that on success will resolve to the app user's session data for login.
  */
 function analyzeGetAppUserInfoResult(email: string, password: string, getAppUserInfoResult: QueryResult): Promise<SessionData> {
+
     logSqlQueryResult(getAppUserInfoResult.rows);
 
     // We should only be getting one row back with the app user data!
     if (getAppUserInfoResult.rowCount === 1) {
+
         let firstRowResult: any = getAppUserInfoResult.rows[0];
         let hashPassword: string = firstRowResult.password;
         

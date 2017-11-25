@@ -38,7 +38,10 @@ export class DateFormatter {
      * @return A date object equivalent to the input.
      */
     public static ensureIsDate(date: Date): Date {
-        if (!(date instanceof Date))  date = new Date(date);
+        
+        if (!(date instanceof Date)) {
+            date = new Date(date);
+        }
         return date;
     }
 
@@ -176,7 +179,7 @@ export class DateFormatter {
      * @param date The date to convert to the string format.
      * @return The string format for the date.
      */
-    public static dateToMonthDayYearWallClickString(date: Date): string {
+    public static dateToDateTimeString(date: Date): string {
 
         if (date != null) {
             // Check to see if we are in fact passed a Date object (may have been stringified in JSON response)!

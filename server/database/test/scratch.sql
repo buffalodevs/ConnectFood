@@ -12,4 +12,6 @@ WHERE       Receiver.appUserKey = 1
   AND       ST_DWITHIN(ReceiverContactInfo.gpsCoordinate, DonorContactInfo.gpsCoordinate, 29731.67); */
 
 
-SELECT vehicleType FROM FoodListing;
+SELECT      AppUser.email, AppUserAvailability.*
+FROM        AppUserAvailability
+INNER JOIN  AppUser ON AppUserAvailability.appUserKey = AppUser.appUserKey;

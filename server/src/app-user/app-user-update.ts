@@ -1,10 +1,9 @@
 import { logSqlQueryExec, logSqlQueryResult } from "../logging/sql-logger";
 import { query, QueryResult } from "../database-util/connection-pool";
-import { login } from './app-user-login';
-import { signup } from './app-user-signup';
-import { SessionData, AppUserInfo } from "../common-util/session-data";
 
-import { Validation } from "../../../shared/common-util/validation";
+import { SessionData, AppUserInfo } from "../common-util/session-data";
+import { login } from './app-user-login';
+import { addOrUpdateAppUser } from "./app-user-add-update";
 
 
 /**
@@ -17,11 +16,7 @@ import { Validation } from "../../../shared/common-util/validation";
  */
 export function updateAppUser(appUserUpdateInfo: AppUserInfo, newPassword: string,
                               currentPasswordCheck: string, appUserSessionData: SessionData): Promise<SessionData>
-{
-    // Make sure that update information is in a correct format.
-    let validationErr: Error = Validation.validateAppUserInfo(appUserUpdateInfo, newPassword);
-    if (validationErr != null)  throw validationErr;
-    
+{   
     // Check the current password if provided by user (when updating password).
     let passwordCheckPromise: Promise<void> = Promise.resolve();
     if (currentPasswordCheck != null) {
@@ -69,6 +64,7 @@ function checkPassword(currentEmail: string, currentPassword: string): Promise<v
  * @return true if we have address update fields, false if not.
  */
 function isAddressInfoUpdate(appUserUpdateInfo: AppUserInfo): boolean {
+
     return (appUserUpdateInfo.address != null
         ||  appUserUpdateInfo.city != null
         ||  appUserUpdateInfo.state != null
@@ -82,6 +78,7 @@ function isAddressInfoUpdate(appUserUpdateInfo: AppUserInfo): boolean {
  * @param request The request from the client (incldues session data to fill missing address parts with).
  */
 function fillAddressUpdateInfo(appUserUpdateInfo: AppUserInfo, appUserSessionInfo: AppUserInfo): void {
+
     if (appUserUpdateInfo.address == null)  appUserUpdateInfo.address = appUserSessionInfo.address;
     if (appUserUpdateInfo.city == null)     appUserUpdateInfo.city = appUserSessionInfo.city;
     if (appUserUpdateInfo.state == null)    appUserUpdateInfo.state = appUserSessionInfo.state;
@@ -98,7 +95,7 @@ function fillAddressUpdateInfo(appUserUpdateInfo: AppUserInfo, appUserSessionInf
  */
 function performDatabaseUpdate(appUserUpdateInfo: AppUserInfo, newPassword: string, appUserUpdateKey: number): Promise<SessionData> {
 
-    return signup(appUserUpdateInfo, newPassword, appUserUpdateKey)
+    return addOrUpdateAppUser(appUserUpdateInfo, newPassword, appUserUpdateKey)
         .then((sessionData: SessionData) => {
             console.log('App User update successful.');
             return Promise.resolve(sessionData);

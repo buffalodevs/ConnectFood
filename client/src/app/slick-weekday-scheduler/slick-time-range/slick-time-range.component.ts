@@ -5,7 +5,7 @@ import { ValidationService } from '../../common-util/services/validation.service
 
 import { DateFormatter } from '../../../../../shared/common-util/date-formatter';
 import { TimeRange } from '../../../../../shared/app-user/time-range';
-import { SlickTimeRangeValidationService } from './validation/slick-time-range-validation.service';
+import { SlickTimeRangeValidationService } from './slick-time-range-validation.service';
 
 
 @Component({
@@ -86,7 +86,7 @@ export class SlickTimeRangeComponent implements OnInit, OnChanges, ControlValueA
     public ngOnChanges(changes: SimpleChanges): void {
         
         // Make sure we validate the contained form when validate is marked as true.
-        if (changes.validate && changes.validate.currentValue) {
+        if (changes.validate && changes.validate.currentValue && this.timeRangeForm) {
             this.validationService.markAllAsTouched(this.timeRangeForm);
         }
     }

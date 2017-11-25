@@ -1,10 +1,14 @@
 #wrapper {
     display: inline-block;
     font-size: 18px;
+    text-align: left;
 }
 
 #start-time-form, #end-time-form {
     white-space: nowrap;
+    display: inline-block;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 #to-separator {
@@ -14,7 +18,8 @@
 }
 
 #err-msg {
-    margin-top: 5px;
+    margin-top: 10px;
+    font-size: 14px;
 }
 
 md-input-container {

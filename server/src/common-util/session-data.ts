@@ -21,11 +21,16 @@ export class SessionData {
     private static readonly SESSION_DATA_KEY = 'sessionData';
 
 
-    constructor(
-        public appUserInfo:         AppUserInfo = new AppUserInfo(),
-        public appUserKey?:         number,
-        public signupVerified?:     boolean
+    public constructor (
+        public appUserInfo: AppUserInfo = new AppUserInfo(),
+        public appUserKey?: number,
+        public verificationToken?: string
     ) { }
+
+
+    get signupVerified(): boolean {
+        return ( this.verificationToken != null );
+    }
 
 
     /**

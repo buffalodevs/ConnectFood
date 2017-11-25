@@ -40,3 +40,7 @@ h2 {
 :host ::ng-deep md-input-container {
     width: 100%;
 }
+
+slick-auto-complete-input {
+    margin-bottom: 10px;
+}

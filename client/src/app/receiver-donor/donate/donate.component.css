@@ -22,11 +22,6 @@ md-form-field, md-input-container {
     width: 100%;
 }
 
-::ng-deep .mat-horizontal-content-container {
-    padding-left: 0px !important;
-    padding-right: 0px !important;
-}
-
 .inline-error, md-form-field, md-input-container {
     font-size: 20px;
 }
@@ -62,7 +57,7 @@ button.mat-raised-button.mat-primary.file-upload-button {
     font-size: 18px;
 }
 
-::ng-deep .mat-horizontal-stepper-header-container {
+:host ::ng-deep .mat-horizontal-stepper-header-container {
     height: 0px;
     visibility: hidden;
 }

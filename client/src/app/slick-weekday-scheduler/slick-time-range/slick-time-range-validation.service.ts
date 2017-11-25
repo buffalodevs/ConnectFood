@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { FormGroup, AbstractControl, ValidationErrors } from '@angular/forms';
 
-import { ValidationService } from '../../../common-util/services/validation.service';
+import { ValidationService } from '../../common-util/services/validation.service';
 
-import { DateFormatter } from '../../../../../../shared/common-util/date-formatter';
+import { DateFormatter } from '../../../../../shared/common-util/date-formatter';
 
 
 @Injectable()
@@ -23,7 +23,7 @@ export class SlickTimeRangeValidationService extends ValidationService {
      */
     public timeOrder(startTimeControlName: string = 'startTime', endTimeControlName: string = 'endTime'): (group: FormGroup) => any {
         
-        return function(group: FormGroup): any {
+        return function(group: FormGroup): {[key: string]: any} {
 
             // Get the time strings from the from controls.
             let startTime: string = group.get(startTimeControlName).value;

@@ -33,6 +33,17 @@ RETURNS TABLE
 AS $$
 BEGIN
 
+    -- First, if email is being updated, ensure that new email does not already exist (fail fast)!
+    IF EXISTS (
+        SELECT  1
+        FROM    AppUser
+        WHERE   AppUser.email = _email
+          AND   AppUser.appUserKey <> _appUserKey
+    )
+    THEN
+        RAISE EXCEPTION 'Duplicate email provided';
+    END IF;
+
     -- Permorm the update on the AppUser table fields and get keys to related tables that may need updating.
     UPDATE AppUser
     SET email       = COALESCE(_email, email),
