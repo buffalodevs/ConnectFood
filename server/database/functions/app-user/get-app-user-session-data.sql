@@ -39,14 +39,24 @@ AS $$
                                             'city',             ContactInfo.city,
                                             'state',            ContactInfo.state,
                                             'zip',              ContactInfo.zip,
-                                            -- @ts-sql class="gpsCoordinate" file="/shared/common-util/geocode.ts"
+                                            -- @ts-sql class="GPSCoordinate" file="/shared/common-util/geocode.ts"
                                             'gpsCoordinate',    JSON_BUILD_OBJECT (
                                                                     'latitude',         ST_Y(ContactInfo.gpsCoordinate::GEOMETRY),
                                                                     'longitude',        ST_X(ContactInfo.gpsCoordinate::GEOMETRY)
                                                                 ),
                                             'phone',            ContactInfo.phone,
                                             'isDonor',          AppUser.isDonor,
-                                            'isReceiver',       AppUser.isReceiver
+                                            'isReceiver',       AppUser.isReceiver,
+                                            'availability',     (   SELECT  ARRAY_AGG (
+                                                                                -- @ts-sql class="TimeRangeStr" file="/shared/app-user/time-range.ts"
+                                                                                JSON_BUILD_OBJECT (
+                                                                                    'weekday',      (SELECT EXTRACT(DOW FROM AppUserAvailability.startTime)),
+                                                                                    'startTime',    TO_CHAR(AppUserAvailability.startTime, 'HH12:MI AM'),
+                                                                                    'endTime',      TO_CHAR(AppUserAvailability.endTime, 'HH12:MI AM')
+                                                                                )
+                                                                            )
+                                                                    FROM    AppUserAvailability
+                                                                    WHERE   AppUserAvailability.appUserKey = AppUser.appUserKey )
                                         ),
                 'verificationToken',    UnverifiedAppUser.verificationToken
             )
@@ -68,4 +78,4 @@ AS $$
 
 $$ LANGUAGE sql;
 
-SELECT * FROM getAppUserSessionData(NULL, 'marknemm@buffalo.edu', TRUE);
+--SELECT * FROM getAppUserSessionData(NULL, 'marknemm@buffalo.edu', TRUE);

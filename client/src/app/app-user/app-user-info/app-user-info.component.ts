@@ -1,15 +1,20 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl, FormControl, ValidatorFn } from '@angular/forms';
+import { FormGroup, Validators, AbstractControl, FormControl, ValidatorFn } from '@angular/forms';
 import { Observable } from "rxjs/Observable";
 import { Subscription } from "rxjs/Subscription";
 
+import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
+import { AppUserValidationService } from '../common-app-user/app-user-validation.service';
+import { AppUserConstantsService } from '../common-app-user/app-user-constants.service';
 import { AppUserUpdateService } from "./app-user-update.service";
 import { SessionDataService } from "../../common-util/services/session-data.service";
 import { FoodWebBusyConfig } from "../../common-util/etc/food-web-busy-config";
-
+ 
 import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 import { Validation } from "../../../../../shared/common-util/validation";
 import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
+import { SignupErrors } from '../../../../../shared/app-user/signup-message';
+import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
 
 
 @Component({
@@ -18,99 +23,88 @@ import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web
     styleUrls: ['./app-user-info.component.css'],
     providers: [AppUserUpdateService]
 })
-export class AppUserInfoComponent {
+export class AppUserInfoComponent extends AbstractModelDrivenComponent {
     
     private isOrganization: boolean;
-    
-    private appUserInfoForm: FormGroup;
     private editFlags: Map<string, boolean>;
-    private errMsgs: Map<string, string>;
-    private busySaveConfig: FoodWebBusyConfig;
 
 
-    constructor(
-        private formBuilder: FormBuilder,
+    public constructor (
+        private appUserValidationService: AppUserValidationService,
+        private appUserConstantsService: AppUserConstantsService,
         private appUserUpdateService: AppUserUpdateService,
         private sessionDataService: SessionDataService
     ) {
+        super(appUserValidationService);
+
         let appUserInfo: AppUserInfo = sessionDataService.getAppUserSessionData();
 
         // Set some form labels based off of whether or not user is an organization.
         this.isOrganization = (appUserInfo.organizationName != null);
 
-        this.appUserInfoForm = new FormGroup({});
+        this.form = new FormGroup({});
         this.editFlags = new Map<string, boolean>();
-        this.errMsgs = new Map<string, string>();
-
-        // Loader symbol with this configuration will be displayed if we are stuck saving for a noticably long period of time.
-        this.busySaveConfig = new FoodWebBusyConfig('Saving');
 
         // Fill the form group model based off of the properties found in AppUserInfo.
         // Also, add edit flags based off of the properties.
         for (let property in appUserInfo) {
             if (appUserInfo.hasOwnProperty(property)) {
-                let validators: ValidatorFn[] = [Validators.required];
+
+                let validators: ValidatorFn[] = [ Validators.required ];
 
                 // Add additional needed validators for email and password fields.
-                switch(property) {
-                    case 'email':       validators.push(Validators.email);                                  break;
-                    case 'state':       validators.push(Validators.minLength(2));                           break;
-                    case 'zip':         validators.push(Validators.pattern(Validation.ZIP_REGEX));          break;
-                    case 'phone':       validators.push(Validators.pattern(Validation.PHONE_REGEX));        break;
+                switch (property) {
+                    case 'email':       validators.push(Validators.pattern(Validation.EMAIL_REGEX));    break;
+                    case 'zip':         validators.push(Validators.pattern(Validation.ZIP_REGEX));      break;
                 }
 
                 let initValue: any = (appUserInfo[property] == null) ? '' : appUserInfo[property];
-                this.appUserInfoForm.addControl(property, new FormControl(initValue.toString(), validators));
+                this.form.addControl(property, new FormControl(initValue, validators));
                 this.editFlags.set(property, false);
-                this.errMsgs.set(property, null);
             }
         }
 
         // Initialize form with elements that are not part of AppUserInfo object.
-        this.appUserInfoForm.addControl('password', new FormControl('', [Validators.pattern(Validation.PASSWORD_REGEX)]));
-        this.appUserInfoForm.addControl('currentPassword', new FormControl('', [Validators.required, Validators.pattern(Validation.PASSWORD_REGEX),
-                                                                                this.passwordConfirmed.bind(this)]));
-        this.appUserInfoForm.addControl('confirmPassword', new FormControl('', [Validators.required, Validators.pattern(Validation.PASSWORD_REGEX),
-                                                                                this.passwordConfirmed.bind(this)]));
+        this.form.addControl('password', new FormControl('', [Validators.required, Validators.pattern(Validation.PASSWORD_REGEX)]));
+        this.form.addControl('currentPassword', new FormControl('', [Validators.required, Validators.pattern(Validation.PASSWORD_REGEX)]));
+        this.form.addControl('confirmPassword', new FormControl('', [Validators.required, Validators.pattern(Validation.PASSWORD_REGEX)]));
+        this.form.setValidators(this.appUserValidationService.confirmPasswordEqual());
     }
 
 
     /**
-     * Sets a field in the App User Info form to be editable and focuses the form control used for editing.
+     * Sets a field in the App User Info form to be (un)editable and focuses the form control used for editing.
      * @param editFormControlId The id of the form control that will be used for editing.
+     * @param editable Default is true. The edit state to be set.
      */
-    private setEditable(editFormControlId: string): void {
-        // Reset the validation state of the fields involved in the edit.
-        this.controls[editFormControlId].markAsUntouched();
-        if (editFormControlId === 'password') {
-            this.controls.currentPassword.markAsUntouched();
-            this.controls.confirmPassword.markAsUntouched();
-        }
+    private setEditable(editFormControlId: string, editable: boolean = true): void {
+        this.setManyEditable([editFormControlId], editable);
+    }
 
-        this.editFlags.set(editFormControlId, true);
+
+    /**
+     * Sets many fields in the App User Info form to be (un)editable and focuses the form control used for editing.
+     * @param editFormControlIds A list of the ids of the form controls that will be used for editing.
+     * @param editable Default is true. The edit state to be set.
+     */
+    private setManyEditable(editFormControlIds: string[], editable: boolean = true): void {
+
+        for (let i: number = 0; i < editFormControlIds.length; i++) {
+
+            // Reset the validation state of the fields involved in the edit.
+            this.control(editFormControlIds[i]).markAsUntouched();                
+
+            // Set the form control value to the session data value for consistency.
+            this.control(editFormControlIds[i]).setValue(this.sessionDataService.getAppUserSessionData()[editFormControlIds[i]]);
+
+            this.editFlags.set(editFormControlIds[i], editable);
+        }
 
         // Force processing of form input element after it is shown (via *ngIf) by inserting into end of event queue (via setTimeout).
-        setTimeout(() => {
-            document.getElementById(editFormControlId).focus();
+        if (editable)  setTimeout(() => {
+            let input: HTMLElement = document.getElementById(editFormControlIds[0]);
+            if (input != null)  input.focus();
         }, 0);
-    }
-
-
-    /**
-     * Validator used to check if the password and confirm password values are equal.
-     * @return null if they are equal, or { passwordConfirmed: false } object if they are not.
-     */
-    private passwordConfirmed(): { passwordConfirmed: boolean } {
-
-        // If the password and confirm password fields match or the fields do not yet exist.
-        if (   this.controls.password == null
-            || this.controls.confirmPassword == null
-            || this.controls.password.value === this.controls.confirmPassword.value)
-        {
-            return null; // Valid (return no error flag)
-        }
-
-        return { passwordConfirmed: true }; // Invalid (return passwordConfirmed error flag)
     }
 
 
@@ -122,20 +116,12 @@ export class AppUserInfoComponent {
      */
     private savePassword(currentPasswordName: string, newPasswordName: string, confirmPasswordName: string): void {
 
-        let currentPassword: AbstractControl = this.controls[currentPasswordName];
-        let newPassword: AbstractControl = this.controls[newPasswordName];
-        let confirmPassword: AbstractControl = this.controls[confirmPasswordName];
-
-        // Make sure we can see valid states.
-        this.forceValidation(currentPassword);
-        this.forceValidation(newPassword);
-        this.forceValidation(confirmPassword);
+        let currentPassword: AbstractControl = this.control(currentPasswordName);
+        let newPassword: AbstractControl = this.control(newPasswordName);
+        let confirmPassword: AbstractControl = this.control(confirmPasswordName);
 
         // First validate the password fields before saving the password.
-        if (   this.isValid(currentPassword)
-            && this.isValid(newPassword)
-            && this.isValid(confirmPassword))
-        {
+        if (currentPassword.valid && newPassword.valid && confirmPassword.valid) {
             this.saveMany([ newPasswordName ], newPassword.value, currentPassword.value);
         }
     }
@@ -163,11 +149,9 @@ export class AppUserInfoComponent {
         // Go through each form control checking valid state and adding value to update object.
         for (let i: number = 0; i < saveFormControlNames.length && newPassword === null; i++) {
 
-            let saveFormControl: AbstractControl = this.controls[saveFormControlNames[i]];
+            let saveFormControl: AbstractControl = this.control(saveFormControlNames[i]);
 
-            // Check valid state of each control.
-            this.forceValidation(saveFormControl);
-            if (!this.isValid(saveFormControl)) {
+            if (!saveFormControl.valid) {
                 return; // Invalid control, force out now!
             }
             
@@ -179,48 +163,22 @@ export class AppUserInfoComponent {
         // Send save field update to server and listen for response.
         let observable: Observable<FoodWebResponse> = this.appUserUpdateService.updateAppUserInfo(appUserInfoUpdate, newPassword, currentPassword);
         
-        this.busySaveConfig.busy = observable.subscribe((response: FoodWebResponse) => {
-            console.log(response.message);
+        observable.subscribe((response: FoodWebResponse) => {
 
             // Update all involved form controls based off of reply from server.
             for (let i: number = 0; i < saveFormControlNames.length; i++) {
 
-                if(response.success) {
-                    this.errMsgs.set(saveFormControlNames[i], null);
-                    this.editFlags.set(saveFormControlNames[i], false);
+                if (response.success) {
+                    this.control(saveFormControlNames[i]).setErrors(null);
+                    this.setEditable(saveFormControlNames[i], false);
                 }
-                else {
-                    this.errMsgs.set(saveFormControlNames[i], response.message);
+                else if (response.message === SignupErrors.DUPLICATE_EMAIL) {
+                    this.appUserValidationService.addError(this.control(saveFormControlNames[i]), 'duplicateEmail', response.message);
+                }
+                else if (response.message === SignupErrors.INVALID_ADDRESS) {
+                    this.appUserValidationService.addError(this.control(saveFormControlNames[i]), 'invalidAddress', response.message);
                 }
             }
         });
-    }
-
-
-    /**
-     * Forces a given field to validate by marking it touched and dirty.
-     * @param validField The field to force validation on.
-     */
-    private forceValidation(validField: AbstractControl): void {
-        validField.markAsTouched();
-        validField.markAsDirty();
-    }
-
-
-    /**
-     * Checks if a given field is valid.
-     * @param validField The field to check for validity.
-     * @return true if the field is valid, false if not.
-     */
-    private isValid(validField: AbstractControl): boolean {
-        return (validField.errors == null || !validField.touched || !validField.dirty);
-    }
-
-
-    /**
-     * Gets a raw list of the form controls.
-     */
-    private get controls(): { [key: string]: AbstractControl } {
-        return this.appUserInfoForm.controls;
     }
 }

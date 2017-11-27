@@ -1,196 +1,217 @@
-<div [formGroup]="appUserInfoForm" class="container" [ngBusy]="busySaveConfig" spellcheck="false">
+<div [formGroup]="form" class="container" [ngBusy]="busySaveConfig" spellcheck="false">
 
     <h2 class>Identification</h2>
     <hr>
-    <div class="row">
+    <div class="row no-pad-top-input">
 
         <div class="col-md-6">
+
             <div class="form-group">
-                <label for="email">Email Address:</label><br>
+
+                <h4>Email Address:</h4>
+
                 <span *ngIf="!editFlags.get('email')" class="link-content" (click)="setEditable('email')" title="edit">
-                    {{controls.email.value}}<i class="material-icons">&#xe254;</i>
+                    {{ control('email').value }}<i class="material-icons">&#xe254;</i>
                 </span>
-                <span *ngIf="editFlags.get('email')">
-                    <md-input-container class="input-infix">
-                        <input mdInput type="email" id="email" formControlName="email" (keyup.enter)="saveEmail.click()" autocomplete="on">
-                        <md-icon #saveEmail mdSuffix (click)="save('email')">
-                            <i class="material-icons">save</i>
-                        </md-icon>
-                        <md-error>Required (must be valid email)</md-error>
+
+                <form [formGroup]="form" (ngSubmit)="save('email')" *ngIf="editFlags.get('email')">
+
+                    <md-input-container floatPlaceholder="never">
+                        <input mdInput type="email" id="email" formControlName="email" placeholder="Email">
+                        <md-error *ngIf="hasError('email')">{{ errorMsgFor('email') }}</md-error>
                     </md-input-container>
-                </span>
+
+                    <button md-raised-button color="primary" class="button-sm" type="submit">Save</button>
+                    <button md-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('email', false)">Cancel</button>
+
+                </form>
+
             </div>
 
             <div *ngIf="isOrganization" class="form-group">
-                <label for="organizationName">Organization Name:</label><br>
+
+                <h4>Organization Name:</h4>
+
                 <span *ngIf="!editFlags.get('organizationName')" class="link-content" (click)="setEditable('organizationName')" title="edit">
-                    {{controls.organizationName.value}}<i class="material-icons">&#xe254;</i>
+                    {{ control('organizationName').value}}<i class="material-icons">&#xe254;</i>
                 </span>
-                <span *ngIf="editFlags.get('organizationName')">
-                    <md-input-container class="input-infix">
-                        <input mdInput id="organizationName" formControlName="organizationName" (keyup.enter)="saveOrganizationName.click()" autocomplete="on">
-                        <md-icon #saveOrganizationName mdSuffix (click)="save('organizationName')">
-                            <i class="material-icons">save</i>
-                        </md-icon>
-                        <md-error>Required</md-error>
+
+                <form [formGroup]="form" (ngSubmit)="save('organizationName')" *ngIf="editFlags.get('organizationName')">
+
+                    <md-input-container floatPlaceholder="never">
+                        <input mdInput id="organizationName" formControlName="organizationName" placeholder="Organization Name">
                     </md-input-container>
-                </span>
+
+                    <button md-raised-button color="primary" class="button-sm" type="submit">Save</button>
+                    <button md-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('organizationName', false)">Cancel</button>
+
+                </form>
+
             </div>
+
         </div><!-- col 2 -->
 
         <div class="col-md-6">
-            <div class="form-group">
-                <label for="firstName">{{ isOrganization ? 'Admin First Name' : 'First Name' }}:</label><br>
-                <span *ngIf="!editFlags.get('firstName')" class="link-content" (click)="setEditable('firstName')" title="edit">
-                    {{controls.firstName.value}}<i class="material-icons">&#xe254;</i>
-                </span>
-                <span *ngIf="editFlags.get('firstName')">
-                    <md-input-container class="input-infix">
-                        <input mdInput id="firstName" formControlName="firstName" (keyup.enter)="saveFirstName.click()" autocomplete="on">
-                        <md-icon #saveFirstName mdSuffix (click)="save('firstName')">
-                            <i class="material-icons">save</i>
-                        </md-icon>
-                        <md-error>Required</md-error>
-                    </md-input-container>
-                </span>
-            </div>
 
             <div class="form-group">
-                <label for="lastName">{{ isOrganization ? 'Admin Last Name' : 'Last Name' }}:</label><br>
-                <span *ngIf="!editFlags.get('lastName')" class="link-content" (click)="setEditable('lastName')" title="edit">
-                    {{controls.lastName.value}}<i class="material-icons">&#xe254;</i>
+
+                <h4>{{ isOrganization ? 'Admin Name' : 'Name' }}:</h4>
+
+                <span *ngIf="!editFlags.get('firstName')" class="link-content" (click)="setManyEditable(['firstName', 'lastName'])" title="edit">
+                    {{ control('firstName').value }} {{ control('lastName').value }}<i class="material-icons">&#xe254;</i>
                 </span>
-                <span *ngIf="editFlags.get('lastName')">
-                    <md-input-container class="input-infix">
-                        <input mdInput id="lastName" formControlName="lastName" (keyup.enter)="saveLastName.click()" autocomplete="on">
-                        <md-icon #saveLastName mdSuffix (click)="save('lastName')">
-                            <i class="material-icons">save</i>
-                        </md-icon>
-                        <md-error>Required</md-error>
-                    </md-input-container>
-                </span>
+
+                <form [formGroup]="form" (ngSubmit)="saveMany(['firstName', 'lastName'])" *ngIf="editFlags.get('firstName')">
+
+                    <div class="row">
+
+                        <md-input-container floatPlaceholder="never" class="col-md-6">
+                            <input mdInput id="firstName" placeholder="First Name" formControlName="firstName">
+                        </md-input-container>
+
+                        <md-input-container floatPlaceholder="never" class="col-md-6">
+                            <input mdInput id="lastName" placeholder="Last Name" formControlName="lastName">
+                        </md-input-container>
+
+                    </div>
+
+                    <button #saveName md-raised-button color="primary" class="button-sm" type="submit">Save</button>
+                    <button md-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setManyEditable(['firstName', 'lastName'], false)">Cancel</button>
+
+                </form>
+
             </div>
+
         </div><!-- col 1 -->
 
     </div><br><br><!-- row -->
 
     <h2 class>Contact Info</h2>
     <hr>
-    <div class="row">
+    <div class="row no-pad-top-input">
 
         <div class="col-md-6">
+
+            <h4>Address:</h4>
+
             <div class="form-group" *ngIf="!editFlags.get('address')">
-                <label for="address">Address:</label><br>
-                <span class="link-content" (click)="setEditable('address')" title="edit">
-                    {{controls.address.value}}<br>
-                    {{controls.city.value}}, {{controls.state.value}} {{controls.zip.value}}<i class="material-icons">&#xe254;</i>
+                <span class="link-content" (click)="setManyEditable(['address', 'city', 'state', 'zip'])" title="edit">
+                    {{ control('address').value }}<br>
+                    {{ control('city').value }}, {{ control('state').value }} {{ control('zip').value }}<i class="material-icons">&#xe254;</i>
                 </span>
             </div>
 
-            <form [formGroup]="appUserInfoForm" (ngSubmit)="saveMany(['address', 'city', 'state', 'zip'])" *ngIf="editFlags.get('address')">
+            <form [formGroup]="form" (ngSubmit)="saveMany(['address', 'city', 'state', 'zip'])" *ngIf="editFlags.get('address')">
 
-                <div class="form-group">
-                    <label for="address">Address:</label><br>
-                    <span>
-                        <md-input-container class="input-infix">
-                            <input mdInput id="address" formControlName="address" autocomplete="on">
-                            <md-error>Required</md-error>
-                        </md-input-container>
-                    </span>
+                <md-input-container floatPlaceholder="never" class="form-group">
+                    <input mdInput id="address" placeholder="Street Address" name="address" formControlName="address">
+                </md-input-container>
+
+                <div class="row">
+
+                    <md-input-container floatPlaceholder="never" class="form-group col-md-5">
+                        <input mdInput placeholder="City" name="city" formControlName="city">
+                    </md-input-container>
+
+                    <slick-auto-complete-input [autoCompleteData]="appUserConstantsService.STATE_LIST" floatPlaceholder="never" placeholder="State"
+                    [selectOnBlur]="true" [mustMatchAutoComplete]="true" class="col-md-3" [inputControl]="control('state')"></slick-auto-complete-input>
+
+                    <md-input-container floatPlaceholder="never" class="form-group col-md-4">
+                        <input mdInput placeholder="Zip" name="zip" [InputFilter]="appUserConstantsService.DYNAMIC_ZIP_REGEX" formControlName="zip">
+                        <md-error *ngIf="hasError('zip')">{{ errorMsgFor('zip') }}</md-error>
+                    </md-input-container>
+
                 </div>
 
-                <div class="form-group">
-                    <label for="city">City:</label><br>
-                    <span>
-                        <md-input-container class="input-infix">
-                            <input mdInput id="city" formControlName="city" autocomplete="on">
-                            <md-error>Required</md-error>
-                        </md-input-container>
-                    </span>
-                </div>
-
-                <div class="form-group">
-                    <label for="state">State:</label><br>
-                    <span>
-                        <md-input-container class="input-infix">
-                            <input mdInput id="state" formControlName="state" autocomplete="on" maxlength="2">
-                            <md-error>Required (valid 2 letter state)</md-error>
-                        </md-input-container>
-                    </span>
-                </div>
-
-                <div class="form-group">
-                    <label for="zip">ZIP Code:</label><br>
-                    <span>
-                        <md-input-container class="input-infix">
-                            <input mdInput id="zip" formControlName="zip" autocomplete="on" maxlength="5">
-                            <md-error>Required (must be 5 digits long)</md-error>
-                        </md-input-container>
-                    </span>
-                </div>
-
-                <md-error *ngIf="errMsgs.get('address') != null">{{ errMsgs.get('address') }}</md-error>
-
-                <button md-raised-button color="primary" class="button-md" type="submit">Save</button>
+                <button md-raised-button color="primary" class="button-sm" type="submit">Save</button>
+                <button md-raised-button color="primary" class="button-sm warn-button" type="button"
+                 (click)="setManyEditable(['address', 'city', 'state', 'zip'], false)">Cancel</button>
 
             </form>
 
         </div><!-- col 1 -->
 
         <div class="col-md-6">
-            
             <div class="form-group">
-                <label for="phone">Phone Number:</label><br>
-                <span *ngIf="!editFlags.get('phone')" class="link-content" (click)="setEditable('phone')" title="edit">
-                    {{controls.phone.value}}<i class="material-icons">&#xe254;</i>
-                </span>
-                <span *ngIf="editFlags.get('phone')">
-                    <md-input-container class="input-infix">
-                        <input mdInput id="phone" formControlName="phone" (keyup.enter)="savePhone.click()" autocomplete="on" maxlength="12">
-                        <md-icon #savePhone mdSuffix (click)="save('phone')">
-                            <i class="material-icons">save</i>
-                        </md-icon>
-                        <md-error>Required (format ###-###-####)</md-error>
-                    </md-input-container>
-                </span>
+
+                <h4>Phone Number:</h4>
+
+                <div class="form-group" *ngIf="!editFlags.get('phone')">
+                    <span class="link-content" (click)="setEditable('phone')" title="edit">
+                        {{ control('phone').value }}<i class="material-icons">&#xe254;</i>
+                    </span>
+                </div>
+
+                <form [formGroup]="form" (ngSubmit)="save('phone')" *ngIf="editFlags.get('phone')">
+
+                    <phone id="phone" required="true" [includeLabel]="false" formControlName="phone"></phone>
+                    
+                    <button md-raised-button color="primary" class="button-sm" type="submit">Save</button>
+                    <button md-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('phone', false)">Cancel</button>
+
+                </form>
+
             </div>
         </div><!-- col 2 -->
 
     </div><br><br> <!-- row -->
 
-    <h2 class>Password</h2>
+    <h2>Availability</h2>
+    <hr>
+    <div class="row">
+
+        <slick-weekday-scheduler #availability id="availability" [displayOnly]="!editFlags.get('availability')" formControlName="availability"></slick-weekday-scheduler>
+
+        <div class="col-md-6">
+
+            <button md-raised-button color="primary" class="button-sm" *ngIf="!editFlags.get('availability')" (click)="setEditable('availability')">
+                Update Availability
+            </button>
+
+            <form [formGroup]="form" (ngSubmit)="save('availability')" *ngIf="editFlags.get('availability')">
+                <button md-raised-button color="primary" class="button-sm" type="submit">Save</button>
+                <button md-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('availability', false)">Cancel</button>
+            </form>
+
+        </div>
+
+    </div><br><br>
+
+    <h2>Password</h2>
     <hr>
     <div class="row">
             
         <div class="col-md-6">
-            <button md-raised-button color="primary" class="button-md" *ngIf="!editFlags.get('password')" (click)="setEditable('password')">
+            <button md-raised-button color="primary" class="button-sm" *ngIf="!editFlags.get('password')"
+             (click)="setManyEditable(['currentPassword', 'password', 'confirmPassword'])">
                 Update Password
             </button>
 
-            <form [formGroup]="appUserInfoForm" (ngSubmit)="savePassword('currentPassword', 'password', 'confirmPassword')" *ngIf="editFlags.get('password')">
+            <form [formGroup]="form" (ngSubmit)="savePassword('currentPassword', 'password', 'confirmPassword')" *ngIf="editFlags.get('password')">
+
                 <div class="form-group">
                     <md-input-container class="full-width">
-                        <input mdInput type="password" placeholder="Current Password" id="password" #currentPassword formControlName="currentPassword" required>
-                        <md-error>Required</md-error>
+                        <input mdInput type="password" placeholder="Current Password" id="currentPassword" #currentPassword formControlName="currentPassword">
                     </md-input-container>
                 </div>
                 
                 <div class="form-group">
                     <md-input-container class="full-width">
-                        <input mdInput type="password" placeholder="New Password" #newPassword formControlName="password" required>
-                        <md-error>Required (at least 6 characters)</md-error>
+                        <input mdInput type="password" placeholder="New Password" id="password" #password formControlName="password">
+                        <md-error *ngIf="hasError('password')">{{ errorMsgFor('password') }}</md-error>
                     </md-input-container>
                 </div>
 
                 <div class="form-group">
                     <md-input-container class="full-width">
-                        <input mdInput type="password" placeholder="Confirm Password" #confirmPassword formControlName="confirmPassword" required>
-                        <md-error>Required</md-error>
+                        <input mdInput type="password" placeholder="Confirm Password" id="confirmPassword" #confirmPassword formControlName="confirmPassword">
+                        <md-error *ngIf="hasError('confirmPassword')">{{ errorMsgFor('confirmPassword') }}</md-error>
                     </md-input-container>
                 </div>
 
-                <button md-raised-button color="primary" class="button-md" type="submit">Save</button>
-                <button md-raised-button color="primary" class="button-md" type="button" (click)="this.editFlags.set('password', false)">Cancel</button>
+                <button md-raised-button color="primary" class="button-sm" type="submit">Save</button>
+                <button md-raised-button color="primary" class="button-sm warn-button" type="button"
+                 (click)="setManyEditable(['currentPassword', 'password', 'confirmPassword'], false)">Cancel</button>
             </form>
         </div><!-- col -->
 

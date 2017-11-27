@@ -1,3 +1,6 @@
+import { Validation } from "./validation";
+
+
 class WallClockTime {
 
     public constructor (
@@ -19,11 +22,6 @@ class WallClockTime {
 
 
 export class DateFormatter {
-
-    // All timestamps for weekdays are based on date 11/12/2017 (Sunday).
-    private static readonly REF_DATE_MONTH: number = 11;
-    private static readonly REF_DATE_DAY: number = 12;
-    private static readonly REF_DATE_YEAR: number = 2017;
 
 
     // Pure static class!
@@ -152,7 +150,7 @@ export class DateFormatter {
      * Checks if a given string is in a proper wall clock format: /^([1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/
      */
     public static isWallClockFormat(time: string): boolean {
-        return (/^([1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/).test(time);
+        return (Validation.TIME_REGEX).test(time);
     }
 
 
@@ -229,31 +227,5 @@ export class DateFormatter {
             case 'saturday':    return 6;
             default:            throw new Error('Weekday string must be a valid day of the week, but this string was provided: ' + weekdayString);
         }
-    }
-
-
-    /**
-     * Converts a weekday time to a standard Date timestamp that is placed within the week of 11/12/2017.
-     * This is done for compactness of the time representation, easy comparison, and efficient storage.
-     * @param weekday The day of the week in string format (case insensitive).
-     * @param time The time in string format. Will be wall clock time with AM or PM after the time.
-     * @return The compact Date timestamp version of the weekday time.
-     */
-    public static convertWeekdayTimeToDate(weekday: string, time: string): Date {
-
-        const dateDay: number = ( DateFormatter.REF_DATE_DAY + DateFormatter.convertWeekdayStringToInt(weekday) );
-        return new Date(DateFormatter.REF_DATE_MONTH + '/' + dateDay + '/' + DateFormatter.REF_DATE_YEAR + ' ' + time);
-    }
-
-
-    /**
-     * Gets the date for a given weekday. The date is for the week of 11/12/2017 and is used meerly to signify a weekday and time in compact form.
-     * @param weekday The weekday string ['Sunday', 'Saturday'] (non-case sensitive).
-     * @return The weekday date.
-     */
-    public static getDateForWeekday(weekday: string): Date {
-
-        const dateDay: number = DateFormatter.convertWeekdayStringToInt(weekday);
-        return new Date('' + DateFormatter.REF_DATE_MONTH + '/' + (DateFormatter.REF_DATE_DAY + dateDay) + '/' + DateFormatter.REF_DATE_YEAR);
     }
 }

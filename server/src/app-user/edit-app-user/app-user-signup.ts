@@ -1,9 +1,9 @@
 'use strict';
-import { SessionData, AppUserInfo } from '../common-util/session-data';
+import { SessionData, AppUserInfo } from '../../common-util/session-data';
 import { addOrUpdateAppUser } from './app-user-add-update';
 
-import { logSqlQueryExec } from '../logging/sql-logger';
-import { query } from '../database-util/connection-pool';
+import { logSqlQueryExec } from '../../logging/sql-logger';
+import { query } from '../../database-util/connection-pool';
 
 let nodemailer = require("nodemailer-promise");
 require('dotenv');

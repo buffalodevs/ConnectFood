@@ -14,4 +14,7 @@ WHERE       Receiver.appUserKey = 1
 
 SELECT      AppUser.email, AppUserAvailability.*
 FROM        AppUserAvailability
-INNER JOIN  AppUser ON AppUserAvailability.appUserKey = AppUser.appUserKey;
+INNER JOIN  AppUser         ON AppUserAvailability.appUserKey = AppUser.appUserKey;
+
+
+--delete from AppUserPassword where appUserKey = 1 and createDate <> (select min(createDate) from AppUserPassword where appUserKey = 1)

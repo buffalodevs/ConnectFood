@@ -1,8 +1,8 @@
-import { logSqlQueryExec, logSqlQueryResult } from "../logging/sql-logger";
-import { query, QueryResult } from "../database-util/connection-pool";
+import { logSqlQueryExec, logSqlQueryResult } from "../../logging/sql-logger";
+import { query, QueryResult } from "../../database-util/connection-pool";
 
-import { SessionData, AppUserInfo } from "../common-util/session-data";
-import { login } from './app-user-login';
+import { SessionData, AppUserInfo } from "../../common-util/session-data";
+import { login } from '../login-app-user/app-user-login';
 import { addOrUpdateAppUser } from "./app-user-add-update";
 
 
@@ -19,7 +19,7 @@ export function updateAppUser(appUserUpdateInfo: AppUserInfo, newPassword: strin
 {   
     // Check the current password if provided by user (when updating password).
     let passwordCheckPromise: Promise<void> = Promise.resolve();
-    if (currentPasswordCheck != null) {
+    if (newPassword != null) {
         passwordCheckPromise = checkPassword(appUserSessionData.appUserInfo.email, currentPasswordCheck);
     }
 

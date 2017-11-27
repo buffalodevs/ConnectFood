@@ -3,7 +3,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { FormGroup, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
-import { ValidationService } from '../../common-util/services/validation.service';
+import { ValidationService, Validation } from '../../common-util/services/validation.service';
+
+export { Validation };
 
 
 @Injectable()

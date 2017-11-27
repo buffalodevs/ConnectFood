@@ -1,8 +1,9 @@
 'use strict';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../logging/sql-logger';
-import { connect, query, Client, QueryResult } from '../database-util/connection-pool';
-import { checkPassword } from './password-util';
-import { SessionData, AppUserInfo } from "../common-util/session-data";
+import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
+import { connect, query, Client, QueryResult } from '../../database-util/connection-pool';
+import { checkPassword } from '../common-app-user/password-util';
+import { SessionData, AppUserInfo } from "../../common-util/session-data";
+import { TimeRange } from '../../../../shared/app-user/time-range';
 
 
 /**
@@ -62,14 +63,13 @@ function analyzeGetAppUserInfoResult(email: string, password: string, getAppUser
             .then((isMatch: boolean) => {
 
                 if (isMatch) {
-                    let sessionData: SessionData = firstRowResult.sessiondata;
-                    return Promise.resolve(sessionData);
+                    return <SessionData>(firstRowResult.sessiondata);
                 }
 
-                return Promise.reject(new Error('Password is incorrect'));
+                throw new Error('Password is incorrect');
             });
     }
 
     // Otherwise, we could not find an AppUser with username or email in database.
-    return Promise.reject(new Error('AppUser could not be found with email: ' + email));
+    throw new Error('AppUser could not be found with email: ' + email);
 }

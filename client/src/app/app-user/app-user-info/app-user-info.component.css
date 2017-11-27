@@ -1,10 +1,3 @@
-label {
-    font-weight: bold;
-    font-size: 22px;
-    padding-bottom: 0px;
-    margin-bottom: 0px;
-}
-
 h2 {
     font-weight: bold;
 }
@@ -27,14 +20,14 @@ span {
     min-height: 50px;
 }
 
-span > i {
+span i {
     display: none;
     position: absolute;
     margin-left: 3px;
     margin-top: 5px;
 }
 
-span:hover > i {
+span:hover i {
     display: inline-block;
 }
 
@@ -44,13 +37,6 @@ input:not(.form-control) {
 
 .full-width {
     width: 100%;
-}
-
-.input-infix {
-    width: 100%;
-    padding-right: 30px;
-    position: absolute;
-    transform: translateY(-20px);
 }
 
 .select-infix {
@@ -65,12 +51,23 @@ input:not(.form-control) {
     transform: translateY(-3px);
 }
 
-input:not(.form-control), md-select {
-    margin-top: 0px;
+:host ::ng-deep input {
     font-size: 20px;
+}
+
+:host ::ng-deep .phone-3digits {
+    width: 40px !important;
+}
+
+:host ::ng-deep .phone-4digits {
+    width: 55px !important;
 }
 
 md-icon {
     cursor: pointer;
     cursor: hand;
+}
+
+:host ::ng-deep md-input-container {
+    width: 100%;
 }

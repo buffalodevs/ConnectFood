@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { AppUserType } from '../../../../shared/app-user/app-user-info';
+import { AppUserType } from '../../../../../shared/app-user/app-user-info';
 
 
 @Injectable()

@@ -1,8 +1,8 @@
-<form [formGroup]="signupForm" class="container" *ngIf="!signupComplete">
+<form [formGroup]="form" class="container" *ngIf="!signupComplete">
 
     <md-horizontal-stepper #stepper [linear]="true">
 
-        <md-step [stepControl]="signupForm.get('primary.appUserType')" [formGroup]="signupForm.get('primary')" label="User Type">
+        <md-step [stepControl]="control('primary.appUserType')" [formGroup]="control('primary')" label="User Type">
 
             <h3 class="center-text">What Type of User Are You</h3>
             <hr>
@@ -17,13 +17,13 @@
 
             </md-radio-group>
 
-            <button #appUserTypeNext *ngIf="signupForm.get('primary.appUserType').value != null"
+            <button #appUserTypeNext *ngIf="control('primary.appUserType').value != null"
                 md-raised-button color="primary" class="button-md" mdStepperNext>Next</button>
 
         </md-step>
 
         
-        <md-step [stepControl]="signupForm.get('primary')" [formGroup]="signupForm.get('primary')" label="Primary Info">
+        <md-step [stepControl]="control('primary')" [formGroup]="control('primary')" label="Primary Info">
 
             <!-- Next, get the user's primary information -->
             <h3 class="center-text">Identification and Password</h3>
@@ -81,7 +81,7 @@
 
         </md-step>
 
-        <md-step [stepControl]="signupForm.get('addressPhone')" [formGroup]="signupForm.get('addressPhone')" label="Address & Phone">
+        <md-step [stepControl]="control('addressPhone')" [formGroup]="control('addressPhone')" label="Address & Phone">
 
             <!-- Then, get the user's contact information -->
             <h3 class="center-text">Address and Phone</h3>
@@ -103,7 +103,7 @@
                             </md-input-container>
 
                             <slick-auto-complete-input [autoCompleteData]="appUserConstants.STATE_LIST" placeholder="State" [selectOnBlur]="true"
-                                [mustMatchAutoComplete]="true" class="col-md-3" [inputControl]="signupForm.get('addressPhone.state')"></slick-auto-complete-input>
+                                [mustMatchAutoComplete]="true" class="col-md-3" [inputControl]="control('addressPhone.state')"></slick-auto-complete-input>
 
                             <md-input-container id="zip" class="form-group col-md-4">
                                 <input mdInput placeholder="Zip" name="zip" [InputFilter]="appUserConstants.DYNAMIC_ZIP_REGEX" formControlName="zip">
@@ -126,7 +126,7 @@
 
         </md-step>
 
-        <md-step [stepControl]="signupForm" [formGroup]="signupForm" label="Availability">
+        <md-step [stepControl]="form" [formGroup]="form" label="Availability">
 
             <!-- Then, get the user's weekly availability information -->
             <h3 class="center-text">Weekly Availability</h3>
@@ -135,7 +135,7 @@
             <slick-weekday-scheduler [validate]="validate.get('availability')" formControlName="availability"></slick-weekday-scheduler>
 
             <button md-raised-button color="primary" class="button-md warn-button" type="button" mdStepperPrevious>Back</button>
-            <button md-raised-button color="primary" class="button-md" type="submit" (click)="signupUser(signupForm.value, signupForm.valid)">Submit</button>
+            <button md-raised-button color="primary" class="button-md" type="submit" (click)="signupUser(form.value, form.valid)">Submit</button>
 
         </md-step>
 

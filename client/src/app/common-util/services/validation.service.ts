@@ -1,4 +1,3 @@
-import { Injectable } from '@angular/core';
 import { AbstractControl, ValidatorFn, FormGroup, FormArray, FormControl, ValidationErrors } from '@angular/forms';
 
 import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
@@ -7,10 +6,29 @@ import { Validation } from '../../../../../shared/common-util/validation';
 export { Validation };
 
 
-@Injectable()
 export class ValidationService {
 
     public constructor() {}
+
+
+    /**
+     * Generates an error message for a given control (if there is an error).
+     * @param control The control for which to generate the error message.
+     * @param controlPath The path for the control for which to generate the error message.
+     * @return The generated error message if an error exists. null if no error exists.
+     */
+    public errorMsgFor(control: AbstractControl, controlPath?: string): string {
+        
+        if (control.hasError('required') || control.hasError('requiredTrue'))   return '* required';
+        if (control.hasError('pattern'))                                        return 'Incorrect format';
+        if (control.hasError('maxLength'))                                      return 'Entry too long';
+        if (control.hasError('minLength'))                                      return 'Entry too short';
+        if (control.hasError('max'))                                            return 'Value too large';
+        if (control.hasError('min'))                                            return 'Value too small';
+        if (control)
+
+        return null;
+    }
 
 
     /**

@@ -41,7 +41,22 @@ export class Validation {
     /**
      * Regular expression used for verifying wall clock time string (hh:mm [AM|PM]) format.
      */
-    public static readonly TIME_REGEX: RegExp = /^\d{1,2}\:\d{2} [AaPp][Mm]$/;
+    public static readonly TIME_REGEX: RegExp = /^(0?[1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/;
+
+    /**
+     * Regular expression used for verifying hour format.
+     */
+    public static readonly HH_REGEX: RegExp = /^(0?[1-9]|1[0-2]?)$/;
+
+    /**
+     * Regular expression used for verifying minute format.
+     */
+    public static readonly MM_REGEX: RegExp = /^([0-5][0-9])$/;
+
+    /**
+     * Regular expression used for verifying Am or Pm string (non-case sensitive) format.
+     */
+    public static readonly AM_OR_PM_REGEX: RegExp = /^([aApP][mM])$/;
 
     
     /**
@@ -106,6 +121,36 @@ export class Validation {
      */
     public static timeValidator(time: string): boolean {
         return Validation.TIME_REGEX.test(time);
+    }
+
+
+    /**
+     * Checks if an hour string is in the correct (hh) format.
+     * @param hour The hour string to check.
+     * @return true if it is, false if not.
+     */
+    public static hourValidator(hour: string): boolean {
+        return Validation.HH_REGEX.test(hour);
+    }
+
+
+    /**
+     * Checks if an minute string is in the correct (mm) format.
+     * @param minute The minute string to check.
+     * @return true if it is, false if not.
+     */
+    public static minuteValidator(minute: string): boolean {
+        return Validation.MM_REGEX.test(minute);
+    }
+
+
+    /**
+     * Checks if an Am or Pm string is in the correct format (non-case sensitive).
+     * @param amOrPm The Am or Pm string to check.
+     * @return true if it is, false if not.
+     */
+    public static amOrPmValidator(amOrPm: string): boolean {
+        return Validation.AM_OR_PM_REGEX.test(amOrPm);
     }
 
 

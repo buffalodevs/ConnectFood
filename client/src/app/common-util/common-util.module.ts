@@ -7,7 +7,7 @@ import { NumRangePipe } from './pipes/num-range.pipe';
 import { AutoFocusDirective } from './directives/auto-focus.directive';
 import { DefaultImgDirective } from './directives/default-img.directive';
 import { InputFilterDirective } from './directives/input-filter.directive';
-import { BannerComponent } from './banner/banner.component';
+import { BannerComponent } from './components/banner/banner.component';
 
 import { GeocodeService } from './services/geocode.service';
 import { RequestService } from './services/request.service';

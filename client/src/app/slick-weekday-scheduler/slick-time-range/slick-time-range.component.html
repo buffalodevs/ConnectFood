@@ -1,17 +1,17 @@
-<div id="wrapper" [formGroup]="timeRangeForm">
+<div id="wrapper" class="no-pad-top-input no-pad-mid-input no-pad-bottom-input" [formGroup]="timeRangeForm">
 
-    <slick-input-group #startTimeForm [formGroup]="startTimeForm" [validate]="validate"
+    <slick-input-group #startTimeForm [formGroup]="startTimeForm" [validate]="validate" *ngIf="!displayOnly"
      concatPattern="`hh`:`mm` `am`" [validators]="groupValidators" formControlName="startTime">
         <span id="start-time-form">
 
             <md-input-container floatPlaceholder="never">
-                <input mdInput placeholder="hh" formControlName="hh" [InputFilter]="HH_REG_EXP">
+                <input mdInput placeholder="hh" formControlName="hh" [InputFilter]="DYNAMIC_HH_REG_EXP">
             </md-input-container>
 
             <span>:</span>
 
             <md-input-container floatPlaceholder="never">
-                <input #startMM mdInput placeholder="mm" formControlName="mm" [InputFilter]="MM_REG_EXP" (blur)="ensureMinutes2Digits(startTimeForm.controls.mm)">
+                <input #startMM mdInput placeholder="mm" formControlName="mm" [InputFilter]="DYNAMIC_MM_REG_EXP" (blur)="ensureMinutes2Digits(startTimeForm.controls.mm)">
             </md-input-container>
 
             <slick-auto-complete-input containerId="am-pm" [autoCompleteData]="['Am', 'Pm']" placeholder="Am" floatPlaceholder="never"
@@ -20,20 +20,22 @@
         </span>
     </slick-input-group>
 
+    <span *ngIf="displayOnly">{{ timeRangeForm.get('startTime').value }}</span>
+
     <span id="to-separator">to</span>
 
-    <slick-input-group #endTimeForm [formGroup]="endTimeForm" [validate]="validate"
+    <slick-input-group #endTimeForm [formGroup]="endTimeForm" [validate]="validate" *ngIf="!displayOnly"
      concatPattern="`hh`:`mm` `am`" [validators]="groupValidators" formControlName="endTime">
         <span id="end-time-form">
             
             <md-input-container floatPlaceholder="never">
-                <input mdInput placeholder="hh" formControlName="hh" [InputFilter]="HH_REG_EXP">
+                <input mdInput placeholder="hh" formControlName="hh" [InputFilter]="DYNAMIC_HH_REG_EXP">
             </md-input-container>
 
             <span>:</span>
 
             <md-input-container floatPlaceholder="never">
-                <input #endMM mdInput placeholder="mm" formControlName="mm" [InputFilter]="MM_REG_EXP" (blur)="ensureMinutes2Digits(endTimeForm.controls.mm)">
+                <input #endMM mdInput placeholder="mm" formControlName="mm" [InputFilter]="DYNAMIC_MM_REG_EXP" (blur)="ensureMinutes2Digits(endTimeForm.controls.mm)">
             </md-input-container>
 
             <slick-auto-complete-input containerId="am-pm" [autoCompleteData]="['Am', 'Pm']" placeholder="Am" floatPlaceholder="never"
@@ -41,6 +43,8 @@
 
          </span>
     </slick-input-group>
+
+    <span *ngIf="displayOnly">{{ timeRangeForm.get('endTime').value }}</span>
 
     <div id="err-msg" class="warn-foreground" *ngIf="timeRangeForm.errors != null">
         <span>{{ validationService.errorMsgFor(timeRangeForm) }}</span>

@@ -11,8 +11,12 @@ CREATE OR REPLACE FUNCTION updateAvailability
 )
 RETURNS VOID
 AS $$
-    DECLARE _startTime  AppUserAvailability.startTime%TYPE;
-    DECLARE _endTime    AppUserAvailability.endTime%TYPE;
+    DECLARE _weekday        INTEGER;
+    DECLARE _startTime      TEXT;
+    DECLARE _endTime        TEXT;
+    DECLARE _weekdayDate    TEXT;
+    DECLARE _startTimestamp AppUserAvailability.startTime%TYPE;
+    DECLARE _endTimestamp   AppUserAvailability.endTime%TYPE;
 BEGIN
 
     -- First delete all current availability entries for the given App User.
@@ -20,17 +24,31 @@ BEGIN
     WHERE       appUserKey = _appUserKey;
 
 
-    -- Loop through all time ranges in _timeRanges argument, and add them into AppUserAvailability.
+    -- Iterate through all time ranges in _timeRanges argument, and add them into AppUserAvailability.
     FOR i IN array_lower(_timeRanges, 1) .. array_upper(_timeRanges, 1)
     LOOP
 
         -- Convert time in TEXT format to time in TIMESTAMP format.
-        _startTime := TO_TIMESTAMP(_timeRanges[i]->>'startTime', 'MM/DD/YYYY hh12:mi AM');
-        _endTime := TO_TIMESTAMP(_timeRanges[i]->>'endTime', 'MM/DD/YYYY hh12:mi AM');
+        _weekday := _timeRanges[i]->>'weekday';
+        _startTime := _timeRanges[i]->>'startTime';
+        _endTime := _timeRanges[i]->>'endTime';
+
+        _weekdayDate := CASE (_weekday)
+                            WHEN 0 THEN '11/12/2017'
+                            WHEN 1 THEN '11/13/2017'
+                            WHEN 2 THEN '11/14/2017'
+                            WHEN 3 THEN '11/15/2017'
+                            WHEN 4 THEN '11/16/2017'
+                            WHEN 5 THEN '11/17/2017'
+                            WHEN 6 THEN '11/18/2017'
+                        END;
+
+        _startTimestamp := TO_TIMESTAMP(_weekdayDate || ' ' || _startTime, 'MM/DD/YYYY hh12:mi AM');
+        _endTimestamp := TO_TIMESTAMP(_weekdayDate || ' ' || _endTime, 'MM/DD/YYYY hh12:mi AM');
 
         -- Perform the insert.
         INSERT INTO AppUserAvailability (appUserKey, startTime, endTime)
-        VALUES      (_appUserKey, _startTime, _endTime);
+        VALUES      (_appUserKey, _startTimestamp, _endTimestamp);
 
     END LOOP;
     
@@ -39,7 +57,7 @@ $$ LANGUAGE plpgsql;
 
 
 /*
-SELECT * FROM updateAvailability( 1, array[JSON_BUILD_OBJECT('startTime', '11/12/2017 10:00 AM', 'endTime', '11/12/2017 1:00 PM')] );
+SELECT * FROM updateAvailability( 1, array[JSON_BUILD_OBJECT('weekday', 0, 'startTime', '9:00 AM', 'endTime', '1:00 PM')] );
 
 SELECT  AppUser.email,
         appUserAvailability.startTime,

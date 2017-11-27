@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import { RequestService, Response } from '../../common-util/services/request.service';
+import { SessionDataService } from '../../common-util/services/session-data.service';
 
-import { UpdateAppUserRequest } from '../../../../../shared/app-user/update-app-user-message';
+import { UpdateAppUserRequest, UpdateAppUserResponse } from '../../../../../shared/app-user/update-app-user-message';
 import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
 
@@ -11,8 +12,9 @@ import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web
 @Injectable()
 export class AppUserUpdateService {
 
-    constructor(
-        private requestService: RequestService
+    public constructor (
+        private requestService: RequestService,
+        private sessionDataService: SessionDataService
     ) { }
 
 
@@ -28,10 +30,14 @@ export class AppUserUpdateService {
         let observer: Observable<Response> = this.requestService.post('/appUser/updateAppUser', body);
 
         return observer.map((response: Response): FoodWebResponse => {
-            let appUserUpdateResponse: FoodWebResponse = response.json();
+
+            let appUserUpdateResponse: UpdateAppUserResponse = response.json();
             console.log(appUserUpdateResponse.message);
 
-            // TODO: generate login popup if session ended and resend request upon login response.
+            // Immediately update client session data on success!
+            if (appUserUpdateResponse.success) {
+                this.sessionDataService.updateAppUserSessionData(appUserUpdateResponse.appUserInfo);
+            }
 
             return appUserUpdateResponse;
         });

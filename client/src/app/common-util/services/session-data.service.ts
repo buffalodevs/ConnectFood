@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 
 import { AppUserInfo } from "./../../../../../shared/app-user/app-user-info";
+import { StringManipulation } from '../../../../../shared/common-util/string-manipulation';
+import { TimeRange } from '../../../../../shared/app-user/time-range';
 
 
 @Injectable()
@@ -11,7 +13,8 @@ export class SessionDataService {
      */
     private static appUserInfo: AppUserInfo = null;
 
-    constructor() { }
+
+    public constructor() {}
 
 
     /**
@@ -33,26 +36,6 @@ export class SessionDataService {
 
 
     /**
-     * convenience method for retrieving the full name of a logged in organization or individual user.
-     */
-    public getFullName(): string {
-
-        // Session does not exist, so no name available.
-        if (SessionDataService.appUserInfo == null) {
-            return null;
-        }
-
-        // Session pertains to an organization user, so use organization name as full name.
-        if (SessionDataService.appUserInfo.organizationName != null) {
-            return SessionDataService.appUserInfo.organizationName;
-        }
-
-        // Session pertains to an individual user, so use first & last name of individual as full name.
-        return (SessionDataService.appUserInfo.firstName + ' ' + SessionDataService.appUserInfo.lastName);
-    }
-
-
-    /**
      * Clears the current session data.
      */
     public clearSessionData(): void {
@@ -65,6 +48,6 @@ export class SessionDataService {
      * @return true if session data is available, false if not (it is clear).
      */
     public sessionDataAvailable(): boolean {
-        return (SessionDataService.appUserInfo != null);
+        return ( SessionDataService.appUserInfo != null );
     }
 }

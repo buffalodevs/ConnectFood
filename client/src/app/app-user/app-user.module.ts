@@ -15,7 +15,8 @@ import { SignupComponent } from './signup/signup.component';
 import { AppUserInfoComponent } from './app-user-info/app-user-info.component';
 
 import { RoutePreprocessService } from '../common-util/services/route-preprocess.service';
-import { AppUserConstantsService } from './app-user-constants.service';
+import { AppUserConstantsService } from './common-app-user/app-user-constants.service';
+import { AppUserValidationService } from './common-app-user/app-user-validation.service';
 
 
 const appUserRoutes: Routes = [
@@ -54,7 +55,8 @@ const appUserRoutes: Routes = [
         LoginComponent
     ],
     providers: [
-        AppUserConstantsService
+        AppUserConstantsService,
+        AppUserValidationService
     ]
 })
 export class AppUserModule {}

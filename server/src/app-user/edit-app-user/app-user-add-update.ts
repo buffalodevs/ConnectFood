@@ -1,16 +1,16 @@
 'use strict';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../logging/sql-logger';
-import { query, Client, QueryResult } from '../database-util/connection-pool';
-import { fixNullQueryArgs } from "./../database-util/prepared-statement-util";
+import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
+import { query, Client, QueryResult } from '../../database-util/connection-pool';
+import { fixNullQueryArgs } from "../../database-util/prepared-statement-util";
 
-import { SessionData, AppUserInfo } from '../common-util/session-data';
-import { hashPassword } from './password-util';
-import { GPSCoordinate, getGPSCoordinate } from '../../../shared/common-util/geocode';
+import { SessionData, AppUserInfo } from '../../common-util/session-data';
+import { hashPassword } from '../common-app-user/password-util';
 
-import { Validation } from '../../../shared/common-util/validation';
-import { AppUserType, Address } from '../../../shared/app-user/app-user-info';
-import { SignupErrors } from '../../../shared/app-user/signup-message';
-import { TimeRange, TimeRangeStr } from '../../../shared/app-user/time-range';
+import { GPSCoordinate, getGPSCoordinate } from '../../../../shared/common-util/geocode';
+import { Validation } from '../../../../shared/common-util/validation';
+import { AppUserType, Address } from '../../../../shared/app-user/app-user-info';
+import { SignupErrors } from '../../../../shared/app-user/signup-message';
+import { TimeRange } from '../../../../shared/app-user/time-range';
 
 
 /**
@@ -109,7 +109,7 @@ function addOrUpdateAppUserInSQL(appUserInfo: AppUserInfo, hashedPassword?: stri
                                   appUserInfo.phone,
                                   (appUserInfo.appUserType === AppUserType.Donor),
                                   (appUserInfo.appUserType === AppUserType.Receiver),
-                                  (appUserInfo.availability != null ? availabilityDatesToStrings(appUserInfo.availability): null),
+                                  appUserInfo.availability,
                                   appUserInfo.organizationName ];
     
     // If an update, then we will need additional appUserKey argument at beginning of list.
@@ -129,23 +129,6 @@ function addOrUpdateAppUserInSQL(appUserInfo: AppUserInfo, hashedPassword?: stri
 
 
 /**
- * Converts availability time range dates to strings.
- * @param availabilityDates The availability time range dates.
- * @return The availability time range strings.
- */
-function availabilityDatesToStrings(availabilityDates: TimeRange[]): TimeRangeStr[] {
-
-    let availabilityStrs: TimeRangeStr[] = [];
-
-    for (let i: number = 0; i < availabilityDates.length; i++) {
-        availabilityStrs.push(TimeRange.toTimeRangeStr(availabilityDates[i]));
-    }
-
-    return availabilityStrs;
-}
-
-
-/**
  * Analyzes and handles the result of the insert into or update AppUser query. Generates the final result of the signup operation.
  * @param addOrUpdateResult The result of the add or update AppUser query.
  * @param isUpdate A flag that is set true if this is the update of signup (AppUser) information. It is false by default for original signup.
@@ -157,11 +140,8 @@ function handleResult(addOrUpdateResult: QueryResult, isUpdate: boolean): Sessio
 
     if (addOrUpdateResult.rows.length === 1) {
 
-        // Fill Session Data.
-        let sessionData: SessionData = addOrUpdateResult.rows[0].sessiondata;
-
         console.log('Successfully ' + (isUpdate ? 'updated' : 'added') + ' user in database.');
-        return sessionData;
+        return <SessionData>(addOrUpdateResult.rows[0].sessiondata);
     }
 
     // Fail: we didn't get one row back when adding or updating a new App User.

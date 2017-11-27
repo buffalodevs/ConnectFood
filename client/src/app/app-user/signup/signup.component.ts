@@ -4,14 +4,13 @@ import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms'
 import { Observable } from 'rxjs/Observable';
 
 import { SignupService } from './signup.service'
-import { AppUserConstantsService } from '../app-user-constants.service';
-import { Validation } from '../../common-util/services/validation.service';
-import { AppUserValidationService } from '../common-app-user/app-user-validation.service';
+import { AppUserConstantsService } from '../common-app-user/app-user-constants.service';
+import { AppUserValidationService, Validation } from '../common-app-user/app-user-validation.service';
+import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
 
 import { AppUserInfo, AppUserType } from "../../../../../shared/app-user/app-user-info";
 import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
 import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
-import { AbstractControl } from '@angular/forms/src/model';
 import { SignupErrors } from '../../../../../shared/app-user/signup-message';
 
 
@@ -19,14 +18,10 @@ import { SignupErrors } from '../../../../../shared/app-user/signup-message';
     selector: 'app-signup',
     templateUrl: './signup.component.html',
     styleUrls: ['./signup.component.css'],
-    providers: [
-        SignupService,
-        AppUserValidationService
-    ]
+    providers: [SignupService]
 })
-export class SignupComponent implements OnInit {
+export class SignupComponent extends AbstractModelDrivenComponent implements OnInit {
 
-    private signupForm: FormGroup;
     private signupError: string;
     private signupComplete: boolean;
     /**
@@ -46,6 +41,7 @@ export class SignupComponent implements OnInit {
         private signupService: SignupService,
         private appUserConstants: AppUserConstantsService
     ) {
+        super(signupValidationService);
         this.signupError = null;
         this.signupComplete = false;
         this.adminPreStr = '';
@@ -59,7 +55,7 @@ export class SignupComponent implements OnInit {
     public ngOnInit(): void {
 
         // Initialize signup form.
-        this.signupForm = this.formBuilder.group({
+        this.form = this.formBuilder.group({
 
             'primary': this.formBuilder.group({
                 'appUserType':      [null, Validators.required],
@@ -83,13 +79,13 @@ export class SignupComponent implements OnInit {
         });
 
         // Generate validate mappings for each poriton of the signup form. Initialize all of them to false.
-        ObjectManipulation.applyToProperties(this.signupForm.controls,
+        ObjectManipulation.applyToProperties(this.form.controls,
             (formPortion: string) => {
                 this.validate.set(formPortion, false);
             });
 
         // Listen for changes to the appUserType member of the AppUserInfo Form, so we can change form fields appropriately.
-        this.signupForm.get('primary.appUserType').valueChanges.subscribe(this.listenAppUserTypeChange.bind(this));
+        this.form.get('primary.appUserType').valueChanges.subscribe(this.listenAppUserTypeChange.bind(this));
     }
 
 
@@ -98,7 +94,7 @@ export class SignupComponent implements OnInit {
      */
     private listenAppUserTypeChange(): void {
 
-        let organizationNameControl: FormControl = <FormControl>this.signupForm.get('primary.organizationName');
+        let organizationNameControl: FormControl = <FormControl>this.form.get('primary.organizationName');
 
         if (this.isOrganization()) {
             this.adminPreStr = 'Admin';
@@ -116,27 +112,7 @@ export class SignupComponent implements OnInit {
      * @return true if the AppUser is an organization (Donor/Receiver), false if not (Driver).
      */
     private isOrganization(): boolean {
-        return ( this.signupForm.get('primary.appUserType').value !== AppUserType.Driver );
-    }
-
-
-    /**
-     * Determines if a given control has any error(s).
-     * @param controlPath The path of the control relative to the base signupForm.
-     * true if an error(s) exist, false if not.
-     */
-    private hasError(controlPath: string): boolean {
-        return ( this.signupForm.get(controlPath).errors != null );
-    }
-
-
-    /**
-     * Generates an error message for a given control (assuming the control has an error).
-     * @param controlPath The path of the control relative to the base signupForm.
-     * @return The error message for the given control.
-     */
-    private errorMsgFor(controlPath: string): string {
-        return this.signupValidationService.errorMsgFor(this.signupForm.get(controlPath), controlPath);
+        return ( this.form.get('primary.appUserType').value !== AppUserType.Driver );
     }
 
 

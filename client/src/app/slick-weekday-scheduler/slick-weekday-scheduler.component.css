@@ -1,13 +1,22 @@
 .time-range-container {
     position: relative;
-    display: table;
     background-color: rgb(247, 247, 239);
     border: 1px solid lightgray;
-    padding-left: 3px;
-    padding-right: 25px;
     padding-top: 15px;
     padding-bottom: 15px;
     text-align: center;
+}
+
+.edit-time-range-container {
+    display: table;
+    padding-left: 3px;
+    padding-right: 25px;
+}
+
+.display-time-range-container {
+    display: inline-block;
+    padding-left: 7px;
+    padding-right: 7px;
 }
 
 .remove-button {

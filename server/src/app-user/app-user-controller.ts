@@ -1,16 +1,15 @@
 'use strict';
 import { Request, Response } from "express";
 
-import { login } from "./app-user-login";
-import { signup, signupVerify } from './app-user-signup';
-import { updateAppUser } from './app-user-update';
-import { QueryResult } from 'pg';
+import { login } from "./login-app-user/app-user-login";
+import { signup, signupVerify } from './edit-app-user/app-user-signup';
+import { updateAppUser } from './edit-app-user/app-user-update';
+import { SessionData, AppUserInfo } from "../common-util/session-data";
 
 import { FoodWebResponse } from "../../../shared/message-protocol/food-web-response";
 import { LoginRequest, LoginResponse } from '../../../shared/app-user/login-message';
 import { SignupRequest } from '../../../shared/app-user/signup-message';
-import { UpdateAppUserRequest } from '../../../shared/app-user/update-app-user-message';
-import { SessionData, AppUserInfo } from "../common-util/session-data";
+import { UpdateAppUserRequest, UpdateAppUserResponse } from '../../../shared/app-user/update-app-user-message';
 
 
 /**
@@ -102,10 +101,10 @@ export function handleUpdateAppUserRequest(request: Request, response: Response)
     updateAppUser(appUserUpdateInfo, newPassword, currentPassword, sessionData)
         .then((sessionData: SessionData) => {
             SessionData.saveSessionData(request, sessionData);
-            response.send(new FoodWebResponse(true, 'App User Update Successful'));
+            response.send(new UpdateAppUserResponse(sessionData.appUserInfo, true, 'App User Update Successful'));
         })
         .catch((err: Error) => {
-            response.send(new FoodWebResponse(false, err.message));
+            response.send(new UpdateAppUserResponse(null, false, err.message));
         });
 }
 

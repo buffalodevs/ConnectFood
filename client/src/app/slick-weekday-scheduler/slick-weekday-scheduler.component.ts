@@ -21,14 +21,13 @@ import { TimeRange } from '../../../../shared/app-user/time-range';
 })
 export class SlickWeekdaySchedulerComponent implements OnInit, OnChanges, ControlValueAccessor {
 
-    private readonly WEEKDAY_SPLITS: string[][];
     private readonly WEEKDAYS: string[];
     
     /**
      * Set to true if this component should be in display mode rather than edit mode.
      * Default value is false.
      */
-    @Input() private displayMode: boolean;
+    @Input() private displayOnly: boolean;
     @Input() private allowAdd: boolean;
     @Input() private allowRemove: boolean;
     /**
@@ -36,6 +35,7 @@ export class SlickWeekdaySchedulerComponent implements OnInit, OnChanges, Contro
      */
     @Input() private validate: boolean;
 
+    private weekdaySplits: string[][];
     /**
      * If set by parent component via model binding (implicitly calls registerOnChange method),
      * then this callback will be invoked whenever a change occurs.
@@ -48,9 +48,9 @@ export class SlickWeekdaySchedulerComponent implements OnInit, OnChanges, Contro
         private formBuilder: FormBuilder,
         private validationService: ValidationService
     ) {
-        this.WEEKDAY_SPLITS = [['Monday', 'Tuesday', 'Wednesday', 'Thursday'], ['Friday', 'Saturday', 'Sunday']];
-        this.WEEKDAYS = this.WEEKDAY_SPLITS.reduce((acc, cur) => acc.concat(cur), []);
-        this.displayMode = false;
+        this.WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        this.calcWeekdaySplits();
+        this.displayOnly = false;
         this.allowAdd = true;
         this.allowRemove = true;
         this.timeRangesForm = new FormGroup({}, this.validationService.requireAtLeastOneField());
@@ -68,6 +68,7 @@ export class SlickWeekdaySchedulerComponent implements OnInit, OnChanges, Contro
         // Listen for any form value changes.
         this.timeRangesForm.valueChanges.subscribe(() => { this.onChange(this.readValue()); });
 
+        // Trigger validate after full form initialization (if validate is set).
         this.ngOnChanges({ validate: new SimpleChange(this.validate, this.validate, false) });
     }
 
@@ -78,6 +79,101 @@ export class SlickWeekdaySchedulerComponent implements OnInit, OnChanges, Contro
         if (changes.validate && changes.validate.currentValue) {
             this.validationService.markAllAsTouched(this.timeRangesForm);
         }
+        
+        // Adjust the column splits based on the value of displayOnly and the number of weekdays we have data for.
+        if (changes.displayOnly) {
+            this.calcWeekdaySplits();
+        }
+    }
+
+
+    /**
+     * Calculates the (column) weekday splits used based off of the displayOnly input and the data bound to this component's model.
+     */
+    private calcWeekdaySplits(): void {
+
+        // If in edit mode or we have not fully intialized the form (view model) yet.
+        if (!this.displayOnly || this.timeRangesForm.get(this.WEEKDAYS[0]) == null) {
+            this.weekdaySplits = [['Monday', 'Tuesday', 'Wednesday', 'Thursday'], ['Friday', 'Saturday', 'Sunday']];
+        }
+        else {
+
+            // Determine the weekdays that actually have time range data.
+            let nonEmptyWeekdays: string[] = [];
+            for (let i: number = 0; i < 7; i++) {
+                
+                if ((<FormArray>this.timeRangesForm.get(this.WEEKDAYS[i])).length > 0) {
+                    nonEmptyWeekdays.push(this.WEEKDAYS[i]);
+                }
+            }
+
+            // Start with assumption of there only being one column.
+            this.weekdaySplits = [[]];
+            let firstSplitEnd: number = nonEmptyWeekdays.length;
+
+            // Do we have enough non-empty weekdays for 2 columns?
+            if (nonEmptyWeekdays.length >= 4) {
+                firstSplitEnd = Math.ceil(nonEmptyWeekdays.length / 2);
+                this.weekdaySplits.push([]);
+            }
+
+            // Enter data into first column.
+            for (let i: number = 0; i < firstSplitEnd; i++) {
+                this.weekdaySplits[0].push(nonEmptyWeekdays[i]);
+            }
+
+            // If two columns, then we will enter data here.
+            for (let i: number = firstSplitEnd; i < nonEmptyWeekdays.length; i++) {
+                this.weekdaySplits[1].push(nonEmptyWeekdays[i]);
+            }
+        }
+    }
+
+
+    /**
+     * Adds a time range to a given weekday.
+     * @param weekday The weekday to add the time range to.
+     */
+    private addTimeRange(weekday: string): void {
+        
+        if (!this.allowAdd)  throw new Error('Attempting to add time range when allowAdd is: ' + this.allowAdd);
+        (<FormArray>this.timeRangesForm.controls[weekday]).push(new FormControl(null, Validators.required));
+    }
+
+
+    /**
+     * Removes a time range from a given weekday at a given index.
+     * @param weekday The weekday to remove the time range from.
+     * @param index The index of the time range to remove.
+     */
+    private removeTimeRange(weekday: string, index: number): void {
+
+        if (!this.allowRemove)  throw new Error('Attempting to remove time range when allowRemove is: ' + this.allowRemove);
+        (<FormArray>this.timeRangesForm.controls[weekday]).removeAt(index);
+    }
+
+
+    /**
+     * See DateFormatter.convertWeekdayStringToInt.
+     * @param weekday See DateFormatter.convertWeekdayStringToInt.
+     * @return See DateFormatter.convertWeekdayStringToInt.
+     */
+    private getWeekdayInd(weekday: string): number {
+        return DateFormatter.convertWeekdayStringToInt(weekday);
+    }
+
+
+    /**
+     * Checks if a new time range can be added for a given weekday.
+     * @param weekday The weekday that is being checked.
+     * @return true if a new time range can be added, false if not.
+     */
+    private canAddNewTimeRange(weekday: string): boolean {
+
+        let weekdaysFormArr: FormArray = <FormArray>this.timeRangesForm.controls[weekday];
+        let lastTimeRangeValid: boolean = ( weekdaysFormArr.length === 0 || weekdaysFormArr.at(weekdaysFormArr.length - 1).value != null );
+
+        return ( this.allowAdd && lastTimeRangeValid );
     }
 
 
@@ -123,9 +219,11 @@ export class SlickWeekdaySchedulerComponent implements OnInit, OnChanges, Contro
         // Then, go through each weekday form array and add in time ranges.
         for (let i: number = 0; i < value.length; i++) {
 
-            let weekday: string = DateFormatter.covertWeekdayIntToString(value[i].startTime.getDay());
+            let weekday: string = DateFormatter.covertWeekdayIntToString(value[i].weekday);
             (<FormArray>this.timeRangesForm.controls[weekday]).push(new FormControl(value[i]));
         }
+
+        this.calcWeekdaySplits();
     }
 
 
@@ -163,52 +261,5 @@ export class SlickWeekdaySchedulerComponent implements OnInit, OnChanges, Contro
      */
     public registerOnTouched(onTouched: string): void {
         // TODO - not really necessary...
-    }
-
-
-    /**
-     * Adds a time range to a given weekday.
-     * @param weekday The weekday to add the time range to.
-     */
-    private addTimeRange(weekday: string): void {
-        (<FormArray>this.timeRangesForm.controls[weekday]).push(new FormControl(null, Validators.required));
-    }
-
-
-    /**
-     * Removes a time range from a given weekday at a given index.
-     * @param weekday The weekday to remove the time range from.
-     * @param index The index of the time range to remove.
-     */
-    private removeTimeRange(weekday: string, index: number): void {
-
-        if (!this.allowRemove)  throw new Error('Attempting to remove time range when allowRemove is: ' + this.allowRemove);
-        (<FormArray>this.timeRangesForm.controls[weekday]).removeAt(index);
-    }
-
-
-    /**
-     * See DateFormatter.getDateForWeekday.
-     * @param weekday See DateFormatter.getDateForWeekday.
-     * @return See DateFormatter.getDateForWeekday.
-     */
-    private getDateForWeekday(weekday: string): Date {
-
-        if (!this.allowRemove)  throw new Error('Attempting to add time range when allowAdd is: ' + this.allowAdd);
-        return DateFormatter.getDateForWeekday(weekday);
-    }
-
-
-    /**
-     * Checks if a new time range can be added for a given weekday.
-     * @param weekday The weekday that is being checked.
-     * @return true if a new time range can be added, false if not.
-     */
-    private canAddNewTimeRange(weekday: string): boolean {
-
-        let weekdaysFormArr: FormArray = <FormArray>this.timeRangesForm.controls[weekday];
-        let lastTimeRangeValid: boolean = ( weekdaysFormArr.length === 0 || weekdaysFormArr.at(weekdaysFormArr.length - 1).value != null );
-
-        return ( this.allowAdd && lastTimeRangeValid );
     }
 }

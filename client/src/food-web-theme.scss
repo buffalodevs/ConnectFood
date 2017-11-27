@@ -238,7 +238,35 @@ button.button-sm {
 }
 
 
+/* Get rid of extra padding present with the mdHorizontalStepper */
 .mat-horizontal-content-container {
     padding-left: 0px !important;
     padding-right: 0px !important;
+}
+
+
+/* Ensure that mdInput has no padding or space to the top for floating placeholder */
+.no-pad-top-input .mat-form-field-infix {
+    border-top: none;
+}
+
+/* Ensure that mdInput has no space directly around text (between text and underline) */
+.no-pad-mid-input .mat-form-field-infix {
+    padding: 0px;
+}
+
+/* Ensure mdInput placeholder is not pushed down */
+.no-pad-mid-input .mat-form-field-placeholder {
+    position: initial !important;
+}
+
+
+/* Get rid of the bottom space in mdInput container */
+.no-pad-bottom-input .mat-form-field-wrapper {
+    padding-bottom: 0px;
+}
+
+/* Fix placement of input underline after getting rid of bottom space */
+.no-pad-bottom-input .mat-form-field-underline {
+    bottom: initial;
 }

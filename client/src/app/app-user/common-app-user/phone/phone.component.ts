@@ -1,8 +1,7 @@
 import { Component, OnInit, forwardRef, Input, SimpleChange, SimpleChanges } from '@angular/core';
 import { FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, Validators, FormBuilder, FormGroup, ValidatorFn } from '@angular/forms';
 
-import { AppUserConstantsService } from '../../app-user-constants.service';
-import { ValidationService, Validation } from '../../../common-util/services/validation.service';
+import { AppUserConstantsService } from '../../common-app-user/app-user-constants.service';
 
 import { StringManipulation } from '../../../../../../shared/common-util/string-manipulation';
 
@@ -40,7 +39,6 @@ export class PhoneComponent implements OnInit, ControlValueAccessor {
 
     public constructor (
         private formBuilder: FormBuilder,
-        private validationService: ValidationService,
         private appUserConstants: AppUserConstantsService
     ) {
         this.includeLabel = true;
