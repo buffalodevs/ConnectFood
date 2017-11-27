@@ -9,10 +9,8 @@
 
             <md-radio-group class="row center-text space-bottom" (change)="stepper.next()" formControlName="appUserType">
 
-                <div class="col-md-4" *ngFor="let typeKey of appUserConstants.APP_USER_TYPE_KEYS; let i = index">
-                    <md-radio-button name="accountType" [value]="appUserConstants.APP_USER_TYPE_VALS[i]">
-                        {{ typeKey }}
-                    </md-radio-button>
+                <div class="col-md-4" *ngFor="let type of appUserTypes; let i = index">
+                    <md-radio-button name="accountType" [value]="type">{{ type }}</md-radio-button>
                 </div>
 
             </md-radio-group>

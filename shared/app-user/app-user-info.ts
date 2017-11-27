@@ -4,13 +4,6 @@ import { TimeRange } from './time-range';
 export { TimeRange };
 
 
-export enum AppUserType {
-    Receiver,
-    Donor,
-    Driver
-}
-
-
 export interface Address {
     address?: string;
     city?: string;
@@ -27,7 +20,7 @@ export class AppUserInfo implements Address {
     
     public constructor (
         public email?: string,
-        public appUserType?: AppUserType,
+        public appUserType?: string,
         public organizationName?: string,
         public lastName?: string,
         public firstName?: string,

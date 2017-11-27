@@ -17,10 +17,9 @@ CREATE OR REPLACE FUNCTION updateAppUser
     _state                  ContactInfo.state%TYPE              DEFAULT NULL,
     _zip                    ContactInfo.zip%TYPE                DEFAULT NULL,
     _phone                  ContactInfo.phone%TYPE              DEFAULT NULL,
-    _isDonor                AppUser.isDonor%TYPE                DEFAULT NULL,
-    _isReceiver             AppUser.isReceiver%TYPE             DEFAULT NULL,
+    _appUserType            AppUser.appUserType%TYPE            DEFAULT NULL,
     -- @ts-sql class="TimeRange" file="/shared/availability/time-range.ts"
-    _availabilityTimeRanges JSON[]                              DEFAULT NULL,
+    _availability           JSON[]                              DEFAULT NULL,
     _organizationName       Organization.name%TYPE              DEFAULT NULL
 )
 -- Returns the new App User's information.
@@ -45,13 +44,12 @@ BEGIN
     END IF;
 
     -- Permorm the update on the AppUser table fields and get keys to related tables that may need updating.
-    UPDATE AppUser
-    SET email       = COALESCE(_email, email),
-        lastName    = COALESCE(_lastName, lastName),
-        firstName   = COALESCE(_firstName, firstName),
-        isDonor     = COALESCE(_isDonor, isDonor),
-        isReceiver  = COALESCE(_isReceiver, isReceiver)
-    WHERE AppUser.appUserKey = _appUserKey;
+    UPDATE  AppUser
+    SET     email       = COALESCE(_email, email),
+            lastName    = COALESCE(_lastName, lastName),
+            firstName   = COALESCE(_firstName, firstName),
+            appUserType = COALESCE(_appUserType, appUserType)
+    WHERE   AppUser.appUserKey = _appUserKey;
 
     -- Update any ContactInfo fields related to AppUser being updated.
     PERFORM updateContactInfo(_appUserKey, _address, _latitude, _longitude, _city, _state, _zip, _phone);
@@ -59,21 +57,21 @@ BEGIN
     -- Update any Organization fields related to AppUser being updated.
     IF (_organizationName IS NOT NULL)
     THEN
-        UPDATE Organization
-        SET name = _organizationName
-        WHERE Organization.appUserKey = _appUserKey;
+        UPDATE  Organization
+        SET     name = _organizationName
+        WHERE   Organization.appUserKey = _appUserKey;
     END IF;
 
     -- Update password related to AppUser being updated. We keep track of all old passwords, so this is an insert!
     IF (_password IS NOT NULL)
     THEN
         INSERT INTO AppUserPassword (appUserKey, password)
-        VALUES (_appUserKey, _password);
+        VALUES      (_appUserKey, _password);
     END IF;
 
-    IF (_availabilityTimeRanges IS NOT NULL)
+    IF (_availability IS NOT NULL)
     THEN
-        PERFORM updateAvailability(_appUserKey, _availabilityTimeRanges);
+        PERFORM updateAvailability(_appUserKey, _availability);
     END IF;
 
     RETURN QUERY
@@ -82,4 +80,5 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
---SELECT updateAppUser(1, NULL, NULL, 'Nemmer');
+
+--SELECT updateAppUser(1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Donor');

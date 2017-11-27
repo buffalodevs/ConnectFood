@@ -10,7 +10,7 @@ import { SessionDataService } from '../../common-util/services/session-data.serv
 
 import { FoodListing } from "../../../../../shared/receiver-donor/food-listing";
 import { FoodListingsFilters, LISTINGS_STATUS } from "../../../../../shared/receiver-donor/food-listings-filters";
-import { AppUserInfo, AppUserType } from "../../../../../shared/app-user/app-user-info";
+import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 
 
 @Component({
@@ -43,7 +43,7 @@ export class CartComponent implements OnInit {
     public ngOnInit(): void {
         const appUserInfo: AppUserInfo = this.sessionDataService.getAppUserSessionData();
 
-        if (appUserInfo.appUserType === AppUserType.Receiver) {
+        if (appUserInfo.appUserType === 'Receiver') {
             // If both receiver and donor, then default to receiver mode!
             this.foodListingsFiltersComponent.addControl('listingsStatus', new FormControl(LISTINGS_STATUS.myClaimedListings));
         } 

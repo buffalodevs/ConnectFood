@@ -45,9 +45,8 @@ AS $$
                                                                     'longitude',        ST_X(ContactInfo.gpsCoordinate::GEOMETRY)
                                                                 ),
                                             'phone',            ContactInfo.phone,
-                                            'isDonor',          AppUser.isDonor,
-                                            'isReceiver',       AppUser.isReceiver,
-                                            'availability',     (   SELECT  ARRAY_AGG (
+                                            'availability',     (   
+                                                                    SELECT  ARRAY_AGG (
                                                                                 -- @ts-sql class="TimeRangeStr" file="/shared/app-user/time-range.ts"
                                                                                 JSON_BUILD_OBJECT (
                                                                                     'weekday',      (SELECT EXTRACT(DOW FROM AppUserAvailability.startTime)),
@@ -56,7 +55,9 @@ AS $$
                                                                                 )
                                                                             )
                                                                     FROM    AppUserAvailability
-                                                                    WHERE   AppUserAvailability.appUserKey = AppUser.appUserKey )
+                                                                    WHERE   AppUserAvailability.appUserKey = AppUser.appUserKey
+                                                                ),
+                                            'appUserType',      AppUser.appUserType
                                         ),
                 'verificationToken',    UnverifiedAppUser.verificationToken
             )

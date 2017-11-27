@@ -12,9 +12,8 @@ WHERE       Receiver.appUserKey = 1
   AND       ST_DWITHIN(ReceiverContactInfo.gpsCoordinate, DonorContactInfo.gpsCoordinate, 29731.67); */
 
 
-SELECT      AppUser.email, AppUserAvailability.*
-FROM        AppUserAvailability
-INNER JOIN  AppUser         ON AppUserAvailability.appUserKey = AppUser.appUserKey;
+SELECT  AppUser.*
+FROM    AppUser;
 
 
 --delete from AppUserPassword where appUserKey = 1 and createDate <> (select min(createDate) from AppUserPassword where appUserKey = 1)

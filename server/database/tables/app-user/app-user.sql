@@ -15,17 +15,13 @@ ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS firstName              VARCHAR(60) 
 -- Date that the AppUser was created.
 ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS createDate             TIMESTAMP       DEFAULT CURRENT_TIMESTAMP;
 
--- Flag to determine if the user has confirmed their signup/registration via link sent in email if individual or via other methods if organization.
-ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS singupConfirmed        BOOLEAN         DEFAULT FALSE;
-
 -- Next three entries relate to disabling a user for violation of terms of use.
 ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS disabled               BOOLEAN         DEFAULT FALSE;
 ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS disabledDate           TIMESTAMP       DEFAULT NULL;
 ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS disabledReason         TEXT            DEFAULT NULL;
 
--- Flags that determine how this AppUser can function.
-ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS isDonor                BOOLEAN         NOT NULL;
-ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS isReceiver             BOOLEAN         NOT NULL;
+-- Determine AppUser's primary function.
+ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS appUserType            AppUserType     NOT NULL DEFAULT 'Receiver';
 
 
 CREATE INDEX IF NOT EXISTS appUser_fullNameIdx ON AppUser (lastName, firstName);

@@ -14,8 +14,7 @@ CREATE OR REPLACE FUNCTION addAppUser
     _state                  ContactInfo.state%TYPE,
     _zip                    ContactInfo.zip%TYPE,
     _phone                  ContactInfo.phone%TYPE,
-    _isDonor                AppUser.isDonor%TYPE,
-    _isReceiver             AppUser.isReceiver%TYPE,
+    _appUserType            AppUser.appUserType%TYPE,
     -- @ts-sql class="TimeRange" file="/shared/availability/time-range.ts"
     _availabilityTimeRanges JSON[]                      DEFAULT NULL,
     _organizationName       Organization.name%TYPE      DEFAULT NULL
@@ -41,15 +40,9 @@ BEGIN
         RAISE EXCEPTION 'Duplicate email provided';
     END IF;
 
-    -- Ensure that we are giving donor or receiver capabilities to new user (cannot have neither).
-    IF (_isDonor = FALSE AND _isReceiver = FALSE)
-    THEN
-        _isReceiver := TRUE; -- If neither, then default to receiver.
-    END IF;
-
     -- Add the new user and get reference to entry.
-    INSERT INTO AppUser (email, lastName, firstName, isDonor, isReceiver)                  
-    VALUES      (_email, _lastName, _firstName, _isDonor, _isReceiver)
+    INSERT INTO AppUser (email, lastName, firstName, appUserType)                  
+    VALUES      (_email, _lastName, _firstName, _appUserType)
     RETURNING   AppUser.appUserKey
     INTO        _appUserKey;
 
@@ -86,5 +79,5 @@ $$ LANGUAGE plpgsql;
 
 /*
 SELECT * FROM addAppUser('testemail7@test.com', 'testPass', 'testLast', 'testFirst', '11 test rd.',
-                         43.123456, 83.33, 'Test City', 'NY', 12345, '777-777-7777', true, true, '{"(Monday, 11:00 AM, 3:00 PM)"}'::TimeRange[]);
+                         43.123456, 83.33, 'Test City', 'NY', 12345, '777-777-7777', 'Donor', '{"(Monday, 11:00 AM, 3:00 PM)"}'::TimeRange[]);
 */

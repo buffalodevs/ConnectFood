@@ -6,6 +6,7 @@ import { MdCheckboxModule } from '@angular/material';
 import { FoodTypesComponent } from './food-types/food-types.component';
 import { FoodTypesService } from './food-types/food-types.service';
 import { VehicleTypesService } from './vehicle-types/vehicle-types.service';
+import { AppUserTypesService } from './app-user-types/app-user-types.service';
 import { GetDomainValuesService } from './get-domain-values.service';
 
 
@@ -24,7 +25,8 @@ import { GetDomainValuesService } from './get-domain-values.service';
     ],
     providers: [
         FoodTypesService,
-        VehicleTypesService
+        VehicleTypesService,
+        AppUserTypesService
     ]
 })
-export class CommonFoodListingDomainsModule { }
+export class CommonFoodListingDomainsModule {}

@@ -8,7 +8,7 @@ import { hashPassword } from '../common-app-user/password-util';
 
 import { GPSCoordinate, getGPSCoordinate } from '../../../../shared/common-util/geocode';
 import { Validation } from '../../../../shared/common-util/validation';
-import { AppUserType, Address } from '../../../../shared/app-user/app-user-info';
+import { Address } from '../../../../shared/app-user/app-user-info';
 import { SignupErrors } from '../../../../shared/app-user/signup-message';
 import { TimeRange } from '../../../../shared/app-user/time-range';
 
@@ -92,8 +92,8 @@ function addOrUpdateAppUserInSQL(appUserInfo: AppUserInfo, hashedPassword?: stri
 
     // Generate query string based off of either signing up or updating App User.
     let queryString: string = 'SELECT * FROM ';
-    if (isUpdate)   queryString += 'updateAppUser($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)';
-    else            queryString += 'addAppUser($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)';
+    if (isUpdate)   queryString += 'updateAppUser($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)';
+    else            queryString += 'addAppUser($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)';
 
     // Generate query args based off of either signing up or updating App User.
     let queryArgs: Array<any> = [ appUserInfo.email,
@@ -107,8 +107,7 @@ function addOrUpdateAppUserInSQL(appUserInfo: AppUserInfo, hashedPassword?: stri
                                   appUserInfo.state,
                                   appUserInfo.zip,
                                   appUserInfo.phone,
-                                  (appUserInfo.appUserType === AppUserType.Donor),
-                                  (appUserInfo.appUserType === AppUserType.Receiver),
+                                  appUserInfo.appUserType,
                                   appUserInfo.availability,
                                   appUserInfo.organizationName ];
     

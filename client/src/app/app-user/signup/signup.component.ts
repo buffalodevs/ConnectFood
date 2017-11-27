@@ -1,14 +1,14 @@
-import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 
+import { AppUserTypesService } from '../../domain/app-user-types/app-user-types.service';
 import { SignupService } from './signup.service'
 import { AppUserConstantsService } from '../common-app-user/app-user-constants.service';
 import { AppUserValidationService, Validation } from '../common-app-user/app-user-validation.service';
 import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
 
-import { AppUserInfo, AppUserType } from "../../../../../shared/app-user/app-user-info";
+import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
 import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
 import { SignupErrors } from '../../../../../shared/app-user/signup-message';
@@ -22,6 +22,7 @@ import { SignupErrors } from '../../../../../shared/app-user/signup-message';
 })
 export class SignupComponent extends AbstractModelDrivenComponent implements OnInit {
 
+    private appUserTypes: string[];
     private signupError: string;
     private signupComplete: boolean;
     /**
@@ -35,8 +36,8 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
 
 
     public constructor (
-        private router: Router,
         private formBuilder: FormBuilder,
+        private appUserTypesService: AppUserTypesService,
         private signupValidationService: AppUserValidationService,
         private signupService: SignupService,
         private appUserConstants: AppUserConstantsService
@@ -45,6 +46,7 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
         this.signupError = null;
         this.signupComplete = false;
         this.adminPreStr = '';
+        this.appUserTypesService.getAppUserTypes().subscribe((appUserTypes: string[]) => { this.appUserTypes = appUserTypes });
         this.validate = new Map<string, boolean>();
     }
 
@@ -112,7 +114,7 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
      * @return true if the AppUser is an organization (Donor/Receiver), false if not (Driver).
      */
     private isOrganization(): boolean {
-        return ( this.form.get('primary.appUserType').value !== AppUserType.Driver );
+        return ( this.form.get('primary.appUserType').value !== 'Driver' );
     }
 
 

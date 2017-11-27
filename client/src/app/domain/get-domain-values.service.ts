@@ -43,6 +43,7 @@ export class GetDomainValuesService {
         })
         .catch((err: any, caught: Observable<string[]>) => {
             console.log(err);
+            // TODO: Replace with error.
             return Observable.of(['Option 1', 'Option 2', 'Option 3']); // For testing, simply return dummy results if the server cannot be reached.
         });
     }
