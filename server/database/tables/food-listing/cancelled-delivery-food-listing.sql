@@ -1,7 +1,7 @@
 -- Keeps records of all cancelled Deliveries.
 -- Should only be cancelled if the deliverer cannot make the drive, or if the food has gone bad / not handled properly.
 
---DROP TABLE CancelledDeliveryFoodListing CASCADE; 
+DROP TABLE CancelledDeliveryFoodListing CASCADE; 
 CREATE TABLE IF NOT EXISTS CancelledDeliveryFoodListing
 (
     cancelledDeliveryFoodListingKey SERIAL PRIMARY KEY

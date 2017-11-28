@@ -1,21 +1,22 @@
 /**
- * Gets a textual representation of the delivery state that a (Delivery) Food Listing is in based off of its members.
+ * Gets the delivery state that a (Delivery) Food Listing is in.
  */
 SELECT dropFunction('getDeliveryState');
 CREATE OR REPLACE FUNCTION getDeliveryState
 (
-     _startTime     TIMESTAMP,
-     _pickUpTime    TIMESTAMP,
-     _dropOffTime   TIMESTAMP
+    _scheduledStartTime TIMESTAMP,
+    _startTime          TIMESTAMP,
+    _pickUpTime         TIMESTAMP,
+    _dropOffTime        TIMESTAMP
 )
-RETURNS TEXT -- The textual representation of the delivery state.
+RETURNS DeliveryState -- The delivery state.
 AS $$
 
     SELECT CASE
-        WHEN (_dropOffTime IS NOT NULL) THEN 'Delivery Finished'
-        WHEN (_pickUpTime IS NOT NULL)  THEN 'On Route to Receiver'
-        WHEN (_startTime IS NOT NULL)   THEN 'On Route to Donor'
-        ELSE                                 'Delivery Not Started'
+        WHEN (_dropOffTime IS NOT NULL)         THEN 'Delivery completed'::DeliveryState
+        WHEN (_pickUpTime IS NOT NULL)          THEN 'On route to receiver'::DeliveryState
+        WHEN (_startTime IS NOT NULL)           THEN 'On route to donor'::DeliveryState
+        WHEN (_scheduledStartTime IS NOT NULL)  THEN 'Delivery scheduled'::DeliveryState
     END;
 
 $$ LANGUAGE sql;

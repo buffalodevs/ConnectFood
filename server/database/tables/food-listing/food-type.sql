@@ -1,6 +1,5 @@
 /** 
- *  A domain enum (table) that holds all possible hard-coded short hand food type descriptions.
- *  Should be used to populate some form item such as checkboxes for filtering.
+ *  A domain enum (table) that holds all possible hard-coded Food Types.
  */
 DO $$
 BEGIN
