@@ -26,6 +26,7 @@ psql --set=sslmode=require -h %server% -U %username% -p %port% -d %database% ^
  ^
     -f tables/food-listing/food-listing.sql ^
     -f tables/food-listing/claimed-food-listing.sql ^
+    -f tables/food-listing/delivery-state.sql ^
     -f tables/food-listing/delivery-food-listing.sql ^
     -f tables/food-listing/cancelled-delivery-food-listing.sql ^
     -f tables/food-listing/food-type.sql ^
@@ -62,10 +63,9 @@ psql --set=sslmode=require -h %server% -U %username% -p %port% -d %database% ^
     -f functions/food-listing/donate/update-food-listing.sql ^
     -f functions/food-listing/claim/claim-food-listing.sql ^
     -f functions/food-listing/claim/unclaim-food-listing.sql ^
-    -f functions/food-listing/delivery/start-food-listing-delivery.sql ^
-    -f functions/food-listing/delivery/cancel-food-listing-delivery.sql ^
-    -f functions/food-listing/delivery/mark-food-listing-pick-up.sql ^
-    -f functions/food-listing/delivery/mark-food-listing-drop-off.sql ^
+    -f functions/food-listing/delivery/add-delivery-food-listing.sql ^
+    -f functions/food-listing/delivery/cancel-delivery-food-listing.sql ^
+    -f functions/food-listing/delivery/update-delivery-state.sql ^
     -f functions/food-listing/delivery/get-delivery-state.sql ^
     -f functions/food-listing/delivery/get-delivery-food-listings.sql ^
     -f functions/food-listing/delivery/get-possible-delivery-times.sql

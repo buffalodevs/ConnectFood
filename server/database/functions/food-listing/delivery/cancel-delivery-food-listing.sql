@@ -1,8 +1,8 @@
 /**
  * Cancels the delivery process for a Claimed Food Listing.
  */
-SELECT dropFunction('cancelFoodListingDelivery');
-CREATE OR REPLACE FUNCTION cancelFoodListingDelivery
+SELECT dropFunction('cancelDeliveryFoodListing');
+CREATE OR REPLACE FUNCTION cancelDeliveryFoodListing
 (
      _deliveryFoodListingKey    DeliveryFoodListing.deliveryFoodListingKey%TYPE,            -- This is the key of the Delivery Food Listing that is to be cancelled.
      _cancelledByAppUserKey     CancelledDeliveryFoodListing.cancelledByAppUserKey%TYPE,    -- This is the key of the user who is cancelling the delivery of the Food Listing.
