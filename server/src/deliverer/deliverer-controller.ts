@@ -1,50 +1,61 @@
 import { Request, Response, Errback } from 'express';
 
 import { SessionData } from "../common-util/session-data";
-import { getDeliveryFoodListings } from './get-delivery-food-listings';
+import { getDeliveries } from './get-deliveries';
 import { getPossibleDeliveryTimes } from './get-possible-delivery-times';
 
-import { GetDeliveryFoodListingsRequest, GetDeliveryFoodListingsResponse,
-         DeliveryFoodListing } from '../../../shared/deliverer/message/get-delivery-food-listings-message';
-import { ManageDeliveryFoodListingRequest } from '../../../shared/deliverer/message/manage-delivery-food-listing-message';
+import { GetDeliveriesRequest, GetDeliveriesResponse, Delivery } from '../../../shared/deliverer/message/get-deliveries-message';
+import { ScheduleDeliveryFoodListingRequest } from '../../../shared/deliverer/message/schedule-delivery-food-listing-message';
+import { ManageDeliveryRequest } from '../../../shared/deliverer/message/manage-delivery-message';
 import { TimeRange } from '../../../shared/app-user/time-range';
 import { GetPossibleDeliveryTimesResponse } from '../../../shared/deliverer/message/get-possible-delivery-times-message';
 
 
-export function handleGetDeliveryFoodListings(request: Request, response: Response): void {
+export function handleGetDeliveries(request: Request, response: Response): void {
     
     response.setHeader('Content-Type', 'application/json');
 
-    let getDeliveryFoodListingsRequest: GetDeliveryFoodListingsRequest = request.body;
+    let getDeliveriesRequest: GetDeliveriesRequest = request.body;
     let sessionData: SessionData = SessionData.loadSessionData(request);
 
-    getDeliveryFoodListings(getDeliveryFoodListingsRequest.filters, sessionData.appUserKey, sessionData.appUserInfo.gpsCoordinate)
-        .then((deliveryFoodListings: DeliveryFoodListing[]) => {
-            response.send(new GetDeliveryFoodListingsResponse(deliveryFoodListings, true, 'Delivery Food Listings Successfully Retrieved'));
+    getDeliveries(getDeliveriesRequest.filters, sessionData.appUserKey, sessionData.appUserInfo.gpsCoordinate)
+        .then((deliveries: Delivery[]) => {
+            response.send(new GetDeliveriesResponse(deliveries, true, 'Delivery Food Listings Successfully Retrieved'));
         })
         .catch((err: Error) => {
-            response.send(new GetDeliveryFoodListingsResponse(null, false, err.message));
+            response.send(new GetDeliveriesResponse(null, false, err.message));
         });
 }
 
 
-export function handleClaimDeliveryFoodListing(request: Request, response: Response): void {
+export function handleScheduleDelivery(request: Request, response: Response): void {
     
     response.setHeader('Content-Type', 'application/json');
 
-    const claimDeliveryFoodListingRequest: ManageDeliveryFoodListingRequest = request.body;
-    let claimedFoodListingKey: number = claimDeliveryFoodListingRequest.claimedFoodListingKey;
+    const scheduleDeliveryFoodListingRequest: ScheduleDeliveryFoodListingRequest = request.body;
+    let claimedFoodListingKey: number = scheduleDeliveryFoodListingRequest.claimedFoodListingKey;
 
 
 }
 
 
-export function handleUnclaimDeliveryFoodListing(request: Request, response: Response): void {
+export function handleCancelDelivery(request: Request, response: Response): void {
 
     response.setHeader('Content-Type', 'application/json');
 
-    const unclaimDeliveryFoodListingRequest: ManageDeliveryFoodListingRequest = request.body;
-    let unclaimedFoodListingKey: number = unclaimDeliveryFoodListingRequest.claimedFoodListingKey;
+    const cancelDeliveryRequest: ManageDeliveryRequest = request.body;
+    let deliveryFoodListingKey: number = cancelDeliveryRequest.deliveryFoodListingKey;
+
+    
+}
+
+
+export function handleUpdateDeliveryState(request: Request, response: Response): void {
+
+    response.setHeader('Content-Type', 'application/json');
+    
+    const updateDeliveryStateRequest: ManageDeliveryRequest = request.body;
+    let deliveryFoodListingKey: number = updateDeliveryStateRequest.deliveryFoodListingKey;
 
     
 }
@@ -54,10 +65,10 @@ export function handleGetPossibleDeliveryTimes(request: Request, response: Respo
 
     response.setHeader('Content-Type', 'application/json');
 
-    const getPossibleDeliveryTimesRequest: ManageDeliveryFoodListingRequest = request.body;
+    const getPossibleDeliveryTimesRequest: ManageDeliveryRequest = request.body;
     const sessionData: SessionData = SessionData.loadSessionData(request);
 
-    let claimedFoodListingKey: number = getPossibleDeliveryTimesRequest.claimedFoodListingKey;
+    let claimedFoodListingKey: number = getPossibleDeliveryTimesRequest.deliveryFoodListingKey;
     let myAppUserKey: number = sessionData.appUserKey;
 
     getPossibleDeliveryTimes(claimedFoodListingKey, myAppUserKey)

@@ -1,24 +1,24 @@
-import { DeliveryFoodListingsFilters } from '../delivery-food-listings-filters';
-export { DeliveryFoodListingsFilters };
+import { DeliveryFilters } from '../delivery-filters';
+export { DeliveryFilters };
 
 import { FoodWebResponse } from '../../message-protocol/food-web-response';
-import { DeliveryFoodListing } from "../delivery-food-listing";
-export { DeliveryFoodListing };
+import { Delivery, DeliveryState } from "../delivery";
+export { Delivery, DeliveryState };
 
 import { SlickListResponse } from '../../../client/src/app/slick-filtered-list/slick-list/slick-list-message/slick-list-response';
 import { SlickListRequest } from '../../../client/src/app/slick-filtered-list/slick-list/slick-list-message/slick-list-request';
 
 
 /**
- * The expected request for the get delivery food listings operation. Should be sent from the client to the server.
+ * The expected request for the get deliveries operation. Should be sent from the client to the server.
  */
-export class GetDeliveryFoodListingsRequest extends SlickListRequest<DeliveryFoodListingsFilters> {
+export class GetDeliveriesRequest extends SlickListRequest <DeliveryFilters> {
 
-    constructor (
+    public constructor (
         /**
          * Filters to use when getting food listings.
          */
-        public filters: DeliveryFoodListingsFilters
+        filters: DeliveryFilters
     ) {
         super(filters);
     }
@@ -26,32 +26,32 @@ export class GetDeliveryFoodListingsRequest extends SlickListRequest<DeliveryFoo
 
 
 /**
- * The expected response from the get food listings operation. Should be sent form the server to the client.
+ * The expected response from the get deliveries operation. Should be sent form the server to the client.
  */
-export class GetDeliveryFoodListingsResponse extends SlickListResponse <DeliveryFoodListing> {
+export class GetDeliveriesResponse extends SlickListResponse <Delivery> {
 
-    constructor (
+    public constructor (
         /**
-         * The delivery food listings that were retrieved during the server operation.
+         * The food listing delivery data that were retrieved during the server operation.
          */
-        public dataList?: DeliveryFoodListing[],
+        dataList?: Delivery[],
         /**
          * Indicates whether or not the operation on the back end was successful.
          */
-        public success?: boolean,
+        success?: boolean,
         /**
          * A message containing information pertaining to what happened during processing on the back end. If successful, then it should
          * contain a simple success message. If unsuccessful, then it should contain the error message (without leaking sensitive data).
          */
-        public message?: string,
+        message?: string,
         /**
          * Indicates if there is a need for the user to login to perform the related operation on the server.
          */
-        public loginRequired: boolean = false,
+        loginRequired: boolean = false,
         /**
          * Indicates if there is a need for the user to have their signup confirmed before performing certain functionality.
          */
-        public signupConfirmRequired: boolean = false
+        signupConfirmRequired: boolean = false
     ) {
         super(dataList, success, message, loginRequired, signupConfirmRequired);
     }

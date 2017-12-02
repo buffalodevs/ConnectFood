@@ -1,0 +1,85 @@
+<h3>Deliveries</h3>
+<hr>
+
+
+<!-- This is the Delivery Food Listings (generated via loop) -->
+<slick-list-item *ngFor="let deliveryListing of listData; let i = index;">
+
+    <ng-container slick-list-item-header>
+        <a (click)="selectListing(i)" title="Click for Details">{{ deliveryListing.foodTitle }}</a>
+    </ng-container>
+
+    <ng-container slick-list-item-left>
+
+        <slick-map #SlickMapComponent [addresses]="[ deliveryListing.donorInfo, deliveryListing.receiverInfo ]"
+         [addressNames]="[ deliveryListing.donorInfo.organizationName, deliveryListing.receiverInfo.organizationName ]"
+         [diameterMi]="deliveryUtilService.calcMaxMapDiameterFromDelivery(deliveryListing)">
+        </slick-map>
+
+    </ng-container>
+
+
+    <ng-container slick-list-item-right-header>
+        <a (click)="selectListing(i)" title="Click for Details">{{ deliveryListing.foodTitle }}</a>
+    </ng-container>
+
+    <div slick-list-item-right-body class="row">
+
+        <div class="col-lg-6 col-md-12" id="right-body-col1">
+        
+            <div class="space-bottom">
+                <b>Donor</b><br>
+                <span class="inline-block">{{ deliveryListing.donorInfo.organizationName }}</span><br>
+                <span>{{ deliveryListing.donorInfo.address }}</span><br>
+                <span>
+                    {{ deliveryListing.donorInfo.city }}, {{ deliveryListing.donorInfo.state }} {{ deliveryListing.donorInfo.zip }}
+                </span>
+            </div>
+
+        </div>
+
+        <div class="col-lg-6 col-md-12">
+
+            <div class="space-bottom">
+                <b>Receiver</b><br>
+                <span class="inline-block">{{ deliveryListing.receiverInfo.organizationName }}</span><br>
+                <span>{{ deliveryListing.receiverInfo.address }}</span><br>
+                <span>
+                    {{ deliveryListing.receiverInfo.city }}, {{ deliveryListing.receiverInfo.state }} {{ deliveryListing.receiverInfo.zip }}
+                </span>
+            </div>
+
+        </div>
+
+        <div class="col-lg-12">
+            <b>Total Driving Distance:</b>
+            <div class="inline-block">
+                {{ deliveryUtilService.calcTotalDrivingDistance(deliveryListing) }} miles
+            </div>
+        </div>
+
+        <div class="col-lg-12">
+            <b>Total Driving Time:</b>
+            <div class="inline-block">
+                {{ deliveryUtilService.calcTotalDrivingTime(deliveryListing) }} minutes
+            </div>
+        </div>
+
+        <div class="col-lg-12">
+            <a [href]="SlickMapComponent.genGoogleMapsHref()" target="_blank" class="link-content">Get Directions</a>
+        </div>
+
+    </div>
+    
+</slick-list-item>
+
+
+<!-- This is our modal popup. It is separated into its own (child) component.
+     Simply pass down transcluded HTML into this child component here! -->
+<delivery-listing-dialog #DeliveryListingDialogComponent>
+
+    <ng-container delivery-listing-dialog-footer>
+        <ng-content select="[delivery-listing-dialog-footer]"></ng-content>
+    </ng-container>
+
+</delivery-listing-dialog>

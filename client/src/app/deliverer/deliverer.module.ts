@@ -9,15 +9,15 @@ import { AngularMaterialWrapperModule } from '../angular-material-wrapper/angula
 import { SlickFilteredListModule } from '../slick-filtered-list/slick-filtered-list.module';
 import { SlickMapModule } from '../slick-map/slick-map.module';
 
-import { DeliveryFoodListingsComponent } from './delivery-food-listings/delivery-food-listings.component';
-import { DeliveryFoodListingsFiltersComponent } from './delivery-food-listings/delivery-food-listings-filters/delivery-food-listings-filters.component';
-import { DeliveryFoodListingDialogComponent } from './delivery-food-listings/delivery-food-listing-dialog/delivery-food-listing-dialog.component';
+import { DeliveryListingsComponent } from './delivery-listings/delivery-listings.component';
+import { DeliveryListingsFiltersComponent } from './delivery-listings/delivery-listings-filters/delivery-listings-filters.component';
+import { DeliveryListingDialogComponent } from './delivery-listings/delivery-listing-dialog/delivery-listing-dialog.component';
 import { DeliverComponent } from './deliver/deliver.component';
 
 import { RoutePreprocessService } from '../common-util/services/route-preprocess.service';
 import { VehicleTypesService } from '../domain/vehicle-types/vehicle-types.service';
-import { GetDeliveryFoodListingsService } from './delivery-food-listings/delivery-food-listing-services/get-delivery-food-listings.service';
-import { DeliveryFoodListingUtilService } from './delivery-food-listings/delivery-food-listing-services/delivery-food-listing-util.service';
+import { GetDeliveriesService } from './delivery-listings/delivery-services/get-deliveries.service';
+import { DeliveryUtilService } from './delivery-listings/delivery-services/delivery-util.service';
 
 
 const delivererRoutes: Routes = [
@@ -35,9 +35,9 @@ const delivererRoutes: Routes = [
 
 @NgModule({
     declarations: [
-        DeliveryFoodListingsComponent,
-        DeliveryFoodListingsFiltersComponent,
-        DeliveryFoodListingDialogComponent,
+        DeliveryListingsComponent,
+        DeliveryListingsFiltersComponent,
+        DeliveryListingDialogComponent,
         DeliverComponent
     ],
     imports: [
@@ -52,8 +52,8 @@ const delivererRoutes: Routes = [
         SlickMapModule
     ],
     providers: [
-        GetDeliveryFoodListingsService,
-        DeliveryFoodListingUtilService
+        GetDeliveriesService,
+        DeliveryUtilService
     ]
 })
-export class DelivererModule { }
+export class DelivererModule {}

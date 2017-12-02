@@ -2,13 +2,26 @@ import { FoodListingUser } from '../receiver-donor/food-listing';
 
 
 /**
- * A single Food Listing Delivery entry that mainly contains data that is relavent to the user when browsing potential deliveries.
+ * The state (implies location) of the Delivery Food Listing
  */
-export class DeliveryFoodListing {
+export enum DeliveryState {
+    unscheduled = 'unscheduled',
+    scheduled = 'scheduled',
+    onRouteToDonor = 'onRouteToReceiver',
+    onRouteToReceiver = 'onRouteToDonor',
+    completed = 'completed'
+}
 
-    constructor (
+
+/**
+ * A single Food Listing Delivery entry that mainly contains data that is relavent to the user when browsing potential deliveries and scheduled/started deliveries.
+ */
+export class Delivery {
+
+    public constructor (
         public claimedFoodListingKey?: number,
         public deliveryFoodListingKey?: number,
+        public deliveryState?: DeliveryState,
         public foodTitle?: string,
         public foodDescription?: string,
         public perishable?: boolean,
@@ -24,5 +37,5 @@ export class DeliveryFoodListing {
         public receiverInfo?: FoodListingUser,  // Driving distance and time here is from donor to receiver!
         public claimedUnitsCount?: number,
         public unitsLabel?: string
-    ) { }
+    ) {}
 }

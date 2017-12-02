@@ -1,14 +1,18 @@
 /**
  * A basic container for Food Listing Delivery filter data that may be sent to/from the server/client.
  */
-export class DeliveryFoodListingsFilters {
+export class DeliveryFilters {
 
 
-    constructor(
+    public constructor (
         /**
-         * Determines whether or not we will only pull back listings that are avaialble now (implies we ignore match availability).
+         * The key ID of the Delivery Food Listing to pull back.
          */
-        //public availableNow?: boolean,
+        public deliveryFoodListingKey?: number,
+        /**
+         * The key ID of the Claimed Food Listing to pull back as a potential delivery.
+         */
+        public claimedFoodListingKey?: number,
         /**
          * Determines the maximum distance (mi) from the requesting entity that donations must fall within.
          */
@@ -26,12 +30,20 @@ export class DeliveryFoodListingsFilters {
          */
         public retrievalAmount?: number,
         /**
+         * Determines if we should only retrieve unscheduled Delivery Food Listings (Food Listings that are claimed but have no uncancelled Delivery data).
+         */
+        public unscheduledDeliveries?: boolean,
+        /**
          * Determines if we should only retrieve Delivery Food Listings that have been established for this deliverer (Deliver Cart).
          */
-        public myScheduledDeliveries?: boolean
+        public myScheduledDeliveries?: boolean,
         /**
          * Determines whether or not we should only pull back deliveries for Donors and Receivers whose availablility times match the logged in deliverer's times.
          */
-        //public matchAvailability?: boolean
-    ) { }
+        public matchAvailability?: boolean,
+        /**
+         * Determines whether or not we will only pull back listings that are avaialble now for immediate delivery (implies we ignore match availability).
+         */
+        public availableNow?: boolean
+    ) {}
 }

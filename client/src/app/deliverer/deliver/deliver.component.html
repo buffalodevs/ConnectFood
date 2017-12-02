@@ -3,20 +3,20 @@
 
         <div id="filters" class="col-md-0 col-lg-3 no-pad" [style.max-width]="minFiltersWidth">
 
-            <delivery-food-listings-filters header="Search Filters" [maxWidth]="minFiltersWidth" #deliveryFoodListingsFilters>
-            </delivery-food-listings-filters>
+            <delivery-listings-filters header="Search Filters" [maxWidth]="minFiltersWidth" #deliveryListingsFilters>
+            </delivery-listings-filters>
         
         </div>
 
         <div id="listings" class="col-md-12 col-lg-9">
 
-            <delivery-food-listings header="Available Deliveries" #deliveryFoodListings>
+            <delivery-listings header="Available Deliveries" #deliveryListings>
 
-                <ng-container delivery-food-listing-dialog-footer>
-                    <button md-raised-button color="primary" class="button-md" (click)="claimSelectedDeliveryFoodListing()">Claim</button>
+                <ng-container delivery-listing-dialog-footer>
+                    <button md-raised-button color="primary" class="button-md" (click)="startDelivery()">Start</button>
                 </ng-container>
                 
-            </delivery-food-listings>
+            </delivery-listings>
             
         </div>
         

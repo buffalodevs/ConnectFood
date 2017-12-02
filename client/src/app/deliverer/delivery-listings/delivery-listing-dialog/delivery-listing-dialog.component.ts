@@ -1,19 +1,19 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 
 import { AbstractSlickListDialog } from '../../../slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
-import { DeliveryFoodListingUtilService } from '../delivery-food-listing-services/delivery-food-listing-util.service';
+import { DeliveryUtilService } from '../delivery-services/delivery-util.service';
 
-import { DeliveryFoodListing } from '../../../../../../shared/deliverer/delivery-food-listing';
+import { Delivery } from '../../../../../../shared/deliverer/delivery';
 import { SlickListDialogComponent } from '../../../slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component';
 
 
 @Component({
-    selector: 'delivery-food-listing-dialog',
-    templateUrl: './delivery-food-listing-dialog.component.html',
-    styleUrls: ['./delivery-food-listing-dialog.component.css', './../delivery-food-listings.component.css'],
-    providers: [DeliveryFoodListingUtilService]
+    selector: 'delivery-listing-dialog',
+    templateUrl: './delivery-listing-dialog.component.html',
+    styleUrls: ['./delivery-listing-dialog.component.css', './../delivery-listings.component.css'],
+    providers: [DeliveryUtilService]
 })
-export class DeliveryFoodListingDialogComponent extends AbstractSlickListDialog <DeliveryFoodListing> {
+export class DeliveryListingDialogComponent extends AbstractSlickListDialog <Delivery> {
 
     /**
      * This is a shadow of the slickListDialog member in AbstractSlickListDialog.
@@ -23,7 +23,7 @@ export class DeliveryFoodListingDialogComponent extends AbstractSlickListDialog 
 
 
     public constructor (
-        private deliveryFoodListingUtilService: DeliveryFoodListingUtilService
+        private deliveryFoodListingUtilService: DeliveryUtilService // Referenced in HTML template
     ) {
         super();
     }

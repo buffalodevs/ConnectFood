@@ -13,10 +13,11 @@ RETURNS DeliveryState -- The delivery state.
 AS $$
 
     SELECT CASE
-        WHEN (_dropOffTime IS NOT NULL)         THEN 'Delivery completed'::DeliveryState
-        WHEN (_pickUpTime IS NOT NULL)          THEN 'On route to receiver'::DeliveryState
-        WHEN (_startTime IS NOT NULL)           THEN 'On route to donor'::DeliveryState
-        WHEN (_scheduledStartTime IS NOT NULL)  THEN 'Delivery scheduled'::DeliveryState
+        WHEN (_dropOffTime IS NOT NULL)         THEN    'completed'::DeliveryState
+        WHEN (_pickUpTime IS NOT NULL)          THEN    'onRouteToReceiver'::DeliveryState
+        WHEN (_startTime IS NOT NULL)           THEN    'onRouteToDonor'::DeliveryState
+        WHEN (_scheduledStartTime IS NOT NULL)  THEN    'scheduled'::DeliveryState
+        ELSE                                            'unscheduled'::DeliveryState
     END;
 
 $$ LANGUAGE sql;

@@ -22,17 +22,17 @@ BEGIN
 
     UPDATE  DeliveryFoodListing
     SET     startTime   =   CASE (_deliveryState)
-                                WHEN 'On route to donor' THEN       CURRENT_TIMESTAMP
+                                WHEN 'onRouteToDonor'       THEN    CURRENT_TIMESTAMP
                                 ELSE                                startTime
                             END,
             pickupTime  =   CASE (_deliveryState)
-                                WHEN 'On route to receiver' THEN    CURRENT_TIMESTAMP
-                                WHEN 'On route to donor'    THEN    NULL -- Going back a step.
+                                WHEN 'onRouteToReceiver'    THEN    CURRENT_TIMESTAMP
+                                WHEN 'onRouteToDonor'       THEN    NULL -- Going back a step.
                                 ELSE                                pickuptTime
                             END,
             dropOffTime =   CASE (_deliveryState)
-                                WHEN 'Delivery completed'   THEN    CURRENT_TIMESTAMP
-                                WHEN 'On route to receiver' THEN    NULL -- Going back a step.
+                                WHEN 'completed'            THEN    CURRENT_TIMESTAMP
+                                WHEN 'onRouteToReceiver'    THEN    NULL -- Going back a step.
                                 ELSE                                dropOffTime
                             END
     WHERE   deliveryFoodListingKey = _deliveryFoodListingKey;    

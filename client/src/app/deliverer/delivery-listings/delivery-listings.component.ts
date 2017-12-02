@@ -1,0 +1,30 @@
+import { Component, OnInit, ViewChild } from '@angular/core';
+
+import { AbstractSlickList } from '../../slick-filtered-list/slick-list/abstract-slick-list';
+import { AbstractSlickListDialog } from '../../slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
+import { GetDeliveriesService } from './delivery-services/get-deliveries.service';
+import { DeliveryUtilService } from './delivery-services/delivery-util.service';
+
+import { Delivery } from '../../../../../shared/deliverer/delivery';
+import { DeliveryFilters } from '../../../../../shared/deliverer/delivery-filters';
+import { GPSCoordinate } from '../../../../../shared/common-util/geocode';
+import { Address } from '../../../../../shared/app-user/app-user-info';
+
+
+@Component({
+    selector: 'delivery-listings',
+    templateUrl: './delivery-listings.component.html',
+    styleUrls: ['./delivery-listings.component.css']
+})
+export class DeliveryListingsComponent extends AbstractSlickList <Delivery, DeliveryFilters> {
+
+    @ViewChild('DeliveryListingDialogComponent') protected slickListDialog: AbstractSlickListDialog <Delivery>;
+
+
+    public constructor (
+        private getDeliveriesService: GetDeliveriesService,
+        private deliveryUtilService: DeliveryUtilService // Referenced in HTML template
+    ) {
+        super(getDeliveriesService, '/deliverer/getDeliveries');
+    }
+}

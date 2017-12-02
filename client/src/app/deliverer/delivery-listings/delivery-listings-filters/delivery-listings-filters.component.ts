@@ -3,15 +3,13 @@ import { FormGroup, FormControl, AbstractControl } from '@angular/forms';
 
 import { VehicleTypesService } from '../../../domain/vehicle-types/vehicle-types.service';
 
-import { DeliveryFoodListingsFilters } from '../../../../../../shared/deliverer/delivery-food-listings-filters';
-
 
 @Component({
-    selector: 'delivery-food-listings-filters',
-    templateUrl: './delivery-food-listings-filters.component.html',
-    styleUrls: ['./delivery-food-listings-filters.component.css']
+    selector: 'delivery-listings-filters',
+    templateUrl: './delivery-listings-filters.component.html',
+    styleUrls: ['./delivery-listings-filters.component.css']
 })
-export class DeliveryFoodListingsFiltersComponent extends FormGroup implements OnInit {
+export class DeliveryListingsFiltersComponent extends FormGroup implements OnInit {
 
     @Input() private header: string = 'Filters';
     @Input() private maxWidth: string = null;

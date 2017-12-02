@@ -5,12 +5,12 @@ import { Observable } from 'rxjs/Observable';
 import { GetListingsService } from '../../../slick-filtered-list/slick-list/get-listings.service';
 import { RequestService } from '../../../common-util/services/request.service';
 
-import { DeliveryFoodListingsFilters, GetDeliveryFoodListingsRequest } from '../../../../../../shared/deliverer/message/get-delivery-food-listings-message';
-import { DeliveryFoodListing } from '../../../../../../shared/deliverer/delivery-food-listing';
+import { DeliveryFilters, GetDeliveriesRequest } from '../../../../../../shared/deliverer/message/get-deliveries-message';
+import { Delivery } from '../../../../../../shared/deliverer/delivery';
 
 
 @Injectable()
-export class GetDeliveryFoodListingsService extends GetListingsService <DeliveryFoodListing, DeliveryFoodListingsFilters> {
+export class GetDeliveriesService extends GetListingsService <Delivery, DeliveryFilters> {
     
     public constructor (
         requestService: RequestService
@@ -25,7 +25,7 @@ export class GetDeliveryFoodListingsService extends GetListingsService <Delivery
      * @param filters The filter criteria used when retrieving listings.
      * @return The final request that will be sent to the server.
      */
-    protected generateListingsRequest(filters: DeliveryFoodListingsFilters): GetDeliveryFoodListingsRequest {
-        return new GetDeliveryFoodListingsRequest(filters);
+    protected generateListingsRequest(filters: DeliveryFilters): GetDeliveriesRequest {
+        return new GetDeliveriesRequest(filters);
     }
 }

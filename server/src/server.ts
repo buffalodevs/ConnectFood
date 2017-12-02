@@ -25,9 +25,10 @@ import { handleAddFoodListing,
          handleGetFoodListings,
          handleClaimFoodListing,
          handleUnclaimFoodListing } from './receiver-donor/receiver-donor-controller';
-import { handleGetDeliveryFoodListings,
-         handleClaimDeliveryFoodListing, 
-         handleUnclaimDeliveryFoodListing, 
+import { handleGetDeliveries,
+         handleScheduleDelivery, 
+         handleCancelDelivery,
+         handleUpdateDeliveryState, 
          handleGetPossibleDeliveryTimes } from './deliverer/deliverer-controller';
 import { handleGetDomainValues } from './domain/domain-controller';
 
@@ -66,9 +67,10 @@ app.post('/receiverDonor/receiver/unclaimFoodListing',  SessionData.ensureSessio
 
 
 // Deliverer Controller Routes.
-app.post('/deliverer/getDeliveryFoodListings',          SessionData.ensureSessionActive, handleGetDeliveryFoodListings);
-app.post('/deliverer/claimDeliveryFoodListing',         SessionData.ensureSessionActive, handleClaimDeliveryFoodListing);
-app.post('/deliverer/unclaimDeliveryFoodListing',       SessionData.ensureSessionActive, handleUnclaimDeliveryFoodListing);
+app.post('/deliverer/getDeliveries',                    SessionData.ensureSessionActive, handleGetDeliveries);
+app.post('/deliverer/scheduleDelivery',                 SessionData.ensureSessionActive, handleScheduleDelivery);
+app.post('/deliverer/cancelDelivery',                   SessionData.ensureSessionActive, handleCancelDelivery);
+app.post('/deliverer/updateDeliveryState',              SessionData.ensureSessionActive, handleUpdateDeliveryState);
 app.post('/deliverer/getPossibleDeliveryTimes',         SessionData.ensureSessionActive, handleGetPossibleDeliveryTimes)
 
 

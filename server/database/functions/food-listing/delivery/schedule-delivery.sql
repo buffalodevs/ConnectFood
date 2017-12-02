@@ -1,8 +1,8 @@
 /**
- * Adds a new delivery food listing
+ * Schedules a new delivery by adding a new DeliveryFoodListing.
  */
-SELECT dropFunction('startFoodListingDelivery');
-CREATE OR REPLACE FUNCTION addDeliveryFoodListing
+SELECT dropFunction('scheduleDelivery');
+CREATE OR REPLACE FUNCTION scheduleDelivery
 (
     _claimedFoodListingKey  DeliveryFoodListing.deliveryFoodListingKey%TYPE,    -- This is the key of the Claimed Food Listing that is to be delivered.
     _deliveryAppUserKey     DeliveryFoodListing.deliveryAppUserKey%TYPE,        -- This is the key of the user who is delivering the Food Listing.
