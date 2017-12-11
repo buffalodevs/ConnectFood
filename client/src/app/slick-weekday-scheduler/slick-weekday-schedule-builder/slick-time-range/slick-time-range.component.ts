@@ -1,11 +1,11 @@
 import { Component, OnInit, Input, forwardRef, OnChanges, SimpleChanges, SimpleChange } from '@angular/core';
 import { ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, FormControl, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
 
-import { ValidationService, Validation } from '../../common-util/services/validation.service';
+import { SlickTimeRangeValidationService, ValidationService, Validation } from './slick-time-range-validation.service';
+import { AbstractModelDrivenComponent } from '../../../common-util/components/abstract-model-driven-component';
 
-import { DateFormatter } from '../../../../../shared/common-util/date-formatter';
-import { TimeRange } from '../../../../../shared/app-user/time-range';
-import { SlickTimeRangeValidationService } from './slick-time-range-validation.service';
+import { DateFormatter } from '../../../../../../shared/common-util/date-formatter';
+import { TimeRange } from '../../../../../../shared/app-user/time-range';
 
 
 @Component({
@@ -21,7 +21,7 @@ import { SlickTimeRangeValidationService } from './slick-time-range-validation.s
         SlickTimeRangeValidationService
     ]
 })
-export class SlickTimeRangeComponent implements OnInit, OnChanges, ControlValueAccessor {
+export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implements OnInit, OnChanges, ControlValueAccessor {
     
     // Regular expressions used to dynaimcally filter hours and minutes inputs.
     private readonly DYNAMIC_HH_REG_EXP: RegExp;
@@ -37,7 +37,6 @@ export class SlickTimeRangeComponent implements OnInit, OnChanges, ControlValueA
     @Input() private validate: boolean;
     @Input() private displayOnly: boolean;
 
-    private timeRangeForm: FormGroup;
     private groupValidators: ValidatorFn[][];
     /**
      * A callback function provided by a parent component (via directive such as ngModel).
@@ -48,8 +47,10 @@ export class SlickTimeRangeComponent implements OnInit, OnChanges, ControlValueA
 
     public constructor (
         private formBuilder: FormBuilder,
-        private validationService: SlickTimeRangeValidationService
+        protected validationService: SlickTimeRangeValidationService
     ) {
+        super(validationService);
+
         this.DYNAMIC_HH_REG_EXP = /^(0?[1-9]?|1[0-2]?)$/;
         this.DYNAMIC_MM_REG_EXP = /^([0-5][0-9]?)$/;
 
@@ -59,7 +60,7 @@ export class SlickTimeRangeComponent implements OnInit, OnChanges, ControlValueA
 
     public ngOnInit(): void {
 
-        this.timeRangeForm = this.formBuilder.group({
+        this.form = this.formBuilder.group({
             'weekday':      [null],
             'startTime':    [null, Validators.required],
             'endTime':      [null, Validators.required]
@@ -73,7 +74,7 @@ export class SlickTimeRangeComponent implements OnInit, OnChanges, ControlValueA
         ];
 
         // Listen for any form changes and notify any listening components of change.
-        this.timeRangeForm.valueChanges.subscribe(data => {
+        this.form.valueChanges.subscribe(data => {
             this.onChange(this.readValue());
         });
 
@@ -84,8 +85,8 @@ export class SlickTimeRangeComponent implements OnInit, OnChanges, ControlValueA
     public ngOnChanges(changes: SimpleChanges): void {
         
         // Make sure we validate the contained form when validate is marked as true.
-        if (changes.validate && changes.validate.currentValue && this.timeRangeForm) {
-            this.validationService.markAllAsTouched(this.timeRangeForm);
+        if (changes.validate && changes.validate.currentValue && this.form) {
+            this.validationService.markAllAsTouched(this.form);
         }
     }
 
@@ -109,8 +110,8 @@ export class SlickTimeRangeComponent implements OnInit, OnChanges, ControlValueA
         let timeRange: TimeRange = null;
 
         // Extract start and end time strings from form.
-        let startTime: string = this.timeRangeForm.controls.startTime.value;
-        let endTime: string = this.timeRangeForm.controls.endTime.value;
+        let startTime: string = this.form.controls.startTime.value;
+        let endTime: string = this.form.controls.endTime.value;
 
         // Take calendar base date and construct new date with additional times. If time strings are missing parts, then null is generated here!
         let startDate: Date = DateFormatter.setWallClockTimeForDate(new Date(), startTime);
@@ -139,11 +140,11 @@ export class SlickTimeRangeComponent implements OnInit, OnChanges, ControlValueA
 
         // If given a non-null value, then write it.
         if (timeRange !== null) {
-            this.timeRangeForm.setValue(timeRange);
+            this.form.setValue(timeRange);
         }
         // Else we were given null, so set contained value back to empty.
         else {
-            this.timeRangeForm.setValue(new TimeRange(this.weekday, null, null));
+            this.form.setValue(new TimeRange(this.weekday, null, null));
         }
     }
 

@@ -20,7 +20,7 @@ RETURNS TABLE
 (
     claimedFoodListingKey   ClaimedFoodListing.claimedFoodListingKey%TYPE,
     deliveryFoodListingKey  DeliveryFoodListing.deliveryFoodListingKey%TYPE,
-    deliveryFoodListing     JSON
+    delivery                JSON
 )
 AS $$
     DECLARE _maxDistanceMeters  INTEGER     DEFAULT NULL;
@@ -35,6 +35,11 @@ BEGIN
 
 
     -- If NULL is passed in for following inputs, then set them to FALSE for consistency.
+    IF (_unscheduledDeliveries IS NULL)
+    THEN
+        _unscheduledDeliveries := FALSE;
+    END IF;
+
     IF (_myScheduledDeliveries IS NULL)
     THEN
         _myScheduledDeliveries := FALSE;
@@ -117,8 +122,14 @@ BEGIN
                 'claimedUnitsCount',        ClaimedFoodListing.claimedUnitsCount,
                 'unitsLabel',               FoodListing.unitsLabel,
                 'imgUrl',                   FoodListing.imgUrl,
-                'totalWeight',              FoodListing.totalWeight
-            ) AS deliveryFoodListing
+                'totalWeight',              FoodListing.totalWeight,
+                -- This large subquery in getPossibleDeliveryTimes may need to be inlined for performance benefits. Although, the select portion of this query
+                -- should be evaluated last, and therefore, this should only happen a very limited number of times... so it's probably fine.
+                'possibleDeliveryTimes',    (   
+                                                SELECT  ARRAY_AGG(getPossibleDeliveryTimes)
+                                                FROM    getPossibleDeliveryTimes(ClaimedFoodListing.claimedFoodListingKey, _appUserKey)
+                                            )
+            ) AS delivery
     FROM        FoodListing
     INNER JOIN  ClaimedFoodListing                              ON FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
     INNER JOIN  AppUser AS DelivererAppUser                     ON _appUserKey = DelivererAppUser.appUserKey
@@ -139,19 +150,21 @@ BEGIN
                                                                     FROM    CancelledDeliveryFoodListing
                                                                     WHERE   DeliveryFoodListing.deliveryFoodListingKey = CancelledDeliveryFoodListing.deliveryFoodListingKey
                                                                 )
-    WHERE   (_maxDistanceMeters IS NULL     OR ST_DWITHIN(ReceiverContact.gpsCoordinate, DonorContact.gpsCoordinate, _maxDistanceMeters))
-      AND   (_maxTotalWeight IS NULL        OR FoodListing.totalWeight <= _maxTotalWeight)
-      AND   (_myScheduledDeliveries = FALSE OR DeliveryFoodListing.deliveryAppUserKey = _appUserKey)
-      AND   (_unscheduledDeliveries = FALSE OR DeliveryFoodListing.scheduledStartTime IS NULL)
+    WHERE   (_deliveryFoodListingKey IS NULL    OR DeliveryFoodListing.deliveryFoodListingKey = _deliveryFoodListingKey)
+      AND   (_claimedFoodListingKey IS NULL     OR ClaimedFoodListing.claimedFoodListingKey = _claimedFoodListingKey)
+      AND   (_maxDistanceMeters IS NULL         OR ST_DWITHIN(ReceiverContact.gpsCoordinate, DonorContact.gpsCoordinate, _maxDistanceMeters))
+      AND   (_maxTotalWeight IS NULL            OR FoodListing.totalWeight <= _maxTotalWeight)
+      AND   (_myScheduledDeliveries = FALSE     OR DeliveryFoodListing.deliveryAppUserKey = _appUserKey)
+      AND   (_unscheduledDeliveries = FALSE     OR DeliveryFoodListing.scheduledStartTime IS NULL)
       -- When deliverer, receiver, and donor availabilities must all line up for future scheduling of delivery.
-      AND   (_matchAvailability = FALSE     OR (    ReceiverAvailability.endTime > DelivererAvailability.startTime
-                                                AND ReceiverAvailability.startTime < DelivererAvailability.endTime
-                                                AND DonorAvailability.endTime > DelivererAvailability.startTime
-                                                AND DonorAvailability.startTime < DelivererAvailability.endTime))
-      AND   (_availableNow = FALSE          OR (    ReceiverAvailability.endTime > _currentTimestamp
-                                                AND ReceiverAvailability.startTime < _currentTimestamp
-                                                AND DonorAvailability.endTime > _currentTimestamp
-                                                AND DonorAvailability.startTime < _currentTimestamp))  
+      AND   (_matchAvailability = FALSE         OR (    ReceiverAvailability.endTime > DelivererAvailability.startTime
+                                                    AND ReceiverAvailability.startTime < DelivererAvailability.endTime
+                                                    AND DonorAvailability.endTime > DelivererAvailability.startTime
+                                                    AND DonorAvailability.startTime < DelivererAvailability.endTime))
+      AND   (_availableNow = FALSE              OR (    ReceiverAvailability.endTime > _currentTimestamp
+                                                    AND ReceiverAvailability.startTime < _currentTimestamp
+                                                    AND DonorAvailability.endTime > _currentTimestamp
+                                                    AND DonorAvailability.startTime < _currentTimestamp))  
     OFFSET      _retrievalOffset
     LIMIT       _retrievalAmount;
 

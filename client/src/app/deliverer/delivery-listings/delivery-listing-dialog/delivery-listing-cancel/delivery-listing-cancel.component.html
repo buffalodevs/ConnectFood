@@ -1,0 +1,19 @@
+<form [formGroup]="cancelForm">
+
+    <div class="modal-body">
+
+        <h4>Please provide a reason for the delivery cancellation:</h4>
+        <md-form-field floatPlaceholder="never" id="cancel-reason">
+            <textarea #foodTitle mdInput mdTextareaAutosize placeholder="Cancellation Reason" formControlName="cancelReason"></textarea>
+        </md-form-field>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+        
+        <button md-raised-button color="primary" id="cancel-button" class="button-md sm-button-full" (click)="cancelDelivery()">Confirm Cancel</button>
+
+    </div>
+
+</form>

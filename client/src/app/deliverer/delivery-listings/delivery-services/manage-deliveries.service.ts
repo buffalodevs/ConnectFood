@@ -10,7 +10,7 @@ import { DeliveryState } from '../../../../../../shared/deliverer/delivery';
 
 
 /**
- * Service for managing an already created or scheduled Delivery Food Listing (by changing Delivery State or Cancelling).
+ * Service for managing an already created or scheduled Delivery.
  */
 @Injectable()
 export class ManageDeliveryService {
@@ -21,37 +21,15 @@ export class ManageDeliveryService {
 
 
     /**
-     * Updates the state of a Delivery Food Listing.
-     * @param deliveryFoodListingKey The Delivery Food Listing key (ID).
-     * @param deliveryState The new state of the Delivery Food Listing.
-     * @return An observable that resolves to nothing on success.
-     */
-    public updateDeliveryFoodListingState(deliveryFoodListingKey: number, deliveryState: DeliveryState): Observable<void> {
-        return this.manageDeliveryFoodListing(deliveryFoodListingKey, deliveryState, '/deliverer/updateDeliveryFoodListingState');
-    }
-
-
-    /**
-     * Cancels the Delivery Food Listing.
-     * @param deliveryFoodListingKey The Delivery Food Listing key (ID).
-     * @return An observable that resolves to nothing on success.
-     */
-    public cancelDeliveryFoodListing(deliveryFoodListingKey: number): Observable<void> {
-        return this.manageDeliveryFoodListing(deliveryFoodListingKey, DeliveryState.unscheduled, '/deliverer/cancelDeliveryFoodListing');
-    }
-
-
-    /**
-     * Uniform function for managing a Delivery Food Listing (for functions such as updateDeliveryFoodListingState and cancelDeliveryFoodListing).
+     * Updates the state of a delivery.
      * @param deiveryFoodListingKey The key identifier of the Delivery Food Listing that is to be acted upon.
      * @param deliveryState The delivery state to set the Delivery Food Listing to. Set to DeliveryState.unscheduled if cancelling delivery (value does not matter).
-     * @param controllerRoute The controller route for the management function.
      * @return An observable that has no payload (simply resolves on success).
      */
-    private manageDeliveryFoodListing(deliveryFoodListingKey: number, deliveryState: DeliveryState, controllerRoute: string): Observable<void> {
+    public updateDeliveryState(deliveryFoodListingKey: number, deliveryState: DeliveryState): Observable<void> {
 
         let body: ManageDeliveryRequest = new ManageDeliveryRequest(deliveryFoodListingKey, deliveryState);
-        let observer: Observable<Response> = this.requestService.post(controllerRoute, body);
+        let observer: Observable<Response> = this.requestService.post('/deliverer/updateDeliveryState', body);
 
         // Listen for a response now.
         return observer.map((response: Response) => {

@@ -1,7 +1,7 @@
 /**
  * Expected request for scheduling a delivery.
  */
-export class ScheduleDeliveryFoodListingRequest {
+export class ScheduleDeliveryRequest {
     
     public constructor (
         /**

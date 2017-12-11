@@ -8,9 +8,16 @@ CREATE OR REPLACE FUNCTION cancelDelivery
      _cancelledByAppUserKey     CancelledDeliveryFoodListing.cancelledByAppUserKey%TYPE,    -- This is the key of the user who is cancelling the delivery of the Food Listing.
      _cancelReason              CancelledDeliveryFoodListing.cancelReason%TYPE              -- The reason why the delivery was cancelled.
 )
-RETURNS INTEGER -- The cancelledDeliveryFoodListing primary key.
+RETURNS TABLE -- Returns the Delivery that has been cancelled.
+(
+    claimedFoodListingKey   ClaimedFoodListing.claimedFoodListingKey%TYPE,
+    deliveryFoodListingKey  DeliveryFoodListing.deliveryFoodListingKey%TYPE,
+    delivery                JSON
+)
 AS $$
-    DECLARE _cancelledDeliveryFoodListingKey  CancelledDeliveryFoodListing.cancelledDeliveryFoodListingKey%TYPE;
+    DECLARE _cancelledDeliveryFoodListingKey    CancelledDeliveryFoodListing.cancelledDeliveryFoodListingKey%TYPE;
+    DECLARE _claimedFoodListingKey              ClaimedFoodListing.claimedFoodListingKey%TYPE;
+    DECLARE _deliveryAppUserKey                AppUser.appUserKey%TYPE;
 BEGIN
 
     -- TODO: Check that the cancelling app user and claimed food listing exist!
@@ -28,11 +35,18 @@ BEGIN
         _deliveryFoodListingKey,
         _cancelledByAppUserKey,
         _cancelReason
-    )
-    RETURNING   cancelledDeliveryFoodListingKey
-    INTO        _cancelledDeliveryFoodListingKey;
+    );
 
-    RETURN _cancelledDeliveryFoodListingKey;
+    -- Grab data used for getting Delivery data of the cancelled delivery.
+    SELECT      ClaimedFoodListing.claimedFoodListingKey,
+                DeliveryFoodListing.deliveryAppUserKey
+    INTO        _claimedFoodListingKey,
+                _deliveryAppUserKey
+    FROM        DeliveryFoodListing
+    INNER JOIN  ClaimedFoodListing ON DeliveryFoodListing.claimedFoodListingKey = ClaimedFoodListing.claimedFoodListingKey;
+
+    RETURN QUERY
+    SELECT * FROM getDeliveries(_deliveryAppUserKey, 0, 1, NULL, _claimedFoodListingKey);
 
 END;
 $$ LANGUAGE plpgsql;

@@ -16,15 +16,22 @@ BEGIN
     RETURN QUERY
                 -- @ts-sql class="TimeRange" file="/shared/app-user/time-range.ts"
     SELECT      JSON_BUILD_OBJECT (
-                    'startTime',    GREATEST (
-                                        ReceiverAvailability.startTime,
-                                        DonorAvailability.startTime,
-                                        DelivererAvailability.startTime
+                    'weekday',      (SELECT EXTRACT(DOW FROM DelivererAvailability.startTime)),
+                    'startTime',    TO_CHAR (
+                                        GREATEST (
+                                            ReceiverAvailability.startTime,
+                                            DonorAvailability.startTime,
+                                            DelivererAvailability.startTime
+                                        ),
+                                        'HH12:MI AM'
                                     ),
-                    'endTime',      LEAST (
-                                        ReceiverAvailability.endTime,
-                                        DonorAvailability.endTime,
-                                        DelivererAvailability.endTime
+                    'endTime',      TO_CHAR (
+                                        LEAST (
+                                            ReceiverAvailability.endTime,
+                                            DonorAvailability.endTime,
+                                            DelivererAvailability.endTime
+                                        ),
+                                        'HH12:MI AM'
                                     )
                 )
     FROM        ClaimedFoodListing

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 
 import { AbstractSlickList } from '../../slick-filtered-list/slick-list/abstract-slick-list';
 import { AbstractSlickListDialog } from '../../slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
@@ -18,6 +18,11 @@ import { Address } from '../../../../../shared/app-user/app-user-info';
 })
 export class DeliveryListingsComponent extends AbstractSlickList <Delivery, DeliveryFilters> {
 
+    /**
+     * Set to true if the Delivery Listings are for a Delivery Cart. Default is false.
+     */
+    @Input() private isCart: boolean;
+
     @ViewChild('DeliveryListingDialogComponent') protected slickListDialog: AbstractSlickListDialog <Delivery>;
 
 
@@ -26,5 +31,6 @@ export class DeliveryListingsComponent extends AbstractSlickList <Delivery, Deli
         private deliveryUtilService: DeliveryUtilService // Referenced in HTML template
     ) {
         super(getDeliveriesService, '/deliverer/getDeliveries');
+        this.isCart = false;
     }
 }

@@ -32,10 +32,15 @@ export abstract class AbstractModelDrivenComponent {
     /**
      * Determines if a given control has any error(s).
      * @param controlPath The path of the control relative to the base signupForm.
+     * @param errorCode An optional error code to check for if a specific error is being examined. Default is null for any error.
      * true if an error(s) exist, false if not.
      */
-    protected hasError(controlPath: string): boolean {
-        return ( this.control(controlPath).errors != null );
+    protected hasError(controlPath: string, errorCode?: string): boolean {
+
+        let control: AbstractControl = (controlPath === '.') ? this.form
+                                                             : this.control(controlPath);
+
+        return ( control.errors != null && (errorCode == null || control.hasError(errorCode)));
     }
 
 
@@ -45,6 +50,10 @@ export abstract class AbstractModelDrivenComponent {
      * @return The error message for the given control.
      */
     protected errorMsgFor(controlPath: string): string {
-        return this.validationService.errorMsgFor(this.form.get(controlPath), controlPath);
+
+        let control: AbstractControl = (controlPath === '.') ? this.form
+                                                             : this.control(controlPath);
+
+        return this.validationService.errorMsgFor(control, controlPath);
     }
 }

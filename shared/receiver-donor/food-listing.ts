@@ -20,7 +20,7 @@ export class FoodListingUser implements Address {
         public email?: string,
         public lastName?: string,
         public firstName?: string
-    ) { }
+    ) {}
 }
 
 
@@ -51,7 +51,7 @@ export class FoodListingUnits {
          * The user given label for the units that the Food Listing has been split into (e.g. cans, bottles, lbs, etc).
          */
         public unitsLabel?: string
-    ) { }
+    ) {}
 }
 
 
@@ -76,5 +76,5 @@ export class FoodListing {
         public imgUrl?: string,
         public donorInfo?: FoodListingUser,
         public unitsInfo?: FoodListingUnits
-    ) { }
+    ) {}
 }

@@ -14,15 +14,15 @@ import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 
 
 @Component({
-    selector: 'app-cart',
-    templateUrl: './cart.component.html',
-    styleUrls: ['./cart.component.css', '../../slick-filtered-list/slick-filtered-list.component.css'],
+    selector: 'food-listing-cart',
+    templateUrl: './food-listing-cart.component.html',
+    styleUrls: ['./food-listing-cart.component.css', '../../slick-filtered-list/slick-filtered-list.component.css'],
     providers: [
         SessionDataService,
         ManageFoodListingService
     ]
 })
-export class CartComponent implements OnInit {
+export class FoodListingCartComponent implements OnInit {
 
     // Need to declare LISTINGS_STATUS enum inside component to be used in the HTML template!
     private readonly LISTINGS_STATUS: typeof LISTINGS_STATUS = LISTINGS_STATUS;

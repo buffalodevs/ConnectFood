@@ -130,7 +130,7 @@
             <h3 class="center-text">Weekly Availability</h3>
             <hr>
 
-            <slick-weekday-scheduler [validate]="validate.get('availability')" formControlName="availability"></slick-weekday-scheduler>
+            <slick-weekday-schedule-builder [validate]="validate.get('availability')" formControlName="availability"></slick-weekday-schedule-builder>
 
             <button md-raised-button color="primary" class="button-md warn-button" type="button" mdStepperPrevious>Back</button>
             <button md-raised-button color="primary" class="button-md" type="submit" (click)="signupUser(form.value, form.valid)">Submit</button>

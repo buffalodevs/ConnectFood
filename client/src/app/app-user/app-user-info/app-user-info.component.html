@@ -160,7 +160,8 @@
     <hr>
     <div class="row">
 
-        <slick-weekday-scheduler #availability id="availability" [displayOnly]="!editFlags.get('availability')" formControlName="availability"></slick-weekday-scheduler>
+        <slick-weekday-schedule-builder #availability id="availability" [displayOnly]="!editFlags.get('availability')" formControlName="availability">
+        </slick-weekday-schedule-builder>
 
         <div class="col-md-6">
 

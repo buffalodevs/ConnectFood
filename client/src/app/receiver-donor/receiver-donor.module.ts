@@ -14,7 +14,7 @@ import { FoodListingDialogComponent } from './food-listings/food-listing-dialog/
 import { FoodListingsComponent } from './food-listings/food-listings.component';
 import { DonateComponent } from './donate/donate.component';
 import { ReceiveComponent } from './receive/receive.component';
-import { CartComponent } from './cart/cart.component';
+import { FoodListingCartComponent } from './food-listing-cart/food-listing-cart.component';
 
 import { RoutePreprocessService } from '../common-util/services/route-preprocess.service';
 import { FoodTypesService } from '../domain/food-types/food-types.service';
@@ -42,8 +42,8 @@ const receiverDonorRoutes: Routes = [
         }
     },
     {
-        path: 'cart',
-        component: CartComponent,
+        path: 'foodListingCart',
+        component: FoodListingCartComponent,
         canActivate: [RoutePreprocessService],
         // Make sure that we get the FoodTypes from the back end before routing to the cart interface!
         resolve: {
@@ -60,7 +60,7 @@ const receiverDonorRoutes: Routes = [
         FoodListingsComponent,
         DonateComponent,
         ReceiveComponent,
-        CartComponent
+        FoodListingCartComponent
     ],
     imports: [
         CommonModule,

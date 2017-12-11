@@ -3,7 +3,7 @@ import { query, QueryResult } from '../database-util/connection-pool';
 import { fixNullQueryArgs, toPostgresArray } from './../database-util/prepared-statement-util';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../logging/sql-logger';
 
-import { getDrivingDistances, GPSCoordinate } from '../common-util/geocode';
+import { getDrivingDistTime, GPSCoordinate, DriveDistTime } from '../common-util/geocode';
 import { FoodListingsFilters, LISTINGS_STATUS } from '../../../shared/receiver-donor/food-listings-filters';
 import { FoodListing } from "../../../shared/receiver-donor/food-listing";
 import { DateFormatter } from "../../../shared/common-util/date-formatter";
@@ -101,10 +101,11 @@ function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate, myDona
     if (myDonatedListingsOnly)  return Promise.resolve(foodListings);
 
     // In Receive tab or Receiver Cart, we do care about driving distances!
-    return getDrivingDistances(myGPSCoordinate, donorGPSCoordinate)
-        .then((distances: number[]) => {
-            for (let i: number = 0; i < distances.length; i++) {
-                foodListings[i].donorInfo.drivingDistance = distances[i];
+    return getDrivingDistTime(myGPSCoordinate, donorGPSCoordinate)
+        .then((driveDistTime: DriveDistTime[]) => {
+            for (let i: number = 0; i < driveDistTime.length; i++) {
+                foodListings[i].donorInfo.drivingDistance = driveDistTime[i].driveDistanceMi;
+                foodListings[i].donorInfo.drivingTime = driveDistTime[i].driveDurationMin;
             }
 
             return foodListings;

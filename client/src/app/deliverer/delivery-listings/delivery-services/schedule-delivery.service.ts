@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { RequestService, Response } from "../../../common-util/services/request.service";
 
-import { ScheduleDeliveryFoodListingRequest } from '../../../../../../shared/deliverer/message/schedule-delivery-food-listing-message';
+import { ScheduleDeliveryRequest } from '../../../../../../shared/deliverer/message/schedule-delivery-message';
 import { FoodWebResponse } from "./../../../../../../shared/message-protocol/food-web-response";
 import { DeliveryState } from '../../../../../../shared/deliverer/delivery';
 
@@ -29,8 +29,8 @@ export class ScheduleDeliveryService {
      */
     public scheduleDelivery(claimedFoodListingKey: number, startImmediately: boolean, scheduledStartTime?: Date): Observable<void> {
         
-        let body: ScheduleDeliveryFoodListingRequest = new ScheduleDeliveryFoodListingRequest(claimedFoodListingKey, startImmediately, scheduledStartTime);
-        let observer: Observable<Response> = this.requestService.post('/deliverer/scheduleDeliveryFoodListing', body);
+        let body: ScheduleDeliveryRequest = new ScheduleDeliveryRequest(claimedFoodListingKey, startImmediately, scheduledStartTime);
+        let observer: Observable<Response> = this.requestService.post('/deliverer/scheduleDelivery', body);
 
         // Listen for a response now.
         return observer.map((response: Response) => {

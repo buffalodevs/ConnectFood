@@ -10,7 +10,6 @@ CREATE OR REPLACE FUNCTION updateDeliveryState
 )
 RETURNS DeliveryFoodListing.deliveryFoodListingKey%TYPE -- The deliveryFoodListing primary key.
 AS $$
-    DECLARE _deliveryFoodListingKey  DeliveryFoodListing.deliveryFoodListingKey%TYPE;
 BEGIN
 
     -- TODO: Check that the delivery app user and delivery food listing exist!
@@ -25,10 +24,10 @@ BEGIN
                                 WHEN 'onRouteToDonor'       THEN    CURRENT_TIMESTAMP
                                 ELSE                                startTime
                             END,
-            pickupTime  =   CASE (_deliveryState)
+            pickUpTime  =   CASE (_deliveryState)
                                 WHEN 'onRouteToReceiver'    THEN    CURRENT_TIMESTAMP
                                 WHEN 'onRouteToDonor'       THEN    NULL -- Going back a step.
-                                ELSE                                pickuptTime
+                                ELSE                                pickUpTime
                             END,
             dropOffTime =   CASE (_deliveryState)
                                 WHEN 'completed'            THEN    CURRENT_TIMESTAMP
@@ -41,3 +40,6 @@ BEGIN
 
 END;
 $$ LANGUAGE plpgsql;
+
+
+SELECT * FROM updateDeliveryState(7, 1, 'onRouteToDonor');

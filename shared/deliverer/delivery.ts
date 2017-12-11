@@ -1,4 +1,5 @@
 import { FoodListingUser } from '../receiver-donor/food-listing';
+import { TimeRange } from '../app-user/time-range';
 
 
 /**
@@ -7,8 +8,8 @@ import { FoodListingUser } from '../receiver-donor/food-listing';
 export enum DeliveryState {
     unscheduled = 'unscheduled',
     scheduled = 'scheduled',
-    onRouteToDonor = 'onRouteToReceiver',
-    onRouteToReceiver = 'onRouteToDonor',
+    onRouteToDonor = 'onRouteToDonor',
+    onRouteToReceiver = 'onRouteToReceiver',
     completed = 'completed'
 }
 
@@ -36,6 +37,39 @@ export class Delivery {
         public donorInfo?: FoodListingUser,     // Driving distance and time here is from driver to donor!
         public receiverInfo?: FoodListingUser,  // Driving distance and time here is from donor to receiver!
         public claimedUnitsCount?: number,
-        public unitsLabel?: string
+        public unitsLabel?: string,
+        public possibleDeliveryTimes?: TimeRange[]
     ) {}
+
+
+    /**
+     * Compares two delivery states. This is much like the C language compare method for string comparison. See it for more details.
+     * @param lhs The left hand side of the comparison.
+     * @param rhs The right hand side of the comparison.
+     * @return If lhs < rhs, then any negative number. If lhs > rhs, then any positive number. If lhs == rhs, then 0.
+     */
+    public static compareDeliveryStates(lhs: DeliveryState, rhs: DeliveryState): number {
+
+        const lhsIndex: number = Delivery.getDeliveryStateIndex(lhs);
+        const rhsIndex: number = Delivery.getDeliveryStateIndex(rhs);
+
+        return ( lhsIndex - rhsIndex );
+    }
+
+
+    /**
+     * Converts a given delivery state into an ordered index related to the logical ordering of states as they occur throughout the delivery process.
+     * @param deliveryState The delivery state to generate an index for.
+     * @return The index of the delivery state.
+     */
+    public static getDeliveryStateIndex(deliveryState: DeliveryState): number {
+
+        switch (deliveryState) {
+            case DeliveryState.unscheduled:         return 0;
+            case DeliveryState.scheduled:           return 1;
+            case DeliveryState.onRouteToDonor:      return 2;
+            case DeliveryState.onRouteToReceiver:   return 3;
+            case DeliveryState.completed:           return 4;
+        }
+    }
 }

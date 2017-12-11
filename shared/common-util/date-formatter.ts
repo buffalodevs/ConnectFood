@@ -191,6 +191,18 @@ export class DateFormatter {
 
 
     /**
+     * Gets the date corresponding to the first day (Sunday) of the current week.
+     * @return The date of the first day of the current week.
+     */
+    public static getDateOfWeekStart(): Date {
+
+        const now: Date = new Date();
+        const weekday: number = now.getDay();
+        return new Date(now.getDate() - weekday);
+    }
+
+
+    /**
      * Converts an integer day of the week to a string day of the week.
      * @param weekdayInt The integer in range [0, 6] representing a day of the week [Sunday, Saturday] accordingly.
      * @return The proper noun string representation of the day of the week.

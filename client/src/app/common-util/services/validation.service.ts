@@ -25,7 +25,6 @@ export class ValidationService {
         if (control.hasError('minLength'))                                      return 'Entry too short';
         if (control.hasError('max'))                                            return 'Value too large';
         if (control.hasError('min'))                                            return 'Value too small';
-        if (control)
 
         return null;
     }

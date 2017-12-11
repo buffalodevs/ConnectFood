@@ -1,24 +1,28 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { MdExpansionPanel } from '@angular/material';
 
 import { ResponsiveService } from '../../common-util/services/responsive.service';
 
 
 @Component({
-    selector: 'slick-expansion-panel',
+    selector: 'slick-expansion-panel, [slick-expansion-panel]',
     templateUrl: './slick-expansion-panel.component.html',
     styleUrls: ['./slick-expansion-panel.component.css']
 })
 export class SlickExpansionPanelComponent {
 
-    @Input() private expanded: boolean = true;
-    @Input() private collapseWidth: number = 767;
-    @Input() private minHeightStyle: string = '100%';
+    @Input() private expanded: boolean;
+    @Input() private collapseWidth: number;
+    @Input() private minHeightStyle: string;
 
 
     public constructor (
         private responsiveService: ResponsiveService
-    ) { }
+    ) {
+        this.expanded = true;
+        this.collapseWidth = 767;
+        this.minHeightStyle = '100%';
+    }
 
 
     /**
@@ -26,8 +30,7 @@ export class SlickExpansionPanelComponent {
      * @return true if it should be initially expanded, false if it should be collapsed.
      */
     private initExpanded(): boolean {
-        return (this.collapseWidth != null) ? this.responsiveService.widthGreaterThan(this.collapseWidth)
-                                            : this.expanded;
+        return ( this.expanded && (this.collapseWidth == null || this.responsiveService.widthGreaterThan(this.collapseWidth)) );
     }
 
 

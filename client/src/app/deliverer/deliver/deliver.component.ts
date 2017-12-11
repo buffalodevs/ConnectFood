@@ -18,8 +18,8 @@ import { ScheduleDeliveryService } from '../delivery-listings/delivery-services/
 })
 export class DeliverComponent implements OnInit {
 
-    @ViewChild('deliveryListingsFilters') private deliveryFoodListingsFiltersComponent: DeliveryListingsFiltersComponent;
-    @ViewChild('deliveryListings') private deliveryFoodListingsComponent: DeliveryListingsComponent;
+    @ViewChild('deliveryListingsFilters') private deliveryListingsFiltersComponent: DeliveryListingsFiltersComponent;
+    @ViewChild('deliveryListings') private deliveryListingsComponent: DeliveryListingsComponent;
 
     private readonly minFiltersWidth: string;
 
@@ -42,18 +42,19 @@ export class DeliverComponent implements OnInit {
      */
     public ngAfterViewInit(): void {
         // First, trigger a refresh by manually invoking update function.
-        this.onFiltersUpdate(this.deliveryFoodListingsFiltersComponent.value);
-        this.deliveryFoodListingsFiltersComponent.valueChanges.subscribe(this.onFiltersUpdate.bind(this));
+        this.onFiltersUpdate(this.deliveryListingsFiltersComponent.value);
+        this.deliveryListingsFiltersComponent.valueChanges.subscribe(this.onFiltersUpdate.bind(this));
     }
 
 
     /**
-     * Handles filters updates by refreshing the Delivery Food Listings with unclaimed listings only.
-     * @param filters The filters from the Delivery Food Listing Filters component.
+     * Handles filters updates by refreshing the Delivery Listings with unscheduled Deliveries only.
+     * @param filters The filters from the Delivery Listing Filters component.
      */
     private onFiltersUpdate(filters: DeliveryFilters): void {
-        // Make sure we mark down that we only want unclaimed listings!
-        this.deliveryFoodListingsComponent.refreshList(filters);
+        // Make sure we mark down that we only want unscheduled Deliveries!
+        filters.unscheduledDeliveries = true;
+        this.deliveryListingsComponent.refreshList(filters);
     }
 
 
@@ -81,14 +82,14 @@ export class DeliverComponent implements OnInit {
      */
     private startOrScheduleDelivery(startImmediately: boolean, scheduledStartTime?: Date): void {
 
-        let selectedDelivery: Delivery = this.deliveryFoodListingsComponent.getSelectedListing();
+        let selectedDelivery: Delivery = this.deliveryListingsComponent.getSelectedListing();
         let observer: Observable<void> = this.scheduleDeliveryService.scheduleDelivery(selectedDelivery.claimedFoodListingKey, startImmediately, scheduledStartTime);
         
         // Listen for result.
         observer.subscribe(
             () => {
                 // On success, simply remove the Delivery Food Listing from the Deliver interface.
-                this.deliveryFoodListingsComponent.removeSelectedListing();
+                this.deliveryListingsComponent.removeSelectedListing();
             },
             (err: Error) => {
                 console.log(err);

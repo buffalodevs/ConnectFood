@@ -6,6 +6,10 @@
 	align-items: center;
 }
 
+.header-text {
+    padding-right: 25px;
+}
+
 ::ng-deep .modal-backdrop.fade.show {
     opacity: 1 !important;
     background-color: #444;
@@ -16,6 +20,21 @@
     width: 100%;
     max-width: 100%;
     padding-right: 20px; /* In small screen, this will make spacing on left and right equal! */
+}
+
+.modal-footer {
+    display: block !important;
+    text-align: right;
+}
+
+
+@media only screen and (max-width: 600px)  {
+    
+    .sm-button-full {
+        width: 100%;
+        margin-left: 0px;
+        margin-right: 0px;
+    }
 }
 
 
@@ -34,4 +53,3 @@
         padding-left: 30px;
     }
 }
-

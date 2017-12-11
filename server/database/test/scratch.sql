@@ -17,3 +17,7 @@ WHERE       Receiver.appUserKey = 1
 --delete from AppUserPassword where appUserKey = 1 and createDate <> (select min(createDate) from AppUserPassword where appUserKey = 1);
 
 --SELECT * FROM ClaimedFoodListing;
+
+SELECT * FROM DeliveryFoodListing;
+
+--SELECT * FROM CancelledDeliveryFoodListing;

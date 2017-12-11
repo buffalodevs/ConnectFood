@@ -1,7 +1,7 @@
 <slick-list-dialog #SlickListDialogComponent [header]="dialogData?.foodTitle">
 
     <!-- The body of the dialog is in the format of a slick list item! -->
-    <slick-list-item *ngIf="isOpen()" slick-list-dialog-body [includeDivider]="false">
+    <slick-list-item *ngIf="isOpen()" class="modal-body" [includeDivider]="false">
                     
         <ng-container slick-list-item-left>
             <img DefaultImg [src]="dialogData.imgUrl" alt="Image Not Available"/>
@@ -139,7 +139,7 @@
     </slick-list-item>
 
 
-    <ng-container slick-list-dialog-footer>
+    <ng-container>
         <ng-content select="[food-listing-dialog-footer]"></ng-content>
     </ng-container>
 

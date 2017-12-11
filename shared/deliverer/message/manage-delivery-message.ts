@@ -1,5 +1,8 @@
+import { DeliveryState } from "../delivery";
+
+
 /**
- * The expected request for the management operation for the delivery of a Food Listing. A management function can be Delivery State Update or Cancellation.
+ * The expected request for the management operation for a Delivery.
  */
 export class ManageDeliveryRequest {
     
@@ -11,6 +14,6 @@ export class ManageDeliveryRequest {
         /**
          * The delivery state that the Delivery Food Listing should be set to.
          */
-        public deliveryState: string
+        public deliveryState: DeliveryState
     ) {}
 }
