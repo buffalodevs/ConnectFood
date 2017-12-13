@@ -5,6 +5,8 @@ import { ManageDeliveryService } from '../../delivery-services/manage-deliveries
 
 import { Delivery } from '../../../../../../../shared/deliverer/delivery';
 import { DeliveryState } from '../../../../../../../shared/deliverer/message/get-deliveries-message';
+import { Observable } from 'rxjs/Observable';
+import { ScheduleDeliveryService } from '../../delivery-services/schedule-delivery.service';
 
 
 @Component({
@@ -28,17 +30,20 @@ export class DeliveryListingInfoComponent implements OnChanges {
      * Emitted whenever the 'Cancel Delivery' button is selected.
      */
     @Output() private toCancelReason: EventEmitter<void>; // Referenced in HTML template
+    @Output() private started: EventEmitter<void>;
 
     private showStartButton: boolean;
 
 
     public constructor (
         private deliveryUtilService: DeliveryUtilService, // Referenced in HTML template
-        private startDeliveryService: ManageDeliveryService
+        private manageDeliveryService: ManageDeliveryService,
+        private scheduleDeliveryService: ScheduleDeliveryService
     ) {
         this.showStartButton = false;
         this.toSchedule = new EventEmitter<void>();
         this.toCancelReason = new EventEmitter<void>();
+        this.started = new EventEmitter<void>();
     }
 
 
@@ -65,9 +70,16 @@ export class DeliveryListingInfoComponent implements OnChanges {
      * Starts a delivery by updating its state to onRouteToDonor.
      */
     private startDelivery(): void {
-        this.startDeliveryService.updateDeliveryState(this.delivery.deliveryFoodListingKey, DeliveryState.onRouteToDonor)
-            .subscribe(() => {
-                console.log('Delivery started');  
-            });
+
+        let startObservable: Observable<void>;
+        
+        // If in Cart (Delivery already scheduled), then update delivery state. Otherwise, schedule new Delivery with startImmediately flag set true.
+        startObservable = this.isCart ? this.manageDeliveryService.updateDeliveryState(this.delivery.deliveryFoodListingKey, DeliveryState.onRouteToDonor)
+                                      : this.scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, true);
+
+        startObservable.subscribe(() => {
+            console.log('Delivery started');
+            this.started.emit();
+        });
     }
 }

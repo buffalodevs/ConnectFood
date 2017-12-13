@@ -24,6 +24,7 @@ import { VehicleTypesService } from '../domain/vehicle-types/vehicle-types.servi
 import { GetDeliveriesService } from './delivery-listings/delivery-services/get-deliveries.service';
 import { DeliveryUtilService } from './delivery-listings/delivery-services/delivery-util.service';
 import { ManageDeliveryService } from './delivery-listings/delivery-services/manage-deliveries.service';
+import { ScheduleDeliveryService } from './delivery-listings/delivery-services/schedule-delivery.service';
 
 
 const delivererRoutes: Routes = [
@@ -74,6 +75,7 @@ const delivererRoutes: Routes = [
     providers: [
         GetDeliveriesService,
         DeliveryUtilService,
+        ScheduleDeliveryService,
         ManageDeliveryService
     ]
 })

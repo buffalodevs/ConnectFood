@@ -196,9 +196,10 @@ export class DateFormatter {
      */
     public static getDateOfWeekStart(): Date {
 
-        const now: Date = new Date();
+        let now: Date = new Date();
         const weekday: number = now.getDay();
-        return new Date(now.getDate() - weekday);
+        now.setDate(now.getDate() - weekday);
+        return now;
     }
 
 

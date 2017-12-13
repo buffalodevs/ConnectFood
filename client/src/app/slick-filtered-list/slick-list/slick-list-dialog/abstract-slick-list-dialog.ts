@@ -1,4 +1,6 @@
+import { EventEmitter } from "@angular/core";
 import { SlickListDialogComponent } from "./slick-list-dialog.component";
+
 
 /**
  * Handles implementations of opening and closing dialog. Simply need to assign an actual implementation of SlickListDialogInterface to slickListDialog member.
@@ -8,9 +10,12 @@ export abstract class AbstractSlickListDialog<LIST_T> {
 
     protected slickListDialog: SlickListDialogComponent;
     protected dialogData: LIST_T;
+    public removeListing: EventEmitter<void>;
 
     
-    protected constructor() {}
+    protected constructor() {
+        this.removeListing = new EventEmitter<void>();
+    }
 
 
     /**

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { CancelDeliveryService } from '../../delivery-services/cancel-delivery.service';
@@ -16,6 +16,7 @@ import { DeliveryState } from '../../../../../../../shared/deliverer/message/get
 export class DeliveryListingCancelComponent {
 
     @Input() private delivery: Delivery;
+    @Output() private cancelled: EventEmitter<void>
 
     private cancelForm: FormGroup
 
@@ -23,6 +24,8 @@ export class DeliveryListingCancelComponent {
     public constructor (
         private cancelDeliveryService: CancelDeliveryService
     ) {
+        this.cancelled = new EventEmitter<void>();
+
         this.cancelForm = new FormGroup({
             'cancelReason': new FormControl('', [Validators.required])
         });
@@ -37,7 +40,8 @@ export class DeliveryListingCancelComponent {
         if (!this.cancelForm.valid)  return;
         this.cancelDeliveryService.cancelDelivery(this.delivery.deliveryFoodListingKey, this.cancelForm.get('cancelReason').value)
             .subscribe(() => {
-                console.log('Cancel Delivery Completed!');  
+                console.log('Cancel Delivery Completed!'); 
+                this.cancelled.emit(); // Emit cancelled signal to parent (Dialog) so it can close and remove the cancelled listing. 
             });
     }
 }

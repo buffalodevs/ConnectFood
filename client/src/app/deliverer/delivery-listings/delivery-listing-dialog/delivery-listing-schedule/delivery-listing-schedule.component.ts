@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { ScheduleDeliveryService } from '../../delivery-services/schedule-delivery.service';
@@ -15,21 +15,23 @@ import { DeliveryState } from '../../../../../../../shared/deliverer/message/get
 export class DeliveryListingScheduleComponent {
 
     @Input() private delivery: Delivery;
+    @Output() private scheduled: EventEmitter<void>;
 
     private scheduleControl: FormControl;
 
+
     public constructor (
-        scheduleDeliveryService: ScheduleDeliveryService
+        private scheduleDeliveryService: ScheduleDeliveryService
     ) {
+        this.scheduled = new EventEmitter<void>();
+
         this.scheduleControl = new FormControl(null);
         this.scheduleControl.valueChanges.subscribe((value: Date) => {
             scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, false, value)
                 .subscribe(() => {
                     console.log('Scheduling complete!');
+                    this.scheduled.emit();
                 });
         });
     }
-
-
-    
 }

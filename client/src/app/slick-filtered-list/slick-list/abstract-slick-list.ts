@@ -1,3 +1,4 @@
+import { OnInit } from "@angular/core";
 import { Observable } from "rxjs/Observable";
 
 import { GetListingsService } from './get-listings.service';
@@ -5,7 +6,7 @@ import { SlickListFilters } from './slick-list-message/slick-list-request';
 import { AbstractSlickListDialog } from "./slick-list-dialog/abstract-slick-list-dialog";
 
 
-export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilters> {
+export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilters> implements OnInit {
 
     protected listData: Array<LIST_T>;
     protected selectedListIndex: number;
@@ -28,6 +29,15 @@ export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilt
 
         // Setup callback (listener) for the retrieval of more listings.
         this.getListingsService.onGetMoreListings(this.onGetMoreListings.bind(this));
+    }
+
+
+    public ngOnInit(): void {
+
+        // Listen to removeListing event in dialog child (if child exists).
+        if (this.slickListDialog != null) {
+            this.slickListDialog.removeListing.subscribe(this.removeSelectedListing.bind(this));
+        }
     }
 
 
