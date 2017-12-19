@@ -36,7 +36,10 @@ export class DeliveryListingInfoComponent implements OnChanges {
      */
     @Output() private toCancelReason: EventEmitter<void>; // Referenced in HTML template
     @Output() private deliveryStateChange: EventEmitter<void>;
+    @Output() private close: EventEmitter<void>;
 
+    private startComplete: boolean;
+    private stateChangeComplete: boolean;
     private showStartButton: boolean;
     private showMarkPickedUpButton: boolean;
     private showMarkDroppedOffButton: boolean;
@@ -52,7 +55,10 @@ export class DeliveryListingInfoComponent implements OnChanges {
         this.toSchedule = new EventEmitter<void>();
         this.toCancelReason = new EventEmitter<void>();
         this.deliveryStateChange = new EventEmitter<void>();
+        this.close = new EventEmitter<void>();
 
+        this.startComplete = false;
+        this.stateChangeComplete = false;
         this.showStartButton = false;
         this.showMarkPickedUpButton = false;
         this.showMarkDroppedOffButton = false;
@@ -141,6 +147,7 @@ export class DeliveryListingInfoComponent implements OnChanges {
                 console.log('Delivery state updated to: ' + deliveryState);
                 this.delivery.deliveryState = deliveryState;
                 this.deliveryStateChange.emit();
+                this.stateChangeComplete = true;
             })
     }
 }

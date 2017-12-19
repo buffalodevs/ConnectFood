@@ -1,10 +1,10 @@
-<div [ngStyle]="{'min-height': BODY_HEIGHT + 'px'}">
+<div id="header-body-wrapper" [ngStyle]="{'min-height': BODY_HEIGHT + 'px', 'margin-bottom': BODY_MARGIN + 'px'}">
 
     <app-header></app-header>
 
     <!-- This is replaced with each component we route to -->
     <router-outlet></router-outlet>
-    
+
 </div>
 
 <app-footer [height]="FOOTER_HEIGHT"></app-footer>

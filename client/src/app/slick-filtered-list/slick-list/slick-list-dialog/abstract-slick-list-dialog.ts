@@ -10,11 +10,11 @@ export abstract class AbstractSlickListDialog<LIST_T> {
 
     protected slickListDialog: SlickListDialogComponent;
     protected dialogData: LIST_T;
-    public removeListing: EventEmitter<void>;
+    public removeListing: EventEmitter<boolean>;
 
     
     protected constructor() {
-        this.removeListing = new EventEmitter<void>();
+        this.removeListing = new EventEmitter<boolean>();
     }
 
 

@@ -96,11 +96,12 @@ export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilt
 
     /**
      * Removes the selected listing.
+     * @param close Determines whether or not to also close any open dialog. Default is true.
      */
-    public removeSelectedListing(): void {
+    public removeSelectedListing(close: boolean = true): void {
 
         // Close any modal details popup related to the listing we are deleting.
-        if (this.slickListDialog != null && this.slickListDialog.isOpen()) {
+        if (close && this.slickListDialog != null && this.slickListDialog.isOpen()) {
             this.slickListDialog.close();
         }
         

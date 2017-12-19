@@ -1,5 +1,7 @@
 .time-range-container {
     position: relative;
+    margin-right: 5px;
+    margin-bottom: 5px;
     background-color: rgb(247, 247, 239);
     border: 1px solid lightgray;
     padding-top: 15px;

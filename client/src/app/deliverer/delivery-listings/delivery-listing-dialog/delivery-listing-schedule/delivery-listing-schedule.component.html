@@ -1,2 +1,23 @@
-<h4>Please select a time that you will start the delivery:</h4>
-<slick-weekday-scheduler [availabilityTimeRanges]="delivery.possibleDeliveryTimes" [formControl]="scheduleControl"></slick-weekday-scheduler>
+<ng-container *ngIf="!schedulingComplete">
+
+    <h4>Please select a time that you will start the delivery:</h4>
+    <slick-weekday-scheduler [availabilityTimeRanges]="delivery.possibleDeliveryTimes" [formControl]="scheduleControl"></slick-weekday-scheduler>
+
+</ng-container>
+
+
+<ng-container *ngIf="schedulingComplete">
+        
+    <p>The delivery has been scheduled on <b>{{ getScheduledDate() }}</b> at <b>{{ getScheduledTime() }}</b>
+    <p>We will send you a reminder via text and email one hour prior to the delivery.</p>
+
+    <p>
+        You can view, start, and update status information about the delivery in the
+        <a (click)="close.emit()" [routerLink]="['/deliveryCart']" class="link-content">Delivery Cart</a> tab.
+    </p>
+
+    <div class="modal-button-group">
+        <button md-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>
+    </div>
+    
+</ng-container>

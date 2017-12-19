@@ -16,16 +16,19 @@ import { DeliveryState } from '../../../../../../../shared/deliverer/message/get
 export class DeliveryListingCancelComponent {
 
     @Input() private delivery: Delivery;
-    @Output() private cancelled: EventEmitter<void>
+    @Output() private cancelled: EventEmitter<void>;
+    @Output() private close: EventEmitter<void>;
 
-    private cancelForm: FormGroup
+    private cancelForm: FormGroup;
     private validate: boolean;
+    private cancelComplete: boolean;
 
 
     public constructor (
         private cancelDeliveryService: CancelDeliveryService
     ) {
         this.cancelled = new EventEmitter<void>();
+        this.close = new EventEmitter<void>();
 
         this.cancelForm = new FormGroup({
             'cancelReason': new FormControl('', [Validators.required]),
@@ -33,6 +36,7 @@ export class DeliveryListingCancelComponent {
         });
 
         this.validate = false;
+        this.cancelComplete = false;
     }
 
 
@@ -50,7 +54,8 @@ export class DeliveryListingCancelComponent {
         this.cancelDeliveryService.cancelDelivery(this.delivery.deliveryFoodListingKey, cancelReason, foodRejected)
             .subscribe(() => {
                 console.log('Cancel Delivery Completed!'); 
-                this.cancelled.emit(); // Emit cancelled signal to parent (Dialog) so it can close and remove the cancelled listing. 
+                this.cancelled.emit(); // Emit cancelled signal to parent (Dialog) so it can close and remove the cancelled listing.
+                this.cancelComplete = true;
             });
     }
 }

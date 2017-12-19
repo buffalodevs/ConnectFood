@@ -35,10 +35,6 @@ export class DeliveryListingDialogComponent extends AbstractSlickListDialog <Del
      * Set to true if the Delivery Listings are for a Delivery Cart. Default is false.
      */
     @Input() private isCart: boolean;
-    /**
-     * Invoked whenever a delivery is to be cancelled.
-     */
-    @Output() private cancelDelivery: EventEmitter<{ deliveryFoodListingKey: number, cancelReason: string}>;
 
     /**
      * This is a shadow of the slickListDialog member in AbstractSlickListDialog.
@@ -55,8 +51,6 @@ export class DeliveryListingDialogComponent extends AbstractSlickListDialog <Del
         super();
 
         this.isCart = false;
-        this.cancelDelivery = new EventEmitter<{ deliveryFoodListingKey: number, cancelReason: string}>();
-
         this.deliveryDialogState = DeliveryDialogState.DeliveryInfo;
     }
 

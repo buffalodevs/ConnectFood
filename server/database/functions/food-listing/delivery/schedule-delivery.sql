@@ -27,8 +27,7 @@ BEGIN
     (
         claimedFoodListingKey,
         deliveryAppUserKey,
-        scheduledStartTime,
-        startTime
+        scheduledStartTime
     )
     VALUES
     (
@@ -37,14 +36,15 @@ BEGIN
         CASE (_startImmediately)
             WHEN TRUE THEN  _currentTimestamp
             ELSE            TO_TIMESTAMP(_scheduledStartTime, 'MM/DD/YYYY hh:mi AM')
-        END,
-        CASE (_startImmediately)
-            WHEN TRUE THEN  _currentTimestamp
-            ELSE            NULL
         END
     )
     RETURNING   DeliveryFoodListing.deliveryFoodListingKey
     INTO        _deliveryFoodListingKey;
+
+    -- If starting immediately, then update the state of the new delivery to started!
+    IF (_startImmediately) THEN
+        PERFORM updateDeliveryState(_deliveryFoodListingKey, +deliveryAppUserKey, 'started', _currentTimestamp);
+    END IF;
 
     RETURN QUERY
     SELECT * FROM getDeliveries(_deliveryAppUserKey, 0, 1, _deliveryFoodListingKey);

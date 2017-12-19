@@ -5,6 +5,7 @@ import { ScheduleDeliveryService } from '../../delivery-services/schedule-delive
 
 import { Delivery } from '../../../../../../../shared/deliverer/delivery';
 import { DeliveryState } from '../../../../../../../shared/deliverer/message/get-deliveries-message';
+import { DateFormatter } from '../../../../../../../shared/common-util/date-formatter';
 
 
 @Component({
@@ -16,7 +17,9 @@ export class DeliveryListingScheduleComponent {
 
     @Input() private delivery: Delivery;
     @Output() private scheduled: EventEmitter<void>;
+    @Output() private close: EventEmitter<void>;
 
+    private schedulingComplete: boolean;
     private scheduleControl: FormControl;
 
 
@@ -24,14 +27,34 @@ export class DeliveryListingScheduleComponent {
         private scheduleDeliveryService: ScheduleDeliveryService
     ) {
         this.scheduled = new EventEmitter<void>();
+        this.close = new EventEmitter<void>();
+        this.schedulingComplete = false;
 
         this.scheduleControl = new FormControl(null);
         this.scheduleControl.valueChanges.subscribe((value: Date) => {
             scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, false, value)
                 .subscribe(() => {
                     console.log('Scheduling complete!');
+                    this.delivery.deliveryState = DeliveryState.scheduled;
                     this.scheduled.emit();
+                    this.schedulingComplete = true;
                 });
         });
+    }
+
+
+    /**
+     * Gets the scheduled date string.
+     */
+    private getScheduledDate(): string {
+        return DateFormatter.dateToMonthDayYearString(this.scheduleControl.value);
+    }
+
+
+    /**
+     * Gets the scheduled wall-clock time string.
+     */
+    private getScheduledTime(): string {
+        return DateFormatter.dateToWallClockString(this.scheduleControl.value);
     }
 }

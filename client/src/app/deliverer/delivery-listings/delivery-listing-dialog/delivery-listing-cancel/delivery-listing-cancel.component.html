@@ -1,12 +1,12 @@
-<form [formGroup]="cancelForm">
+<form [formGroup]="cancelForm" *ngIf="!cancelComplete">
 
-    <h4>Has the food been judged inadquate and rejected?</h4>
+    <h5>Has the food been judged inadquate and rejected?</h5>
     <md-radio-group name="foodRejected" formControlName="foodRejected" [ngClass]="{ 'warn-foreground': (validate && !cancelForm.get('foodRejected').valid) }">
         <md-radio-button name="foodRejected" [value]="true">Yes</md-radio-button>
         <md-radio-button id="food-rejected-no" name="foodRejected" [value]="false">No</md-radio-button>
     </md-radio-group>
 
-    <h4>Please provide a reason for the delivery cancellation:</h4>
+    <h5>Please provide a reason for the delivery cancellation:</h5>
     <md-form-field floatPlaceholder="never" class="no-pad-top-input" id="cancel-reason">
         <textarea #foodTitle mdInput mdTextareaAutosize placeholder="Cancellation Reason" formControlName="cancelReason"></textarea>
     </md-form-field>
@@ -17,3 +17,15 @@
     </div>
 
 </form>
+
+
+<ng-container *ngIf="cancelComplete">
+
+    <p>The delivery cancellation succeeded.</p>
+    <p>Both the Donor and Receiver will be automatically notified about your cancellation.</p>
+
+    <div class="modal-button-group">
+        <button md-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>
+    </div>
+
+</ng-container>
