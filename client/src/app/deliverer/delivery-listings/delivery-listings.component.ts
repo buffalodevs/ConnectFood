@@ -9,6 +9,7 @@ import { Delivery } from '../../../../../shared/deliverer/delivery';
 import { DeliveryFilters } from '../../../../../shared/deliverer/delivery-filters';
 import { GPSCoordinate } from '../../../../../shared/common-util/geocode';
 import { Address } from '../../../../../shared/app-user/app-user-info';
+import { SessionDataService } from '../../common-util/services/session-data.service';
 
 
 @Component({
@@ -27,6 +28,7 @@ export class DeliveryListingsComponent extends AbstractSlickList <Delivery, Deli
 
 
     public constructor (
+        private sessionDataService: SessionDataService,
         private getDeliveriesService: GetDeliveriesService,
         private deliveryUtilService: DeliveryUtilService // Referenced in HTML template
     ) {

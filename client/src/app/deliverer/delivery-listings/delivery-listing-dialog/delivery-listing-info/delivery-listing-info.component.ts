@@ -1,18 +1,23 @@
 import { Component, OnChanges, Input, ViewChild, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
 
+import { ScheduleDeliveryService } from '../../delivery-services/schedule-delivery.service';
+import { SessionDataService } from '../../../../common-util/services/session-data.service';
 import { DeliveryUtilService } from '../../delivery-services/delivery-util.service';
 import { ManageDeliveryService } from '../../delivery-services/manage-deliveries.service';
 
 import { Delivery } from '../../../../../../../shared/deliverer/delivery';
 import { DeliveryState } from '../../../../../../../shared/deliverer/message/get-deliveries-message';
-import { Observable } from 'rxjs/Observable';
-import { ScheduleDeliveryService } from '../../delivery-services/schedule-delivery.service';
 
 
 @Component({
     selector: 'delivery-listing-info',
     templateUrl: './delivery-listing-info.component.html',
-    styleUrls: ['./delivery-listing-info.component.css', './../../delivery-listings.component.css']
+    styleUrls: [
+        './delivery-listing-info.component.css',
+        './../../delivery-listings.component.css',
+        './../../../../slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
+    ]
 })
 export class DeliveryListingInfoComponent implements OnChanges {
     
@@ -30,27 +35,42 @@ export class DeliveryListingInfoComponent implements OnChanges {
      * Emitted whenever the 'Cancel Delivery' button is selected.
      */
     @Output() private toCancelReason: EventEmitter<void>; // Referenced in HTML template
-    @Output() private started: EventEmitter<void>;
+    @Output() private deliveryStateChange: EventEmitter<void>;
 
     private showStartButton: boolean;
+    private showMarkPickedUpButton: boolean;
+    private showMarkDroppedOffButton: boolean;
+    private showCancelButton: boolean;
 
 
     public constructor (
+        private sessionDataService: SessionDataService,
         private deliveryUtilService: DeliveryUtilService, // Referenced in HTML template
         private manageDeliveryService: ManageDeliveryService,
         private scheduleDeliveryService: ScheduleDeliveryService
     ) {
-        this.showStartButton = false;
         this.toSchedule = new EventEmitter<void>();
         this.toCancelReason = new EventEmitter<void>();
-        this.started = new EventEmitter<void>();
+        this.deliveryStateChange = new EventEmitter<void>();
+
+        this.showStartButton = false;
+        this.showMarkPickedUpButton = false;
+        this.showMarkDroppedOffButton = false;
+        this.showCancelButton = false;
     }
 
 
     public ngOnChanges(changes: SimpleChanges): void {
         
+        // Show the start button if the delivery state is before onRouteToDonor.
         if (changes.delivery.currentValue != null) {
-            this.showStartButton = this.shouldShowStartButton(changes.delivery.currentValue);
+
+            const delivery: Delivery = changes.delivery.currentValue;
+
+            this.showStartButton = this.shouldShowStartButton(delivery);
+            this.showMarkPickedUpButton = ( delivery.deliveryState === DeliveryState.started );
+            this.showMarkDroppedOffButton = ( delivery.deliveryState === DeliveryState.pickedUp );
+            this.showCancelButton = ( this.isCart && Delivery.compareDeliveryStates(delivery.deliveryState, DeliveryState.droppedOff) < 0 );
         }
     }
 
@@ -62,24 +82,65 @@ export class DeliveryListingInfoComponent implements OnChanges {
      */
     private shouldShowStartButton(delivery: Delivery): boolean {
         return this.deliveryUtilService.isPossibleDeliveryTimeNow(delivery)
-            && Delivery.compareDeliveryStates(delivery.deliveryState, DeliveryState.onRouteToDonor) < 0;
+            && Delivery.compareDeliveryStates(delivery.deliveryState, DeliveryState.started) < 0;
     }
 
 
     /**
-     * Starts a delivery by updating its state to onRouteToDonor.
+     * Gets a human readable version of the contained Delivery's State.
+     * @return A human readable Delivery State.
+     */
+    private getReadableDeliveryState(): string {
+        return Delivery.getReadableDeliveryState(this.delivery.deliveryState);
+    }
+
+
+    /**
+     * Starts a delivery by updating its state to onRouteToDonor or scheduling the delivery with startImmediately flag set true.
      */
     private startDelivery(): void {
 
-        let startObservable: Observable<void>;
-        
         // If in Cart (Delivery already scheduled), then update delivery state. Otherwise, schedule new Delivery with startImmediately flag set true.
-        startObservable = this.isCart ? this.manageDeliveryService.updateDeliveryState(this.delivery.deliveryFoodListingKey, DeliveryState.onRouteToDonor)
-                                      : this.scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, true);
+        if (this.isCart) {
+            this.updateDeliveryState(DeliveryState.started);
+        }
+        else {
+            this.scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, true)
+                .subscribe(() => {
+                    console.log('Delivery started');
+                    this.deliveryStateChange.emit();
+                });
+        }
+    }
 
-        startObservable.subscribe(() => {
-            console.log('Delivery started');
-            this.started.emit();
-        });
+
+    /**
+     * Marks the delivery as picked up (on route from Donor to Receiver).
+     */
+    private markPickedUp(): void {
+        this.updateDeliveryState(DeliveryState.pickedUp);
+    }
+
+
+    /**
+     * Marks the delivery as dropped off (completed at the Receiver).
+     */
+    private markDroppedOff(): void {
+        this.updateDeliveryState(DeliveryState.droppedOff);
+    }
+
+
+    /**
+     * Updates the Delivery's state.
+     * @param deliveryState The new Delivery state.
+     */
+    private updateDeliveryState(deliveryState: DeliveryState): void {
+
+        this.manageDeliveryService.updateDeliveryState(this.delivery.deliveryFoodListingKey, deliveryState)
+            .subscribe(() => {
+                console.log('Delivery state updated to: ' + deliveryState);
+                this.delivery.deliveryState = deliveryState;
+                this.deliveryStateChange.emit();
+            })
     }
 }

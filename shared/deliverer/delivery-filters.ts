@@ -39,11 +39,8 @@ export class DeliveryFilters {
         public myScheduledDeliveries?: boolean,
         /**
          * Determines whether or not we should only pull back deliveries for Donors and Receivers whose availablility times match the logged in deliverer's times.
+         * If not set true, then only Deliveries that are available for Delivery now will be pulled back.
          */
-        public matchAvailability?: boolean,
-        /**
-         * Determines whether or not we will only pull back listings that are avaialble now for immediate delivery (implies we ignore match availability).
-         */
-        public availableNow?: boolean
+        public matchAvailability?: boolean
     ) {}
 }

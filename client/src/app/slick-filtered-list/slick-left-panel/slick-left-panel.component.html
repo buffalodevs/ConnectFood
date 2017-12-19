@@ -1,7 +1,9 @@
+<div #backDrop id="back-drop"></div>
+
 <div id="slick-left-panel" #slickLeftPanel [style.max-width]="maxWidth">
 
     <button md-raised-button color="primary" class="green-glow" id="slick-left-panel-button" [title]="buttonTitle"
-        #slickLeftPanelButton (click)="togglePanelVisibility(slickLeftPanel, slickLeftPanelButton._elementRef.nativeElement)"></button>
+        #slickLeftPanelButton (click)="togglePanelVisibility(slickLeftPanel, slickLeftPanelButton._elementRef.nativeElement, backDrop)"></button>
 
     <ng-content></ng-content>
     

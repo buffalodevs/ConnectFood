@@ -10,6 +10,7 @@ import { AngularMaterialWrapperModule } from '../angular-material-wrapper/angula
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 import { HomeComponent } from './home/home.component';
+import { BannerService } from '../common-util/services/banner.service';
 
 
 const appBaseRoutes: Routes = [
@@ -37,6 +38,9 @@ const appBaseRoutes: Routes = [
     exports: [
         HeaderComponent,
         FooterComponent
+    ],
+    providers: [
+        BannerService
     ]
 })
 export class AppBaseModule {}

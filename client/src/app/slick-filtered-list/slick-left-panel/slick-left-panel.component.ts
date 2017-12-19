@@ -11,23 +11,22 @@ export class SlickLeftPanelComponent {
     /**
      * The title of the toggle button. Will show in the tooltip tab for the button on hover.
      */
-    @Input() private buttonTitle: string = "toggle";
+    @Input() private buttonTitle: string;
     /**
-     * Set to true if clicks outside of the panel should be ignored (and the panel state will remain unchanged/open/visible).
+     * Determines whether or not a back drop will be used when the panel is toggled to visible in mobile mode. Default is true.
      */
-    @Input() private ignoreClicksOutsidePanel: boolean = false;
-    /**
-     * Set to the ID of an elemnent that when clicked, it will not count as a click outside of the panel.
-     * This means that clicking this element (or any contained children) will not result in a state chnage (closing) of the panel.
-     */
-    @Input() private ignoreOutsideClickInId: string;
+    @Input() private useBackDrop: boolean;
     /**
      * The maximum width of the navigation panel.
      */
-    @Input() private maxWidth: string = "400px";
+    @Input() private maxWidth: string;
 
 
-    constructor() { }
+    public constructor() {
+        this.buttonTitle = 'toggle';
+        this.useBackDrop = true;
+        this.maxWidth = '400px';
+    }
 
 
     /**
@@ -35,14 +34,15 @@ export class SlickLeftPanelComponent {
      * @param slickLeftPanel The slickLeftPanel (div) element which will be toggled in or out of the viewport.
      * @param slickLeftPanelButton The slickLeftPanelButton (button) element which was pressed.
      */
-    private togglePanelVisibility(slickLeftPanel: HTMLElement, slickLeftPanelButton: HTMLElement): void {
+    private togglePanelVisibility(slickLeftPanel: HTMLElement, slickLeftPanelButton: HTMLElement, backDrop: HTMLElement): void {
+
         // If our slickLeftPanel div is outside the viewport, and we are translating it into the viewport
         if (!this.isPanelToggledIntoView(slickLeftPanel)) {
-            this.toggleIntoView(slickLeftPanel, slickLeftPanelButton);
+            this.toggleIntoView(slickLeftPanel, slickLeftPanelButton, backDrop);
         }
         // Else if our slickLeftPanel div is inside the viewport, and we are translating it out of the viewport (getting rid of translation).
         else {
-            this.toggleOutOfView(slickLeftPanel, slickLeftPanelButton);
+            this.toggleOutOfView(slickLeftPanel, slickLeftPanelButton, backDrop);
         }
     }
 
@@ -62,12 +62,14 @@ export class SlickLeftPanelComponent {
      * @param slickLeftPanel The slickLeftPanel (div) element which will be toggled into the viewport.
      * @param slickLeftPanelButton The slickLeftPanelButton (button) element which was pressed.
      */
-    private toggleIntoView(slickLeftPanel: HTMLElement, slickLeftPanelButton: HTMLElement): void {
+    private toggleIntoView(slickLeftPanel: HTMLElement, slickLeftPanelButton: HTMLElement, backDrop: HTMLElement): void {
         // The toggle-into-view css class contains the translation.
         slickLeftPanel.classList.add('toggle-into-view');
         slickLeftPanelButton.classList.remove('green-glow');
         slickLeftPanelButton.style.right = '0px';
-        window.onclick = this.handleClickOutsidePanel.bind(this, slickLeftPanel, slickLeftPanelButton);
+        if (this.useBackDrop)   backDrop.classList.add('show-back-drop');
+        else                    backDrop.classList.add('show-transparent-back-drop');
+        backDrop.onclick = this.toggleOutOfView.bind(this, slickLeftPanel, slickLeftPanelButton, backDrop);
     }
 
 
@@ -76,31 +78,13 @@ export class SlickLeftPanelComponent {
      * @param slickLeftPanel The slickLeftPanel (div) element which will be toggled out of the viewport.
      * @param slickLeftPanelButton The slickLeftPanelButton (button) element which was pressed.
      */
-    private toggleOutOfView(slickLeftPanel: HTMLElement, slickLeftPanelButton: HTMLElement): void {
+    private toggleOutOfView(slickLeftPanel: HTMLElement, slickLeftPanelButton: HTMLElement, backDrop: HTMLElement): void {
         window.onclick = null;
         slickLeftPanel.classList.remove('toggle-into-view');
         //slickLeftPanelButton.classList.add('green-glow');
+        backDrop.classList.remove('show-back-drop');
+        backDrop.classList.remove('show-transparent-back-drop');
         slickLeftPanelButton.style.right = '-' + slickLeftPanelButton.offsetWidth + 'px';
-    }
-
-
-    /**
-     * Handles detected clicks outside of this panel by closing the panel.
-     * @param slickLeftPanel The click left panel.
-     * @param slickLeftPanelButton The toggle button for the slick left panel.
-     * @param event The click event that was detected outside of the panel.
-     */
-    private handleClickOutsidePanel(slickLeftPanel: HTMLElement, slickLeftPanelButton: HTMLElement, event): void {
-        const clickOutsidePanel: boolean = !slickLeftPanel.contains(event.target);
-        // Parent may have specified the ID of an element which we are to ignore clicks inside of.
-        const clickOutsideIgnoredElement: boolean = (   this.ignoreOutsideClickInId == null
-                                                     || document.getElementById(this.ignoreOutsideClickInId) == null 
-                                                     || !document.getElementById(this.ignoreOutsideClickInId).contains(event.target));
-
-        // If click is outside panel, it should not be ignored, and it's outside of any marked element that should be ignored.
-        if (!this.ignoreClicksOutsidePanel && clickOutsidePanel && clickOutsideIgnoredElement) {
-            this.toggleOutOfView(slickLeftPanel, slickLeftPanelButton);
-        }
     }
 
 

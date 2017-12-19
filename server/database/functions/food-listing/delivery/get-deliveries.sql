@@ -13,8 +13,8 @@ CREATE OR REPLACE FUNCTION getDeliveries
     _maxTotalWeight         FoodListing.totalWeight%TYPE                    DEFAULT NULL,   -- The maximum total weight of the delivery.
     _unscheduledDeliveries  BOOLEAN                                         DEFAULT FALSE,  -- Set to TRUE if we should only pull back deliveries that have not been scheduled.
     _myScheduledDeliveries  BOOLEAN                                         DEFAULT FALSE,  -- Set to TRUE if we should only pull back deliveries that are scheduled for deliverer.
-    _matchAvailability      BOOLEAN                                         DEFAULT FALSE,  -- Matches the availability of the Driver with that of the Receiver and Donor.
-    _availableNow           BOOLEAN                                         DEFAULT FALSE   -- Disregards Driver availability and finds Donors and Receivers that are available now.
+    _matchAvailability      BOOLEAN                                         DEFAULT TRUE    -- If TRUE, matches the availability of the Driver with that of the Receiver and Donor.
+                                                                                            -- When set FALSE, only grabs Deliveries that are available to start immediately.
 )
 RETURNS TABLE
 (
@@ -23,8 +23,9 @@ RETURNS TABLE
     delivery                JSON
 )
 AS $$
-    DECLARE _maxDistanceMeters  INTEGER     DEFAULT NULL;
-    DECLARE _currentTimestamp   TIMESTAMP   DEFAULT CURRENT_TIMESTAMP; -- Only evaluate current time once and store it for efficiency.
+    DECLARE _availableNow                   BOOLEAN     DEFAULT FALSE;
+    DECLARE _maxDistanceMeters              INTEGER     DEFAULT NULL;
+    DECLARE _nowRelativeAvailabilityTimes   TIMESTAMP;
 BEGIN
 
     -- Calculate the max distance in meters if provided as argument (in miles).
@@ -50,21 +51,19 @@ BEGIN
         _matchAvailability := FALSE;
     END IF;
 
-    IF (_availableNow IS NULL)
-    THEN
-        _availableNow := FALSE;
-    END IF;
 
-    
-    -- If we are finding potential deliveries that are available now to be delivered, then we will not try to match against Deliverer Availability!
-    IF (_matchAvailability = TRUE AND _availableNow = TRUE)
-    THEN
-        _matchAvailability := FALSE;
+    -- Determine if we should only pull back Deliveries that are available to start now.
+    IF (_matchAvailability <> TRUE AND _myScheduledDeliveries <> TRUE) THEN
+        
+        _availableNow := TRUE;
+
+        -- Get current time, but relative to App User Availability timestamps.
+        _nowRelativeAvailabilityTimes := nowRelativeAvailabilityTimes();
+
     END IF;
     
 
     -- TODO: Measure performance of this query! If optimizer doesn't come through here, we can select multiple results in temp table with dynamic queries above!!!
-    -- Perform final return query using filters.
     RETURN QUERY
     SELECT DISTINCT ON (ClaimedFoodListing.claimedFoodListingKey)
             ClaimedFoodListing.claimedFoodListingKey,
@@ -131,17 +130,25 @@ BEGIN
                                             )
             ) AS delivery
     FROM        FoodListing
-    INNER JOIN  ClaimedFoodListing                              ON FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
-    INNER JOIN  AppUser AS DelivererAppUser                     ON _appUserKey = DelivererAppUser.appUserKey
-    INNER JOIN  AppUserAvailability AS DelivererAvailability    ON DelivererAppUser.appUserKey = DelivererAvailability.appUserKey
-    INNER JOIN  AppUser AS DonorAppUser                         ON FoodListing.donatedByAppUserKey = DonorAppUser.appUserKey
-    INNER JOIN  ContactInfo AS DonorContact                     ON DonorAppUser.appUserKey = DonorContact.appUserKey
-    INNER JOIN  Organization AS DonorOrganization               ON DonorAppUser.appUserKey = DonorOrganization.appUserKey
-    INNER JOIN  AppUserAvailability AS DonorAvailability        ON DonorAppUser.appUserKey = DonorAvailability.appUserKey
-    INNER JOIN  AppUser AS ReceiverAppUser                      ON ClaimedFoodListing.claimedByAppUserKey = ReceiverAppUser.appUserKey
-    INNER JOIN  ContactInfo AS ReceiverContact                  ON ReceiverAppUser.appUserKey = ReceiverContact.appUserKey
-    INNER JOIN  Organization AS ReceiverOrganization            ON ReceiverAppUser.appUserKey = ReceiverOrganization.appUserKey
-    INNER JOIN  AppUserAvailability AS ReceiverAvailability     ON ReceiverAppUser.appUserKey = ReceiverAvailability.appUserKey
+    INNER JOIN  ClaimedFoodListing                              ON  FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
+                                                                AND NOT EXISTS (
+                                                                    SELECT      1
+                                                                    FROM        CancelledDeliveryFoodListing
+                                                                    INNER JOIN  DeliveryFoodListing ON CancelledDeliveryFoodListing.deliveryFoodListingKey =
+                                                                                                       DeliveryFoodListing.deliveryFoodListingKey
+                                                                    WHERE       DeliveryFoodListing.claimedFoodListingKey = ClaimedFoodListing.claimedFoodListingKey
+                                                                      AND       CancelledDeliveryFoodListing.foodRejected = TRUE
+                                                                )
+    INNER JOIN  AppUser AS DelivererAppUser                     ON  _appUserKey = DelivererAppUser.appUserKey
+    INNER JOIN  AppUserAvailability AS DelivererAvailability    ON  DelivererAppUser.appUserKey = DelivererAvailability.appUserKey
+    INNER JOIN  AppUser AS DonorAppUser                         ON  FoodListing.donatedByAppUserKey = DonorAppUser.appUserKey
+    INNER JOIN  ContactInfo AS DonorContact                     ON  DonorAppUser.appUserKey = DonorContact.appUserKey
+    INNER JOIN  Organization AS DonorOrganization               ON  DonorAppUser.appUserKey = DonorOrganization.appUserKey
+    INNER JOIN  AppUserAvailability AS DonorAvailability        ON  DonorAppUser.appUserKey = DonorAvailability.appUserKey
+    INNER JOIN  AppUser AS ReceiverAppUser                      ON  ClaimedFoodListing.claimedByAppUserKey = ReceiverAppUser.appUserKey
+    INNER JOIN  ContactInfo AS ReceiverContact                  ON  ReceiverAppUser.appUserKey = ReceiverContact.appUserKey
+    INNER JOIN  Organization AS ReceiverOrganization            ON  ReceiverAppUser.appUserKey = ReceiverOrganization.appUserKey
+    INNER JOIN  AppUserAvailability AS ReceiverAvailability     ON  ReceiverAppUser.appUserKey = ReceiverAvailability.appUserKey
     -- LEFT b/c we may or may not have a delivery lined up yet (deliverer may be looking for potential deliveries here).
     LEFT JOIN   DeliveryFoodListing                             ON  ClaimedFoodListing.claimedFoodListingKey = DeliveryFoodListing.claimedFoodListingKey
                                                                 -- Exclude Delivery Food Listings that have been cancelled!
@@ -150,21 +157,21 @@ BEGIN
                                                                     FROM    CancelledDeliveryFoodListing
                                                                     WHERE   DeliveryFoodListing.deliveryFoodListingKey = CancelledDeliveryFoodListing.deliveryFoodListingKey
                                                                 )
-    WHERE   (_deliveryFoodListingKey IS NULL    OR DeliveryFoodListing.deliveryFoodListingKey = _deliveryFoodListingKey)
-      AND   (_claimedFoodListingKey IS NULL     OR ClaimedFoodListing.claimedFoodListingKey = _claimedFoodListingKey)
-      AND   (_maxDistanceMeters IS NULL         OR ST_DWITHIN(ReceiverContact.gpsCoordinate, DonorContact.gpsCoordinate, _maxDistanceMeters))
-      AND   (_maxTotalWeight IS NULL            OR FoodListing.totalWeight <= _maxTotalWeight)
-      AND   (_myScheduledDeliveries = FALSE     OR DeliveryFoodListing.deliveryAppUserKey = _appUserKey)
-      AND   (_unscheduledDeliveries = FALSE     OR DeliveryFoodListing.scheduledStartTime IS NULL)
+    WHERE       (_deliveryFoodListingKey IS NULL    OR DeliveryFoodListing.deliveryFoodListingKey = _deliveryFoodListingKey)
+      AND       (_claimedFoodListingKey IS NULL     OR ClaimedFoodListing.claimedFoodListingKey = _claimedFoodListingKey)
+      AND       (_maxDistanceMeters IS NULL         OR ST_DWITHIN(ReceiverContact.gpsCoordinate, DonorContact.gpsCoordinate, _maxDistanceMeters))
+      AND       (_maxTotalWeight IS NULL            OR FoodListing.totalWeight <= _maxTotalWeight)
+      AND       (_myScheduledDeliveries = FALSE     OR DeliveryFoodListing.deliveryAppUserKey = _appUserKey)
+      AND       (_unscheduledDeliveries = FALSE     OR DeliveryFoodListing.scheduledStartTime IS NULL)
       -- When deliverer, receiver, and donor availabilities must all line up for future scheduling of delivery.
-      AND   (_matchAvailability = FALSE         OR (    ReceiverAvailability.endTime > DelivererAvailability.startTime
-                                                    AND ReceiverAvailability.startTime < DelivererAvailability.endTime
-                                                    AND DonorAvailability.endTime > DelivererAvailability.startTime
-                                                    AND DonorAvailability.startTime < DelivererAvailability.endTime))
-      AND   (_availableNow = FALSE              OR (    ReceiverAvailability.endTime > _currentTimestamp
-                                                    AND ReceiverAvailability.startTime < _currentTimestamp
-                                                    AND DonorAvailability.endTime > _currentTimestamp
-                                                    AND DonorAvailability.startTime < _currentTimestamp))  
+      AND       (_matchAvailability = FALSE         OR (    ReceiverAvailability.endTime > DelivererAvailability.startTime
+                                                        AND ReceiverAvailability.startTime < DelivererAvailability.endTime
+                                                        AND DonorAvailability.endTime > DelivererAvailability.startTime
+                                                        AND DonorAvailability.startTime < DelivererAvailability.endTime))
+      AND       (_availableNow = FALSE              OR (    ReceiverAvailability.endTime > _nowRelativeAvailabilityTimes
+                                                        AND ReceiverAvailability.startTime < _nowRelativeAvailabilityTimes
+                                                        AND DonorAvailability.endTime > _nowRelativeAvailabilityTimes
+                                                        AND DonorAvailability.startTime < _nowRelativeAvailabilityTimes))  
     OFFSET      _retrievalOffset
     LIMIT       _retrievalAmount;
 
@@ -172,4 +179,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 
---SELECT * FROM getDeliveries(1, 0, 10);
+SELECT * FROM getDeliveries(1, 0, 10, null, null, 15, null, true, null, null);

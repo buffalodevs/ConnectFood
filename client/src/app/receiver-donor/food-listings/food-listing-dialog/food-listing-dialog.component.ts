@@ -8,12 +8,16 @@ import { FoodListing } from './../../../../../../shared/receiver-donor/food-list
 
 
 @Component({
-  selector: 'food-listing-dialog',
-  templateUrl: './food-listing-dialog.component.html',
-  styleUrls: ['./food-listing-dialog.component.css', '../food-listings.component.css']
+    selector: 'food-listing-dialog',
+    templateUrl: './food-listing-dialog.component.html',
+    styleUrls: [
+        './food-listing-dialog.component.css',
+        '../food-listings.component.css',
+        '../../../slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
+    ]
 })
-export class FoodListingDialogComponent extends AbstractSlickListDialog <FoodListing> {
-    
+export class FoodListingDialogComponent extends AbstractSlickListDialog<FoodListing> {
+
     /**
      * Determines if this dialog is displaying Food Listing info for a Receiver's Cart. Default is false.
      */
@@ -31,7 +35,7 @@ export class FoodListingDialogComponent extends AbstractSlickListDialog <FoodLis
      * This is a shadow of the slickListDialog member in AbstractSlickListDialog.
      * It is all that is needed to make basic dialog functions work (open, close, etc).
      */
-    @ViewChild('SlickListDialogComponent') protected slickListDialog: SlickListDialogComponent; 
+    @ViewChild('SlickListDialogComponent') protected slickListDialog: SlickListDialogComponent;
 
 
     public constructor (

@@ -23,11 +23,12 @@ export class CancelDeliveryService {
      * Cancels a Delivery.
      * @param deiveryFoodListingKey The key identifier of the Delivery Food Listing that is to be acted upon.
      * @param cancelReason The reason for the cancellation.
+     * @param foodRejected Determines whether or not the food was rejected due to an inadequate quality.
      * @return An observable that has no payload (simply resolves on success).
      */
-    public cancelDelivery(deliveryFoodListingKey: number, cancelReason: string): Observable<void> {
+    public cancelDelivery(deliveryFoodListingKey: number, cancelReason: string, foodRejected: boolean): Observable<void> {
 
-        let body: CancelDeliveryRequest = new CancelDeliveryRequest(deliveryFoodListingKey, cancelReason);
+        let body: CancelDeliveryRequest = new CancelDeliveryRequest(deliveryFoodListingKey, cancelReason, foodRejected);
         let observer: Observable<Response> = this.requestService.post('/deliverer/cancelDelivery', body);
 
         // Listen for a response now.

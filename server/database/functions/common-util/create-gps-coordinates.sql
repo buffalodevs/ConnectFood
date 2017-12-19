@@ -16,4 +16,4 @@ AS $$
 $$ LANGUAGE sql;
 
 
-SELECT createGPSCoordinate(42.715080,-78.835782);
+--SELECT createGPSCoordinate(42.715080,-78.835782);

@@ -1,3 +1,9 @@
 #cancel-reason {
     width: 100%;
+    margin-bottom: 30px;
+}
+
+#food-rejected-no {
+    margin-left: 15px;
+    margin-bottom: 30px;
 }

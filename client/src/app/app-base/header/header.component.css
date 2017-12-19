@@ -48,11 +48,11 @@
     cursor: hand;
 }
 
-header {
+#header {
 	text-align: center;
 	font-size: 30px;
 	height: 150px;
-	position: absolute;
+	position: relative;
 	left: 0px;
 	top: 0px;
 	width: 100%;
@@ -66,28 +66,31 @@ header {
 	top: 0px;
 	width: 262px;
 	padding: 0;
-	margin: 0;
+    margin: 0;
+    z-index: 100;
 }
 
 nav {
-	max-height: 75px;
+	max-height: 75px; /* NOTE: Changing this will require a change to #banner margin-top style accordingly! */
     margin-left: 262px;
     padding: 0px 2px 0px 2px;
 }
 
-#vertSpacer {
+#banner {
+    margin-top: -75px; /* Bring the banner up to be positioned within the header just below the nav! */
 	position: relative;
-	margin-top: 150px; /* Everything must fall below the header on the page!*/
+	width: 100%;
 }
 
 @media screen and (max-width: 767px) {
+
 	nav {
 		max-height: 100%;
 		min-height: 65px;
 		margin-left: 0px;
 	}
 
-	header {
+	#header {
 		height: auto;
 		position: relative;
 	}
@@ -95,8 +98,8 @@ nav {
 	#logo {
 		visibility: hidden;
 	}
-
-	#vertSpacer {
+    
+    #banner {
 		visibility: hidden;
 		position: absolute;
 	}

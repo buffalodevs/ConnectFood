@@ -6,6 +6,12 @@
 html, body {
     padding: 0;
     margin: 0;
+    width: 100%;
+}
+
+body {
+    min-height: 100%;
+    position: relative;
 }
 
 .no-pad {

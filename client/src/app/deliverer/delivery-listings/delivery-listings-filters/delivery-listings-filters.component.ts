@@ -33,10 +33,9 @@ export class DeliveryListingsFiltersComponent extends FormGroup implements OnIni
     public ngOnInit(): void {
         
         // Fetch vehicle types domain values from client cache (should be prerequisite service for this component)
-        this.vehicleTypesService.getVehicleTypes()
-            .subscribe((vehicleTypes: string[]) => {
-                this.vehicleTypes = vehicleTypes;
-            });
+        this.vehicleTypesService.getVehicleTypes().subscribe((vehicleTypes: string[]) => {
+            this.vehicleTypes = vehicleTypes;
+        });
 
         const medianDistanceMi: number = this.maxDistances[Math.floor(this.maxDistances.length / 2)];
         this.addControl('maxDistance', new FormControl(medianDistanceMi));

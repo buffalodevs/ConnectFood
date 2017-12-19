@@ -11,7 +11,7 @@
 
     <ng-container slick-list-item-left>
 
-        <slick-map #SlickMapComponent [addresses]="[ deliveryListing.donorInfo, deliveryListing.receiverInfo ]"
+        <slick-map #SlickMapComponent [addresses]="[ sessionDataService.getAppUserSessionData(), deliveryListing.donorInfo, deliveryListing.receiverInfo ]"
          [addressNames]="[ deliveryListing.donorInfo.organizationName, deliveryListing.receiverInfo.organizationName ]"
          [diameterMi]="deliveryUtilService.calcMaxMapDiameterFromDelivery(deliveryListing)">
         </slick-map>

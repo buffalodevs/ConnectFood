@@ -1,8 +1,27 @@
 <div class="container-fluid">
     <div class="row">
 
-        <div id="filters" class="col-md-0 col-lg-3 no-pad" [style.max-width]="minFiltersWidth">
-            <delivery-listings-filters header="Search Filters" [maxWidth]="minFiltersWidth" #deliveryListingsFilters></delivery-listings-filters>
+        <div id="filters" class="col-md-0 col-lg-3 no-pad" [style.max-width]="minFiltersWidth"> 
+            <delivery-listings-filters #deliveryListingsFilters [formGroup]="deliveryListingsFilters" header="Search Filters" [maxWidth]="minFiltersWidth">
+
+                <ng-container bottom>
+
+                    <br>
+                    <h5>Availability Schedule:</h5>
+                    <div class="form-group">
+                        <md-radio-group name="availability" formControlName="matchAvailability">
+                            <md-radio-button name="availability" [value]="true" title="Shows deliveries that are available according to your weekly availability schedule">
+                                Match Availability
+                            </md-radio-button><br>
+                            <md-radio-button name="availability" [value]="false" title="Shows deliveries that are avaialble to start delivery immediately">
+                                Available Now
+                            </md-radio-button>
+                        </md-radio-group>
+                    </div>
+
+                </ng-container>
+
+            </delivery-listings-filters>
         </div>
 
         <div id="listings" class="col-md-12 col-lg-9">

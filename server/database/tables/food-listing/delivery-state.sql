@@ -16,8 +16,8 @@ END$$;
 -- @ts-sql enum="DeliveryState" file="/shared/food-listings/delivery-food-listing.ts"
 ALTER TYPE DeliveryState ADD VALUE IF NOT EXISTS 'unscheduled';         -- No uncancelled entry in DeliveryFoodListing
 ALTER TYPE DeliveryState ADD VALUE IF NOT EXISTS 'scheduled';           -- scheduledStartTime
-ALTER TYPE DeliveryState ADD VALUE IF NOT EXISTS 'onRouteToDonor';      -- startTime
-ALTER TYPE DeliveryState ADD VALUE IF NOT EXISTS 'onRouteToReceiver';   -- pickUpTime
-ALTER TYPE DeliveryState ADD VALUE IF NOT EXISTS 'completed';           -- dropOffTime
+ALTER TYPE DeliveryState ADD VALUE IF NOT EXISTS 'started';             -- startTime
+ALTER TYPE DeliveryState ADD VALUE IF NOT EXISTS 'pickedUp';            -- pickUpTime
+ALTER TYPE DeliveryState ADD VALUE IF NOT EXISTS 'droppedOff';          -- dropOffTime
 
 SELECT unnest(enum_range(NULL::DeliveryState)) AS deliveryState;

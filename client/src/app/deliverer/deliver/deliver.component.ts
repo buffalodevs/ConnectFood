@@ -34,7 +34,9 @@ export class DeliverComponent implements OnInit {
     /**
      * Executes after all input bindings have been established but before view children have been fully initialized.
      */
-    public ngOnInit(): void {}
+    public ngOnInit(): void {
+        this.deliveryListingsFiltersComponent.addControl('matchAvailability', new FormControl(true));
+    }
 
 
     /**

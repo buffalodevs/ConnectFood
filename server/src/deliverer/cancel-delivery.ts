@@ -7,10 +7,10 @@ import { DateFormatter } from '../../../shared/common-util/date-formatter';
 import { Delivery } from '../../../shared/deliverer/delivery';
 
 
-export function cancelDelivery(deliveryFoodListingKey: number, cancelledByAppUserKey: number, cancelReason: string): Promise<void> {
+export function cancelDelivery(deliveryFoodListingKey: number, cancelledByAppUserKey: number, cancelReason: string, foodRejected: boolean): Promise<void> {
 
-    let queryString: string = 'SELECT * FROM cancelDelivery($1, $2, $3)';
-    let queryArgs: any[] = [ deliveryFoodListingKey, cancelledByAppUserKey, cancelReason ];
+    let queryString: string = 'SELECT * FROM cancelDelivery($1, $2, $3, $4)';
+    let queryArgs: any[] = [ deliveryFoodListingKey, cancelledByAppUserKey, cancelReason, foodRejected ];
 
     queryString = fixNullQueryArgs(queryString, queryArgs);
     logSqlQueryExec(queryString, queryArgs);
@@ -25,7 +25,7 @@ export function cancelDelivery(deliveryFoodListingKey: number, cancelledByAppUse
                 return emailCancelledNotification(queryResult.rows[0].delivery);
             }
 
-            throw new Error('An incorrect number of rows have returned from the scheduleDelivery() SQL function call');
+            throw new Error('An incorrect number of rows have returned from the cancelDelivery() SQL function call');
         })
         .catch((err: Error) => {
             console.log(err);

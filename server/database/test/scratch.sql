@@ -20,4 +20,6 @@ WHERE       Receiver.appUserKey = 1
 
 SELECT * FROM DeliveryFoodListing;
 
---SELECT * FROM CancelledDeliveryFoodListing;
+SELECT * FROM CancelledDeliveryFoodListing;
+
+SELECT * FROM AppUserAvailability;

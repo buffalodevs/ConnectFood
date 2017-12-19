@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { DialogService } from "ng2-bootstrap-modal";
 import { Observable } from "rxjs/Observable";
+import { Router, NavigationStart } from '@angular/router';
 
+import { BannerService } from '../../common-util/services/banner.service';
 import { SessionDataService } from '../../common-util/services/session-data.service';
 import { LoginComponent } from '../../app-user/login/login.component';
 import { LogoutService } from '../../app-user/logout/logout.service';
@@ -15,11 +17,19 @@ import { LogoutService } from '../../app-user/logout/logout.service';
 })
 export class HeaderComponent {
 
-    constructor(
+    public constructor (
+        private router: Router,
         private dialogService: DialogService,
         private sessionDataService: SessionDataService,
-        private logoutService: LogoutService
-    ) { }
+        private logoutService: LogoutService,
+        private bannerService: BannerService
+    ) {   
+        this.router.events.filter(event => (event instanceof NavigationStart))
+            .subscribe((routeData: any) => {
+                // Reset banner on each re-route!
+                bannerService.setSrcImgUrl(null);
+            });
+    }
 
 
     private showLogin(): void {

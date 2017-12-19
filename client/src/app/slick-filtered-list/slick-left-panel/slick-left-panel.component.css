@@ -1,10 +1,25 @@
+#back-drop {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 100vh;
+    background: gray;
+    display: none;
+    opacity: 0;
+    z-index: 50;
+}
+
 #slick-left-panel {
     position: relative;
     z-index: 100;
     padding-left: 10px;
     padding-right: 10px;
     word-wrap: break-word;
-    background-color: inherit;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    background-color: white;
 }
 
 #slick-left-panel-button {
@@ -20,6 +35,7 @@
     border-bottom-right-radius: 10%;
     border-top-left-radius: 0%;
     border-bottom-left-radius: 0%;
+    margin-bottom: 0px;
     transition: right 0.5s linear;
     -webkit-transition: right 0.5s linear;
     -moz-transition: right 0.5s linear;
@@ -32,7 +48,7 @@
 
     #slick-left-panel {
         position: absolute;
-        padding-right: 25px; /* Make room for the button overlap! */
+        padding-right: 34px; /* Make room for the button overlap! */
         border-top-right-radius: 10%;
         border-bottom-right-radius: 10%;
         width: calc(100vw - 20px);
@@ -42,7 +58,6 @@
         -moz-transition: -moz-transform 0.3s linear;
         -ms-transition: -ms-transform 0.3s linear;
         -o-transition: -o-transform 0.3s linear;
-        background: white;
     }
 
     .toggle-into-view {
@@ -51,6 +66,15 @@
         -moz-transform: translateX(100%);
         -ms-transform: translateX(100%);
         -o-transform: translateX(100%);
+    }
+
+    .show-back-drop {
+        display: block !important;
+        opacity: 0.67 !important;
+    }
+
+    .show-transparent-back-drop {
+        display: block !important;
     }
 
     #slick-left-panel-button {

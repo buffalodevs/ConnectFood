@@ -21,18 +21,18 @@ BEGIN
 
     UPDATE  DeliveryFoodListing
     SET     startTime   =   CASE (_deliveryState)
-                                WHEN 'onRouteToDonor'       THEN    CURRENT_TIMESTAMP
-                                ELSE                                startTime
+                                WHEN 'started'      THEN    CURRENT_TIMESTAMP
+                                ELSE                        startTime
                             END,
             pickUpTime  =   CASE (_deliveryState)
-                                WHEN 'onRouteToReceiver'    THEN    CURRENT_TIMESTAMP
-                                WHEN 'onRouteToDonor'       THEN    NULL -- Going back a step.
-                                ELSE                                pickUpTime
+                                WHEN 'pickedUp'     THEN    CURRENT_TIMESTAMP
+                                WHEN 'started'      THEN    NULL -- Going back a step.
+                                ELSE                        pickUpTime
                             END,
             dropOffTime =   CASE (_deliveryState)
-                                WHEN 'completed'            THEN    CURRENT_TIMESTAMP
-                                WHEN 'onRouteToReceiver'    THEN    NULL -- Going back a step.
-                                ELSE                                dropOffTime
+                                WHEN 'droppedOff'   THEN    CURRENT_TIMESTAMP
+                                WHEN 'pickedUp'     THEN    NULL -- Going back a step.
+                                ELSE                        dropOffTime
                             END
     WHERE   deliveryFoodListingKey = _deliveryFoodListingKey;    
 
@@ -42,4 +42,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-SELECT * FROM updateDeliveryState(7, 1, 'onRouteToDonor');
+SELECT * FROM updateDeliveryState(7, 1, 'started');

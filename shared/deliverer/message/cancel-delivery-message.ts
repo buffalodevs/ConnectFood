@@ -11,6 +11,10 @@ export class CancelDeliveryRequest {
         /**
          * The required reason for the cancellation.
          */
-        public cancelReason: string
+        public cancelReason: string,
+        /**
+         * Determines whether or not the deliverer or receiver has rejected the food due to an inadequate quality.
+         */
+        public foodRejected: boolean
     ) {}
 }

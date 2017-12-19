@@ -10,7 +10,7 @@ import { DeliveryState } from '../../../../../../../shared/deliverer/message/get
 @Component({
     selector: 'delivery-listing-schedule',
     templateUrl: './delivery-listing-schedule.component.html',
-    styleUrls: ['./delivery-listing-schedule.component.css'],
+    styleUrls: ['./delivery-listing-schedule.component.css', './../../../../slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'],
 })
 export class DeliveryListingScheduleComponent {
 

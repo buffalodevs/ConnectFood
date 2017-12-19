@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { BannerService } from '../../common-util/services/banner.service';
+
 
 @Component({
     selector: 'app-home',
@@ -9,7 +11,12 @@ import { Component, OnInit } from '@angular/core';
 export class HomeComponent implements OnInit {
 
 
-    public constructor() {}
+    public constructor(
+        private bannerService: BannerService
+    ) {}
 
-    public ngOnInit(): void {}
+
+    public ngOnInit(): void {
+        this.bannerService.setSrcImgUrl('../assets/BannerImg.jpg');
+    }
 }

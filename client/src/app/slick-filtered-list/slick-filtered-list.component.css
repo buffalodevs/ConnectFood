@@ -1,3 +1,7 @@
+#filters {
+    border-right: 1px solid #D5D5D5;
+}
+
 /* When the screen gets small and the filters panel goes into mobile mode, then center the listings */
 @media only screen and (max-width: 991px) {
     #listings {
@@ -9,8 +13,4 @@
     #listings {
         text-align: center;
     }
-}
-
-#filters {
-    border-right: 1px solid #D5D5D5;
 }

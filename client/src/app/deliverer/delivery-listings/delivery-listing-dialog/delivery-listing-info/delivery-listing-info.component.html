@@ -3,7 +3,7 @@
     
     <ng-container slick-list-item-left>
 
-        <slick-map #SlickMapComponent [addresses]="[ delivery.donorInfo, delivery.receiverInfo ]"
+        <slick-map #SlickMapComponent [addresses]="[ sessionDataService.getAppUserSessionData(), delivery.donorInfo, delivery.receiverInfo ]"
             [addressNames]="[ delivery.donorInfo.organizationName, delivery.receiverInfo.organizationName ]"
             [diameterMi]="deliveryUtilService.calcMaxMapDiameterFromDelivery(delivery)">
         </slick-map>
@@ -44,16 +44,12 @@
 
             <div>
                 <b>Total Driving Distance:</b>
-                <div class="inline-block">
-                    {{ deliveryUtilService.calcTotalDrivingDistance(delivery) }} miles
-                </div>
+                <div class="inline-block">{{ deliveryUtilService.calcTotalDrivingDistance(delivery) }} miles</div>
             </div>
     
             <div>
                 <b>Total Driving Time:</b>
-                <div class="inline-block">
-                    {{ deliveryUtilService.calcTotalDrivingTime(delivery) }} minutes
-                </div>
+                <div class="inline-block">{{ deliveryUtilService.calcTotalDrivingTime(delivery) }} minutes</div>
             </div>
     
             <div class="space-bottom">
@@ -62,9 +58,12 @@
 
             <div>
                 <b>Total Weight:</b>
-                <div class="inline-block">
-                    {{ delivery.totalWeight }} lbs
-                </div>
+                <div class="inline-block">{{ delivery.totalWeight }} lbs</div>
+            </div>
+
+            <div>
+                <b>Delivery State:</b>
+                <div class="inline-block">{{ getReadableDeliveryState() }}</div>
             </div>
 
         </slick-expansion-panel>
@@ -73,11 +72,13 @@
     
 </slick-list-item>
 
-<!-- Footer -->
-<div class="modal-footer">
+<!-- Footer Buttons -->
+<div class="modal-button-group">
     
-    <button md-raised-button color="primary" class="button-md sm-button-full" (click)="toSchedule.emit()" *ngIf="!isCart">Schedule Delivery</button>
-    <button md-raised-button color="primary" class="button-md sm-button-full" (click)="startDelivery()" *ngIf="showStartButton">Start</button>
-    <button md-raised-button color="primary" class="button-md sm-button-full" (click)="toCancelReason.emit()" *ngIf="isCart">Cancel Delivery</button>
+    <button md-raised-button color="primary" class="button-md" (click)="toSchedule.emit()" *ngIf="!isCart">Schedule Delivery</button>
+    <button md-raised-button color="primary" class="button-md" (click)="startDelivery()" *ngIf="showStartButton">Start Delivery</button>
+    <button md-raised-button color="primary" class="button-md" (click)="markPickedUp()" *ngIf="showMarkPickedUpButton">Mark Picked Up</button>
+    <button md-raised-button color="primary" class="button-md" (click)="markDroppedOff()" *ngIf="showMarkDroppedOffButton">Mark Dropped Off</button>
+    <button md-raised-button color="primary" class="button-md warn-button" (click)="toCancelReason.emit()" *ngIf="showCancelButton">Cancel Delivery</button>
 
 </div>

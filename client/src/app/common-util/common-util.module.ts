@@ -7,7 +7,6 @@ import { NumRangePipe } from './pipes/num-range.pipe';
 import { AutoFocusDirective } from './directives/auto-focus.directive';
 import { DefaultImgDirective } from './directives/default-img.directive';
 import { InputFilterDirective } from './directives/input-filter.directive';
-import { BannerComponent } from './components/banner/banner.component';
 
 import { GeocodeService } from './services/geocode.service';
 import { RequestService } from './services/request.service';
@@ -24,8 +23,7 @@ import { ValidationService } from './services/validation.service';
         NumRangePipe,
         AutoFocusDirective,
         DefaultImgDirective,
-        InputFilterDirective,
-        BannerComponent
+        InputFilterDirective
     ],
     imports: [
         CommonModule,
@@ -35,8 +33,7 @@ import { ValidationService } from './services/validation.service';
         DateFormatterPipe,
         AutoFocusDirective,
         DefaultImgDirective,
-        InputFilterDirective,
-        BannerComponent
+        InputFilterDirective
     ],
     providers: [
         DateFormatterPipe,

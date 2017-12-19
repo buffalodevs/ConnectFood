@@ -3,7 +3,7 @@
     <div class="modal-body" *ngIf="isOpen()">
         
         <delivery-listing-info [delivery]="dialogData" [isCart]="isCart" *ngIf="isDialogState('DeliveryInfo')"
-         (toSchedule)="toSchedule()" (toCancelReason)="toCancelReason()" (started)="isCart ? close() : removeListing.emit()"></delivery-listing-info>
+         (toSchedule)="toSchedule()" (toCancelReason)="toCancelReason()" (deliveryStateChange)="isCart ? close() : removeListing.emit()"></delivery-listing-info>
         <delivery-listing-schedule [delivery]="dialogData" *ngIf="isDialogState('Schedule')" (scheduled)="removeListing.emit()"></delivery-listing-schedule>
         <delivery-listing-cancel [delivery]="dialogData" *ngIf="isDialogState('CancelReason')" (cancelled)="removeListing.emit()"></delivery-listing-cancel>
     

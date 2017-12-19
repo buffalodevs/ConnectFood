@@ -1,8 +1,10 @@
-<div style="margin-bottom: 20px; padding-bottom: 0px;">
+<div [ngStyle]="{'min-height': BODY_HEIGHT + 'px'}">
+
     <app-header></app-header>
 
     <!-- This is replaced with each component we route to -->
     <router-outlet></router-outlet>
+    
 </div>
 
-<!--<app-footer></app-footer>-->
+<app-footer [height]="FOOTER_HEIGHT"></app-footer>

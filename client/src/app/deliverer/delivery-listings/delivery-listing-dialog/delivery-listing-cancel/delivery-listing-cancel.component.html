@@ -1,19 +1,19 @@
 <form [formGroup]="cancelForm">
 
-    <div class="modal-body">
+    <h4>Has the food been judged inadquate and rejected?</h4>
+    <md-radio-group name="foodRejected" formControlName="foodRejected" [ngClass]="{ 'warn-foreground': (validate && !cancelForm.get('foodRejected').valid) }">
+        <md-radio-button name="foodRejected" [value]="true">Yes</md-radio-button>
+        <md-radio-button id="food-rejected-no" name="foodRejected" [value]="false">No</md-radio-button>
+    </md-radio-group>
 
-        <h4>Please provide a reason for the delivery cancellation:</h4>
-        <md-form-field floatPlaceholder="never" id="cancel-reason">
-            <textarea #foodTitle mdInput mdTextareaAutosize placeholder="Cancellation Reason" formControlName="cancelReason"></textarea>
-        </md-form-field>
-
-    </div>
+    <h4>Please provide a reason for the delivery cancellation:</h4>
+    <md-form-field floatPlaceholder="never" class="no-pad-top-input" id="cancel-reason">
+        <textarea #foodTitle mdInput mdTextareaAutosize placeholder="Cancellation Reason" formControlName="cancelReason"></textarea>
+    </md-form-field>
 
     <!-- Footer -->
-    <div class="modal-footer">
-        
-        <button md-raised-button color="primary" id="cancel-button" class="button-md sm-button-full" (click)="cancelDelivery()">Confirm Cancel</button>
-
+    <div class="modal-button-group">
+        <button md-raised-button color="primary" id="cancel-button" class="button-md" (click)="cancelDelivery()">Confirm Cancel</button>
     </div>
 
 </form>

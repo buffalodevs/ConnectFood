@@ -22,22 +22,21 @@ export class DriveDistTime {
  * @param destinationgpsCoordinate An array of one or more destination GPS Coordinates.
  * @return A promise that resolves to an array of the computed driving distances and times.
  */
-export function getDrivingDistTime(origingpsCoordinate: GPSCoordinate, destinationgpsCoordinate: GPSCoordinate[]): Promise<DriveDistTime[]> {
+export function getDrivingDistTime(originGpsCoordinate: GPSCoordinate, destinationGpsCoordinate: GPSCoordinate[]): Promise<DriveDistTime[]> {
 
     // Simply break out with a resolved promise if the given destinationgpsCoordinate array is empty!
-    if (destinationgpsCoordinate == null || destinationgpsCoordinate.length === 0)  return Promise.resolve([]);
+    if (destinationGpsCoordinate == null || destinationGpsCoordinate.length === 0)  return Promise.resolve([]);
 
     return new Promise<DriveDistTime[]> (
 
         function (resolve: (value?: DriveDistTime[]) => void, reject: (reason?: Error) => void) {
 
-            let origins: string[] = [ origingpsCoordinate.latitude.toString() + ',' + origingpsCoordinate.longitude.toString() ];
+            let origins: string[] = [ originGpsCoordinate.latitude.toString() + ',' + originGpsCoordinate.longitude.toString() ];
             let destinations: string[] = [];
 
             // Fill destinations array with correctly formatted destination GPS Coordinates.
-            for (let i: number = 0; i < destinationgpsCoordinate.length; i++) {
-                destinations.push(destinationgpsCoordinate[i].latitude.toString() + ',' +
-                                    destinationgpsCoordinate[i].longitude.toString());
+            for (let i: number = 0; i < destinationGpsCoordinate.length; i++) {
+                destinations.push(destinationGpsCoordinate[i].latitude.toString() + ',' + destinationGpsCoordinate[i].longitude.toString());
             }
             
             googleDistance.get(
@@ -71,6 +70,13 @@ export function getDrivingDistTime(origingpsCoordinate: GPSCoordinate, destinati
                         return resolve(driveDistTime);
                     }
 
+                    // On over query limit (retry).
+                    if (err === 'OVER_QUERY_LIMIT') {
+                        console.log('Geocoder over query limit, retrying now.');
+                        return getDrivingDistTime(originGpsCoordinate, destinationGpsCoordinate);
+                    }
+
+                    // On fatal error, just quit and let error bubble up!
                     console.log(err);
                     return reject(new Error('Unexpected error encountered when calculating driving distances.'));
                 }

@@ -8,9 +8,9 @@ import { TimeRange } from '../app-user/time-range';
 export enum DeliveryState {
     unscheduled = 'unscheduled',
     scheduled = 'scheduled',
-    onRouteToDonor = 'onRouteToDonor',
-    onRouteToReceiver = 'onRouteToReceiver',
-    completed = 'completed'
+    started = 'started',
+    pickedUp = 'pickedUp',
+    droppedOff = 'droppedOff'
 }
 
 
@@ -65,11 +65,30 @@ export class Delivery {
     public static getDeliveryStateIndex(deliveryState: DeliveryState): number {
 
         switch (deliveryState) {
-            case DeliveryState.unscheduled:         return 0;
-            case DeliveryState.scheduled:           return 1;
-            case DeliveryState.onRouteToDonor:      return 2;
-            case DeliveryState.onRouteToReceiver:   return 3;
-            case DeliveryState.completed:           return 4;
+            case DeliveryState.unscheduled: return 0;
+            case DeliveryState.scheduled:   return 1;
+            case DeliveryState.started:     return 2;
+            case DeliveryState.pickedUp:    return 3;
+            case DeliveryState.droppedOff:  return 4;
         }
+    }
+
+
+    /**
+     * Gets a human readable version of a given Delivery State value.
+     * @param deliveryState The Delivery State.
+     * @return A human readable version of the given Delivery State.
+     */
+    public static getReadableDeliveryState(deliveryState: DeliveryState): string {
+
+        switch (deliveryState) {
+            case DeliveryState.unscheduled: return 'Unscheduled';
+            case DeliveryState.scheduled:   return 'Scheduled';
+            case DeliveryState.started:     return 'Started';
+            case DeliveryState.pickedUp:    return 'Picked Up';
+            case DeliveryState.droppedOff:  return 'Dropped Off';
+        }
+
+        throw new Error('Incorrect Delivery State provided to getReadableDeliveryState() method');
     }
 }

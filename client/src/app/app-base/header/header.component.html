@@ -1,4 +1,4 @@
-<header>
+<div id="header">
     <img id="logo" class="navbar-brand" src="./assets/HeaderImg.jpg" [routerLink]="['/home']">
 
     <nav class="navbar navbar-toggleable-sm navbar-inverse bg-inverse no-select">
@@ -24,5 +24,6 @@
             </ul>
         </div>
     </nav>
-</header>
-<div id="vertSpacer"></div>
+</div>
+
+<img id="banner" *ngIf="bannerService.getSrcImgUrl() != null" [src]="bannerService.getSrcImgUrl()" [style.height]="bannerService.getHeightPx()">

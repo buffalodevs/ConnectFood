@@ -23,7 +23,7 @@ export function getDeliveries(filters: DeliveryFilters, myAppUserKey: number, my
     let queryArgs: any[] = [ myAppUserKey, filters.retrievalOffset, filters.retrievalAmount,
                              filters.deliveryFoodListingKey, filters.claimedFoodListingKey,
                              filters.maxDistance, filters.maxTotalWeight, filters.unscheduledDeliveries,
-                             filters.myScheduledDeliveries, filters.matchAvailability, filters.availableNow ];
+                             filters.myScheduledDeliveries, filters.matchAvailability ];
 
     // Replace any NULL query arguments with literals in query string.
     queryString = fixNullQueryArgs(queryString, queryArgs);
@@ -36,7 +36,7 @@ export function getDeliveries(filters: DeliveryFilters, myAppUserKey: number, my
         })
         .catch((err: Error) => {
             console.log(err);
-            return Promise.reject(new Error('Food listing search failed'));
+            return Promise.reject(new Error('Food listing search unexpectedly failed'));
         });
 }
 

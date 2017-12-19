@@ -23,13 +23,16 @@ export function handleGetDeliveries(request: Request, response: Response): void 
     const getDeliveriesRequest: GetDeliveriesRequest = request.body;
     const sessionData: SessionData = SessionData.loadSessionData(request);
 
-    getDeliveries(getDeliveriesRequest.filters, sessionData.appUserKey, sessionData.appUserInfo.gpsCoordinate)
-        .then((deliveries: Delivery[]) => {
-            response.send(new GetDeliveriesResponse(deliveries, true, 'Delivery Food Listings Successfully Retrieved'));
-        })
-        .catch((err: Error) => {
-            response.send(new GetDeliveriesResponse(null, false, err.message));
-        });
+    getDeliveries (
+        getDeliveriesRequest.filters,
+        sessionData.appUserKey,
+        sessionData.appUserInfo.gpsCoordinate
+    ).then((deliveries: Delivery[]) => {
+        response.send(new GetDeliveriesResponse(deliveries, true, 'Delivery Food Listings Successfully Retrieved'));
+    })
+    .catch((err: Error) => {
+        response.send(new GetDeliveriesResponse(null, false, err.message));
+    });
 }
 
 
@@ -40,14 +43,17 @@ export function handleScheduleDelivery(request: Request, response: Response): vo
     const scheduleDeliveryRequest: ScheduleDeliveryRequest = request.body;
     const sessionData: SessionData = SessionData.loadSessionData(request);
 
-    scheduleDelivery(scheduleDeliveryRequest.claimedFoodListingKey, sessionData.appUserKey,
-                     scheduleDeliveryRequest.startImmediately, scheduleDeliveryRequest.scheduledStartTime)
-        .then(() => {
-            response.send(new FoodWebResponse(true, 'Successfully scheduled a new delivery'));
-        })
-        .catch((err: Error) => {
-            response.send(new FoodWebResponse(false, err.message));
-        });
+    scheduleDelivery (
+        scheduleDeliveryRequest.claimedFoodListingKey,
+        sessionData.appUserKey,
+        scheduleDeliveryRequest.startImmediately,
+        scheduleDeliveryRequest.scheduledStartTime
+    ).then(() => {
+        response.send(new FoodWebResponse(true, 'Successfully scheduled a new delivery'));
+    })
+    .catch((err: Error) => {
+        response.send(new FoodWebResponse(false, err.message));
+    });
 }
 
 
@@ -58,13 +64,17 @@ export function handleCancelDelivery(request: Request, response: Response): void
     const cancelDeliveryRequest: CancelDeliveryRequest = request.body;
     const sessionData: SessionData = SessionData.loadSessionData(request);
 
-    cancelDelivery(cancelDeliveryRequest.deliveryFoodListingKey, sessionData.appUserKey, cancelDeliveryRequest.cancelReason)
-        .then(() => {
-            response.send(new FoodWebResponse(true, 'Successfully cancelled a delivery'));
-        })
-        .catch((err: Error) => {
-            response.send(new FoodWebResponse(false, err.message));
-        });
+    cancelDelivery (
+        cancelDeliveryRequest.deliveryFoodListingKey,
+        sessionData.appUserKey,
+        cancelDeliveryRequest.cancelReason,
+        cancelDeliveryRequest.foodRejected
+    ).then(() => {
+        response.send(new FoodWebResponse(true, 'Successfully cancelled a delivery'));
+    })
+    .catch((err: Error) => {
+        response.send(new FoodWebResponse(false, err.message));
+    });
 }
 
 
@@ -75,13 +85,16 @@ export function handleUpdateDeliveryState(request: Request, response: Response):
     const updateDeliveryStateRequest: ManageDeliveryRequest = request.body;
     const sessionData: SessionData = SessionData.loadSessionData(request);
 
-    updateDeliveryState(updateDeliveryStateRequest.deliveryFoodListingKey, sessionData.appUserKey, updateDeliveryStateRequest.deliveryState)
-        .then(() => {
-            response.send(new FoodWebResponse(true, 'Successfully updated delivery state'));
-        })
-        .catch((err: Error) => {
-            response.send(new FoodWebResponse(false, err.message));
-        });
+    updateDeliveryState (
+        updateDeliveryStateRequest.deliveryFoodListingKey,
+        sessionData.appUserKey,
+        updateDeliveryStateRequest.deliveryState
+    ).then(() => {
+        response.send(new FoodWebResponse(true, 'Successfully updated delivery state'));
+    })
+    .catch((err: Error) => {
+        response.send(new FoodWebResponse(false, err.message));
+    });
 }
 
 
