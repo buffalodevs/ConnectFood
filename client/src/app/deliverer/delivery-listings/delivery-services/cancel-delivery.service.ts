@@ -24,23 +24,11 @@ export class CancelDeliveryService {
      * @param deiveryFoodListingKey The key identifier of the Delivery Food Listing that is to be acted upon.
      * @param cancelReason The reason for the cancellation.
      * @param foodRejected Determines whether or not the food was rejected due to an inadequate quality.
-     * @return An observable that has no payload (simply resolves on success).
+     * @return An observable that resolves to true on success, false on non-fatal failure (such as when need login), and throws an error on fatal failure.
      */
-    public cancelDelivery(deliveryFoodListingKey: number, cancelReason: string, foodRejected: boolean): Observable<void> {
+    public cancelDelivery(deliveryFoodListingKey: number, cancelReason: string, foodRejected: boolean): Observable<boolean> {
 
-        let body: CancelDeliveryRequest = new CancelDeliveryRequest(deliveryFoodListingKey, cancelReason, foodRejected);
-        let observer: Observable<Response> = this.requestService.post('/deliverer/cancelDelivery', body);
-
-        // Listen for a response now.
-        return observer.map((response: Response) => {
-
-            let manageDeliveryFoodListingResponse: FoodWebResponse = response.json();
-            
-            // On failure.
-            if (!manageDeliveryFoodListingResponse.success) {
-                console.log(manageDeliveryFoodListingResponse.message);
-                throw new Error(manageDeliveryFoodListingResponse.message);
-            }
-        });
+        return this.requestService.post('/deliverer/cancelDelivery', new CancelDeliveryRequest(deliveryFoodListingKey, cancelReason, foodRejected))
+                                  .map(this.requestService.genericResponseMap);
     }
 }

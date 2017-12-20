@@ -5,6 +5,7 @@ import { ScheduleDeliveryService } from '../../delivery-services/schedule-delive
 import { SessionDataService } from '../../../../common-util/services/session-data.service';
 import { Delivery, DeliveryState, DeliveryUtilService } from '../../delivery-services/delivery-util.service';
 import { ManageDeliveryService } from '../../delivery-services/manage-deliveries.service';
+import { FoodWebResponse } from '../../../../../../../shared/message-protocol/food-web-response';
 
 
 @Component({
@@ -100,11 +101,17 @@ export class DeliveryListingInfoComponent implements OnChanges {
         }
         else {
             this.scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, true)
-                .subscribe(() => {
-                    console.log('Delivery started');
-                    this.delivery.deliveryState = DeliveryState.started;
-                    this.deliveryStateChange.emit();
-                    this.startComplete = true;
+                .subscribe((success: boolean) => {
+                    if (success) {
+                        console.log('Delivery started');
+                        this.delivery.deliveryState = DeliveryState.started;
+                        this.deliveryStateChange.emit();
+                        this.startComplete = true;
+                    }
+                },
+                (err: Error) => {
+                    // If we get here, then we have encountered a fatal error...
+                    alert(err.message);
                 });
         }
     }
@@ -133,11 +140,16 @@ export class DeliveryListingInfoComponent implements OnChanges {
     private updateDeliveryState(deliveryState: DeliveryState): void {
 
         this.manageDeliveryService.updateDeliveryState(this.delivery.deliveryFoodListingKey, deliveryState)
-            .subscribe(() => {
-                console.log('Delivery state updated to: ' + deliveryState);
-                this.delivery.deliveryState = deliveryState;
-                this.deliveryStateChange.emit();
-                this.stateChangeComplete = true;
-            })
+            .subscribe((success: boolean) => {
+                if (success) {
+                    this.delivery.deliveryState = deliveryState;
+                    this.deliveryStateChange.emit();
+                    this.stateChangeComplete = true;
+                }
+            },
+            (err: Error) => {
+                // If we get here, then we have encountered a fatal error...
+                alert(err.message);
+            });
     }
 }

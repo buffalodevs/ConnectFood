@@ -25,23 +25,11 @@ export class ScheduleDeliveryService {
      * @param claimedFoodListingKey The Claimed Food Listing key (ID). This will be used to create a newly scheduled Delivery Food Listing entry.
      * @param startImmediately A flag that determines if this new Delivery Food Listing should be scheduled to start now.
      * @param scheduledStartTime The scheduled start time for the new Delivery Food Listing.
-     * @return An observable that resolves to nothing on success.
+     * @return An observable that resolves to true on success, false on non-fatal failure. If a fatal error occurs, then an exception is thrown.
      */
-    public scheduleDelivery(claimedFoodListingKey: number, startImmediately: boolean, scheduledStartTime?: Date): Observable<void> {
+    public scheduleDelivery(claimedFoodListingKey: number, startImmediately: boolean, scheduledStartTime?: Date): Observable<boolean> {
         
-        let body: ScheduleDeliveryRequest = new ScheduleDeliveryRequest(claimedFoodListingKey, startImmediately, scheduledStartTime);
-        let observer: Observable<Response> = this.requestService.post('/deliverer/scheduleDelivery', body);
-
-        // Listen for a response now.
-        return observer.map((response: Response) => {
-
-            let scheduleDeliveryFoodListingResponse: FoodWebResponse = response.json();
-            
-            // On failure.
-            if (!scheduleDeliveryFoodListingResponse.success) {
-                console.log(scheduleDeliveryFoodListingResponse.message);
-                throw new Error(scheduleDeliveryFoodListingResponse.message);
-            }
-        });
+        return this.requestService.post('/deliverer/scheduleDelivery', new ScheduleDeliveryRequest(claimedFoodListingKey, startImmediately, scheduledStartTime))
+                                  .map(this.requestService.genericResponseMap);
     }
 }

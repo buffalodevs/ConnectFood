@@ -1,5 +1,3 @@
-/* TODO: This file is a hell of a lot confusing... simplify in future. For now, just made lots of comments. */
-
 import { Injectable } from '@angular/core';
 import { Http, Headers, Response, RequestOptionsArgs } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
@@ -22,11 +20,11 @@ export { Response };
 @Injectable()
 export class RequestService {
 
-    constructor(
+    public constructor (
         private http: Http,
         private dialogService: DialogService,
         private sessionDataService: SessionDataService
-    ) { }
+    ) {}
 
 
     /**
@@ -132,5 +130,33 @@ export class RequestService {
 
         // No problems with signup confirmation or login detected!
         return Observable.of(response);
+    }
+
+
+    /**
+     * 
+     * @param response The response received from the server.
+     * @return If the related operation on the server was successful, then true.
+     *         If it was unsuccessful, and due to a resolvable error (such as required login), then false.
+     *         If it was unsuccessful, and due to a fatal error, then an Error is thrown.
+     */
+    public genericResponseMap(response: Response): boolean {
+
+        const foodWebResponse: FoodWebResponse = response.json();
+        console.log(foodWebResponse.message);
+        
+        // On failure.
+        if (!foodWebResponse.success) {
+
+            // Is it a non-fatal failure?
+            if (foodWebResponse.loginRequired || foodWebResponse.signupConfirmRequired) {
+                return false;
+            }
+            // It is a fatal failure.
+            throw new Error(foodWebResponse.message);
+        }
+
+        // Successful.
+        return true;
     }
 }

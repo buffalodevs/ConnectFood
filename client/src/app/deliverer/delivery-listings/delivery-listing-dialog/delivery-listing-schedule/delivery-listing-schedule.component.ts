@@ -33,11 +33,15 @@ export class DeliveryListingScheduleComponent {
         this.scheduleControl = new FormControl(null);
         this.scheduleControl.valueChanges.subscribe((value: Date) => {
             scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, false, value)
-                .subscribe(() => {
-                    console.log('Scheduling complete!');
-                    this.delivery.deliveryState = DeliveryState.scheduled;
-                    this.scheduled.emit();
-                    this.schedulingComplete = true;
+                .subscribe((success: boolean) => {
+                    if (success) {
+                        this.delivery.deliveryState = DeliveryState.scheduled;
+                        this.scheduled.emit();
+                        this.schedulingComplete = true;
+                    }
+                },
+                (err: Error) => {
+                    alert(err.message);
                 });
         });
     }

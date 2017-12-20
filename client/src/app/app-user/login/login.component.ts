@@ -31,12 +31,14 @@ export class LoginComponent extends DialogComponent<null, boolean> implements On
         private passwordRecoveryService: PasswordRecoveryService
     ) {
         super(dialogService);
+
         this.forgotPassword = false;
         this.displayRecoveryResponseMessage = false;
     }
 
 
     public ngOnInit(): void {
+
         this.loginForm = this.formBuilder.group({
             email: [null, Validators.required],
             password: null
@@ -50,14 +52,15 @@ export class LoginComponent extends DialogComponent<null, boolean> implements On
      * @return An observable that will return a meaningless boolean. The observable resolves when the dialog closes.
      */
     public static display(dialogService: DialogService): Observable<boolean> {
-        return dialogService.addDialog(
+
+        return dialogService.addDialog (
             LoginComponent,
             // Dialog Initalization Data
             null,
             // DialogOptions
             {
                 closeByClickingOutside: true,
-                backdropColor: '#444'
+                backdropColor: '#444',
             }
         );
     }
@@ -68,6 +71,7 @@ export class LoginComponent extends DialogComponent<null, boolean> implements On
      * @param event The form submit or click event that triggered this function.
      */
     private loginUser(event: Event): void {
+
         event.preventDefault();
 
         let email: string = this.loginForm.value.email;

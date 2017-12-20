@@ -26,21 +26,9 @@ export class ManageDeliveryService {
      * @param deliveryState The delivery state to set the Delivery Food Listing to. Set to DeliveryState.unscheduled if cancelling delivery (value does not matter).
      * @return An observable that has no payload (simply resolves on success).
      */
-    public updateDeliveryState(deliveryFoodListingKey: number, deliveryState: DeliveryState): Observable<void> {
-
-        let body: ManageDeliveryRequest = new ManageDeliveryRequest(deliveryFoodListingKey, deliveryState);
-        let observer: Observable<Response> = this.requestService.post('/deliverer/updateDeliveryState', body);
-
-        // Listen for a response now.
-        return observer.map((response: Response) => {
-
-            let manageDeliveryFoodListingResponse: FoodWebResponse = response.json();
-            
-            // On failure.
-            if (!manageDeliveryFoodListingResponse.success) {
-                console.log(manageDeliveryFoodListingResponse.message);
-                throw new Error(manageDeliveryFoodListingResponse.message);
-            }
-        });
+    public updateDeliveryState(deliveryFoodListingKey: number, deliveryState: DeliveryState): Observable<boolean> {
+        
+        return this.requestService.post('/deliverer/updateDeliveryState', new ManageDeliveryRequest(deliveryFoodListingKey, deliveryState))
+                                  .map(this.requestService.genericResponseMap);
     }
 }

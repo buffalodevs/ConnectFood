@@ -52,10 +52,14 @@ export class DeliveryListingCancelComponent {
         const foodRejected: boolean = this.cancelForm.get('foodRejected').value;
 
         this.cancelDeliveryService.cancelDelivery(this.delivery.deliveryFoodListingKey, cancelReason, foodRejected)
-            .subscribe(() => {
-                console.log('Cancel Delivery Completed!'); 
-                this.cancelled.emit(); // Emit cancelled signal to parent (Dialog) so it can close and remove the cancelled listing.
-                this.cancelComplete = true;
+            .subscribe((success: boolean) => {
+                if (success) {
+                    this.cancelled.emit(); // Emit cancelled signal to parent (Dialog) so it can close and remove the cancelled listing.
+                    this.cancelComplete = true;
+                }
+            },
+            (err: Error) => {
+                alert(err.message);
             });
     }
 }

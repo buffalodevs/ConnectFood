@@ -81,6 +81,12 @@ i {
 }
 
 
+/* Logim modal dialog specific style to push to top most */
+div.modal {
+    z-index: 2000;
+}
+
+
 /* Shared styles for all modal dialogs in Food Web */
 
 .modal-header {
