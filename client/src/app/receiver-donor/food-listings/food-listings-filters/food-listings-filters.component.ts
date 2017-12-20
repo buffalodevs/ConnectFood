@@ -14,7 +14,6 @@ import { FoodListingsFilters } from "../../../../../../shared/receiver-donor/foo
 export class FoodListingsFiltersComponent extends FormGroup implements OnInit {
 
     @Input() private header: string = 'Filters';
-    @Input() private maxWidth: string = null;
     @Input() private defaultAvailableAfterDateNow: boolean = true;
 
 

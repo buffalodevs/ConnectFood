@@ -20,15 +20,11 @@ export class ReceiveComponent implements OnInit {
 
     @ViewChild('foodListingsFilters') private foodListingsFiltersComponent: FoodListingsFiltersComponent;
     @ViewChild('foodListings') private foodListingsComponent: FoodListingsComponent;
+    
 
-    private readonly minFiltersWidth: string;
-
-
-    constructor(
+    public constructor (
         private claimFoodListingService: ManageFoodListingService
-    ) {
-        this.minFiltersWidth = '262px';
-    }
+    ) {}
 
 
     /**

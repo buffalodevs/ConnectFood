@@ -16,16 +16,11 @@ export class SlickLeftPanelComponent {
      * Determines whether or not a back drop will be used when the panel is toggled to visible in mobile mode. Default is true.
      */
     @Input() private useBackDrop: boolean;
-    /**
-     * The maximum width of the navigation panel.
-     */
-    @Input() private maxWidth: string;
 
 
     public constructor() {
         this.buttonTitle = 'toggle';
         this.useBackDrop = true;
-        this.maxWidth = '400px';
     }
 
 

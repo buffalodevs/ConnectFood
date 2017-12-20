@@ -3,11 +3,8 @@ import { Observable } from 'rxjs/Observable';
 
 import { ScheduleDeliveryService } from '../../delivery-services/schedule-delivery.service';
 import { SessionDataService } from '../../../../common-util/services/session-data.service';
-import { DeliveryUtilService } from '../../delivery-services/delivery-util.service';
+import { Delivery, DeliveryState, DeliveryUtilService } from '../../delivery-services/delivery-util.service';
 import { ManageDeliveryService } from '../../delivery-services/manage-deliveries.service';
-
-import { Delivery } from '../../../../../../../shared/deliverer/delivery';
-import { DeliveryState } from '../../../../../../../shared/deliverer/message/get-deliveries-message';
 
 
 @Component({
@@ -76,7 +73,7 @@ export class DeliveryListingInfoComponent implements OnChanges {
             this.showStartButton = this.shouldShowStartButton(delivery);
             this.showMarkPickedUpButton = ( delivery.deliveryState === DeliveryState.started );
             this.showMarkDroppedOffButton = ( delivery.deliveryState === DeliveryState.pickedUp );
-            this.showCancelButton = ( this.isCart && Delivery.compareDeliveryStates(delivery.deliveryState, DeliveryState.droppedOff) < 0 );
+            this.showCancelButton = ( this.isCart && this.deliveryUtilService.compareDeliveryStates(delivery.deliveryState, DeliveryState.droppedOff) < 0 );
         }
     }
 
@@ -88,16 +85,7 @@ export class DeliveryListingInfoComponent implements OnChanges {
      */
     private shouldShowStartButton(delivery: Delivery): boolean {
         return this.deliveryUtilService.isPossibleDeliveryTimeNow(delivery)
-            && Delivery.compareDeliveryStates(delivery.deliveryState, DeliveryState.started) < 0;
-    }
-
-
-    /**
-     * Gets a human readable version of the contained Delivery's State.
-     * @return A human readable Delivery State.
-     */
-    private getReadableDeliveryState(): string {
-        return Delivery.getReadableDeliveryState(this.delivery.deliveryState);
+            && this.deliveryUtilService.compareDeliveryStates(delivery.deliveryState, DeliveryState.started) < 0;
     }
 
 
@@ -114,7 +102,9 @@ export class DeliveryListingInfoComponent implements OnChanges {
             this.scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, true)
                 .subscribe(() => {
                     console.log('Delivery started');
+                    this.delivery.deliveryState = DeliveryState.started;
                     this.deliveryStateChange.emit();
+                    this.startComplete = true;
                 });
         }
     }

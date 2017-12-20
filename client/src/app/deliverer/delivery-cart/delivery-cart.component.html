@@ -1,8 +1,21 @@
 <div class="container-fluid">
     <div class="row">
 
-        <div id="filters" class="col-md-0 col-lg-3 no-pad" [style.max-width]="minFiltersWidth">
-            <delivery-listings-filters header="Search Filters" [maxWidth]="minFiltersWidth" #deliveryListingsFilters></delivery-listings-filters>
+        <div id="filters" class="col-md-0 col-lg-3 no-pad">
+            <delivery-listings-filters #deliveryListingsFilters [formGroup]="deliveryListingsFilters" header="Search Filters">
+
+                <ng-container top>
+                            
+                    <h5>Delivery Status:</h5>
+                    <md-select formControlName="deliveryState" placeholder="Any Status" floatPlaceholder="never" title="Only shows deliveries with given status">
+                        <md-option *ngFor="let deliveryState of deliveryStates" [value]="deliveryState">
+                            {{ (deliveryState == null) ? 'Any Status' : deliveryUtilService.getReadableDeliveryState(deliveryState) }} 
+                        </md-option>
+                    </md-select>
+
+                </ng-container>
+
+            </delivery-listings-filters>
         </div>
 
         <div id="listings" class="col-md-12 col-lg-9">

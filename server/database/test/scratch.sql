@@ -18,8 +18,8 @@ WHERE       Receiver.appUserKey = 1
 
 --SELECT * FROM ClaimedFoodListing;
 
-SELECT * FROM DeliveryFoodListing;
+--SELECT * FROM DeliveryFoodListing;
 
-SELECT * FROM CancelledDeliveryFoodListing;
+--SELECT * FROM CancelledDeliveryFoodListing;
 
 SELECT * FROM AppUserAvailability;

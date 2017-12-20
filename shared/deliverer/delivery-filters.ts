@@ -1,3 +1,6 @@
+import { DeliveryState } from "./delivery";
+
+
 /**
  * A basic container for Food Listing Delivery filter data that may be sent to/from the server/client.
  */
@@ -34,13 +37,17 @@ export class DeliveryFilters {
          */
         public unscheduledDeliveries?: boolean,
         /**
-         * Determines if we should only retrieve Delivery Food Listings that have been established for this deliverer (Deliver Cart).
+         * Determines if we should only retrieve Delivery Food Listings that are in process (at least scheduled) for this deliverer (Deliver Cart).
          */
         public myScheduledDeliveries?: boolean,
         /**
          * Determines whether or not we should only pull back deliveries for Donors and Receivers whose availablility times match the logged in deliverer's times.
          * If not set true, then only Deliveries that are available for Delivery now will be pulled back.
          */
-        public matchAvailability?: boolean
+        public matchAvailability?: boolean,
+        /**
+         * If set, then only Deliveries with given state will be retrieved. Otherwise, all peranent Deliveries to current tab will be retrieved.
+         */
+        public deliveryState?: DeliveryState
     ) {}
 }

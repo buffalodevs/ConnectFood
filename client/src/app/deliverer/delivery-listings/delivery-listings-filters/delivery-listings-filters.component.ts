@@ -12,7 +12,6 @@ import { VehicleTypesService } from '../../../domain/vehicle-types/vehicle-types
 export class DeliveryListingsFiltersComponent extends FormGroup implements OnInit {
 
     @Input() private header: string = 'Filters';
-    @Input() private maxWidth: string = null;
 
     private readonly maxDistances: number[];
     private readonly maxTotalWeights: number[];

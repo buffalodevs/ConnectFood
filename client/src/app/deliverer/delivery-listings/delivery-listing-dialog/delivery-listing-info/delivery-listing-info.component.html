@@ -65,7 +65,7 @@
 
                 <div>
                     <b>Delivery State:</b>
-                    <div class="inline-block">{{ getReadableDeliveryState() }}</div>
+                    <div class="inline-block">{{ deliveryUtilService.getReadableDeliveryState(delivery.deliveryState) }}</div>
                 </div>
 
             </slick-expansion-panel>
@@ -92,6 +92,10 @@
 
     <p>The delivery has been started.</p>
     <p>Both the Donor and Receiver will automatically be notified concerning your expected arrival.</p>
+    <p>
+        You can view and update the status of the delivery in the
+        <a (click)="close.emit()" [routerLink]="['/deliveryCart']" class="link-content">Delivery Cart</a> tab.
+    </p>
 
     <div class="modal-button-group">
         <button md-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>
@@ -102,7 +106,7 @@
 
 <ng-container *ngIf="stateChangeComplete">
     
-    <p>The delivery status has been updated to: <b>{{ getReadableDeliveryState() }}</b>.</p>
+    <p>The delivery status has been updated to: <b>{{ deliveryUtilService.getReadableDeliveryState(delivery.deliveryState) }}</b>.</p>
     <p>Both the Donor and Receiver will automatically be notified concerning the delivery status change.</p>
 
     <div class="modal-button-group">

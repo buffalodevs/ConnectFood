@@ -34,7 +34,7 @@ export class FoodListingCartComponent implements OnInit {
     public constructor (
         private sessionDataService: SessionDataService,
         private manageFoodListingService: ManageFoodListingService
-    ) { }
+    ) {}
 
 
     /**

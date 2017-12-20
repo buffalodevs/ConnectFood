@@ -13,8 +13,9 @@ CREATE OR REPLACE FUNCTION getDeliveries
     _maxTotalWeight         FoodListing.totalWeight%TYPE                    DEFAULT NULL,   -- The maximum total weight of the delivery.
     _unscheduledDeliveries  BOOLEAN                                         DEFAULT FALSE,  -- Set to TRUE if we should only pull back deliveries that have not been scheduled.
     _myScheduledDeliveries  BOOLEAN                                         DEFAULT FALSE,  -- Set to TRUE if we should only pull back deliveries that are scheduled for deliverer.
-    _matchAvailability      BOOLEAN                                         DEFAULT TRUE    -- If TRUE, matches the availability of the Driver with that of the Receiver and Donor.
+    _matchAvailability      BOOLEAN                                         DEFAULT TRUE,   -- If TRUE, matches the availability of the Driver with that of the Receiver and Donor.
                                                                                             -- When set FALSE, only grabs Deliveries that are available to start immediately.
+    _deliveryState          DeliveryState                                   DEFAULT NULL    -- If set, then only pull back deliveries in given state.
 )
 RETURNS TABLE
 (
@@ -64,6 +65,7 @@ BEGIN
     
 
     -- TODO: Measure performance of this query! If optimizer doesn't come through here, we can select multiple results in temp table with dynamic queries above!!!
+    --       Specifically worried about impact of DISTINCT ON part of clause, although it shouldn't be a big performance penalty!
     RETURN QUERY
     SELECT DISTINCT ON (ClaimedFoodListing.claimedFoodListingKey)
             ClaimedFoodListing.claimedFoodListingKey,
@@ -168,10 +170,24 @@ BEGIN
                                                         AND ReceiverAvailability.startTime < DelivererAvailability.endTime
                                                         AND DonorAvailability.endTime > DelivererAvailability.startTime
                                                         AND DonorAvailability.startTime < DelivererAvailability.endTime))
+      -- When receiver and donor are both available now to handle delivery.
       AND       (_availableNow = FALSE              OR (    ReceiverAvailability.endTime > _nowRelativeAvailabilityTimes
                                                         AND ReceiverAvailability.startTime < _nowRelativeAvailabilityTimes
                                                         AND DonorAvailability.endTime > _nowRelativeAvailabilityTimes
-                                                        AND DonorAvailability.startTime < _nowRelativeAvailabilityTimes))  
+                                                        AND DonorAvailability.startTime < _nowRelativeAvailabilityTimes))
+      -- Apply delivery state filters
+      AND       (_deliveryState IS NULL             OR _deliveryState = (SELECT * FROM getDeliveryState(DeliveryFoodListing.scheduledStartTime,
+                                                                                                        DeliveryFoodListing.startTime,
+                                                                                                        DeliveryFoodListing.pickUpTime,
+                                                                                                        DeliveryFoodListing.dropOffTime)))
+      -- By default, don't include dropped off (completed) deliveries unless explicit delivery state filter selected!
+      AND       (_deliveryState IS NOT NULL         OR DeliveryFoodListing.dropOffTime IS NULL)
+    ORDER BY    ClaimedFoodListing.claimedFoodListingKey,
+                -- Sort by relavent Delivery State filter.
+                CASE WHEN _deliveryState IS NULL        THEN DeliveryFoodListing.scheduledStartTime END ASC,
+                CASE WHEN _deliveryState = 'started'    THEN DeliveryFoodListing.startTime END ASC,
+                CASE WHEN _deliveryState = 'pickedUp'   THEN DeliveryFoodListing.pickUpTime END ASC,
+                CASE WHEN _deliveryState = 'droppedOff' THEN DeliveryFoodListing.dropOffTime END DESC -- DESC for most recently completed.
     OFFSET      _retrievalOffset
     LIMIT       _retrievalAmount;
 
@@ -179,4 +195,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-SELECT * FROM getDeliveries(1, 0, 10, null, null, 15, null, true, null, null);
+--SELECT * FROM getDeliveries(1, 0, 10, null, null, 15, null, true, null, false, null);

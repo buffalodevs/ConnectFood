@@ -1,11 +1,10 @@
 <div class="container-fluid">
     <div class="row">
-        <div class="col-lg-3 col-md-0 no-pad" id="filters" [style.max-width]="'262px'">
+        <div class="col-lg-3 col-md-0 no-pad" id="filters">
 
-            <app-food-listings-filters header="Cart Filters" [formGroup]="foodListingsFilters"
-             [defaultAvailableAfterDateNow]="false" maxWidth="262px" #foodListingsFilters>
-
+            <app-food-listings-filters #foodListingsFilters [formGroup]="foodListingsFilters" header="Cart Filters" [defaultAvailableAfterDateNow]="false">
                 <ng-container top>
+
                     <h5>Listings Status:</h5>
                     <div class="form-group">
                         <md-radio-group formControlName="listingsStatus">
@@ -27,8 +26,8 @@
 
                         </md-radio-group>
                     </div>
-                </ng-container>
 
+                </ng-container>
             </app-food-listings-filters>
 
         </div>

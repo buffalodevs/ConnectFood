@@ -20,6 +20,7 @@
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     background-color: white;
+    max-width: 262px;
 }
 
 #slick-left-panel-button {

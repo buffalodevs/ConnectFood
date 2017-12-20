@@ -1,8 +1,8 @@
 <div class="container-fluid">
     <div id="receivers-row" class="row">
 
-        <div id="filters" class="col-md-0 col-lg-3 no-pad" [style.max-width]="minFiltersWidth">
-            <app-food-listings-filters header="Search Filters" [formGroup]="foodListingsFilters" [maxWidth]="minFiltersWidth" #foodListingsFilters>
+        <div id="filters" class="col-md-0 col-lg-3 no-pad">
+            <app-food-listings-filters #foodListingsFilters [formGroup]="foodListingsFilters" header="Search Filters">
 
                 <ng-container bottom>
                     

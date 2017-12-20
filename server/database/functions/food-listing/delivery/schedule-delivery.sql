@@ -43,7 +43,7 @@ BEGIN
 
     -- If starting immediately, then update the state of the new delivery to started!
     IF (_startImmediately) THEN
-        PERFORM updateDeliveryState(_deliveryFoodListingKey, +deliveryAppUserKey, 'started', _currentTimestamp);
+        PERFORM updateDeliveryState(_deliveryFoodListingKey, _deliveryAppUserKey, 'started', _currentTimestamp);
     END IF;
 
     RETURN QUERY

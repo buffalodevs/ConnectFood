@@ -2,35 +2,45 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Observable } from "rxjs/Observable";
 
+import { DeliveryUtilService } from '../delivery-listings/delivery-services/delivery-util.service';
 import { DeliveryListingsComponent } from '../delivery-listings/delivery-listings.component';
 import { DeliveryListingsFiltersComponent } from '../delivery-listings/delivery-listings-filters/delivery-listings-filters.component';
 
 import { DeliveryFilters } from '../../../../../shared/deliverer/delivery-filters';
-import { Delivery } from '../../../../../shared/deliverer/delivery';
+import { Delivery, DeliveryState } from '../../../../../shared/deliverer/delivery';
 
 
 @Component({
     selector: 'delivery-cart',
     templateUrl: './delivery-cart.component.html',
-    styleUrls: ['./delivery-cart.component.css', '../../slick-filtered-list/slick-filtered-list.component.css']
+    styleUrls: [
+        './delivery-cart.component.css',
+        '../delivery-listings/delivery-listings-filters/delivery-listings-filters.component.css',
+        '../../slick-filtered-list/slick-filtered-list.component.css'
+    ]
 })
 export class DeliveryCartComponent implements OnInit {
 
     @ViewChild('deliveryListingsFilters') private deliveryListingsFiltersComponent: DeliveryListingsFiltersComponent;
     @ViewChild('deliveryListings') private deliveryListingsComponent: DeliveryListingsComponent;
 
-    private readonly minFiltersWidth: string;
+    private deliveryStates: string[];
 
 
-    public constructor () {
-        this.minFiltersWidth = '262px';
+    public constructor (
+        private deliveryUtilService: DeliveryUtilService
+    ) {
+        this.deliveryStates = this.deliveryUtilService.getDeliveryStateVals();
+        this.deliveryStates[0] = null; // Replace 'Unscheduled' with null as first element for default 'Any State' value.
     }
 
 
     /**
      * Executes after all input bindings have been established but before view children have been fully initialized.
      */
-    public ngOnInit(): void {}
+    public ngOnInit(): void {
+        this.deliveryListingsFiltersComponent.addControl('deliveryState', new FormControl(null));
+    }
 
 
     /**

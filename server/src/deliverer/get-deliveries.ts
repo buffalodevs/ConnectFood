@@ -19,11 +19,11 @@ import { DateFormatter } from "./../../../shared/common-util/date-formatter";
 export function getDeliveries(filters: DeliveryFilters, myAppUserKey: number, myGPSCoordinate: GPSCoordinate): Promise<Delivery[]> {
    
     // Build our prepared statement.
-    let queryString: string = 'SELECT * FROM getDeliveries($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);';
+    let queryString: string = 'SELECT * FROM getDeliveries($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);';
     let queryArgs: any[] = [ myAppUserKey, filters.retrievalOffset, filters.retrievalAmount,
                              filters.deliveryFoodListingKey, filters.claimedFoodListingKey,
                              filters.maxDistance, filters.maxTotalWeight, filters.unscheduledDeliveries,
-                             filters.myScheduledDeliveries, filters.matchAvailability ];
+                             filters.myScheduledDeliveries, filters.matchAvailability, filters.deliveryState ];
 
     // Replace any NULL query arguments with literals in query string.
     queryString = fixNullQueryArgs(queryString, queryArgs);
