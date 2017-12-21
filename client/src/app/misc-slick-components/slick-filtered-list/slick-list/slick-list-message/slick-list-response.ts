@@ -1,4 +1,4 @@
-import { FoodWebResponse } from "./../../../../../../shared/message-protocol/food-web-response";
+import { FoodWebResponse } from "./../../../../../../../shared/message-protocol/food-web-response";
 
 
 export class SlickListResponse<LIST_T> extends FoodWebResponse {

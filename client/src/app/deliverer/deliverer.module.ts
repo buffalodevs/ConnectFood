@@ -6,9 +6,9 @@ import { AgmCoreModule } from '@agm/core';
 
 import { CommonUtilModule } from '../common-util/common-util.module';
 import { AngularMaterialWrapperModule } from '../angular-material-wrapper/angular-material-wrapper.module';
-import { SlickFilteredListModule } from '../slick-filtered-list/slick-filtered-list.module';
-import { SlickMapModule } from '../slick-map/slick-map.module';
-import { SlickWeekdaySchedulerModule } from '../slick-weekday-scheduler/slick-weekday-scheduler.module';
+import { SlickFilteredListModule } from '../misc-slick-components/slick-filtered-list/slick-filtered-list.module';
+import { SlickMapModule } from '../misc-slick-components/slick-map/slick-map.module';
+import { SlickWeekdaySchedulerModule } from '../misc-slick-components/slick-weekday-scheduler/slick-weekday-scheduler.module';
 
 import { DeliveryListingsComponent } from './delivery-listings/delivery-listings.component';
 import { DeliveryListingsFiltersComponent } from './delivery-listings/delivery-listings-filters/delivery-listings-filters.component';

@@ -5,8 +5,8 @@ import { FoodWebResponse } from '../../message-protocol/food-web-response';
 import { Delivery, DeliveryState } from "../delivery";
 export { Delivery, DeliveryState };
 
-import { SlickListResponse } from '../../../client/src/app/slick-filtered-list/slick-list/slick-list-message/slick-list-response';
-import { SlickListRequest } from '../../../client/src/app/slick-filtered-list/slick-list/slick-list-message/slick-list-request';
+import { SlickListResponse } from '../../../client/src/app/misc-slick-components/slick-filtered-list/slick-list/slick-list-message/slick-list-response';
+import { SlickListRequest } from '../../../client/src/app/misc-slick-components/slick-filtered-list/slick-list/slick-list-message/slick-list-request';
 
 
 /**

@@ -13,7 +13,7 @@ import { FoodListingsFilters, LISTINGS_STATUS } from "../../../../../shared/rece
 @Component({
     selector: 'app-receive',
     templateUrl: './receive.component.html',
-    styleUrls: ['./receive.component.css', '../../slick-filtered-list/slick-filtered-list.component.css'],
+    styleUrls: ['./receive.component.css', '../../misc-slick-components/slick-filtered-list/slick-filtered-list.component.css'],
     providers: [ManageFoodListingService]
 })
 export class ReceiveComponent implements OnInit {

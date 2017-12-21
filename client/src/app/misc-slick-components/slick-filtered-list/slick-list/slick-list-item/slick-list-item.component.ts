@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 
-import { ResponsiveService } from '../../../common-util/services/responsive.service';
+import { ResponsiveService } from '../../../../common-util/services/responsive.service';
 
 
 @Component({

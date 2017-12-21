@@ -14,7 +14,7 @@ import { FoodWebResponse } from '../../../../../../../shared/message-protocol/fo
     styleUrls: [
         './delivery-listing-info.component.css',
         './../../delivery-listings.component.css',
-        './../../../../slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
+        './../../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
     ]
 })
 export class DeliveryListingInfoComponent implements OnChanges {

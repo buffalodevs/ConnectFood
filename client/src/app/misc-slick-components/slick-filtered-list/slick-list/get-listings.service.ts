@@ -2,7 +2,7 @@
 import { Injectable, Optional } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { RequestService, Response } from "../../common-util/services/request.service";
+import { RequestService, Response } from "../../../common-util/services/request.service";
 import { SlickListRequest, SlickListFilters } from './slick-list-message/slick-list-request';
 import { SlickListResponse } from './slick-list-message/slick-list-response';
 

@@ -2,7 +2,7 @@ import { Component, OnInit, OnChanges, Input, forwardRef, SimpleChanges, SimpleC
 import { ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, FormControl, ValidatorFn } from '@angular/forms';
 
 import { ConcatPatternParserService } from './concat-pattern-parser.service';
-import { ValidationService } from '../common-util/services/validation.service';
+import { ValidationService } from '../../common-util/services/validation.service';
 
 
 /**

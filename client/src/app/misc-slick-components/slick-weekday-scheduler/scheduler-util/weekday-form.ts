@@ -3,8 +3,8 @@ import { FormGroup, FormArray, FormControl, ValidatorFn } from '@angular/forms';
 
 import { WeekdaySplitService } from './weekday-split.service';
 
-import { TimeRange } from '../../../../../shared/app-user/time-range';
-import { DateFormatter } from '../../../../../shared/common-util/date-formatter';
+import { TimeRange } from '../../../../../../shared/app-user/time-range';
+import { DateFormatter } from '../../../../../../shared/common-util/date-formatter';
 
 
 export class WeekdayForm extends FormGroup {

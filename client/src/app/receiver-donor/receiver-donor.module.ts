@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { CommonUtilModule } from '../common-util/common-util.module';
 import { AngularMaterialWrapperModule } from '../angular-material-wrapper/angular-material-wrapper.module';
-import { SlickFilteredListModule } from '../slick-filtered-list/slick-filtered-list.module';
+import { SlickFilteredListModule } from '../misc-slick-components/slick-filtered-list/slick-filtered-list.module';
 import { CommonFoodListingDomainsModule } from '../domain/common-food-listing-domains.module';
 import { ImageCropperModule } from 'ng2-img-cropper';
 

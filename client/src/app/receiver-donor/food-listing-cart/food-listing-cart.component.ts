@@ -16,7 +16,7 @@ import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 @Component({
     selector: 'food-listing-cart',
     templateUrl: './food-listing-cart.component.html',
-    styleUrls: ['./food-listing-cart.component.css', '../../slick-filtered-list/slick-filtered-list.component.css'],
+    styleUrls: ['./food-listing-cart.component.css', '../../misc-slick-components/slick-filtered-list/slick-filtered-list.component.css'],
     providers: [
         SessionDataService,
         ManageFoodListingService

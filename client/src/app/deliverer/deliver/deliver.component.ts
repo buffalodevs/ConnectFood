@@ -10,7 +10,7 @@ import { DeliveryFilters } from '../../../../../shared/deliverer/delivery-filter
 @Component({
     selector: 'deliver',
     templateUrl: './deliver.component.html',
-    styleUrls: ['./deliver.component.css', '../../slick-filtered-list/slick-filtered-list.component.css']
+    styleUrls: ['./deliver.component.css', '../../misc-slick-components/slick-filtered-list/slick-filtered-list.component.css']
 })
 export class DeliverComponent implements OnInit {
 

@@ -1,6 +1,6 @@
 "use strict";
 import { Injectable } from '@angular/core';
-import { StringManipulation } from '../../../../shared/common-util/string-manipulation';
+import { StringManipulation } from '../../../../../shared/common-util/string-manipulation';
 
 
 /**

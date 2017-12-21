@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
 
-import { AbstractSlickList } from '../../slick-filtered-list/slick-list/abstract-slick-list';
-import { AbstractSlickListDialog } from '../../slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
+import { AbstractSlickList } from '../../misc-slick-components/slick-filtered-list/slick-list/abstract-slick-list';
+import { AbstractSlickListDialog } from '../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
 import { GetDeliveriesService } from './delivery-services/get-deliveries.service';
 import { DeliveryUtilService } from './delivery-services/delivery-util.service';
 

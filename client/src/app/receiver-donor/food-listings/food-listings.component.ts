@@ -2,8 +2,8 @@ import { Component, Input, ViewChild } from '@angular/core';
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { Observable } from "rxjs/Observable";
 
-import { AbstractSlickList } from './../../slick-filtered-list/slick-list/abstract-slick-list';
-import { AbstractSlickListDialog } from '../../slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
+import { AbstractSlickList } from './../../misc-slick-components/slick-filtered-list/slick-list/abstract-slick-list';
+import { AbstractSlickListDialog } from '../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
 import { GetFoodListingsService } from './food-listing-services/get-food-listings.service';
 
 import { FoodListing } from '../../../../../shared/receiver-donor/food-listing';

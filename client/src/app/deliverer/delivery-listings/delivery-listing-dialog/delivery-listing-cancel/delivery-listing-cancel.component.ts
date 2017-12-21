@@ -10,7 +10,10 @@ import { DeliveryState } from '../../../../../../../shared/deliverer/message/get
 @Component({
     selector: 'delivery-listing-cancel',
     templateUrl: './delivery-listing-cancel.component.html',
-    styleUrls: ['./delivery-listing-cancel.component.css', './../../../../slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'],
+    styleUrls: [
+        './delivery-listing-cancel.component.css',
+        './../../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
+    ],
     providers: [CancelDeliveryService]
 })
 export class DeliveryListingCancelComponent {

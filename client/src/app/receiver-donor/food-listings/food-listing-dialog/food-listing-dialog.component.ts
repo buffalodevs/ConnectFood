@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild } from '@angular/core';
 
-import { AbstractSlickListDialog } from '../../../slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
-import { SlickListDialogComponent } from '../../../slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component';
+import { AbstractSlickListDialog } from '../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
+import { SlickListDialogComponent } from '../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component';
 import { ResponsiveService } from '../../../common-util/services/responsive.service';
 
 import { FoodListing } from './../../../../../../shared/receiver-donor/food-listing';
@@ -13,7 +13,7 @@ import { FoodListing } from './../../../../../../shared/receiver-donor/food-list
     styleUrls: [
         './food-listing-dialog.component.css',
         '../food-listings.component.css',
-        '../../../slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
+        '../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
     ]
 })
 export class FoodListingDialogComponent extends AbstractSlickListDialog<FoodListing> {

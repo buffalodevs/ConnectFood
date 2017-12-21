@@ -1,14 +1,14 @@
 import { Component, OnInit, Input, OnChanges, forwardRef, SimpleChange, SimpleChanges } from '@angular/core';
 import { FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormArray, Validators } from '@angular/forms';
 
-import { AbstractModelDrivenComponent } from '../common-util/components/abstract-model-driven-component';
+import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
 import { AvailabilityTimes } from './scheduler-util/availability-times';
 import { WeekdayForm } from './scheduler-util/weekday-form';
 import { WeekdaySplitService } from './scheduler-util/weekday-split.service';
-import { ValidationService } from '../common-util/services/validation.service';
+import { ValidationService } from '../../common-util/services/validation.service';
 
-import { DateFormatter } from '../../../../shared/common-util/date-formatter';
-import { TimeRange } from '../../../../shared/app-user/time-range';
+import { DateFormatter } from '../../../../../shared/common-util/date-formatter';
+import { TimeRange } from '../../../../../shared/app-user/time-range';
 
 
 @Component({

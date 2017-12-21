@@ -3,11 +3,11 @@ import { FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormBu
 
 import { WeekdaySplitService } from '../scheduler-util/weekday-split.service';
 import { WeekdayForm } from '../scheduler-util/weekday-form';
-import { ValidationService } from '../../common-util/services/validation.service';
+import { ValidationService } from '../../../common-util/services/validation.service';
 
-import { DateFormatter } from '../../../../../shared/common-util/date-formatter';
-import { TimeRange } from '../../../../../shared/app-user/time-range';
-import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
+import { DateFormatter } from '../../../../../../shared/common-util/date-formatter';
+import { TimeRange } from '../../../../../../shared/app-user/time-range';
+import { AbstractModelDrivenComponent } from '../../../common-util/components/abstract-model-driven-component';
 
 
 @Component({

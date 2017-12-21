@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { GetListingsService } from '../../../slick-filtered-list/slick-list/get-listings.service';
+import { GetListingsService } from '../../../misc-slick-components/slick-filtered-list/slick-list/get-listings.service';
 import { RequestService } from '../../../common-util/services/request.service';
 
 import { DeliveryFilters, GetDeliveriesRequest } from '../../../../../../shared/deliverer/message/get-deliveries-message';

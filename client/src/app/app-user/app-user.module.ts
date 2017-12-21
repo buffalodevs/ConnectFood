@@ -6,8 +6,8 @@ import { BusyModule } from 'angular2-busy';;
 
 import { CommonUtilModule } from '../common-util/common-util.module';
 import { AngularMaterialWrapperModule } from '../angular-material-wrapper/angular-material-wrapper.module';
-import { SlickInputGroupModule } from '../slick-input-group/slick-input-group.module';
-import { SlickWeekdaySchedulerModule } from '../slick-weekday-scheduler/slick-weekday-scheduler.module';
+import { SlickInputGroupModule } from '../misc-slick-components/slick-input-group/slick-input-group.module';
+import { SlickWeekdaySchedulerModule } from '../misc-slick-components/slick-weekday-scheduler/slick-weekday-scheduler.module';
 
 import { PhoneComponent } from './common-app-user/phone/phone.component';
 import { LoginComponent } from './login/login.component';

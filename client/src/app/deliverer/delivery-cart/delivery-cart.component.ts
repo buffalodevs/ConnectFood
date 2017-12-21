@@ -16,7 +16,7 @@ import { Delivery, DeliveryState } from '../../../../../shared/deliverer/deliver
     styleUrls: [
         './delivery-cart.component.css',
         '../delivery-listings/delivery-listings-filters/delivery-listings-filters.component.css',
-        '../../slick-filtered-list/slick-filtered-list.component.css'
+        '../../misc-slick-components/slick-filtered-list/slick-filtered-list.component.css'
     ]
 })
 export class DeliveryCartComponent implements OnInit {

@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, Output, ViewChild, EventEmitter } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 
-import { AbstractSlickListDialog } from '../../../slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
-import { SlickListDialogComponent } from '../../../slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component';
+import { AbstractSlickListDialog } from '../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
+import { SlickListDialogComponent } from '../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component';
 import { DeliveryUtilService } from '../delivery-services/delivery-util.service';
 import { CancelDeliveryService } from '../delivery-services/cancel-delivery.service';
 
@@ -26,7 +26,7 @@ enum DeliveryDialogState {
     styleUrls: [
         './delivery-listing-dialog.component.css',
         './../delivery-listings.component.css',
-        './../../../slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
+        './../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
     ]
 })
 export class DeliveryListingDialogComponent extends AbstractSlickListDialog <Delivery> {

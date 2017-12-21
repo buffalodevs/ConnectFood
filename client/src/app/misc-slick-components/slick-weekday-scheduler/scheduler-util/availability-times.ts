@@ -1,6 +1,6 @@
 "use strict";
-import { TimeRange } from '../../../../../shared/app-user/time-range';
-import { DateFormatter } from '../../../../../shared/common-util/date-formatter';
+import { TimeRange } from '../../../../../../shared/app-user/time-range';
+import { DateFormatter } from '../../../../../../shared/common-util/date-formatter';
 import { WeekdaySplitService } from './weekday-split.service';
 
 
