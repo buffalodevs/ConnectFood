@@ -4,6 +4,7 @@ import { query, QueryResult } from "../../database-util/connection-pool";
 import { SessionData, AppUserInfo } from "../../common-util/session-data";
 import { login } from '../login-app-user/app-user-login';
 import { addOrUpdateAppUser } from "./app-user-add-update";
+import { AppUserErrorMsgs } from "../../../../shared/app-user/app-user-error-msgs";
 
 
 /**
@@ -34,7 +35,7 @@ export function updateAppUser(appUserUpdateInfo: AppUserInfo, newPassword: strin
         })
         .catch((err: Error) => {
             console.log(err);
-            throw new Error('Update failed. ' + err.message);
+            throw new Error(err.message);
         });
 }
 
@@ -53,7 +54,7 @@ function checkPassword(currentEmail: string, currentPassword: string): Promise<v
         })
         .catch((err: Error) => {
             console.log(err);
-            throw new Error('Current password is incorrect.');
+            throw new Error(AppUserErrorMsgs.INCORRECT_PASSWORD);
         })
 }
 

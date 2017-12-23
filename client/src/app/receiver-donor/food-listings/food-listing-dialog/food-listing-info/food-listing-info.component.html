@@ -1,0 +1,146 @@
+<!-- The body of the dialog is in the format of a slick list item! -->
+<slick-list-item [includeDivider]="false">
+                
+    <ng-container slick-list-item-left>
+        <img DefaultImg [src]="foodListing.imgUrl" alt="Image Not Available"/>
+    </ng-container>
+    
+    <div slick-list-item-right-body class="row">
+    
+        <!-- Donor Description (Column 1) -->
+        <div class="col-lg-6 col-md-12 desktop-space-bottom" *ngIf="!isDonatedCart">
+
+            <slick-expansion-panel>
+                    
+                <ng-container md-panel-title>
+                    Donor Info
+                </ng-container>
+                
+                <div class="space-bottom">
+                    <b>Donor Organization:</b>
+                    <span class="inline-block">{{ foodListing.donorInfo.organizationName }}</span>
+                </div>
+
+                <div class="space-bottom">
+                    <b class="inline-block">Donor Administrator:</b>
+                    <span class="inline-block">{{ foodListing.donorInfo.firstName }} {{ foodListing.donorInfo.lastName }}</span>
+                </div>
+
+                <div class="space-bottom">
+                    <div class="inline-block">
+                        <b>Donor Address:</b>
+                    </div>
+                    <div class="inline-block">
+                        <span>{{ foodListing.donorInfo.address }}</span><br>
+                        <span>
+                            {{ foodListing.donorInfo.city }}, {{ foodListing.donorInfo.state }} {{ foodListing.donorInfo.zip }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="space-bottom">
+                    <b>Donor Phone:</b>
+                    <a href="tel:{{ foodListing.donorInfo.phone }}" class="inline-block" class="link-content">{{ foodListing.donorInfo.phone }}</a>
+                </div>
+
+                <div class="space-bottom">
+                    <b>Donor Email:</b>
+                    <a href="mailto:{{ foodListing.donorInfo.email }}" class="inline-block" class="link-content">{{ foodListing.donorInfo.email }}</a>
+                </div>
+
+                <div class ="space-bottom" *ngIf="foodListing.donorInfo.drivingDistance != null">
+                    <b>Driving Distance:</b>
+                    <span class="inline-block">{{ foodListing.donorInfo.drivingDistance + ' miles' }}</span>
+                </div>
+
+            </slick-expansion-panel>
+
+        </div> <!-- Donor Description (Column 1) -->
+
+        <!-- Misc Description (Column 2) -->
+        <div class="col-lg-6 col-md-12 desktop-space-bottom">
+
+            <slick-expansion-panel>
+
+                <ng-container md-panel-title>
+                    Food Info
+                </ng-container>
+
+                <div class="space-bottom">
+                    <b>Available Until:</b> {{ foodListing.availableUntilDate }}
+                </div>
+
+                <div class="space-bottom">
+                    <b>Perishable:</b>
+                    <i class="material-icons" *ngIf="foodListing.perishable" style="color:green">check</i>
+                    <i class="material-icons" *ngIf="!foodListing.perishable" style="color:red">clear</i>
+                    <span>{{ foodListing.perishable ? 'Yes' : 'No'}}</span>
+                </div>
+                
+                <div id="food-types-container" class="space-bottom">
+                    <b>Present Food Types:</b><br>
+                    <app-food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true"
+                    [condensedDisplay]="!responsiveService.widthGreaterThan(767)" [maxNumColumns]="2"></app-food-types>
+                </div>
+
+                <!-- Units Counts Container -->
+                <div class="space-bottom">
+
+                    <div *ngIf="!isClaimedCart">
+                        <b>Available Count:</b>
+                        <span class="inline-block">
+                            {{ foodListing.unitsInfo.availableUnitsCount }} of
+                            {{ foodListing.unitsInfo.totalUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }}
+                        </span>
+                    </div>
+
+                    <div *ngIf="isDonatedCart">
+                        <b>Donor On-Hand Count:</b>
+                        <span class="inline-block">
+                            {{ foodListing.unitsInfo.donorOnHandUnitsCount }} of
+                            {{ foodListing.unitsInfo.totalUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }}
+                        </span>
+                    </div>
+
+                    <div *ngIf="isClaimedCart">
+                        <b>Claimed Count:</b>
+                        <span class="inline-block">
+                            {{ foodListing.unitsInfo.myClaimedUnitsCount }} of
+                            <!-- Instead of total units here, we have total units obtainable by this receiver -->
+                            {{ foodListing.unitsInfo.availableUnitsCount + foodListing.unitsInfo.myClaimedUnitsCount }}
+                            {{ foodListing.unitsInfo.unitsLabel }}
+                        </span>
+                    </div>
+
+                </div> <!-- Units Counts Container -->
+
+            </slick-expansion-panel>
+
+        </div> <!-- Misc Description (Column 2) -->
+
+        <div class="col-md-12">
+
+            <slick-expansion-panel [collapseWidth]="null">
+                    
+                <ng-container md-panel-title>
+                    Description
+                </ng-container>
+        
+            <span class="inline-block">{{ foodListing.foodDescription }}</span>
+
+            </slick-expansion-panel>
+
+        </div>
+    
+    </div>
+
+</slick-list-item>
+
+
+<div class="modal-button-group">
+    
+    <button md-raised-button color="primary" class="button-md" (click)="toClaim.emit()" *ngIf="!isClaimedCart && !isDonatedCart">Claim</button>
+    <button md-raised-button color="primary" class="button-md warn-button" (click)="unclaimSelectedFoodListing()" *ngIf="isClaimedCart">Unclaim</button>
+    <button md-raised-button color="primary" class="button-md warn-button" (click)="removeSelectedFoodListing()" *ngIf="isDonatedCart">Remove</button>
+
+</div>

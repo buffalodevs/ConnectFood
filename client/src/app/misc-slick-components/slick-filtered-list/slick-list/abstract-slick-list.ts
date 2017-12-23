@@ -16,7 +16,7 @@ export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilt
 
     /**
      * A constructor that should only be accessed by child classes. This class is an abstract base class that should not be directly instantiated!
-     * @param getListingsService The service used to get listings from the server (Can either e GetListingsService or a derived class).
+     * @param getListingsService The service used to get listings from the server (Can either be GetListingsService or a derived class).
      * @param ROUTE The route that will be used to fetch list data.
      */
     protected constructor (
@@ -68,14 +68,14 @@ export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilt
     /**
      * Sets a given list item as selected and displays a set dialog if there is one.
      * @param selectedListIndex The index of the list item to select.
-     * @param noDisplayDialog Default is false. Set to true if the set dialog should not be displayed upon selection.
+     * @param displayDialog Default is true. Set to false if the set dialog should not be displayed upon selection.
      */
-    public selectListing(selectedListIndex: number, noDisplayDialog: boolean = false): void {
+    public selectListing(selectedListIndex: number, displayDialog: boolean = true): void {
 
         this.selectedListIndex = selectedListIndex;
 
         // If we wish to display the dialog and we have one set, then open it.
-        if (!noDisplayDialog && this.slickListDialog != null) {
+        if (displayDialog && this.slickListDialog != null) {
             this.slickListDialog.open(this.getSelectedListing());
         }
     }
@@ -96,7 +96,7 @@ export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilt
 
     /**
      * Removes the selected listing.
-     * @param close Determines whether or not to also close any open dialog. Default is true.
+     * @param close Default is true. Determines whether or not to also close any open dialog.
      */
     public removeSelectedListing(close: boolean = true): void {
 

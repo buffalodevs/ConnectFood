@@ -3,14 +3,18 @@ import { SlickListDialogComponent } from "./slick-list-dialog.component";
 
 
 /**
- * Handles implementations of opening and closing dialog. Simply need to assign an actual implementation of SlickListDialogInterface to slickListDialog member.
- * This can be done by redeclaring it in the child as a view child (and the view child can be SlickListDialogComponent).
+ * Handles implementations of opening and closing dialog.
  */
 export abstract class AbstractSlickListDialog<LIST_T> {
 
     protected slickListDialog: SlickListDialogComponent;
     protected dialogData: LIST_T;
-    public removeListing: EventEmitter<boolean>;
+
+    /**
+     * Emitted whenever the dialogData should be removed from parent's list data.
+     * The (optional default true) boolean parameter signifies whether or not to close this dialog upon removal of the list data.
+     */
+    protected removeListing: EventEmitter<boolean>;
 
     
     protected constructor() {

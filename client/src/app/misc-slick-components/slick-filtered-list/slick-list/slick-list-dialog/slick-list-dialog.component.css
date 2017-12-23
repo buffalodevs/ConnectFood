@@ -3,7 +3,7 @@
 }
 
 ::ng-deep .modal-backdrop.fade.show {
-    opacity: 1 !important;
+    opacity: 0.9 !important;
     background-color: #444;
 }
 

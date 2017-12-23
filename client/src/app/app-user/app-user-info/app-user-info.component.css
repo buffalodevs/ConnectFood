@@ -71,3 +71,7 @@ md-icon {
 :host ::ng-deep md-input-container {
     width: 100%;
 }
+
+#state {
+    margin-bottom: 15px;
+}

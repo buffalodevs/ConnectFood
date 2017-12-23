@@ -5,7 +5,6 @@ import { Observable } from "rxjs/Observable";
 
 import { FoodListingsFiltersComponent } from "../food-listings/food-listings-filters/food-listings-filters.component";
 import { FoodListingsComponent } from "../food-listings/food-listings.component";
-import { ManageFoodListingService } from "../food-listings/food-listing-services/manage-food-listing.service";
 import { SessionDataService } from '../../common-util/services/session-data.service';
 
 import { FoodListing } from "../../../../../shared/receiver-donor/food-listing";
@@ -16,11 +15,7 @@ import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 @Component({
     selector: 'food-listing-cart',
     templateUrl: './food-listing-cart.component.html',
-    styleUrls: ['./food-listing-cart.component.css', '../../misc-slick-components/slick-filtered-list/slick-filtered-list.component.css'],
-    providers: [
-        SessionDataService,
-        ManageFoodListingService
-    ]
+    styleUrls: ['./food-listing-cart.component.css', '../../misc-slick-components/slick-filtered-list/slick-filtered-list.component.css']
 })
 export class FoodListingCartComponent implements OnInit {
 
@@ -32,8 +27,7 @@ export class FoodListingCartComponent implements OnInit {
 
 
     public constructor (
-        private sessionDataService: SessionDataService,
-        private manageFoodListingService: ManageFoodListingService
+        private sessionDataService: SessionDataService
     ) {}
 
 
@@ -75,37 +69,5 @@ export class FoodListingCartComponent implements OnInit {
 
     private isDonatedCart(): boolean {
         return (this.foodListingsFiltersComponent.value.listingsStatus === LISTINGS_STATUS.myDonatedListings);
-    }
-
-
-    private unclaimSelectedFoodListing(): void {
-        if (confirm('Are you sure you want to unclaim the food?\nThis cannot be undone.')) {
-            let selectedFoodListing: FoodListing = this.foodListingsComponent.getSelectedListing();
-            let observer: Observable<void> = this.manageFoodListingService.unclaimFoodListing(selectedFoodListing.foodListingKey);
-
-            observer.subscribe(
-                () => {
-                    this.foodListingsComponent.removeSelectedListing();
-                },
-                (err: Error) => {
-                    console.log(err);
-                }
-            );
-        }
-    }
-
-
-    private removeSelectedFoodListing(): void {
-        let selectedFoodListing: FoodListing = this.foodListingsComponent.getSelectedListing();
-        let observer: Observable<void> = this.manageFoodListingService.removeFoodListing(selectedFoodListing.foodListingKey);
-
-        observer.subscribe(
-            () => {
-                this.foodListingsComponent.removeSelectedListing();
-            },
-            (err: Error) => {
-                console.log(err);
-            }
-        );
     }
 }

@@ -3,7 +3,9 @@ import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging
 import { connect, query, Client, QueryResult } from '../../database-util/connection-pool';
 import { checkPassword } from '../common-app-user/password-util';
 import { SessionData, AppUserInfo } from "../../common-util/session-data";
+
 import { TimeRange } from '../../../../shared/app-user/time-range';
+import { AppUserErrorMsgs} from '../../../../shared/app-user/app-user-error-msgs';
 
 
 /**
@@ -21,7 +23,7 @@ export function login(email: string, password: string): Promise<SessionData> {
         .catch((err: Error) => {
             console.log(err);
             // Return general login error message so that we do not give away any sensitive details to potential hacker.
-            return Promise.reject(new Error('Login information is incorrect'));
+            return Promise.reject(new Error(AppUserErrorMsgs.INCORRECT_LOGIN));
         });
 }
 

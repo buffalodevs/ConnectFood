@@ -55,7 +55,7 @@ export function handleRemoveFoodListing(request: Request, response: Response): v
     // The currently logged in user must be the original Donor (have authority to remove Food Listing).
     let donorAppUserKey: number = SessionData.loadSessionData(request).appUserKey;
 
-    removeFoodListing(removeFoodListingRequest.foodListingKey, donorAppUserKey)
+    removeFoodListing(removeFoodListingRequest.foodListingKey, donorAppUserKey, removeFoodListingRequest.unitsCount)
         .then(() => {
             response.send(new FoodWebResponse(true, 'Food listing has been successfully removed.'));
         })
@@ -72,7 +72,7 @@ export function handleClaimFoodListing(request: Request, response: Response): vo
     let claimFoodListingRequest: ManageFoodListingRequest = request.body;
     let claimedByAppUserKey: number = SessionData.loadSessionData(request).appUserKey;
 
-    claimFoodListing(claimFoodListingRequest.foodListingKey, claimedByAppUserKey)
+    claimFoodListing(claimFoodListingRequest.foodListingKey, claimedByAppUserKey, claimFoodListingRequest.unitsCount)
         .then(() => {
             response.send(new FoodWebResponse(true, 'Food listing has been successfully claimed.'));
         })
@@ -89,7 +89,7 @@ export function handleUnclaimFoodListing(request: Request, response: Response): 
     let unclaimFoodListingRequest: ManageFoodListingRequest = request.body;
     let claimedByAppUserKey: number = SessionData.loadSessionData(request).appUserKey;
 
-    unclaimFoodListing(unclaimFoodListingRequest.foodListingKey, claimedByAppUserKey)
+    unclaimFoodListing(unclaimFoodListingRequest.foodListingKey, claimedByAppUserKey, unclaimFoodListingRequest.unitsCount)
         .then(() => {
             response.send(new FoodWebResponse(true, 'Food listing has been successfully unclaimed.'));
         })

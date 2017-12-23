@@ -1,5 +1,6 @@
 <div class="container-fluid">
     <div class="row">
+        
         <div class="col-lg-3 col-md-0 no-pad" id="filters">
 
             <app-food-listings-filters #foodListingsFilters [formGroup]="foodListingsFilters" header="Cart Filters" [defaultAvailableAfterDateNow]="false">
@@ -33,16 +34,8 @@
         </div>
 
         <div id="listings" class="col-lg-9 col-md-12">
-
-            <app-food-listings [header]="getFoodListingsTitle()" [isClaimedCart]="isClaimedCart()" [isDonatedCart]="isDonatedCart()" #foodListings>
-
-                <ng-container food-listing-dialog-footer>
-                    <button md-raised-button color="primary" class="button-md warn-button" *ngIf="isClaimedCart()" (click)="unclaimSelectedFoodListing()">Unclaim</button>
-                    <button md-raised-button color="primary" class="button-md warn-button" *ngIf="isDonatedCart()" (click)="removeSelectedFoodListing()">Remove</button>
-                </ng-container>
-            
-            </app-food-listings>
-
+            <app-food-listings [header]="getFoodListingsTitle()" [isClaimedCart]="isClaimedCart()" [isDonatedCart]="isDonatedCart()" #foodListings></app-food-listings>
         </div>
+
     </div>
 </div>

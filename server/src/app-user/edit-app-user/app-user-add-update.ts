@@ -9,7 +9,7 @@ import { hashPassword } from '../common-app-user/password-util';
 import { GPSCoordinate, getGPSCoordinate } from '../../../../shared/common-util/geocode';
 import { Validation } from '../../../../shared/common-util/validation';
 import { Address } from '../../../../shared/app-user/app-user-info';
-import { SignupErrors } from '../../../../shared/app-user/signup-message';
+import { AppUserErrorMsgs } from '../../../../shared/app-user/app-user-error-msgs';
 import { TimeRange } from '../../../../shared/app-user/time-range';
 
 
@@ -71,7 +71,7 @@ function genGPSCoordsAndHashPass(appUserAddress: Address, hashPass: string): Pro
             return { hashPass: hashPass, gpsCoordinate: gpsCoordinate };
         })
         .catch((err: Error) => {
-            throw new Error(SignupErrors.INVALID_ADDRESS);
+            throw new Error(AppUserErrorMsgs.INVALID_ADDRESS);
         });
 }
 
@@ -121,7 +121,7 @@ function addOrUpdateAppUserInSQL(appUserInfo: AppUserInfo, hashedPassword?: stri
         .catch((err: Error) => {
 
             console.log(err);
-            if (!isUpdate || appUserInfo.email != null) throw new Error(SignupErrors.DUPLICATE_EMAIL);
+            if (!isUpdate || appUserInfo.email != null) throw new Error(AppUserErrorMsgs.DUPLICATE_EMAIL);
             else                                        throw new Error('An unexpected error has occured');
         });
 }

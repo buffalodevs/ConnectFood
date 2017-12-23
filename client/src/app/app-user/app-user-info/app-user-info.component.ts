@@ -13,8 +13,20 @@ import { FoodWebBusyConfig } from "../../common-util/etc/food-web-busy-config";
 import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 import { Validation } from "../../../../../shared/common-util/validation";
 import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
-import { SignupErrors } from '../../../../../shared/app-user/signup-message';
+import { AppUserErrorMsgs } from '../../../../../shared/app-user/app-user-error-msgs';
 import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
+
+
+/**
+ * Wrapper for information pertaining to editing each field (or group of fields).
+ */
+class EditData {
+
+    public constructor (
+        public editing: boolean = false,
+        public savePromise?: PromiseLike<any>
+    ) {}
+}
 
 
 @Component({
@@ -26,7 +38,8 @@ import { ObjectManipulation } from '../../../../../shared/common-util/object-man
 export class AppUserInfoComponent extends AbstractModelDrivenComponent {
     
     private isOrganization: boolean;
-    private editFlags: Map<string, boolean>;
+    private editData: Map<string, EditData>;
+    private savePromise: PromiseLike<any>;
 
 
     public constructor (
@@ -43,7 +56,7 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
         this.isOrganization = (appUserInfo.organizationName != null);
 
         this.form = new FormGroup({});
-        this.editFlags = new Map<string, boolean>();
+        this.editData = new Map<string, EditData>();
 
         // Fill the form group model based off of the properties found in AppUserInfo.
         // Also, add edit flags based off of the properties.
@@ -60,14 +73,16 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
 
                 let initValue: any = (appUserInfo[property] == null) ? '' : appUserInfo[property];
                 this.form.addControl(property, new FormControl(initValue, validators));
-                this.editFlags.set(property, false);
+                this.editData.set(property, new EditData());
             }
         }
 
         // Initialize form with elements that are not part of AppUserInfo object.
-        this.form.addControl('password', new FormControl('', [Validators.required, Validators.pattern(Validation.PASSWORD_REGEX)]));
-        this.form.addControl('currentPassword', new FormControl('', [Validators.required, Validators.pattern(Validation.PASSWORD_REGEX)]));
-        this.form.addControl('confirmPassword', new FormControl('', [Validators.required, Validators.pattern(Validation.PASSWORD_REGEX)]));
+        const passControlNames: string[] = ['password', 'currentPassword', 'confirmPassword'];
+        for (let i: number = 0; i < passControlNames.length; i++) {
+            this.form.addControl(passControlNames[i], new FormControl('', [ Validators.required, Validators.pattern(Validation.PASSWORD_REGEX) ]));
+            this.editData.set(passControlNames[i], new EditData());
+        }
         this.form.setValidators(this.appUserValidationService.confirmPasswordEqual());
     }
 
@@ -75,19 +90,19 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
     /**
      * Sets a field in the App User Info form to be (un)editable and focuses the form control used for editing.
      * @param editFormControlId The id of the form control that will be used for editing.
-     * @param editable Default is true. The edit state to be set.
+     * @param editing Default is true. The edit state to be set.
      */
-    private setEditable(editFormControlId: string, editable: boolean = true): void {
-        this.setManyEditable([editFormControlId], editable);
+    private setEditable(editFormControlId: string, editing: boolean = true): void {
+        this.setManyEditable([editFormControlId], editing);
     }
 
 
     /**
      * Sets many fields in the App User Info form to be (un)editable and focuses the form control used for editing.
      * @param editFormControlIds A list of the ids of the form controls that will be used for editing.
-     * @param editable Default is true. The edit state to be set.
+     * @param editing Default is true. The edit state to be set.
      */
-    private setManyEditable(editFormControlIds: string[], editable: boolean = true): void {
+    private setManyEditable(editFormControlIds: string[], editing: boolean = true): void {
 
         for (let i: number = 0; i < editFormControlIds.length; i++) {
 
@@ -97,11 +112,11 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
             // Set the form control value to the session data value for consistency.
             this.control(editFormControlIds[i]).setValue(this.sessionDataService.getAppUserSessionData()[editFormControlIds[i]]);
 
-            this.editFlags.set(editFormControlIds[i], editable);
+            this.editData.get(editFormControlIds[i]).editing = editing;
         }
 
         // Force processing of form input element after it is shown (via *ngIf) by inserting into end of event queue (via setTimeout).
-        if (editable)  setTimeout(() => {
+        if (editing)  setTimeout(() => {
             let input: HTMLElement = document.getElementById(editFormControlIds[0]);
             if (input != null)  input.focus();
         }, 0);
@@ -122,7 +137,7 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
 
         // First validate the password fields before saving the password.
         if (currentPassword.valid && newPassword.valid && confirmPassword.valid) {
-            this.saveMany([ newPasswordName ], newPassword.value, currentPassword.value);
+            this.saveMany([ currentPasswordName ], newPassword.value, currentPassword.value);
         }
     }
 
@@ -146,7 +161,7 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
 
         let appUserInfoUpdate: AppUserInfo = new AppUserInfo();
 
-        // Go through each form control checking valid state and adding value to update object.
+        // Go through each form control checking valid state and adding value to update object (password form members packaged separately).
         for (let i: number = 0; i < saveFormControlNames.length && newPassword === null; i++) {
 
             let saveFormControl: AbstractControl = this.control(saveFormControlNames[i]);
@@ -162,22 +177,31 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
 
         // Send save field update to server and listen for response.
         let observable: Observable<FoodWebResponse> = this.appUserUpdateService.updateAppUserInfo(appUserInfoUpdate, newPassword, currentPassword);
-        
+
+        // Ensure that we set the save promises so that we can show loading symbol for each individual form component that we are saving.
+        let savePromise: Promise<any> = observable.toPromise();
+        for (let i: number = 0; i < saveFormControlNames.length; i++) {
+            this.editData.get(saveFormControlNames[i]).savePromise = savePromise;
+        }
+
         observable.subscribe((response: FoodWebResponse) => {
 
-            // Update all involved form controls based off of reply from server.
-            for (let i: number = 0; i < saveFormControlNames.length; i++) {
-
-                if (response.success) {
+            if (response.success) {
+                // Update all involved form controls based off of reply from server.
+                for (let i: number = 0; i < saveFormControlNames.length; i++) {
                     this.control(saveFormControlNames[i]).setErrors(null);
                     this.setEditable(saveFormControlNames[i], false);
+                    this.editData.get(saveFormControlNames[i]).savePromise = null;
                 }
-                else if (response.message === SignupErrors.DUPLICATE_EMAIL) {
-                    this.appUserValidationService.addError(this.control(saveFormControlNames[i]), 'duplicateEmail', response.message);
-                }
-                else if (response.message === SignupErrors.INVALID_ADDRESS) {
-                    this.appUserValidationService.addError(this.control(saveFormControlNames[i]), 'invalidAddress', response.message);
-                }
+            }
+            else if (response.message === AppUserErrorMsgs.DUPLICATE_EMAIL) {
+                this.appUserValidationService.addError(this.control(saveFormControlNames[0]), 'duplicateEmail', response.message);
+            }
+            else if (response.message === AppUserErrorMsgs.INVALID_ADDRESS) {
+                this.appUserValidationService.addError(this.control(saveFormControlNames[0]), 'invalidAddress', response.message);
+            }
+            else if (response.message === AppUserErrorMsgs.INCORRECT_PASSWORD) {
+                this.appUserValidationService.addError(this.control(saveFormControlNames[0]), 'incorrectPassword', response.message);
             }
         });
     }

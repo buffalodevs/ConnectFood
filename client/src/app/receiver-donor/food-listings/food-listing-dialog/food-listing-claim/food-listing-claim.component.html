@@ -1,0 +1,30 @@
+<form [formGroup]="claimForm" *ngIf="!claimComplete && foodListing.unitsInfo.availableUnitsCount > 1">
+    
+    <h5>{{ foodListing.unitsInfo.availableUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }} Are available. How many will you claim?</h5>
+    <md-input-container id="units-count" floatPlaceholder="never">
+        <input mdInput formControlName="unitsCount" InputFilter [min]="1" [max]="foodListing.unitsInfo.availableUnitsCount">
+        <span mdSuffix>/ {{ foodListing.unitsInfo.availableUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }}</span>
+    </md-input-container>
+
+    <!-- Footer -->
+    <div class="modal-button-group">    
+        <button md-raised-button color="primary" type="submit" class="button-md" (click)="claimSelectedFoodListing()">Confirm Claim</button>
+    </div>
+
+</form>
+
+
+<ng-container *ngIf="claimComplete">
+
+    <p>Claim of food listing titled <b>{{ foodListing.foodTitle }}</b> successful.</p>
+
+    <p>
+        You can view your newly claimed food in the
+        <a (click)="close.emit()" [routerLink]="['/foodListingCart']" class="link-content">Food Cart</a> tab.
+    </p>
+
+    <div class="modal-button-group">
+        <button md-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>
+    </div>
+
+</ng-container>

@@ -1,0 +1,5 @@
+<div id="progress-spinner-backdrop" *ngIf="showSpinner" [style.opacity]="showBackdrop ? 0.5 : 0">
+    <md-progress-spinner [color]="color" [mode]="mode" [value]="value"></md-progress-spinner>
+</div>
+
+<ng-content></ng-content>

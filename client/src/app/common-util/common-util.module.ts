@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpModule } from '@angular/http';
+import { MdProgressSpinnerModule } from '@angular/material';
 
+import { SlickProgressSpinnerComponent } from './components/slick-progress-spinner/slick-progress-spinner.component';
 import { DateFormatterPipe } from './pipes/date-formatter.pipe';
 import { NumRangePipe } from './pipes/num-range.pipe';
 import { AutoFocusDirective } from './directives/auto-focus.directive';
@@ -19,6 +21,7 @@ import { ValidationService } from './services/validation.service';
 
 @NgModule({
     declarations: [
+        SlickProgressSpinnerComponent,
         DateFormatterPipe,
         NumRangePipe,
         AutoFocusDirective,
@@ -27,9 +30,11 @@ import { ValidationService } from './services/validation.service';
     ],
     imports: [
         CommonModule,
-        HttpModule
+        HttpModule,
+        MdProgressSpinnerModule
     ],
     exports: [
+        SlickProgressSpinnerComponent,
         DateFormatterPipe,
         AutoFocusDirective,
         DefaultImgDirective,

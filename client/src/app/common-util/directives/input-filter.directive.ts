@@ -17,6 +17,14 @@ export class InputFilterDirective implements OnInit {
      * Input true if the filter should be case sensitive. Default is false.
      */
     @Input() private caseSensitive: boolean;
+    /**
+     * Set to max numeric value allowed.
+     */
+    @Input() private max: number;
+    /**
+     * Set to min numeric value allowed.
+     */
+    @Input() private min: number;
 
 
     public constructor (
@@ -48,6 +56,19 @@ export class InputFilterDirective implements OnInit {
         let currentValue: string = this.removeSelectedChars(this.elementRef.nativeElement);
         const newValue: string = StringManipulation.insertCharAt(currentValue, String.fromCharCode(keyCode), charPosition);
         
+        // If we have min and/or max number constraint(s).
+        if (this.max != null || this.min != null) {
+
+            const newNumValue: number = parseInt(newValue);
+
+            // Check numeric range matching.
+            if (    isNaN(newNumValue)
+                || (this.max != null && newNumValue > this.max)
+                || (this.min != null && newNumValue < this.min) )
+            {  return event.preventDefault();  } // Return out of method if already non-conforming pattern found with numeric range.
+        }
+
+        // Check string filter value (either regex or substring matching).
         if (    (StringManipulation.isRegExp(this.filter) && !newValue.match(this.filter))
             ||  (StringManipulation.isString(this.filter) && !newValue.includes(this.caseSensitive ? this.filter
                                                                                                    : this.filter.toLowerCase()))
@@ -128,10 +149,12 @@ export class InputFilterDirective implements OnInit {
             end = input.selectionEnd;
         }
         else {
+
             let ieDocSupport: any = document;
-            range = ieDocSupport.selection.createRange();
+            range = (ieDocSupport.selection) ? ieDocSupport.selection.createRange() : undefined;
     
             if (range && range.parentElement() == input) {
+
                 len = input.value.length;
                 normalizedValue = input.value.replace(/\r\n/g, "\n");
     
@@ -149,6 +172,7 @@ export class InputFilterDirective implements OnInit {
                     start = end = len;
                 }
                 else {
+
                     start = -textInputRange.moveStart("character", -len);
                     start += normalizedValue.slice(0, start).split("\n").length - 1;
     

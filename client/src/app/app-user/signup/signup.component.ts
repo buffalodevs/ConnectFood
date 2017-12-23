@@ -11,7 +11,7 @@ import { AbstractModelDrivenComponent } from '../../common-util/components/abstr
 import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
 import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
-import { SignupErrors } from '../../../../../shared/app-user/signup-message';
+import { AppUserErrorMsgs } from '../../../../../shared/app-user/app-user-error-msgs';
 
 
 @Component({
@@ -164,10 +164,10 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
         else {
             this.signupError = signupResponse.message;
 
-            if (this.signupError === SignupErrors.DUPLICATE_EMAIL) {
+            if (this.signupError === AppUserErrorMsgs.DUPLICATE_EMAIL) {
                 // TODO: Goto primary info tab.
             }
-            else if (this.signupError === SignupErrors.INVALID_ADDRESS) {
+            else if (this.signupError === AppUserErrorMsgs.INVALID_ADDRESS) {
                 // TODO: Goto address & phone tab.
             }
         }

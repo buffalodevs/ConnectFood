@@ -23,7 +23,7 @@ export class ReceiveComponent implements OnInit {
     
 
     public constructor (
-        private claimFoodListingService: ManageFoodListingService
+        
     ) {}
 
 
@@ -53,26 +53,5 @@ export class ReceiveComponent implements OnInit {
         // Make sure we mark down that we only want unclaimed listings!
         filters.listingsStatus = LISTINGS_STATUS.unclaimedListings;
         this.foodListingsComponent.refreshList(filters);
-    }
-
-
-    /**
-     * Claims the currently selected Food Listing.
-     */
-    private claimSelectedFoodListing(): void {
-        
-        let selectedFoodListing: FoodListing = this.foodListingsComponent.getSelectedListing();
-        let observer: Observable<void> = this.claimFoodListingService.claimFoodListing(selectedFoodListing.foodListingKey);
-        
-        // Listen for result.
-        observer.subscribe(
-            () => {
-                // On success, simply remove the Food Listing from the Receiver Food Listings interface.
-                this.foodListingsComponent.removeSelectedListing();
-            },
-            (err: Error) => {
-                console.log(err);
-            }
-        );
     }
 }

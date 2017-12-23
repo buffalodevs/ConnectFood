@@ -5,7 +5,6 @@ import { Observable } from 'rxjs/Observable';
 import { RequestService, Response } from "../../../common-util/services/request.service";
 
 import { ManageFoodListingRequest } from "./../../../../../../shared/receiver-donor/message/manage-food-listing-message";
-import { FoodWebResponse } from "./../../../../../../shared/message-protocol/food-web-response";
 
 
 /**
@@ -16,16 +15,17 @@ export class ManageFoodListingService {
     
     public constructor (
         private requestService: RequestService
-    ) { }
+    ) {}
 
 
     /**
      * Claims a given Food Listing.
      * @param foodListingKey The key (identifier) for the Food Listing that is to be claimed.
+     * @param unitsCount The number of units of the given Food Listing that should be claimed.
      * @return An observable that has no payload (simply resolves on success).
      */
-    public claimFoodListing(foodListingKey: number): Observable<void> {
-        return this.manageFoodListing(foodListingKey, '/receiverDonor/receiver/claimFoodListing');
+    public claimFoodListing(foodListingKey: number, unitsCount: number): Observable<boolean> {
+        return this.manageFoodListing(foodListingKey, unitsCount, '/receiverDonor/receiver/claimFoodListing');
     }
 
 
@@ -34,8 +34,8 @@ export class ManageFoodListingService {
      * @param foodListingKey The key (identifier) for the Food Listing that is to be unclaimed.
      * @return An observable that has no payload (simply resolves on success).
      */
-    public unclaimFoodListing(foodListingKey: number): Observable<void> {
-        return this.manageFoodListing(foodListingKey, '/receiverDonor/receiver/unclaimFoodListing');
+    public unclaimFoodListing(foodListingKey: number): Observable<boolean> {
+        return this.manageFoodListing(foodListingKey, undefined, '/receiverDonor/receiver/unclaimFoodListing');
     }
 
 
@@ -44,8 +44,8 @@ export class ManageFoodListingService {
      * @param foodListingKey The key (identifier) for the Food Listing that is to be removed.
      * @return An observable that has no payload (simply resolves on success).
      */
-    public removeFoodListing(foodListingKey: number): Observable<void> {
-        return this.manageFoodListing(foodListingKey, 'receiverDonor/donor/removeFoodListing');
+    public removeFoodListing(foodListingKey: number): Observable<boolean> {
+        return this.manageFoodListing(foodListingKey, undefined, 'receiverDonor/donor/removeFoodListing');
     }
 
 
@@ -53,23 +53,12 @@ export class ManageFoodListingService {
      * Uniform function for sending Food Listing ID to server for specific management functions (such as claim, unclaim, & remove).
      * @param foodListingKey The key identifier of the food listing that is to be acted upon.
      * @param controllerRoute The route to the controller function that handles the operation.
-     * @return An observable that has no payload (simply resolves on success).
+     * @return An observable that on success resolves to true. On failure, if it is non-fatal (such as required login), then false.
+     *         If fatal failure, then error is thrown.
      */
-    private manageFoodListing(foodListingKey: number, controllerRoute: string): Observable<void> {
+    private manageFoodListing(foodListingKey: number, unitsCount: number, controllerRoute: string): Observable<boolean> {
 
-        let body: ManageFoodListingRequest = new ManageFoodListingRequest(foodListingKey);
-        let observer: Observable<Response> = this.requestService.post(controllerRoute, body);
-
-        // Listen for a response now.
-        return observer.map((response: Response) => {
-
-            let claimFoodListingResponse: FoodWebResponse = response.json();
-            
-            // On failure.
-            if (!claimFoodListingResponse.success) {
-                console.log(claimFoodListingResponse.message);
-                throw new Error(claimFoodListingResponse.message);
-            }
-        });
+        return this.requestService.post(controllerRoute, new ManageFoodListingRequest(foodListingKey, unitsCount))
+                                  .map(this.requestService.genericResponseMap);
     }
 }

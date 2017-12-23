@@ -12,10 +12,9 @@ import { FoodWebResponse } from "./../../../../../../shared/message-protocol/foo
 @Injectable()
 export class AddFoodListingService {
 
-
-    constructor(
+    public constructor (
         private requestService: RequestService
-    ) { }
+    ) {}
 
 
     /**

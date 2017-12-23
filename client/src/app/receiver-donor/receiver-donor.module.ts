@@ -11,6 +11,8 @@ import { ImageCropperModule } from 'ng2-img-cropper';
 
 import { FoodListingsFiltersComponent } from './food-listings/food-listings-filters/food-listings-filters.component';
 import { FoodListingDialogComponent } from './food-listings/food-listing-dialog/food-listing-dialog.component';
+import { FoodListingInfoComponent } from './food-listings/food-listing-dialog/food-listing-info/food-listing-info.component';
+import { FoodListingClaimComponent } from './food-listings/food-listing-dialog/food-listing-claim/food-listing-claim.component';
 import { FoodListingsComponent } from './food-listings/food-listings.component';
 import { DonateComponent } from './donate/donate.component';
 import { ReceiveComponent } from './receive/receive.component';
@@ -19,6 +21,7 @@ import { FoodListingCartComponent } from './food-listing-cart/food-listing-cart.
 import { RoutePreprocessService } from '../common-util/services/route-preprocess.service';
 import { FoodTypesService } from '../domain/food-types/food-types.service';
 import { VehicleTypesService } from '../domain/vehicle-types/vehicle-types.service';
+import { ManageFoodListingService } from './food-listings/food-listing-services/manage-food-listing.service';
 
 
 const receiverDonorRoutes: Routes = [
@@ -57,6 +60,8 @@ const receiverDonorRoutes: Routes = [
     declarations: [
         FoodListingsFiltersComponent,
         FoodListingDialogComponent,
+        FoodListingInfoComponent,
+        FoodListingClaimComponent,
         FoodListingsComponent,
         DonateComponent,
         ReceiveComponent,
@@ -72,6 +77,9 @@ const receiverDonorRoutes: Routes = [
         SlickFilteredListModule,
         CommonFoodListingDomainsModule,
         ImageCropperModule
+    ],
+    providers: [
+        ManageFoodListingService
     ]
 })
-export class ReceiverDonorModule { }
+export class ReceiverDonorModule {}

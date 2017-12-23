@@ -4,20 +4,20 @@ import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging
 import { FoodListing } from '../food-listing';
 
 
-export function claimFoodListing(foodListingKey: number, claimedByAppUserKey: number): Promise<void> {
-    return claimOrUnclaimFoodListing(foodListingKey, claimedByAppUserKey, true);
+export function claimFoodListing(foodListingKey: number, claimedByAppUserKey: number, unitsCount: number): Promise<void> {
+    return claimOrUnclaimFoodListing(foodListingKey, claimedByAppUserKey, unitsCount, true);
 }
 
 
-export function unclaimFoodListing(foodListingKey: number, claimedByAppUserKey: number): Promise<void> {
-    return claimOrUnclaimFoodListing(foodListingKey, claimedByAppUserKey, false);
+export function unclaimFoodListing(foodListingKey: number, claimedByAppUserKey: number, unitsCount: number): Promise<void> {
+    return claimOrUnclaimFoodListing(foodListingKey, claimedByAppUserKey, unitsCount, false);
 }
 
 
-function claimOrUnclaimFoodListing(foodListingKey: number, claimedByAppUserKey: number, isClaim: boolean): Promise<void> {
+function claimOrUnclaimFoodListing(foodListingKey: number, claimedByAppUserKey: number, unitsCount: number, isClaim: boolean): Promise<void> {
     
-    let queryString: string = 'SELECT * FROM ' + (isClaim ? '' : 'un') + 'claimFoodListing($1, $2)';
-    let queryArgs: Array<any> = [foodListingKey, claimedByAppUserKey];
+    let queryString: string = 'SELECT * FROM ' + (isClaim ? '' : 'un') + 'claimFoodListing($1, $2, $3)';
+    let queryArgs: Array<any> = [ foodListingKey, claimedByAppUserKey, unitsCount ];
 
     logSqlQueryExec(queryString, queryArgs);
 

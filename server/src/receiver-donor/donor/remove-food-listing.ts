@@ -10,12 +10,11 @@ import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging
  *                        Should be pulled from server session to ensure that the requestor is authorized to perform this action!
  * @return A promise that simply resolve on success without any payload.
  */
-export function removeFoodListing(foodListingKey: number, donorAppUserKey: number): Promise<void> {
+export function removeFoodListing(foodListingKey: number, donorAppUserKey: number, unitsCount: number): Promise<void> {
     
     // Construct prepared statement.
-    let queryString = 'SELECT * FROM removeFoodListing($1, $2);';
-    let queryArgs = [ foodListingKey,
-                      donorAppUserKey ];
+    let queryString = 'SELECT * FROM removeFoodListing($1, $2, $3);';
+    let queryArgs = [ foodListingKey, donorAppUserKey, unitsCount ];
 
     // Execute prepared statement.
     return query(queryString, queryArgs)

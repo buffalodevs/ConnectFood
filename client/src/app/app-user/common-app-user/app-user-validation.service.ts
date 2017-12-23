@@ -70,8 +70,12 @@ export class AppUserValidationService extends ValidationService {
         if (errors != null) {
 
             if (errors.hasOwnProperty('confirmPasswordEqual'))  return errors.confirmPasswordEqual;
+            if (errors.hasOwnProperty('incorrectPassword'))     return errors.incorrectPassword;
+            if (errors.hasOwnProperty('invalidAddress'))        return errors.invalidAddress;
+            if (errors.hasOwnProperty('duplicateEmail'))        return errors.duplicateEmail;
 
             if (errors.hasOwnProperty('pattern')) {
+                
                 if (controlPath.indexOf('email') >= 0)      return 'Email has incorrect format';
                 if (controlPath.indexOf('password') >= 0)   return 'Password must have at least 6 characters';
                 if (controlPath.indexOf('zip') >= 0)        return 'Zip requires 5 digits';

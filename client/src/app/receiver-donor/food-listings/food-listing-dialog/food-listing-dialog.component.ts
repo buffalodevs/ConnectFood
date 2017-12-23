@@ -7,6 +7,17 @@ import { ResponsiveService } from '../../../common-util/services/responsive.serv
 import { FoodListing } from './../../../../../../shared/receiver-donor/food-listing';
 
 
+/**
+ * Contains the state of the Delivery Dialog, which in turn, determines what to display in the dialog.
+ */
+enum FoodListingDialogState {
+    FoodListingInfo,
+    Claim,
+    Unclaim,
+    Remove
+}
+
+
 @Component({
     selector: 'food-listing-dialog',
     templateUrl: './food-listing-dialog.component.html',
@@ -37,10 +48,36 @@ export class FoodListingDialogComponent extends AbstractSlickListDialog<FoodList
      */
     @ViewChild('SlickListDialogComponent') protected slickListDialog: SlickListDialogComponent;
 
+    private foodListingDialogState: FoodListingDialogState;
+
 
     public constructor (
         private responsiveService: ResponsiveService
     ) {
         super();
+    }
+
+
+    public open(dialogData: FoodListing): void {
+        this.foodListingDialogState = FoodListingDialogState.FoodListingInfo;
+        super.open(dialogData);
+    }
+
+
+    /**
+     * Determines if the dialog state matches a given string.
+     * @param state The state string to match.
+     * @return true if it is in the given state, false if not.
+     */
+    private isDialogState(state: string): boolean {
+        return ( this.foodListingDialogState === FoodListingDialogState[state] );
+    }
+
+
+    /**
+     * Transitions dialog state to Claim.
+     */
+    private toClaim(): void {
+        this.foodListingDialogState = FoodListingDialogState.Claim;
     }
 }
