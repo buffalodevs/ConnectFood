@@ -1,37 +1,33 @@
-<app-slick-left-panel [buttonTitle]="header">
-    
-    <h3>{{header}}</h3>
-    <hr>
-    <div [formGroup]="this">
+<h3>{{header}}</h3>
+<hr>
+<div [formGroup]="this">
 
-        <!-- Any additional filters will be transclused here -->
-        <ng-content select="[top]"></ng-content>
+    <!-- Any additional filters will be transclused here -->
+    <ng-content select="[top]"></ng-content>
 
-        <h5>Max Distance:</h5>
-        <md-select formControlName="maxDistance" [value]="controls.maxDistance.value" panelClass="select-panel"
-         title="Max distance radius (in miles) from driver's start location to donor and receiver">
-            <md-option *ngFor="let distance of maxDistances" [value]="distance">
-                {{ distance }} Mi
-            </md-option>
-        </md-select>
+    <h5>Max Distance:</h5>
+    <md-select formControlName="maxDistance" [value]="controls.maxDistance.value" panelClass="select-panel"
+        title="Max distance radius (in miles) from driver's start location to donor and receiver">
+        <md-option *ngFor="let distance of maxDistances" [value]="distance">
+            {{ distance }} Mi
+        </md-option>
+    </md-select>
 
-        <h5>Max Total Weight:</h5>
-        <md-select formControlName="maxTotalWeight" placeholder="Any Weight" floatPlaceholder="never" title="Max total weight of donation (in lbs)" panelClass="select-panel">
-            <md-option *ngFor="let maxTotalWeight of maxTotalWeights" [value]="maxTotalWeight">
-                {{ (maxTotalWeight != null) ? (maxTotalWeight + 'lbs') : 'Any Weight' }} 
-            </md-option>
-        </md-select>
+    <h5>Max Total Weight:</h5>
+    <md-select formControlName="maxTotalWeight" placeholder="Any Weight" floatPlaceholder="never" title="Max total weight of donation (in lbs)" panelClass="select-panel">
+        <md-option *ngFor="let maxTotalWeight of maxTotalWeights" [value]="maxTotalWeight">
+            {{ (maxTotalWeight != null) ? (maxTotalWeight + 'lbs') : 'Any Weight' }} 
+        </md-option>
+    </md-select>
 
-        <h5>Vehicle Type:</h5>
-        <md-select formControlName="vehicleType" placeholder="Any Vehicle" floatPlaceholder="never" title="The recommended vehicle type (or size)" panelClass="select-panel">
-            <md-option *ngFor="let vehicleType of vehicleTypes" [value]="vehicleType">
-                {{ vehicleType }}
-            </md-option>
-        </md-select>
+    <h5>Vehicle Type:</h5>
+    <md-select formControlName="vehicleType" placeholder="Any Vehicle" floatPlaceholder="never" title="The recommended vehicle type (or size)" panelClass="select-panel">
+        <md-option *ngFor="let vehicleType of vehicleTypes" [value]="vehicleType">
+            {{ vehicleType }}
+        </md-option>
+    </md-select>
 
-        <!-- Any additional filters will be transclused here -->
-        <ng-content select="[bottom]"></ng-content>
+    <!-- Any additional filters will be transclused here -->
+    <ng-content select="[bottom]"></ng-content>
 
-    </div>
-
-</app-slick-left-panel>
+</div>

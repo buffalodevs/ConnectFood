@@ -14,7 +14,7 @@ export abstract class AbstractSlickListDialog<LIST_T> {
      * Emitted whenever the dialogData should be removed from parent's list data.
      * The (optional default true) boolean parameter signifies whether or not to close this dialog upon removal of the list data.
      */
-    protected removeListing: EventEmitter<boolean>;
+    public removeListing: EventEmitter<boolean>;
 
     
     protected constructor() {

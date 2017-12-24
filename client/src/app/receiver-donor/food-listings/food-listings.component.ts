@@ -11,7 +11,7 @@ import { FoodListingsFilters } from "../../../../../shared/receiver-donor/food-l
 
 
 @Component({
-    selector: 'app-food-listings',
+    selector: 'food-listings',
     templateUrl: './food-listings.component.html',
     styleUrls: ['./food-listings.component.css'],
     providers: [GetFoodListingsService]

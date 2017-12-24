@@ -1,29 +1,25 @@
-<div class="container-fluid">
-    <div id="receivers-row" class="row">
+<slick-filtered-list>
 
-        <div id="filters" class="col-md-0 col-lg-3 no-pad">
-            <app-food-listings-filters #foodListingsFilters [formGroup]="foodListingsFilters" header="Search Filters">
+    <ng-container filters>
+        <food-listings-filters #filters [formGroup]="filters" header="Search Filters">
 
-                <ng-container bottom>
-                    
-                    <br>
-                    <h5>Availability Schedule:</h5>
-                    <div class="form-group">
-                        <md-checkbox formControlName="matchAvailability" title="Check this to ensure each donor is available when you are.">
-                            Match Availability
-                        </md-checkbox>
-                    </div>
+            <ng-container bottom>
+                
+                <br>
+                <h5>Availability Schedule:</h5>
+                <div class="form-group">
+                    <md-checkbox formControlName="matchAvailability" title="Check this to ensure each donor is available when you are.">
+                        Match Availability
+                    </md-checkbox>
+                </div>
 
-                </ng-container>
+            </ng-container>
 
-            </app-food-listings-filters>
-        </div>
+        </food-listings-filters>
+    </ng-container>
 
-        <div id="listings" class="col-md-12 col-lg-9">
+    <ng-container listings>
+        <food-listings header="Available Food" #listings></food-listings>
+    </ng-container>
 
-            <app-food-listings header="Available Food" #foodListings></app-food-listings>
-            
-        </div>
-        
-    </div>
-</div>
+</slick-filtered-list>

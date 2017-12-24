@@ -6,12 +6,29 @@ import { SlickListFilters } from './slick-list-message/slick-list-request';
 import { AbstractSlickListDialog } from "./slick-list-dialog/abstract-slick-list-dialog";
 
 
+/**
+ * Base class for all lists that display Iflitered) data queried from server. Holds generic functionality for refreshing the list and appending to it when scroll to bottom.
+ * Also, holds some generic functionality for interaction between list and a details dialog for each item of the list.
+ */
 export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilters> implements OnInit {
 
+    /**
+     * The data held by this list.
+     */
     protected listData: Array<LIST_T>;
+    /**
+     * The index of the selected list item.
+     */
     protected selectedListIndex: number;
 
+    /**
+     * The dialog associated with this list. Should be shadowed by child class so that list interaction with dialog is automatically handled in this base class.
+     */
     protected slickListDialog: AbstractSlickListDialog <LIST_T>;
+    /**
+     * Promise/Observable that is set and active whenever the list is being refreshed.
+     */
+    protected refreshPromise: PromiseLike<any>;
 
 
     /**
@@ -57,6 +74,7 @@ export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilt
     public refreshList(filters: FILTERS_T): void {
 
         let observer: Observable<Array<LIST_T>> = this.getListingsService.getListings(filters, this.ROUTE);
+        this.refreshPromise = observer.toPromise(); // This is set so that child class can show load spinner until resolved!
         this.listData = new Array<LIST_T>(); // Empty our current model list while we wait for server results.
 
         observer.subscribe((listData: Array<LIST_T>) => {

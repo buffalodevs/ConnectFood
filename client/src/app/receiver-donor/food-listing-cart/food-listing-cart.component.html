@@ -1,41 +1,39 @@
-<div class="container-fluid">
-    <div class="row">
+<slick-filtered-list>
         
-        <div class="col-lg-3 col-md-0 no-pad" id="filters">
+    <ng-container filters>
 
-            <app-food-listings-filters #foodListingsFilters [formGroup]="foodListingsFilters" header="Cart Filters" [defaultAvailableAfterDateNow]="false">
-                <ng-container top>
+        <food-listings-filters #filters [formGroup]="filters" header="Cart Filters" [defaultAvailableAfterDateNow]="false">
+            <ng-container top>
 
-                    <h5>Listings Status:</h5>
-                    <div class="form-group">
-                        <md-radio-group formControlName="listingsStatus">
+                <h5>Listings Status:</h5>
+                <div class="form-group">
+                    <md-radio-group formControlName="listingsStatus">
 
-                            <label for="claimed" class="checkbox-compress">
-                                <md-radio-button type="radio" id="claimed" name="listingsStatus" [value]="LISTINGS_STATUS.myClaimedListings"
-                                 title="Check this to only show my claimed food.">
-                                    Claimed
-                                </md-radio-button>
-                            </label>
-                            <br>
+                        <label for="claimed" class="checkbox-compress">
+                            <md-radio-button type="radio" id="claimed" name="listingsStatus" [value]="LISTINGS_STATUS.myClaimedListings"
+                                title="Check this to only show my claimed food.">
+                                Claimed
+                            </md-radio-button>
+                        </label>
+                        <br>
 
-                            <label for="donated" class="checkbox-compress">
-                                <md-radio-button type="radio" id="donated" name="listingsStatus" [value]="LISTINGS_STATUS.myDonatedListings"
-                                 title="Check this to only show my donated food.">
-                                    Donated
-                                </md-radio-button>
-                            </label>
+                        <label for="donated" class="checkbox-compress">
+                            <md-radio-button type="radio" id="donated" name="listingsStatus" [value]="LISTINGS_STATUS.myDonatedListings"
+                                title="Check this to only show my donated food.">
+                                Donated
+                            </md-radio-button>
+                        </label>
 
-                        </md-radio-group>
-                    </div>
+                    </md-radio-group>
+                </div>
 
-                </ng-container>
-            </app-food-listings-filters>
+            </ng-container>
+        </food-listings-filters>
 
-        </div>
+    </ng-container>
 
-        <div id="listings" class="col-lg-9 col-md-12">
-            <app-food-listings [header]="getFoodListingsTitle()" [isClaimedCart]="isClaimedCart()" [isDonatedCart]="isDonatedCart()" #foodListings></app-food-listings>
-        </div>
+    <ng-container listings>
+        <food-listings #listings [header]="getFoodListingsTitle()" [isClaimedCart]="isClaimedCart()" [isDonatedCart]="isDonatedCart()"></food-listings>
+    </ng-container>
 
-    </div>
-</div>
+</slick-filtered-list>

@@ -1,3 +1,7 @@
+div, form {
+    position: relative;
+}
+
 h2 {
     font-weight: bold;
 }

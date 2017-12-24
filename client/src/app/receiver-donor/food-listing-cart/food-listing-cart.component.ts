@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { NgbModule, NgbModal, ModalDismissReasons, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from "rxjs/Observable";
 
+import { AbstractSlickFilteredList } from '../../misc-slick-components/slick-filtered-list/abstract-slick-filtered-list';
 import { FoodListingsFiltersComponent } from "../food-listings/food-listings-filters/food-listings-filters.component";
 import { FoodListingsComponent } from "../food-listings/food-listings.component";
 import { SessionDataService } from '../../common-util/services/session-data.service';
@@ -15,20 +16,19 @@ import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 @Component({
     selector: 'food-listing-cart',
     templateUrl: './food-listing-cart.component.html',
-    styleUrls: ['./food-listing-cart.component.css', '../../misc-slick-components/slick-filtered-list/slick-filtered-list.component.css']
+    styleUrls: ['./food-listing-cart.component.css']
 })
-export class FoodListingCartComponent implements OnInit {
+export class FoodListingCartComponent extends AbstractSlickFilteredList<FoodListing, FoodListingsFilters> implements OnInit {
 
     // Need to declare LISTINGS_STATUS enum inside component to be used in the HTML template!
     private readonly LISTINGS_STATUS: typeof LISTINGS_STATUS = LISTINGS_STATUS;
 
-    @ViewChild('foodListingsFilters') private foodListingsFiltersComponent: FoodListingsFiltersComponent;
-    @ViewChild('foodListings') private foodListingsComponent: FoodListingsComponent;
-
 
     public constructor (
         private sessionDataService: SessionDataService
-    ) {}
+    ) {
+        super();
+    }
 
 
     /**
@@ -39,20 +39,11 @@ export class FoodListingCartComponent implements OnInit {
 
         if (appUserInfo.appUserType === 'Receiver') {
             // If both receiver and donor, then default to receiver mode!
-            this.foodListingsFiltersComponent.addControl('listingsStatus', new FormControl(LISTINGS_STATUS.myClaimedListings));
+            this.filters.addControl('listingsStatus', new FormControl(LISTINGS_STATUS.myClaimedListings));
         } 
         else {
-            this.foodListingsFiltersComponent.addControl('listingsStatus', new FormControl(LISTINGS_STATUS.myDonatedListings));
+            this.filters.addControl('listingsStatus', new FormControl(LISTINGS_STATUS.myDonatedListings));
         }
-    }
-
-
-    /**
-     * Executed after all of the view children have been initialized (so safest to interact with them now).
-     */
-    public ngAfterViewInit(): void {
-        this.foodListingsComponent.refreshList(this.foodListingsFiltersComponent.getRawValue());
-        this.foodListingsFiltersComponent.valueChanges.subscribe(this.foodListingsComponent.refreshList.bind(this.foodListingsComponent));
     }
 
 
@@ -63,11 +54,11 @@ export class FoodListingCartComponent implements OnInit {
 
 
     private isClaimedCart(): boolean {
-        return (this.foodListingsFiltersComponent.value.listingsStatus === LISTINGS_STATUS.myClaimedListings);
+        return (this.filters.value.listingsStatus === LISTINGS_STATUS.myClaimedListings);
     }
 
 
     private isDonatedCart(): boolean {
-        return (this.foodListingsFiltersComponent.value.listingsStatus === LISTINGS_STATUS.myDonatedListings);
+        return (this.filters.value.listingsStatus === LISTINGS_STATUS.myDonatedListings);
     }
 }

@@ -7,7 +7,7 @@ import { FoodListingsFilters } from "../../../../../../shared/receiver-donor/foo
 
 
 @Component({
-    selector: 'app-food-listings-filters',
+    selector: 'food-listings-filters',
     templateUrl: './food-listings-filters.component.html',
     styleUrls: ['./food-listings-filters.component.css']
 })

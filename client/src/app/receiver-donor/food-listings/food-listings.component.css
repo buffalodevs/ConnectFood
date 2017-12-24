@@ -9,3 +9,8 @@
 img {
     max-width: 100%;
 }
+
+:host ::ng-deep .mat-progress-spinner {
+    height: auto !important;
+    margin-top: 65px;
+}
