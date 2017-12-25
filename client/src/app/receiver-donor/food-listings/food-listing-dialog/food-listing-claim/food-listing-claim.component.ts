@@ -32,6 +32,7 @@ export class FoodListingClaimComponent implements OnChanges {
 
     private claimForm: FormGroup;
     private claimComplete: boolean;
+    private claimPromise: PromiseLike<any>;
 
 
     public constructor (
@@ -70,6 +71,7 @@ export class FoodListingClaimComponent implements OnChanges {
         if (!this.claimForm.valid) return;
         
         let observer: Observable<boolean> = this.manageFoodListingService.claimFoodListing(this.foodListing.foodListingKey, this.claimForm.get('unitsCount').value);
+        this.claimPromise = observer.toPromise();
         
         // Listen for result.
         observer.subscribe (
@@ -77,7 +79,7 @@ export class FoodListingClaimComponent implements OnChanges {
                 // On success, simply remove the Food Listing from the Receiver Food Listings interface by bubbling up claimedCompleted event to parent.
                 if (success) {
                     this.claimed.emit();
-                    this.claimComplete = true;
+                    //this.claimComplete = true;
                 }
             },
             (err: Error) => {

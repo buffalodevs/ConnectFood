@@ -14,33 +14,33 @@ import { Validation } from '../../../../../shared/common-util/validation';
 
 
 @Component({
-    moduleId: module.id,
-    selector: 'app-donate',
+    selector: 'donate',
     templateUrl: 'donate.component.html',
-    providers: [AddFoodListingService],
-    styleUrls: ['donate.component.css']
+    styleUrls: ['donate.component.css'],
+    providers: [AddFoodListingService]
 })
 export class DonateComponent implements OnInit {
     
     private foodForm: FormGroup;
-    private forceValidation: boolean;
+    private validate: boolean;
     private dispUrl: string;
 
     private image: string;
     private cropperSettings: CropperSettings;
 
     private foodTitleMaxLength: number;
+    private donatePromise: PromiseLike<any>;
 
     @ViewChild('cropper', undefined) private cropper: ImageCropperComponent;
 
 
-    public constructor(
+    public constructor (
         private formBuilder: FormBuilder,
         private addFoodListingService: AddFoodListingService,
         private dateFormatter: DateFormatterPipe
     ) {
         // Want to force validators to process on submit. Non-text fields will only validate on submit too!
-        this.forceValidation = false;
+        this.validate = false;
 
         // If the window size goes below this threshold, then the cropper must be initialized below the optimal size of 300px.
         const thresholdCropperWidth: number = 367;
@@ -56,12 +56,12 @@ export class DonateComponent implements OnInit {
         this.cropperSettings.fileType = 'image/jpeg';
 
         this.foodTitleMaxLength = 100;
-
         this.foodForm = new FormGroup({});
     }
 
 
     public ngOnInit(): void {
+
         let foodListingUpload: FoodListingUpload = new FoodListingUpload();
 
         // Fill the form group view model based off of the properties found in FoodListingUpload.
@@ -69,6 +69,7 @@ export class DonateComponent implements OnInit {
         for (let property in foodListingUpload) {
 
             if (foodListingUpload.hasOwnProperty(property)) {
+
                 // All of these members are not included in the form view-model at first!
                 if (    property === 'foodListingKey'
                     ||  property === 'imageUpload'
@@ -96,6 +97,7 @@ export class DonateComponent implements OnInit {
      * @param event The file change event.
      */
     private fileChangeListener(event): void {
+
         let image: HTMLImageElement = new Image();
         let file: File = event.target.files[0];
         let myReader: FileReader = new FileReader();
@@ -116,7 +118,7 @@ export class DonateComponent implements OnInit {
      * @return true if it is invalid, false if it is valid.
      */
     private isInvalid(validField: AbstractControl): boolean {
-        return validField != null && validField.errors != null && (validField.touched || this.forceValidation);
+        return validField != null && validField.errors != null && (validField.touched || this.validate);
     }
 
 
@@ -135,6 +137,7 @@ export class DonateComponent implements OnInit {
      * Toggles the display of form controls for splitting the Donation into multiple units.
      */
     private toggleSplitIntoUnits(): void {
+
         if (this.isSplitIntoUnits()) {
             this.foodForm.removeControl('availableUnitsCount');
             this.foodForm.removeControl('unitsLabel');
@@ -146,8 +149,12 @@ export class DonateComponent implements OnInit {
     }
 
 
+    /**
+     * Determines if the donation is split into multiple units.
+     * @return true if it has been split, false if not.
+     */
     private isSplitIntoUnits(): boolean {
-        return (this.foodForm.contains('availableUnitsCount') && this.foodForm.contains('unitsLabel'));
+        return ( this.foodForm.contains('availableUnitsCount') && this.foodForm.contains('unitsLabel') );
     }
 
 
@@ -156,7 +163,7 @@ export class DonateComponent implements OnInit {
      * @param stepper The horizontal stepper that will be invoked to proceed to confirmation display if form is valid.
      */
     private ifValidProceedToReview(value: FoodListingUpload, valid: boolean, stepper: MdHorizontalStepper): void {
-        this.forceValidation = true;
+        this.validate = true;
         if (valid)  stepper.next();
     }
 
@@ -165,19 +172,20 @@ export class DonateComponent implements OnInit {
      * Invoked whenever the donation is submitted (after final confirmation). Sends the new donation to the server.
      * @param value The raw value of the donation form.
      * @param valid The valid state of the donation form.
-     * @param event The form submit event.
+     * @param stepper The stepper for this Donor Form.
      */
     private submitDonation(value: FoodListingUpload, valid: boolean, stepper: MdHorizontalStepper): void {
         
         let observer: Observable<number> = this.addFoodListingService.addFoodListing(value, this.image);
+        this.donatePromise = observer.toPromise();
 
-        observer.subscribe(
+        observer.subscribe (
             (foodListingKey: number) => {
                 stepper.next();
             },
             (err: Error) => {
-                alert('An error has occured which caused your donation to fail.\nPlease contact Food Web for assistnace.\n\nThank-you.');
                 console.log(err);
+                alert(err.message);
             }
         );
     }
@@ -187,16 +195,18 @@ export class DonateComponent implements OnInit {
      * Refreshes the Donation Form, allowing the user to donate another item.
      */
     private donateAgain(stepper: MdHorizontalStepper): void {
+
         this.foodForm.reset();
-        this.foodForm.markAsPristine();
-        this.foodForm.markAsUntouched();
         this.cropper.reset();
         this.image = null;
-        this.forceValidation = false;
+        this.validate = false;
 
         // Must go back 2 tabs to get to start.
         stepper.previous();
         stepper.previous();
+
+        this.foodForm.markAsPristine();
+        this.foodForm.markAsUntouched();
     }
 
 
@@ -204,7 +214,7 @@ export class DonateComponent implements OnInit {
      * Allows the user to return to edit a Donation just after submitting it.
      */
     private editDonation(stepper: MdHorizontalStepper): void {
-        this.forceValidation = false;
+        this.validate = false;
         stepper.previous();
     }
 }

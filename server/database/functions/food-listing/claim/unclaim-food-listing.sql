@@ -32,10 +32,18 @@ BEGIN
     FROM        ClaimedFoodListing
     WHERE       foodListingKey = _foodListingKey
       AND       (_claimedByAppUserKey IS NULL OR claimedByAppUserKey = _claimedByAppUserKey)
-      -- The claimed food listings (to be unclaimed) should not have yet entered the delivery phase!
+      -- The claimed food listings (to be unclaimed) should not have yet entered the started delivery state!
       AND       NOT EXISTS (
-                    SELECT  1 FROM DeliveryFoodListing
-                    WHERE   ClaimedFoodListing.claimedFoodListingKey = DeliveryFoodListing.claimedFoodListingKey
+                    SELECT      1
+                    FROM        DeliveryFoodListing
+                    WHERE       ClaimedFoodListing.claimedFoodListingKey = DeliveryFoodListing.claimedFoodListingKey
+                      AND       DeliveryFoodListing.startTime IS NOT NULL
+                      -- The delivery must not have been cancelled to be in started delivery state.
+                      AND       NOT EXISTS (
+                                    SELECT  1
+                                    FROM    CancelledDeliveryFoodListing
+                                    WHERE   CancelledDeliveryFoodListing.deliveryFoodListingKey = DeliveryFoodListing.deliveryFoodListingKey
+                                )
                 );
 
     -- Grab the total number of Claimed Food Listing units among the unclaim candidates for edit check.
@@ -47,6 +55,7 @@ BEGIN
     -- Make sure the claimed food listing we are to delete exists.
     IF (_totalClaimedUnitsCount = 0 OR _totalClaimedUnitsCount IS NULL)
     THEN
+        RAISE NOTICE '_totalClaimedUnitsCount: %', _totalClaimedUnitsCount;
         RAISE EXCEPTION 'Either the claimed food listing does not exist, or the current user is not authroized to unclaim the given listing.';
     END IF;
 

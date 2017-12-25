@@ -1,4 +1,4 @@
-<form [formGroup]="claimForm" *ngIf="!claimComplete && foodListing.unitsInfo.availableUnitsCount > 1">
+<form [formGroup]="claimForm" *ngIf="!claimComplete" [slick-progress-spinner]="claimPromise">
     
     <h5>{{ foodListing.unitsInfo.availableUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }} Are available. How many will you claim?</h5>
     <md-input-container id="units-count" floatPlaceholder="never">

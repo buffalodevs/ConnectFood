@@ -22,6 +22,7 @@ export class LoginComponent extends DialogComponent<null, boolean> implements On
     private displayRecoveryResponseMessage: boolean;
     private loginForm: FormGroup;
     private loginError: string;
+    private loginPromise: PromiseLike<any>;
 
 
     public constructor(
@@ -78,6 +79,7 @@ export class LoginComponent extends DialogComponent<null, boolean> implements On
         let password: string = this.loginForm.value.password;
         let observer: Observable<FoodWebResponse> = (this.forgotPassword ? this.passwordRecoveryService.recoverPassword(email)
                                                                          : this.loginService.login(email, password));
+        this.loginPromise = observer.toPromise();
 
         observer.subscribe(
 

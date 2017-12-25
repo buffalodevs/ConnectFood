@@ -33,6 +33,10 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
      * Marks whether or not valiation should fire for a specific part of the form.
      */
     private validate: Map<string, boolean>;
+    /**
+     * Used to keep track of submission of signup so we can show load spinner.
+     */
+    private signupPromise: PromiseLike<any>;
 
 
     public constructor (
@@ -138,6 +142,7 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
         appUserInfo.availability = value.availability;
 
         let observer: Observable<FoodWebResponse> = this.signupService.signup(appUserInfo, password);
+        this.signupPromise = observer.toPromise();
 
         observer.subscribe (
             this.handleSignupUserResponse.bind(this),

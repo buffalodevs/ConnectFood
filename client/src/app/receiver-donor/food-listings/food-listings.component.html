@@ -1,7 +1,7 @@
 <h3>{{ header }}</h3>
 <hr>
 
-<div [slick-progress-spinner]="refreshPromise" [showBackdrop]="false">
+<div [slick-progress-spinner]="refreshPromise" class="slick-list-item-container" [showBackdrop]="false">
 
     <!-- This is the Food Listings (generated via loop) -->
     <slick-list-item *ngFor="let foodListing of listData; let i = index">
@@ -50,7 +50,7 @@
         
                 <div id="food-types-container" class="space-bottom ">
                     <b>Present Food Types</b><br>
-                    <app-food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true" [condensedDisplay]="true" [maxNumColumns]="2"></app-food-types>
+                    <food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true" [condensedDisplay]="true"></food-types>
                 </div>
         
             </div>

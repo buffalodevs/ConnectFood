@@ -163,12 +163,10 @@
 
     <h2>Availability</h2>
     <hr>
-    <div class="row">
+    <div class="row" [slick-progress-spinner]="editData.get('availability').savePromise">
 
-        <div [slick-progress-spinner]="editData.get('availability').savePromise">
-            <slick-weekday-schedule-builder #availability id="availability" [displayOnly]="!editData.get('availability').editing" formControlName="availability">
-            </slick-weekday-schedule-builder>
-        </div>
+        <slick-weekday-schedule-builder #availability id="availability" [displayOnly]="!editData.get('availability').editing" formControlName="availability">
+        </slick-weekday-schedule-builder>
 
         <div class="col-md-6">
 

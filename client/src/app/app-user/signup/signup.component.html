@@ -1,4 +1,4 @@
-<form [formGroup]="form" class="container" *ngIf="!signupComplete">
+<form [formGroup]="form" class="container" *ngIf="!signupComplete" [slick-progress-spinner]="signupPromise">
 
     <md-horizontal-stepper #stepper [linear]="true">
 

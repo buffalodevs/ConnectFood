@@ -79,8 +79,7 @@
                 
                 <div id="food-types-container" class="space-bottom">
                     <b>Present Food Types:</b><br>
-                    <app-food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true"
-                    [condensedDisplay]="!responsiveService.widthGreaterThan(767)" [maxNumColumns]="2"></app-food-types>
+                    <food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true" [condensedDisplay]="!responsiveService.widthGreaterThan(767)"></food-types>
                 </div>
 
                 <!-- Units Counts Container -->

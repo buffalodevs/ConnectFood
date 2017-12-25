@@ -29,6 +29,10 @@ export class SlickProgressSpinnerComponent implements OnChanges {
      * An optional extra show condition.
      */
     @Input() private showCondition: boolean;
+    /**
+     * Default is false. Set to true if testing spinner and it should be permanently displayed once first triggered.
+     */
+    @Input() private spinnerTest: boolean;
 
     private showSpinner: boolean;
 
@@ -42,6 +46,7 @@ export class SlickProgressSpinnerComponent implements OnChanges {
         this.showBackdrop = true;
         this.showDuring = null;
         this.showCondition = true;
+        this.spinnerTest = false;
         this.showSpinner = false;
     }
 
@@ -54,8 +59,10 @@ export class SlickProgressSpinnerComponent implements OnChanges {
 
             // Listen for Promise/Observable to resolve so we can stop showing progress spinner then.
             this.showDuring.then(() => {
-                wasResolved = true;
-                this.showSpinner = false
+                if (!this.spinnerTest) {
+                    wasResolved = true;
+                    this.showSpinner = false
+                }
             });
 
             // Wait until the specified delay from parent component to show the progress spinner (if promise hasn't resolved).
