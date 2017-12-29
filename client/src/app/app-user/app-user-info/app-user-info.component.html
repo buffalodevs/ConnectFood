@@ -14,7 +14,7 @@
                     {{ control('email').value }}<i class="material-icons">&#xe254;</i>
                 </span>
 
-                <form [formGroup]="form" (ngSubmit)="save('email')" [slick-progress-spinner]="editData.get('email').savePromise" *ngIf="editData.get('email').editing">
+                <form [formGroup]="form" (ngSubmit)="save('email')" [slick-progress-spinner]="editData.get('email').showProgressSpinner" *ngIf="editData.get('email').editing">
 
                     <md-input-container floatPlaceholder="never">
                         <input mdInput type="email" id="email" formControlName="email" placeholder="Email">
@@ -37,7 +37,7 @@
                 </span>
 
                 <form [formGroup]="form" (ngSubmit)="save('organizationName')"
-                 [slick-progress-spinner]="editData.get('organizationName').savePromise" *ngIf="editData.get('organizationName').editing">
+                 [slick-progress-spinner]="editData.get('organizationName').showProgressSpinner" *ngIf="editData.get('organizationName').editing">
 
                     <md-input-container floatPlaceholder="never">
                         <input mdInput id="organizationName" formControlName="organizationName" placeholder="Organization Name">
@@ -63,7 +63,7 @@
                 </span>
 
                 <form [formGroup]="form" (ngSubmit)="saveMany(['firstName', 'lastName'])"
-                 [slick-progress-spinner]="editData.get('firstName').savePromise" *ngIf="editData.get('firstName').editing">
+                 [slick-progress-spinner]="editData.get('firstName').showProgressSpinner" *ngIf="editData.get('firstName').editing">
 
                     <div class="row">
 
@@ -104,7 +104,7 @@
             </div>
 
             <form [formGroup]="form" (ngSubmit)="saveMany(['address', 'city', 'state', 'zip'])"
-             [slick-progress-spinner]="editData.get('address').savePromise" *ngIf="editData.get('address').editing">
+             [slick-progress-spinner]="editData.get('address').showProgressSpinner" *ngIf="editData.get('address').editing">
 
                 <md-input-container floatPlaceholder="never" class="form-group">
                     <input mdInput id="address" placeholder="Street Address" name="address" formControlName="address">
@@ -147,7 +147,7 @@
                     </span>
                 </div>
 
-                <form [formGroup]="form" (ngSubmit)="save('phone')" [slick-progress-spinner]="editData.get('phone').savePromise" *ngIf="editData.get('phone').editing">
+                <form [formGroup]="form" (ngSubmit)="save('phone')" [slick-progress-spinner]="editData.get('phone').showProgressSpinner" *ngIf="editData.get('phone').editing">
 
                     <phone id="phone" required="true" [includeLabel]="false" formControlName="phone"></phone>
                     
@@ -163,7 +163,7 @@
 
     <h2>Availability</h2>
     <hr>
-    <div class="row" [slick-progress-spinner]="editData.get('availability').savePromise">
+    <div class="row" [slick-progress-spinner]="editData.get('availability').showProgressSpinner">
 
         <slick-weekday-schedule-builder #availability id="availability" [displayOnly]="!editData.get('availability').editing" formControlName="availability">
         </slick-weekday-schedule-builder>
@@ -194,7 +194,7 @@
             </button>
 
             <form [formGroup]="form" (ngSubmit)="savePassword('currentPassword', 'password', 'confirmPassword')"
-             [slick-progress-spinner]="editData.get('password').savePromise" *ngIf="editData.get('password').editing">
+             [slick-progress-spinner]="editData.get('password').showProgressSpinner" *ngIf="editData.get('password').editing">
 
                 <div class="form-group">
                     <md-input-container class="full-width">

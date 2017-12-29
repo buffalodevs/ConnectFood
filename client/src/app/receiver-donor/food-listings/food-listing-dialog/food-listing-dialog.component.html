@@ -3,10 +3,13 @@
     <div class="modal-body" *ngIf="isOpen()">
 
         <food-listing-info [foodListing]="dialogData" [isClaimedCart]="isClaimedCart" [isDonatedCart]="isDonatedCart" *ngIf="isDialogState('FoodListingInfo')"
-         (toClaim)="toClaim()"></food-listing-info>
+         (toClaim)="toClaim()" (toUnclaim)="toUnclaim()" (toRemove)="toRemove()"></food-listing-info>
 
-        <food-listing-claim [foodListing]="dialogData" *ngIf="isDialogState('Claim')" (claimed)="removeListing.emit(false)" (close)="close()"></food-listing-claim>
+        <food-listing-claim [foodListing]="dialogData" *ngIf="isDialogState('Claim')" (removeListing)="removeListing.emit(false)" (close)="close()"></food-listing-claim>
 
+        <food-listing-unclaim [foodListing]="dialogData" *ngIf="isDialogState('Unclaim')" (removeListing)="removeListing.emit(false)" (close)="close()"></food-listing-unclaim>
+
+        <food-listing-remove [foodListing]="dialogData" *ngIf="isDialogState('Remove')" (removeListing)="removeListing.emit(false)" (close)="close()"></food-listing-remove>
     </div>
 
 </slick-list-dialog>

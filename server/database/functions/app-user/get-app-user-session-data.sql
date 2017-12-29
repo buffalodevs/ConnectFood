@@ -6,6 +6,7 @@ SELECT dropFunction('getAppUserSessionData');
 CREATE OR REPLACE FUNCTION getAppUserSessionData
 (
     _appUserKey         AppUser.appUserKey%TYPE     DEFAULT NULL,
+    _appUserKeys        INTEGER[]                   DEFAULT NULL,  -- If wish to get multiple AppUser's information.
     _email              AppUser.email%TYPE          DEFAULT NULL,
     _includePassword    BOOLEAN                     DEFAULT FALSE, -- Excplicitely set to TRUE to bring back password. Extra security measure.
     _lastName           AppUser.lastName%TYPE       DEFAULT NULL,
@@ -67,6 +68,7 @@ AS $$
     LEFT JOIN  Organization         ON AppUser.appUserKey = Organization.appUserKey
     LEFT JOIN  UnverifiedAppUser    ON AppUser.appUserKey = UnverifiedAppUser.appUserKey
     WHERE (_appUserKey IS NULL       OR AppUser.appUserKey = _appUserKey)
+      AND (_appUserKeys IS NULL      OR AppUser.appUserKey = ANY(_appUserKeys))
       AND (_email IS NULL            OR AppUser.email = _email)
       AND (_lastName IS NULL         OR AppUser.lastName = _lastName)
       AND (_firstName IS NULL        OR AppUser.firstName = _firstName)
@@ -79,4 +81,4 @@ AS $$
 
 $$ LANGUAGE sql;
 
---SELECT * FROM getAppUserSessionData(NULL, 'marknemm@buffalo.edu', TRUE);
+--SELECT * FROM getAppUserSessionData(NULL, '{1, 2}'::int[]);

@@ -1,0 +1,38 @@
+<form [formGroup]="unclaimForm" [slick-progress-spinner]="showProgressSpinner" *ngIf="!unclaimComplete">
+    
+    <ng-container *ngIf="foodListing.unitsInfo.myClaimedUnitsCount > 1">
+
+        <h5>{{ foodListing.unitsInfo.myClaimedUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }} Are currently claimed. How many will you unclaim?</h5>
+        <md-input-container id="units-count" floatPlaceholder="never">
+            <input mdInput formControlName="unitsCount" InputFilter [min]="1" [max]="foodListing.unitsInfo.myClaimedUnitsCount">
+            <span mdSuffix>/ {{ foodListing.unitsInfo.myClaimedUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }}</span>
+        </md-input-container>
+
+    </ng-container>
+
+    <ng-container *ngIf="foodListing.unitsInfo.myClaimedUnitsCount === 1">
+        <p>Are you sure that you wish to unclaim the selected food listing?</p>
+    </ng-container>
+
+    <!-- Footer -->
+    <div class="modal-button-group">    
+        <button md-raised-button color="primary" type="submit" class="button-md" (click)="unclaimSelectedFoodListing()">Confirm Unclaim</button>
+    </div>
+
+</form>
+
+
+<ng-container *ngIf="unclaimComplete">
+
+    <p>
+        Successfully unclaimed
+        {{ (foodListing.unitsInfo.unitsLabel == null) ? ''
+                                                      : unclaimForm.get('unitsCount').value + ' ' + foodListing.unitsInfo.unitsLabel + ' of' }}
+        food listing titled <b>{{ foodListing.foodTitle }}</b>.
+    </p>
+
+    <div class="modal-button-group">
+        <button md-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>
+    </div>
+
+</ng-container>

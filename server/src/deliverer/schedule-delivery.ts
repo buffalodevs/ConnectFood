@@ -45,6 +45,8 @@ export function scheduleDelivery(claimedFoodListingKey: number, deliveryAppUserK
 
 
 export function emailScheduledNotification(scheduledDelivery: Delivery, startImmediately: boolean, scheduledStartTime: Date): Promise<void> {
-    // TODO: Email/Text deliverer, receiver, and donor about the schedule (or started) delivery.
+    
+    
+    
     return Promise.resolve();
 }

@@ -9,20 +9,20 @@ import { FoodListing } from './../../../../../../../shared/receiver-donor/food-l
 
 
 @Component({
-    selector: 'food-listing-claim',
-    templateUrl: './food-listing-claim.component.html',
+    selector: 'food-listing-unclaim',
+    templateUrl: './food-listing-unclaim.component.html',
     styleUrls: [
-        './food-listing-claim.component.css',
+        './food-listing-unclaim.component.css',
         '../../food-listings.component.css',
         '../../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
     ]
 })
-export class FoodListingClaimComponent implements OnChanges {
+export class FoodListingUnclaimComponent implements OnChanges {
 
     @Input() private foodListing: FoodListing;
 
     /**
-     * Emitted whenever a Food Listing has been completely claimed and it should be removed from parent comonents listings (Receive).
+     * Emitted whenever a Food Listing has been completely unclaimed and should be removed fromt he parent components list (Cart).
      */
     @Output() private removeListing: EventEmitter<void>;
     /**
@@ -30,8 +30,8 @@ export class FoodListingClaimComponent implements OnChanges {
      */
     @Output() private close: EventEmitter<void>;
 
-    private claimForm: FormGroup;
-    private claimComplete: boolean;
+    private unclaimForm: FormGroup;
+    private unclaimComplete: boolean;
     private showProgressSpinner: boolean;
 
 
@@ -42,8 +42,8 @@ export class FoodListingClaimComponent implements OnChanges {
         this.removeListing = new EventEmitter<void>();
         this.close = new EventEmitter<void>();
 
-        this.claimForm = new FormGroup({'unitsCount': new FormControl(1, [ Validators.required, Validators.min(1) ])});
-        this.claimComplete = false;
+        this.unclaimForm = new FormGroup({'unitsCount': new FormControl(1, [ Validators.required, Validators.min(1) ])});
+        this.unclaimComplete = false;
         this.showProgressSpinner = false;
     }
 
@@ -53,41 +53,37 @@ export class FoodListingClaimComponent implements OnChanges {
         // Listen for update of FoodListing input so we can set default unitsCount value and update max number validation!
         if (changes.foodListing != null && this.foodListing != null) {
 
-            this.claimForm.get('unitsCount').setValue(this.foodListing.unitsInfo.availableUnitsCount);
-            this.claimForm.setValidators([ Validators.required, Validators.min(1), Validators.max(this.foodListing.unitsInfo.availableUnitsCount) ]);
-
-            // If there is only one unit available, then automatically perform claim (no need for user to input units count).
-            if (this.foodListing.unitsInfo.availableUnitsCount === 1) {
-                this.claimSelectedFoodListing();
-            }
+            this.unclaimForm.get('unitsCount').setValue(this.foodListing.unitsInfo.myClaimedUnitsCount);
+            this.unclaimForm.setValidators([ Validators.required, Validators.min(1), Validators.max(this.foodListing.unitsInfo.myClaimedUnitsCount) ]);
         }
     }
 
 
     /**
-     * Claims the currently selected Food Listing.
+     * Unclaims the currently selected Food Listing.
      */
-    private claimSelectedFoodListing(): void {
+    private unclaimSelectedFoodListing(): void {
 
-        if (!this.claimForm.valid) return;
+        if (!this.unclaimForm.valid) return;
         
-        const unitsCount: number = Number.parseInt(this.claimForm.get('unitsCount').value);
-        let observer: Observable<boolean> = this.manageFoodListingService.claimFoodListing(this.foodListing.foodListingKey, unitsCount);
+        const unitsCount: number = Number.parseInt(this.unclaimForm.get('unitsCount').value);
+        let observer: Observable<boolean> = this.manageFoodListingService.unclaimFoodListing(this.foodListing.foodListingKey, unitsCount);
         this.showProgressSpinner = true;
         
         // Listen for result.
-        observer.finally(() => { this.showProgressSpinner = false; })
+        observer.finally(() => { this.showProgressSpinner = true; })
                 .subscribe (
                     (success: boolean) => {
 
                         if (success) {
 
-                            this.foodListing.unitsInfo.myClaimedUnitsCount += unitsCount;
-                            this.foodListing.unitsInfo.availableUnitsCount -= unitsCount;
+                            this.foodListing.unitsInfo.myClaimedUnitsCount -= unitsCount;
+                            this.foodListing.unitsInfo.availableUnitsCount += unitsCount;
 
-                            if (this.foodListing.unitsInfo.availableUnitsCount === 0)
+                            // Remove only if all claimed units are depleted!
+                            if (this.foodListing.unitsInfo.myClaimedUnitsCount === 0)
                                 {  this.removeListing.emit();  }
-                            this.claimComplete = true;
+                            this.unclaimComplete = true;
                         }
                     },
                     (err: Error) => {

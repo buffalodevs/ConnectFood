@@ -1,25 +1,15 @@
-import { Address } from '../app-user/app-user-info';
-import { GPSCoordinate } from "../common-util/geocode";
+import { FoodListingUser, DeliveryStateInfo } from '../common-receiver-donor-deliverer/shared-food-listing-delivery';
 
 
 /**
- * Container for Food Listing Donor data.
+ * Contains information pertaining to a claim on a food listing.
  */
-export class FoodListingUser implements Address {
+export class ClaimInfo {
 
     public constructor (
-        public organizationName?: string,
-        public address?: string,
-        public city?: string,
-        public state?: string,
-        public zip?: number,
-        public gpsCoordinate: GPSCoordinate = new GPSCoordinate(),
-        public drivingDistance?: number,
-        public drivingTime?: number,
-        public phone?: string,
-        public email?: string,
-        public lastName?: string,
-        public firstName?: string
+        public receiverInfo?: FoodListingUser,
+        public delivererInfo?: FoodListingUser,
+        public deliveryStateInfo?: DeliveryStateInfo
     ) {}
 }
 
@@ -75,6 +65,10 @@ export class FoodListing {
          */
         public imgUrl?: string,
         public donorInfo?: FoodListingUser,
+        /**
+         * Information pertaining to all claims on this Food Listing.
+         */
+        public claimsInfo?: ClaimInfo[],
         public unitsInfo?: FoodListingUnits
     ) {}
 }

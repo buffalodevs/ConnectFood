@@ -13,6 +13,8 @@ import { FoodListingsFiltersComponent } from './food-listings/food-listings-filt
 import { FoodListingDialogComponent } from './food-listings/food-listing-dialog/food-listing-dialog.component';
 import { FoodListingInfoComponent } from './food-listings/food-listing-dialog/food-listing-info/food-listing-info.component';
 import { FoodListingClaimComponent } from './food-listings/food-listing-dialog/food-listing-claim/food-listing-claim.component';
+import { FoodListingUnclaimComponent } from './food-listings/food-listing-dialog/food-listing-unclaim/food-listing-unclaim.component';
+import { FoodListingRemoveComponent } from './food-listings/food-listing-dialog/food-listing-remove/food-listing-remove.component';
 import { FoodListingsComponent } from './food-listings/food-listings.component';
 import { DonateComponent } from './donate/donate.component';
 import { ReceiveComponent } from './receive/receive.component';
@@ -62,6 +64,8 @@ const receiverDonorRoutes: Routes = [
         FoodListingDialogComponent,
         FoodListingInfoComponent,
         FoodListingClaimComponent,
+        FoodListingUnclaimComponent,
+        FoodListingRemoveComponent,
         FoodListingsComponent,
         DonateComponent,
         ReceiveComponent,

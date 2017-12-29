@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { SessionData } from "../common-util/session-data";
 import { addFoodListing } from './donor/add-food-listing';
 import { removeFoodListing } from "./donor/remove-food-listing";
-import { getFoodListings } from './get-food-listings';
+import { getFoodListings } from './common-receiver-donor/get-food-listings';
 import { claimFoodListing, unclaimFoodListing } from './receiver/claim-unclaim-food-listing';
 
 import { AddFoodListingRequest, AddFoodListingResponse, FoodListingUpload } from '../../../shared/receiver-donor/message/add-food-listing-message'
@@ -52,10 +52,10 @@ export function handleRemoveFoodListing(request: Request, response: Response): v
     response.setHeader('Content-Type', 'application/json');
 
     let removeFoodListingRequest: ManageFoodListingRequest = request.body;
-    // The currently logged in user must be the original Donor (have authority to remove Food Listing).
-    let donorAppUserKey: number = SessionData.loadSessionData(request).appUserKey;
+    // Need so we can verify that currently logged in user must be the original Donor (have authority to remove Food Listing).
+    let donorSessionData: SessionData = SessionData.loadSessionData(request);
 
-    removeFoodListing(removeFoodListingRequest.foodListingKey, donorAppUserKey, removeFoodListingRequest.unitsCount)
+    removeFoodListing(removeFoodListingRequest.foodListingKey, donorSessionData, removeFoodListingRequest.unitsCount)
         .then(() => {
             response.send(new FoodWebResponse(true, 'Food listing has been successfully removed.'));
         })
@@ -70,9 +70,9 @@ export function handleClaimFoodListing(request: Request, response: Response): vo
     response.setHeader('Content-Type', 'application/json');
 
     let claimFoodListingRequest: ManageFoodListingRequest = request.body;
-    let claimedByAppUserKey: number = SessionData.loadSessionData(request).appUserKey;
+    let receiverSessionData: SessionData = SessionData.loadSessionData(request);
 
-    claimFoodListing(claimFoodListingRequest.foodListingKey, claimedByAppUserKey, claimFoodListingRequest.unitsCount)
+    claimFoodListing(claimFoodListingRequest.foodListingKey, receiverSessionData, claimFoodListingRequest.unitsCount)
         .then(() => {
             response.send(new FoodWebResponse(true, 'Food listing has been successfully claimed.'));
         })
@@ -87,9 +87,9 @@ export function handleUnclaimFoodListing(request: Request, response: Response): 
     response.setHeader('Content-Type', 'application/json');
 
     let unclaimFoodListingRequest: ManageFoodListingRequest = request.body;
-    let claimedByAppUserKey: number = SessionData.loadSessionData(request).appUserKey;
+    let receiverSessionData: SessionData = SessionData.loadSessionData(request);
 
-    unclaimFoodListing(unclaimFoodListingRequest.foodListingKey, claimedByAppUserKey, unclaimFoodListingRequest.unitsCount)
+    unclaimFoodListing(unclaimFoodListingRequest.foodListingKey, receiverSessionData, unclaimFoodListingRequest.unitsCount)
         .then(() => {
             response.send(new FoodWebResponse(true, 'Food listing has been successfully unclaimed.'));
         })

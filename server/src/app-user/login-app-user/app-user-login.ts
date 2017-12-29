@@ -35,7 +35,7 @@ export function login(email: string, password: string): Promise<SessionData> {
  */
 function getAppUserInfo(email: string): Promise<QueryResult> {
 
-    let queryString: string = `SELECT * FROM getAppUserSessionData(NULL, $1, TRUE);`;
+    let queryString: string = `SELECT * FROM getAppUserSessionData(NULL, NULL, $1, TRUE);`;
     let queryArgs: Array<string> = [email];
 
     logSqlQueryExec(queryString, queryArgs);

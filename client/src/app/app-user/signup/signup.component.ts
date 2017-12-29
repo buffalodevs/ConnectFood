@@ -34,9 +34,9 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
      */
     private validate: Map<string, boolean>;
     /**
-     * Used to keep track of submission of signup so we can show load spinner.
+     * Used to keep track of submission of signup so we can show progress spinner.
      */
-    private signupPromise: PromiseLike<any>;
+    private showProgressSpinner: boolean;
 
 
     public constructor (
@@ -47,11 +47,13 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
         private appUserConstants: AppUserConstantsService
     ) {
         super(signupValidationService);
+
         this.signupError = null;
         this.signupComplete = false;
         this.adminPreStr = '';
         this.appUserTypesService.getAppUserTypes().subscribe((appUserTypes: string[]) => { this.appUserTypes = appUserTypes });
         this.validate = new Map<string, boolean>();
+        this.showProgressSpinner = false;
     }
 
 
@@ -142,16 +144,17 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
         appUserInfo.availability = value.availability;
 
         let observer: Observable<FoodWebResponse> = this.signupService.signup(appUserInfo, password);
-        this.signupPromise = observer.toPromise();
+        this.showProgressSpinner = true;
 
-        observer.subscribe (
-            this.handleSignupUserResponse.bind(this),
-            // When we have errors connecting to server.
-            (err: Error) => {
-                this.signupError = 'Error: could not communication with server';
-                console.log(err);
-            }
-        );
+        observer.finally(() => { this.showProgressSpinner = false; })
+                .subscribe (
+                    this.handleSignupUserResponse.bind(this),
+                    // When we have errors connecting to server.
+                    (err: Error) => {
+                        this.signupError = 'Error: could not communication with server';
+                        console.log(err);
+                    }
+                );
     }
 
 

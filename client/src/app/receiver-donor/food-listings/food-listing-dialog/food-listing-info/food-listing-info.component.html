@@ -139,7 +139,7 @@
 <div class="modal-button-group">
     
     <button md-raised-button color="primary" class="button-md" (click)="toClaim.emit()" *ngIf="!isClaimedCart && !isDonatedCart">Claim</button>
-    <button md-raised-button color="primary" class="button-md warn-button" (click)="unclaimSelectedFoodListing()" *ngIf="isClaimedCart">Unclaim</button>
-    <button md-raised-button color="primary" class="button-md warn-button" (click)="removeSelectedFoodListing()" *ngIf="isDonatedCart">Remove</button>
+    <button md-raised-button color="primary" class="button-md warn-button" (click)="toUnclaim.emit()" *ngIf="isClaimedCart">Unclaim</button>
+    <button md-raised-button color="primary" class="button-md warn-button" (click)="toRemove.emit()" *ngIf="isDonatedCart">Remove</button>
 
 </div>

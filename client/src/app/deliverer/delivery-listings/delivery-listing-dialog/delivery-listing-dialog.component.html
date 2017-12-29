@@ -3,13 +3,13 @@
     <div class="modal-body" *ngIf="isOpen()">
         
         <delivery-listing-info [delivery]="dialogData" [isCart]="isCart" *ngIf="isDialogState('DeliveryInfo')" (close)="close()"
-         (toSchedule)="toSchedule()" (toCancelReason)="toCancelReason()" (deliveryStateChange)="isCart ? void : removeListing.emit(false)">
+         (toSchedule)="toSchedule()" (toCancelReason)="toCancelReason()" (removeListing)="removeListing.emit(false)">
         </delivery-listing-info>
 
-        <delivery-listing-schedule [delivery]="dialogData" *ngIf="isDialogState('Schedule')" (scheduled)="removeListing.emit(false)" (close)="close()">
+        <delivery-listing-schedule [delivery]="dialogData" *ngIf="isDialogState('Schedule')" (removeListing)="removeListing.emit(false)" (close)="close()">
         </delivery-listing-schedule>
 
-        <delivery-listing-cancel [delivery]="dialogData" *ngIf="isDialogState('CancelReason')" (cancelled)="removeListing.emit(false)" (close)="close()">
+        <delivery-listing-cancel [delivery]="dialogData" *ngIf="isDialogState('CancelReason')" (removeListing)="removeListing.emit(false)" (close)="close()">
         </delivery-listing-cancel>
     
     </div>

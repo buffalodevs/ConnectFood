@@ -85,7 +85,7 @@ export function signupVerify(appUserKey: number, verificationToken: String): Pro
 
 function sendVerificationEmail(sessionData: SessionData) : Promise<SessionData> {
 
-    let verificationLink = 'http://connect-food.herokuapp.com/appUser/verify?appUserKey='
+    let verificationLink = process.env.HOST_ADDRESS + '/appUser/verify?appUserKey='
                          + sessionData.appUserKey + '&verificationToken=' + sessionData.verificationToken;
 
     let sendEmail = nodemailer.config({
@@ -97,7 +97,7 @@ function sendVerificationEmail(sessionData: SessionData) : Promise<SessionData> 
 
     let mailOptions = {
         subject: 'Verify Your Account With Food Web',            
-        senderName: "Food Web",
+        senderName: 'Food Web',
         receiver: sessionData.appUserInfo.email,
         html: `Dear User,<br><br>
                Welcome to Food Web!<br><br>

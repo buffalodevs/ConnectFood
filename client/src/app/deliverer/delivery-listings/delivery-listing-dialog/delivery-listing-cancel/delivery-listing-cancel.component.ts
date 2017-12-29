@@ -19,18 +19,19 @@ import { DeliveryState } from '../../../../../../../shared/deliverer/message/get
 export class DeliveryListingCancelComponent {
 
     @Input() private delivery: Delivery;
-    @Output() private cancelled: EventEmitter<void>;
+    @Output() private removeListing: EventEmitter<void>;
     @Output() private close: EventEmitter<void>;
 
     private cancelForm: FormGroup;
     private validate: boolean;
     private cancelComplete: boolean;
+    private showProgressSpinner: boolean;
 
 
     public constructor (
         private cancelDeliveryService: CancelDeliveryService
     ) {
-        this.cancelled = new EventEmitter<void>();
+        this.removeListing = new EventEmitter<void>();
         this.close = new EventEmitter<void>();
 
         this.cancelForm = new FormGroup({
@@ -40,6 +41,7 @@ export class DeliveryListingCancelComponent {
 
         this.validate = false;
         this.cancelComplete = false;
+        this.showProgressSpinner = false;
     }
 
 
@@ -50,14 +52,16 @@ export class DeliveryListingCancelComponent {
 
         this.validate = true;
         if (!this.cancelForm.valid)  return;
+        this.showProgressSpinner = true;
 
         const cancelReason: string = this.cancelForm.get('cancelReason').value;
         const foodRejected: boolean = this.cancelForm.get('foodRejected').value;
 
         this.cancelDeliveryService.cancelDelivery(this.delivery.deliveryFoodListingKey, cancelReason, foodRejected)
+            .finally(() => { this.showProgressSpinner = false; })
             .subscribe((success: boolean) => {
                 if (success) {
-                    this.cancelled.emit(); // Emit cancelled signal to parent (Dialog) so it can close and remove the cancelled listing.
+                    this.removeListing.emit(); // Emit signal to parent (Dialog) so it can close and remove the cancelled listing.
                     this.cancelComplete = true;
                 }
             },

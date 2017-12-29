@@ -1,12 +1,12 @@
 'use strict'
-import { query, QueryResult } from '../database-util/connection-pool';
-import { fixNullQueryArgs, toPostgresArray } from './../database-util/prepared-statement-util';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../logging/sql-logger';
+import { query, QueryResult } from '../../database-util/connection-pool';
+import { fixNullQueryArgs, toPostgresArray } from './../../database-util/prepared-statement-util';
+import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 
-import { getDrivingDistTime, GPSCoordinate, DriveDistTime } from '../common-util/geocode';
-import { FoodListingsFilters, LISTINGS_STATUS } from '../../../shared/receiver-donor/food-listings-filters';
-import { FoodListing } from "../../../shared/receiver-donor/food-listing";
-import { DateFormatter } from "../../../shared/common-util/date-formatter";
+import { getDrivingDistTime, GPSCoordinate, DriveDistTime } from '../../common-util/geocode';
+import { FoodListingsFilters, LISTINGS_STATUS } from '../../../../shared/receiver-donor/food-listings-filters';
+import { FoodListing } from "../../../../shared/receiver-donor/food-listing";
+import { DateFormatter } from "../../../../shared/common-util/date-formatter";
 
 
 /**
@@ -88,20 +88,20 @@ function generateAvailableAfterArg(availableAfterDate: Date): string {
 function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate, myDonatedListingsOnly: boolean): Promise<FoodListing[]> {
 
     let foodListings: FoodListing[] = [];
-    let donorGPSCoordinate: GPSCoordinate[] = [];
+    let donorGPSCoordinates: GPSCoordinate[] = [];
 
     // Go through each row of the database output (each row corresponds to a Food Listing).
     for (let i: number = 0; i < rows.length; i++) {
         // Insert returned data into result arrays.
         foodListings.push(rows[i].foodlisting);
-        donorGPSCoordinate.push(rows[i].donorgpscoordinate);
+        donorGPSCoordinates.push(foodListings[i].donorInfo.gpsCoordinate);
     }
 
     // If in Donor Cart, then we don't care about seeing driving distances!
     if (myDonatedListingsOnly)  return Promise.resolve(foodListings);
 
     // In Receive tab or Receiver Cart, we do care about driving distances!
-    return getDrivingDistTime(myGPSCoordinate, donorGPSCoordinate)
+    return getDrivingDistTime(myGPSCoordinate, donorGPSCoordinates)
         .then((driveDistTime: DriveDistTime[]) => {
             for (let i: number = 0; i < driveDistTime.length; i++) {
                 foodListings[i].donorInfo.drivingDistance = driveDistTime[i].driveDistanceMi;

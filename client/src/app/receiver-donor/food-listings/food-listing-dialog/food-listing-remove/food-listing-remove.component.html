@@ -1,0 +1,38 @@
+<form [formGroup]="removeForm" [slick-progress-spinner]="showProgressSpinner" *ngIf="!removeComplete">
+    
+    <ng-container *ngIf="foodListing.unitsInfo.donorOnHandUnitsCount > 1">
+
+        <h5>{{ foodListing.unitsInfo.donorOnHandUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }} Are currently donated. How many will you remove?</h5>
+        <md-input-container id="units-count" floatPlaceholder="never">
+            <input mdInput formControlName="unitsCount" InputFilter [min]="1" [max]="foodListing.unitsInfo.donorOnHandUnitsCount">
+            <span mdSuffix>/ {{ foodListing.unitsInfo.donorOnHandUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }}</span>
+        </md-input-container>
+
+    </ng-container>
+
+    <ng-container *ngIf="foodListing.unitsInfo.donorOnHandUnitsCount === 1">
+        <p>Are you sure that you wish to remove the selected food listing?</p>
+    </ng-container>
+
+    <!-- Footer -->
+    <div class="modal-button-group">    
+        <button md-raised-button color="primary" type="submit" class="button-md" (click)="removeSelectedFoodListing()">Confirm Remove</button>
+    </div>
+
+</form>
+
+
+<ng-container *ngIf="removeComplete">
+
+    <p>
+        Successfully removed
+        {{ (foodListing.unitsInfo.unitsLabel == null) ? ''
+                                                      : removeForm.get('unitsCount').value + ' ' + foodListing.unitsInfo.unitsLabel + ' of' }}
+        food listing titled <b>{{ foodListing.foodTitle }}</b>.
+    </p>
+
+    <div class="modal-button-group">
+        <button md-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>
+    </div>
+
+</ng-container>

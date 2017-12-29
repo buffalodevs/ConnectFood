@@ -17,7 +17,7 @@
 
         <!-- Regular Modal Dialog Body -->
         <form ngNativeValidate *ngIf="!displayRecoveryResponseMessage" class="modal-body" (ngSubmit)="loginUser($event)" id="login-form"
-         [formGroup]="loginForm" [slick-progress-spinner]="loginPromise">
+         [formGroup]="loginForm" [slick-progress-spinner]="showProgressSpinner">
 
             <div>
                 <md-form-field>

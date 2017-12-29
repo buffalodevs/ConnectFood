@@ -80,4 +80,20 @@ export class FoodListingDialogComponent extends AbstractSlickListDialog<FoodList
     private toClaim(): void {
         this.foodListingDialogState = FoodListingDialogState.Claim;
     }
+
+
+    /**
+     * Transitions dialog state to Unclaim.
+     */
+    private toUnclaim(): void {
+        this.foodListingDialogState = FoodListingDialogState.Unclaim;
+    }
+
+
+    /**
+     * Transitions dialog state to Remove.
+     */
+    private toRemove(): void {
+        this.foodListingDialogState = FoodListingDialogState.Remove;
+    }
 }

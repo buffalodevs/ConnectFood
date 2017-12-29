@@ -31,5 +31,5 @@ export class AppUserInfo implements Address {
         public gpsCoordinate: GPSCoordinate = new GPSCoordinate(),
         public phone?: string,
         public availability?: TimeRange[]
-    ) { }
+    ) {}
 }

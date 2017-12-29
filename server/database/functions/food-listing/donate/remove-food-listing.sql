@@ -10,12 +10,24 @@ CREATE OR REPLACE FUNCTION removeFoodListing
                                                                                 -- NOTE: Default NULL means that all units (the whole FoodListing) shall be removed.
                                                                                 --       Also, only units that have not entered a delivery phase may be removed.
 )
-RETURNS VOID -- TODO: Return contact info of App User who lost their claim due to this action for email notification!
+-- Return user information of (receiver/deliverer) app users who were affected by the removal of the donation.
+RETURNS TABLE (
+    claimedFoodListingKey       ClaimedFoodListing.claimedFoodListingKey%TYPE,
+    claimedByAppUserKey         ClaimedFoodListing.claimedByAppUserKey%TYPE,
+    affectedNotificationData    JSON
+)
 AS $$
     DECLARE _donorOnHandUnitsCount          FoodListing.availableUnitsCount%TYPE;
     DECLARE _availableUnitsCount            FoodListing.availableUnitsCount%TYPE;
     DECLARE _claimedUnitsDeleteCount        ClaimedFoodListing.claimedUnitsCount%TYPE;
 BEGIN
+
+    DROP TABLE IF EXISTS AffectedNotificationData;
+    CREATE TEMP TABLE AffectedNotificationData (
+        claimedFoodListingKey       INTEGER,
+        claimedByAppUserKey         INTEGER,
+        affectedNotificationData    JSON
+    );
 
     -- Make sure the food listing we are to delete exists and was donated by user issuing this command.
     IF NOT EXISTS (
@@ -25,7 +37,7 @@ BEGIN
           AND   FoodListing.donatedByAppUserKey = _donatedByAppUserKey
     )
     THEN
-        RAISE EXCEPTION 'Food listing does not exist, or user not authorized.';
+        RAISE EXCEPTION 'Food listing does not exist, or user not authorized as Donor.';
     END IF;
 
     -- Get the count of units that the Donor still has control over.
@@ -58,16 +70,16 @@ BEGIN
 
     -- First get the number of claimed units that we must delete.
     -- NOTE: We only delete claimed units if we have to delete more units than the available (unclaimed) count!
-    _claimedUnitsDeleteCount :=
-    CASE (_deleteUnitsCount > _availableUnitsCount)
-        WHEN TRUE THEN (_deleteUnitsCount - _availableUnitsCount)
-        ELSE 0
-    END;
+    _claimedUnitsDeleteCount := CASE (_deleteUnitsCount > _availableUnitsCount)
+                                    WHEN TRUE THEN (_deleteUnitsCount - _availableUnitsCount)
+                                    ELSE 0
+                                END;
 
     -- Unclaim the number of claimed units that we are to delete.
     IF (_claimedUnitsDeleteCount > 0)
     THEN
-        PERFORM unclaimFoodListing(_foodListingKey, NULL, _claimedUnitsDeleteCount);
+        INSERT INTO     AffectedNotificationData
+        SELECT * FROM   unclaimFoodListing(_foodListingKey, _donatedByAppUserKey, _claimedUnitsDeleteCount);
     END IF;
 
     -- Remove all units from available units that are to be deleted.
@@ -99,6 +111,9 @@ BEGIN
         WHERE       foodListingKey = _foodListingKey;
 
     END IF;
+
+    RETURN QUERY
+    SELECT * FROM AffectedNotificationData;
 
 END;
 $$ LANGUAGE plpgsql;

@@ -13,7 +13,7 @@ export abstract class AbstractSlickFilteredList<LIST_T, FILT_T extends SlickList
 
     @ViewChild('filters') protected filters: FormGroup;
     @ViewChild('listings') protected listings: AbstractSlickList<LIST_T, FILT_T>;
-    
+        
 
     protected constructor() {}
 

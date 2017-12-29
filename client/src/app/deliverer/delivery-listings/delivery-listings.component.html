@@ -1,7 +1,7 @@
 <h3>Deliveries</h3>
 <hr>
 
-<div [slick-progress-spinner]="refreshPromise" [showBackdrop]="false">
+<div class="slick-list-item-container" [slick-progress-spinner]="shouldShowProgressSpinner()" [showBackdrop]="false">
 
     <!-- This is the Delivery Food Listings (generated via loop) -->
     <slick-list-item *ngFor="let deliveryListing of listData; let i = index;">

@@ -32,20 +32,22 @@ export class ManageFoodListingService {
     /**
      * Unclaims a given Food Listing.
      * @param foodListingKey The key (identifier) for the Food Listing that is to be unclaimed.
+     * @param unitsCount The number of units to unclaim.
      * @return An observable that has no payload (simply resolves on success).
      */
-    public unclaimFoodListing(foodListingKey: number): Observable<boolean> {
-        return this.manageFoodListing(foodListingKey, undefined, '/receiverDonor/receiver/unclaimFoodListing');
+    public unclaimFoodListing(foodListingKey: number, unitsCount: number): Observable<boolean> {
+        return this.manageFoodListing(foodListingKey, unitsCount, '/receiverDonor/receiver/unclaimFoodListing');
     }
 
 
     /**
-     * Removes a given Foood Listing.
+     * Removes (un-donates) a given Foood Listing.
      * @param foodListingKey The key (identifier) for the Food Listing that is to be removed.
+     * @param unitsCount The number of units to remove.
      * @return An observable that has no payload (simply resolves on success).
      */
-    public removeFoodListing(foodListingKey: number): Observable<boolean> {
-        return this.manageFoodListing(foodListingKey, undefined, 'receiverDonor/donor/removeFoodListing');
+    public removeFoodListing(foodListingKey: number, unitsCount: number): Observable<boolean> {
+        return this.manageFoodListing(foodListingKey, unitsCount, 'receiverDonor/donor/removeFoodListing');
     }
 
 

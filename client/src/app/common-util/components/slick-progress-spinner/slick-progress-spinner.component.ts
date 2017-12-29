@@ -18,13 +18,17 @@ export class SlickProgressSpinnerComponent implements OnChanges {
      */
     @Input() private delayMs: number;
     /**
+     * Default value is 0. The minimum duration that the progress spinner must show for.
+     */
+    @Input() private minDurationMs: number;
+    /**
      * Default is true. Determines whether or not to use the backdrop.
      */
     @Input() private showBackdrop: boolean;
     /**
-     * The Promise/Observable that the progress spinner should display during.
+     * Triggers the display of the progress spinner if set true once delayMs has elapsed. Stops display if set false after minDurationMs has elapsed.
      */
-    @Input('slick-progress-spinner') private showDuring: PromiseLike<any>;
+    @Input('slick-progress-spinner') private triggerShowSpinner: boolean;
     /**
      * An optional extra show condition.
      */
@@ -43,8 +47,9 @@ export class SlickProgressSpinnerComponent implements OnChanges {
         this.mode = 'indeterminate';
 
         this.delayMs = 0;
+        this.minDurationMs = 0;
         this.showBackdrop = true;
-        this.showDuring = null;
+        this.triggerShowSpinner = false;
         this.showCondition = true;
         this.spinnerTest = false;
         this.showSpinner = false;
@@ -53,22 +58,22 @@ export class SlickProgressSpinnerComponent implements OnChanges {
 
     public ngOnChanges(changes: SimpleChanges): void {
         
-        if (changes.showDuring.currentValue != null) {
+        if (changes.triggerShowSpinner) {
 
-            let wasResolved: boolean = false;
+            // If change is to null/undefined, then set to false.
+            if (this.triggerShowSpinner == null) {
 
-            // Listen for Promise/Observable to resolve so we can stop showing progress spinner then.
-            this.showDuring.then(() => {
-                if (!this.spinnerTest) {
-                    wasResolved = true;
-                    this.showSpinner = false
-                }
-            });
+                this.triggerShowSpinner = false;
+                // If change is to null/undefined, and previous value was false, then simply return / do nothing.
+                if (changes.triggerShowSpinner.previousValue === !this.triggerShowSpinner) return;
+            }
 
-            // Wait until the specified delay from parent component to show the progress spinner (if promise hasn't resolved).
+            // Wait for delay to show/hide progress spinner.
             setTimeout(() => {
-                if (!wasResolved && this.showCondition) this.showSpinner = true
-            }, this.delayMs);
+                this.showSpinner = (!this.spinnerTest || this.triggerShowSpinner) ? this.triggerShowSpinner
+                                                                                  : true; // Always true if spinnerTest is set!
+            }, this.triggerShowSpinner ? this.delayMs
+                                       : this.minDurationMs);
         }
     }
 }

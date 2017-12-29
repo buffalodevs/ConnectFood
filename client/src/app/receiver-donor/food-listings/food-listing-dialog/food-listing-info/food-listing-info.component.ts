@@ -2,7 +2,6 @@ import { Component, Input, ViewChild, Output, EventEmitter } from '@angular/core
 import { Observable } from 'rxjs/Observable';
 
 import { ResponsiveService } from '../../../../common-util/services/responsive.service';
-import { ManageFoodListingService } from '../../food-listing-services/manage-food-listing.service';
 
 import { FoodListing } from './../../../../../../../shared/receiver-donor/food-listing';
 
@@ -33,49 +32,28 @@ export class FoodListingInfoComponent {
     @Input() private defaultImgUrl: string;
 
     /**
-     * Emitted whenever a Food Listing has been managed and is to be removed from the respective listings in parent.
+     * Emitted whenever a Food Listing is to be claimed.
      */
     @Output() private toClaim: EventEmitter<void>;
+    /**
+     * Emitted whenever a Food Listing is to be unclaimed.
+     */
+    @Output() private toUnclaim: EventEmitter<void>;
+    /**
+     * Emitted whenever a Food Listing is to be removed (un-donated).
+     */
+    @Output() private toRemove: EventEmitter<void>;
 
 
     public constructor (
-        private responsiveService: ResponsiveService,
-        private manageFoodListingService: ManageFoodListingService
+        private responsiveService: ResponsiveService
     ) {
         this.isClaimedCart = false;
         this.isDonatedCart = false;
         this.defaultImgUrl = null;
 
         this.toClaim = new EventEmitter<void>();
-    }
-
-
-    private unclaimSelectedFoodListing(): void {
-
-        let observer: Observable<boolean> = this.manageFoodListingService.unclaimFoodListing(this.foodListing.foodListingKey);
-
-        observer.subscribe (
-            () => {
-                //this.managementCompleted.emit();
-            },
-            (err: Error) => {
-                alert(err.message);
-            }
-        );
-    }
-
-
-    private removeSelectedFoodListing(): void {
-
-        let observer: Observable<boolean> = this.manageFoodListingService.removeFoodListing(this.foodListing.foodListingKey);
-
-        observer.subscribe (
-            () => {
-                //this.managementCompleted.emit();
-            },
-            (err: Error) => {
-                alert(err.message);
-            }
-        );
+        this.toUnclaim = new EventEmitter<void>();
+        this.toRemove = new EventEmitter<void>();
     }
 }

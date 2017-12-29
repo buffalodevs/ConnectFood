@@ -33,15 +33,12 @@ export class DeliveryListingInfoComponent implements OnChanges {
      * Emitted whenever the 'Cancel Delivery' button is selected.
      */
     @Output() private toCancelReason: EventEmitter<void>; // Referenced in HTML template
-    @Output() private deliveryStateChange: EventEmitter<void>;
+    @Output() private removeListing: EventEmitter<void>;
     @Output() private close: EventEmitter<void>;
 
     private startComplete: boolean;
     private stateChangeComplete: boolean;
-    private showStartButton: boolean;
-    private showMarkPickedUpButton: boolean;
-    private showMarkDroppedOffButton: boolean;
-    private showCancelButton: boolean;
+    private showMappings: Map<string, boolean>;
 
 
     public constructor (
@@ -52,15 +49,19 @@ export class DeliveryListingInfoComponent implements OnChanges {
     ) {
         this.toSchedule = new EventEmitter<void>();
         this.toCancelReason = new EventEmitter<void>();
-        this.deliveryStateChange = new EventEmitter<void>();
+        this.removeListing = new EventEmitter<void>();
         this.close = new EventEmitter<void>();
 
         this.startComplete = false;
         this.stateChangeComplete = false;
-        this.showStartButton = false;
-        this.showMarkPickedUpButton = false;
-        this.showMarkDroppedOffButton = false;
-        this.showCancelButton = false;
+        this.showMappings = new Map<string, boolean> ([
+            ['startButton', false],
+            ['pickedUpButton', false],
+            ['droppedOffButton', false],
+            ['cancelButton', false],
+            ['progressSpinner', false]
+        ]);
+
     }
 
 
@@ -70,11 +71,12 @@ export class DeliveryListingInfoComponent implements OnChanges {
         if (changes.delivery.currentValue != null) {
 
             const delivery: Delivery = changes.delivery.currentValue;
+            const deliveryState: DeliveryState = delivery.deliveryStateInfo.deliveryState;
 
-            this.showStartButton = this.shouldShowStartButton(delivery);
-            this.showMarkPickedUpButton = ( delivery.deliveryState === DeliveryState.started );
-            this.showMarkDroppedOffButton = ( delivery.deliveryState === DeliveryState.pickedUp );
-            this.showCancelButton = ( this.isCart && this.deliveryUtilService.compareDeliveryStates(delivery.deliveryState, DeliveryState.droppedOff) < 0 );
+            this.showMappings.set('startButton', this.shouldShowStartButton(delivery));
+            this.showMappings.set('pickedUpButton', ( deliveryState === DeliveryState.started ));
+            this.showMappings.set('droppedOffButton', ( deliveryState === DeliveryState.pickedUp ));
+            this.showMappings.set('cancelButton', ( this.isCart && this.deliveryUtilService.compareDeliveryStates(deliveryState, DeliveryState.droppedOff) < 0 ));
         }
     }
 
@@ -85,8 +87,11 @@ export class DeliveryListingInfoComponent implements OnChanges {
      * @return true if it should be shown, false if not.
      */
     private shouldShowStartButton(delivery: Delivery): boolean {
+
+        const deliveryState: DeliveryState = delivery.deliveryStateInfo.deliveryState;
+
         return this.deliveryUtilService.isPossibleDeliveryTimeNow(delivery)
-            && this.deliveryUtilService.compareDeliveryStates(delivery.deliveryState, DeliveryState.started) < 0;
+            && this.deliveryUtilService.compareDeliveryStates(deliveryState, DeliveryState.started) < 0;
     }
 
 
@@ -100,12 +105,16 @@ export class DeliveryListingInfoComponent implements OnChanges {
             this.updateDeliveryState(DeliveryState.started);
         }
         else {
+
+            this.showMappings.set('progressSpinner', true);
+
             this.scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, true)
+                .finally(() => { this.showMappings.set('progressSpinner', false); })
                 .subscribe((success: boolean) => {
                     if (success) {
                         console.log('Delivery started');
-                        this.delivery.deliveryState = DeliveryState.started;
-                        this.deliveryStateChange.emit();
+                        this.delivery.deliveryStateInfo.deliveryState = DeliveryState.started;
+                        if (!this.isCart) this.removeListing.emit();
                         this.startComplete = true;
                     }
                 },
@@ -139,11 +148,13 @@ export class DeliveryListingInfoComponent implements OnChanges {
      */
     private updateDeliveryState(deliveryState: DeliveryState): void {
 
+        this.showMappings.set('progressSpinner', true);
+
         this.manageDeliveryService.updateDeliveryState(this.delivery.deliveryFoodListingKey, deliveryState)
+            .finally(() => { this.showMappings.set('progressSpinner', false); })
             .subscribe((success: boolean) => {
                 if (success) {
-                    this.delivery.deliveryState = deliveryState;
-                    this.deliveryStateChange.emit();
+                    this.delivery.deliveryStateInfo.deliveryState = deliveryState;
                     this.stateChangeComplete = true;
                 }
             },

@@ -1,17 +1,7 @@
-import { FoodListingUser } from '../receiver-donor/food-listing';
 import { TimeRange } from '../app-user/time-range';
+import { DeliveryStateInfo, DeliveryState, FoodListingUser } from '../common-receiver-donor-deliverer/shared-food-listing-delivery';
 
-
-/**
- * The state (implies location) of the Delivery Food Listing
- */
-export enum DeliveryState {
-    unscheduled = 'unscheduled',
-    scheduled = 'scheduled',
-    started = 'started',
-    pickedUp = 'pickedUp',
-    droppedOff = 'droppedOff'
-}
+export { DeliveryState };
 
 
 /**
@@ -22,7 +12,7 @@ export class Delivery {
     public constructor (
         public claimedFoodListingKey?: number,
         public deliveryFoodListingKey?: number,
-        public deliveryState?: DeliveryState,
+        public deliveryStateInfo?: DeliveryStateInfo,
         public foodTitle?: string,
         public foodDescription?: string,
         public perishable?: boolean,

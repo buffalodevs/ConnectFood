@@ -25,10 +25,7 @@ export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilt
      * The dialog associated with this list. Should be shadowed by child class so that list interaction with dialog is automatically handled in this base class.
      */
     protected slickListDialog: AbstractSlickListDialog <LIST_T>;
-    /**
-     * Promise/Observable that is set and active whenever the list is being refreshed.
-     */
-    protected refreshPromise: PromiseLike<any>;
+    private showProgressSpinner: boolean;
 
 
     /**
@@ -43,6 +40,7 @@ export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilt
         // Initialize instance variables.
         this.listData = new Array<LIST_T>();
         this.selectedListIndex = null;
+        this.showProgressSpinner = false;
 
         // Setup callback (listener) for the retrieval of more listings.
         this.getListingsService.onGetMoreListings(this.onGetMoreListings.bind(this));
@@ -74,12 +72,22 @@ export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilt
     public refreshList(filters: FILTERS_T): void {
 
         let observer: Observable<Array<LIST_T>> = this.getListingsService.getListings(filters, this.ROUTE);
-        this.refreshPromise = observer.toPromise(); // This is set so that child class can show load spinner until resolved!
+        this.showProgressSpinner = true;
         this.listData = new Array<LIST_T>(); // Empty our current model list while we wait for server results.
 
-        observer.subscribe((listData: Array<LIST_T>) => {
-            this.listData = listData;
-        });
+        observer.finally(() => { this.showProgressSpinner = false; })
+                .subscribe((listData: Array<LIST_T>) => {
+                    this.listData = listData;
+                });
+    }
+
+
+    /**
+     * Determines whether or not the progress spinner should be shown.
+     * @return true if it should be shown, false if not.
+     */
+    public shouldShowProgressSpinner(): boolean {
+        return this.showProgressSpinner;
     }
 
 

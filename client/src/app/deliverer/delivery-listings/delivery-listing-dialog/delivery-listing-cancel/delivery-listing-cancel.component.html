@@ -1,4 +1,4 @@
-<form [formGroup]="cancelForm" *ngIf="!cancelComplete">
+<form [formGroup]="cancelForm" *ngIf="!cancelComplete" [slick-progress-spinner]="showProgressSpinner">
 
     <h5>Has the food been judged inadquate and rejected?</h5>
     <md-radio-group name="foodRejected" formControlName="foodRejected" [ngClass]="{ 'warn-foreground': (validate && !cancelForm.get('foodRejected').valid) }">

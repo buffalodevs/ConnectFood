@@ -24,7 +24,7 @@ class EditData {
 
     public constructor (
         public editing: boolean = false,
-        public savePromise?: PromiseLike<any>
+        public showProgressSpinner: boolean = false
     ) {}
 }
 
@@ -39,7 +39,6 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
     
     private isOrganization: boolean;
     private editData: Map<string, EditData>;
-    private savePromise: PromiseLike<any>;
 
 
     public constructor (
@@ -177,32 +176,41 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
 
         // Send save field update to server and listen for response.
         let observable: Observable<FoodWebResponse> = this.appUserUpdateService.updateAppUserInfo(appUserInfoUpdate, newPassword, currentPassword);
-
-        // Ensure that we set the save promises so that we can show loading symbol for each individual form component that we are saving.
-        let savePromise: Promise<any> = observable.toPromise();
+        
         for (let i: number = 0; i < saveFormControlNames.length; i++) {
-            this.editData.get(saveFormControlNames[i]).savePromise = savePromise;
+            this.editData.get(saveFormControlNames[i]).showProgressSpinner = true;
         }
 
-        observable.subscribe((response: FoodWebResponse) => {
+        observable.finally(() => {
+            for (let i: number = 0; i < saveFormControlNames.length; i++)
+            { this.editData.get(saveFormControlNames[i]).showProgressSpinner = false; }
+        })
+        .subscribe(this.handleSaveManyResponse.bind(this, saveFormControlNames));
+    }
 
-            if (response.success) {
-                // Update all involved form controls based off of reply from server.
-                for (let i: number = 0; i < saveFormControlNames.length; i++) {
-                    this.control(saveFormControlNames[i]).setErrors(null);
-                    this.setEditable(saveFormControlNames[i], false);
-                    this.editData.get(saveFormControlNames[i]).savePromise = null;
-                }
+
+    /**
+     * Handles the response from the server or the save operation.
+     * @param saveFormControlNames The form control names involved in the save operation.
+     * @param response The response from the server.
+     */
+    private handleSaveManyResponse(saveFormControlNames: string[], response: FoodWebResponse): void {
+
+        if (response.success) {
+            // Update all involved form controls based off of reply from server.
+            for (let i: number = 0; i < saveFormControlNames.length; i++) {
+                this.control(saveFormControlNames[i]).setErrors(null);
+                this.setEditable(saveFormControlNames[i], false);
             }
-            else if (response.message === AppUserErrorMsgs.DUPLICATE_EMAIL) {
-                this.appUserValidationService.addError(this.control(saveFormControlNames[0]), 'duplicateEmail', response.message);
-            }
-            else if (response.message === AppUserErrorMsgs.INVALID_ADDRESS) {
-                this.appUserValidationService.addError(this.control(saveFormControlNames[0]), 'invalidAddress', response.message);
-            }
-            else if (response.message === AppUserErrorMsgs.INCORRECT_PASSWORD) {
-                this.appUserValidationService.addError(this.control(saveFormControlNames[0]), 'incorrectPassword', response.message);
-            }
-        });
+        }
+        else if (response.message === AppUserErrorMsgs.DUPLICATE_EMAIL) {
+            this.appUserValidationService.addError(this.control(saveFormControlNames[0]), 'duplicateEmail', response.message);
+        }
+        else if (response.message === AppUserErrorMsgs.INVALID_ADDRESS) {
+            this.appUserValidationService.addError(this.control(saveFormControlNames[0]), 'invalidAddress', response.message);
+        }
+        else if (response.message === AppUserErrorMsgs.INCORRECT_PASSWORD) {
+            this.appUserValidationService.addError(this.control(saveFormControlNames[0]), 'incorrectPassword', response.message);
+        }
     }
 }

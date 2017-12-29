@@ -19,9 +19,11 @@ import { DateFormatter } from '../../../../../../../shared/common-util/date-form
 export class DeliveryListingScheduleComponent {
 
     @Input() private delivery: Delivery;
-    @Output() private scheduled: EventEmitter<void>;
+    
+    @Output() private removeListing: EventEmitter<void>;
     @Output() private close: EventEmitter<void>;
 
+    private showProgressSpinner: boolean;
     private schedulingComplete: boolean;
     private scheduleControl: FormControl;
 
@@ -29,24 +31,32 @@ export class DeliveryListingScheduleComponent {
     public constructor (
         private scheduleDeliveryService: ScheduleDeliveryService
     ) {
-        this.scheduled = new EventEmitter<void>();
+        this.removeListing = new EventEmitter<void>();
         this.close = new EventEmitter<void>();
-        this.schedulingComplete = false;
 
+        this.showProgressSpinner = false;
+        this.schedulingComplete = false;
         this.scheduleControl = new FormControl(null);
-        this.scheduleControl.valueChanges.subscribe((value: Date) => {
-            scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, false, value)
-                .subscribe((success: boolean) => {
-                    if (success) {
-                        this.delivery.deliveryState = DeliveryState.scheduled;
-                        this.scheduled.emit();
-                        this.schedulingComplete = true;
-                    }
-                },
-                (err: Error) => {
-                    alert(err.message);
-                });
-        });
+        this.scheduleControl.valueChanges.subscribe(this.scheduleDelivery.bind(this));
+    }
+
+
+    private scheduleDelivery(value: Date): void {
+
+        this.showProgressSpinner = true;
+
+        this.scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, false, value)
+            .finally(() => { this.showProgressSpinner = false; })
+            .subscribe((success: boolean) => {
+                if (success) {
+                    this.delivery.deliveryStateInfo.deliveryState = DeliveryState.scheduled;
+                    this.removeListing.emit();
+                    this.schedulingComplete = true;
+                }
+            },
+            (err: Error) => {
+                alert(err.message);
+            });
     }
 
 

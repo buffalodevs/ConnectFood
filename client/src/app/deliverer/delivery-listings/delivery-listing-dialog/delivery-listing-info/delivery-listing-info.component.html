@@ -1,4 +1,4 @@
-<ng-container *ngIf="!stateChangeComplete && !startComplete">
+<div *ngIf="!stateChangeComplete && !startComplete" [slick-progress-spinner]="showMappings.get('progressSpinner')">
 
     <!-- Body in the format of a Slick List Item! -->
     <slick-list-item [includeDivider]="false">
@@ -66,7 +66,7 @@
 
                 <div>
                     <b>Delivery State:</b>
-                    <div class="inline-block">{{ deliveryUtilService.getReadableDeliveryState(delivery.deliveryState) }}</div>
+                    <div class="inline-block">{{ deliveryUtilService.getReadableDeliveryState(delivery.deliveryStateInfo.deliveryState) }}</div>
                 </div>
 
             </slick-expansion-panel>
@@ -79,14 +79,14 @@
     <div class="modal-button-group">
         
         <button md-raised-button color="primary" class="button-md" (click)="toSchedule.emit()" *ngIf="!isCart">Schedule Delivery</button>
-        <button md-raised-button color="primary" class="button-md" (click)="startDelivery()" *ngIf="showStartButton">Start Delivery</button>
-        <button md-raised-button color="primary" class="button-md" (click)="markPickedUp()" *ngIf="showMarkPickedUpButton">Mark Picked Up</button>
-        <button md-raised-button color="primary" class="button-md" (click)="markDroppedOff()" *ngIf="showMarkDroppedOffButton">Mark Dropped Off</button>
-        <button md-raised-button color="primary" class="button-md warn-button" (click)="toCancelReason.emit()" *ngIf="showCancelButton">Cancel Delivery</button>
+        <button md-raised-button color="primary" class="button-md" (click)="startDelivery()" *ngIf="showMappings.get('startButton')">Start Delivery</button>
+        <button md-raised-button color="primary" class="button-md" (click)="markPickedUp()" *ngIf="showMappings.get('markPickedUpButton')">Mark Picked Up</button>
+        <button md-raised-button color="primary" class="button-md" (click)="markDroppedOff()" *ngIf="showMappings.get('markDroppedOffButton')">Mark Dropped Off</button>
+        <button md-raised-button color="primary" class="button-md warn-button" (click)="toCancelReason.emit()" *ngIf="showMappings.get('cancelButton')">Cancel Delivery</button>
 
     </div>
 
-</ng-container>
+</div>
 
 
 <ng-container *ngIf="startComplete">
@@ -107,7 +107,7 @@
 
 <ng-container *ngIf="stateChangeComplete">
     
-    <p>The delivery status has been updated to: <b>{{ deliveryUtilService.getReadableDeliveryState(delivery.deliveryState) }}</b>.</p>
+    <p>The delivery status has been updated to: <b>{{ deliveryUtilService.getReadableDeliveryState(delivery.deliveryStateInfo.deliveryState) }}</b>.</p>
     <p>Both the Donor and Receiver will automatically be notified concerning the delivery status change.</p>
 
     <div class="modal-button-group">

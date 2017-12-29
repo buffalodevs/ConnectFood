@@ -1,9 +1,9 @@
-<ng-container *ngIf="!schedulingComplete">
+<div *ngIf="!schedulingComplete" [slick-progress-spinner]="showProgressSpinner">
 
     <h4>Please select a time that you will start the delivery:</h4>
     <slick-weekday-scheduler [availabilityTimeRanges]="delivery.possibleDeliveryTimes" [formControl]="scheduleControl"></slick-weekday-scheduler>
 
-</ng-container>
+</div>
 
 
 <ng-container *ngIf="schedulingComplete">

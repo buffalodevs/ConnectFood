@@ -28,7 +28,7 @@ ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS availableUnitsCount            
 ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS unitsLabel                     TEXT            DEFAULT NULL;
 
 -- Contains the total weight of the entire Food Listing in pounds.
-ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS totalWeight                    INTEGER         DEFAULT NULL;
+ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS totalWeight                    NUMERIC(6, 2)   DEFAULT NULL;
 
 -- The recommended vehicle type (size) for food delivery.
 ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS vehicleType                    VehicleType     NOT NULL DEFAULT 'Sedan';

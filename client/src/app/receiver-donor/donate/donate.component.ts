@@ -29,7 +29,7 @@ export class DonateComponent implements OnInit {
     private cropperSettings: CropperSettings;
 
     private foodTitleMaxLength: number;
-    private donatePromise: PromiseLike<any>;
+    private showProgressSpinner: boolean;
 
     @ViewChild('cropper', undefined) private cropper: ImageCropperComponent;
 
@@ -56,6 +56,7 @@ export class DonateComponent implements OnInit {
         this.cropperSettings.fileType = 'image/jpeg';
 
         this.foodTitleMaxLength = 100;
+        this.showProgressSpinner = false;
         this.foodForm = new FormGroup({});
     }
 
@@ -177,17 +178,18 @@ export class DonateComponent implements OnInit {
     private submitDonation(value: FoodListingUpload, valid: boolean, stepper: MdHorizontalStepper): void {
         
         let observer: Observable<number> = this.addFoodListingService.addFoodListing(value, this.image);
-        this.donatePromise = observer.toPromise();
-
-        observer.subscribe (
-            (foodListingKey: number) => {
-                stepper.next();
-            },
-            (err: Error) => {
-                console.log(err);
-                alert(err.message);
-            }
-        );
+        this.showProgressSpinner = true;
+        
+        observer.finally(() => { this.showProgressSpinner = false; })
+                .subscribe (
+                    (foodListingKey: number) => {
+                        stepper.next();
+                    },
+                    (err: Error) => {
+                        console.log(err);
+                        alert(err.message);
+                    }
+                );
     }
 
 

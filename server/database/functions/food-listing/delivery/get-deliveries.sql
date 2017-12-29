@@ -74,49 +74,22 @@ BEGIN
             JSON_BUILD_OBJECT (
                 'claimedFoodListingKey',    ClaimedFoodListing.claimedFoodListingKey,
                 'deliveryFoodListingKey',   DeliveryFoodListing.deliveryFoodListingKey,
-                'deliveryState',            (
-                                                SELECT getDeliveryState (
-                                                    DeliveryFoodListing.scheduledStartTime,
-                                                    DeliveryFoodListing.startTime,
-                                                    DeliveryFoodListing.pickUpTime,
-                                                    DeliveryFoodListing.dropOffTime
-                                                )
+                'deliveryStateInfo',        JSON_BUILD_OBJECT (
+                                                'deliveryState',        getDeliveryState (
+                                                                            DeliveryFoodListing.scheduledStartTime,
+                                                                            DeliveryFoodListing.startTime,
+                                                                            DeliveryFoodListing.pickUpTime,
+                                                                            DeliveryFoodListing.dropOffTime
+                                                                        ),
+                                                'scheduledStartTime',   DeliveryFoodListing.scheduledStartTime,
+                                                'startTime',            DeliveryFoodListing.startTime,
+                                                'pickUpTime',           DeliveryFoodListing.pickUpTime,
+                                                'dropOffTime',          DeliveryFoodListing.dropOffTime
                                             ),
                 'foodTitle',                FoodListing.foodTitle,
-                -- @ts-sql class="FoodListingUser" file="/shared/food-listings/food-listing.ts"
-                'donorInfo',                JSON_BUILD_OBJECT (
-                                                'organizationName', DonorOrganization.name,
-                                                'address',          DonorContact.address,
-                                                'city',             DonorContact.city,
-                                                'state',            DonorContact.state,
-                                                'zip',              DonorContact.zip,
-                                                -- @ts-sql class="GPSCoordinate" file="/shared/common-util/geocode.ts"
-                                                'gpsCoordinate',    JSON_BUILD_OBJECT (
-                                                                        'latitude',     ST_Y(DonorContact.gpsCoordinate::GEOMETRY),
-                                                                        'longitude',    ST_X(DonorContact.gpsCoordinate::GEOMETRY)    
-                                                                    ),
-                                                'phone',            DonorContact.phone,
-                                                'email',            DonorAppUser.email,
-                                                'lastName',         DonorAppUser.lastName,
-                                                'firstName',        DonorAppUser.firstName
-                                            ),
-                -- @ts-sql class="FoodListingUser" file="/shared/food-listings/food-listing.ts"
-                'receiverInfo',             JSON_BUILD_OBJECT (
-                                                'organizationName', ReceiverOrganization.name,
-                                                'address',          ReceiverContact.address,
-                                                'city',             ReceiverContact.city,
-                                                'state',            ReceiverContact.state,
-                                                'zip',              ReceiverContact.zip,
-                                                -- @ts-sql class="GPSCoordinate" file="/shared/common-util/geocode.ts"
-                                                'gpsCoordinate',    JSON_BUILD_OBJECT (
-                                                                        'latitude',     ST_Y(ReceiverContact.gpsCoordinate::GEOMETRY),
-                                                                        'longitude',    ST_X(ReceiverContact.gpsCoordinate::GEOMETRY)    
-                                                                    ),
-                                                'phone',            ReceiverContact.phone,
-                                                'email',            ReceiverAppUser.email,
-                                                'lastName',         ReceiverAppUser.lastName,
-                                                'firstName',        ReceiverAppUser.firstName
-                                            ),
+                -- NOTE: We may want to remove these getAppUserSessionData() function calls for performance improvements! They create subqueries (likely inlined though).
+                'donorInfo',                (SELECT sessionData->'appUserInfo' FROM getAppUserSessionData(DonorAppUser.appUserKey)),
+                'receiverInfo',             (SELECT sessionData->'appUserInfo' FROM getAppUserSessionData(ReceiverAppUser.appUserKey)),
                 'foodDescription',          FoodListing.foodDescription,
                 'perishable',               FoodListing.perishable,
                 'availableUntilDate',       FoodListing.availableUntilDate,
@@ -133,6 +106,7 @@ BEGIN
             ) AS delivery
     FROM        FoodListing
     INNER JOIN  ClaimedFoodListing                              ON  FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
+                                                                -- Do not include rejected cancelled deliveries!
                                                                 AND NOT EXISTS (
                                                                     SELECT      1
                                                                     FROM        CancelledDeliveryFoodListing
@@ -141,15 +115,13 @@ BEGIN
                                                                     WHERE       DeliveryFoodListing.claimedFoodListingKey = ClaimedFoodListing.claimedFoodListingKey
                                                                       AND       CancelledDeliveryFoodListing.foodRejected = TRUE
                                                                 )
-    INNER JOIN  AppUser AS DelivererAppUser                     ON  _appUserKey = DelivererAppUser.appUserKey
+    INNER JOIN  AppUser             AS DelivererAppUser         ON  _appUserKey = DelivererAppUser.appUserKey
     INNER JOIN  AppUserAvailability AS DelivererAvailability    ON  DelivererAppUser.appUserKey = DelivererAvailability.appUserKey
-    INNER JOIN  AppUser AS DonorAppUser                         ON  FoodListing.donatedByAppUserKey = DonorAppUser.appUserKey
-    INNER JOIN  ContactInfo AS DonorContact                     ON  DonorAppUser.appUserKey = DonorContact.appUserKey
-    INNER JOIN  Organization AS DonorOrganization               ON  DonorAppUser.appUserKey = DonorOrganization.appUserKey
+    INNER JOIN  AppUser             AS DonorAppUser             ON  FoodListing.donatedByAppUserKey = DonorAppUser.appUserKey
+    INNER JOIN  ContactInfo         AS DonorContact             ON  DonorAppUser.appUserKey = DonorContact.appUserKey
     INNER JOIN  AppUserAvailability AS DonorAvailability        ON  DonorAppUser.appUserKey = DonorAvailability.appUserKey
-    INNER JOIN  AppUser AS ReceiverAppUser                      ON  ClaimedFoodListing.claimedByAppUserKey = ReceiverAppUser.appUserKey
-    INNER JOIN  ContactInfo AS ReceiverContact                  ON  ReceiverAppUser.appUserKey = ReceiverContact.appUserKey
-    INNER JOIN  Organization AS ReceiverOrganization            ON  ReceiverAppUser.appUserKey = ReceiverOrganization.appUserKey
+    INNER JOIN  AppUser             AS ReceiverAppUser          ON  ClaimedFoodListing.claimedByAppUserKey = ReceiverAppUser.appUserKey
+    INNER JOIN  ContactInfo         AS ReceiverContact          ON  ReceiverAppUser.appUserKey = ReceiverContact.appUserKey
     INNER JOIN  AppUserAvailability AS ReceiverAvailability     ON  ReceiverAppUser.appUserKey = ReceiverAvailability.appUserKey
     -- LEFT b/c we may or may not have a delivery lined up yet (deliverer may be looking for potential deliveries here).
     LEFT JOIN   DeliveryFoodListing                             ON  ClaimedFoodListing.claimedFoodListingKey = DeliveryFoodListing.claimedFoodListingKey
@@ -195,4 +167,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 
---SELECT * FROM getDeliveries(1, 0, 10, null, null, 15, null, true, null, false, null);
+--SELECT * FROM getDeliveries(1, 0, 10);
