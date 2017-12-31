@@ -5,9 +5,9 @@
         
         <ng-container slick-list-item-left>
 
-            <slick-map #SlickMapComponent *ngIf="sessionDataService.sessionDataAvailable()"
+            <slick-map #SlickMapComponent
                 [addresses]="[ sessionDataService.getAppUserSessionData(), delivery.donorInfo, delivery.receiverInfo ]"
-                [addressNames]="[ delivery.donorInfo.organizationName, delivery.receiverInfo.organizationName ]"
+                [addressNames]="[ 'Me', delivery.donorInfo.organizationName, delivery.receiverInfo.organizationName ]"
                 [diameterMi]="deliveryUtilService.calcMaxMapDiameterFromDelivery(delivery)">
             </slick-map>
 
@@ -56,7 +56,7 @@
                 </div>
         
                 <div class="space-bottom">
-                    <a [href]="SlickMapComponent?.genGoogleMapsHref()" target="_blank" class="link-content">Get Directions</a>
+                    <a [href]="SlickMapComponent.getGoogleMapsHref()" target="_blank" class="link-content">Get Directions</a>
                 </div>
 
                 <div>

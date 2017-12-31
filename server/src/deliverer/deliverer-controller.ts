@@ -45,7 +45,7 @@ export function handleScheduleDelivery(request: Request, response: Response): vo
 
     scheduleDelivery (
         scheduleDeliveryRequest.claimedFoodListingKey,
-        sessionData.appUserKey,
+        sessionData,
         scheduleDeliveryRequest.startImmediately,
         scheduleDeliveryRequest.scheduledStartTime
     ).then(() => {
@@ -66,7 +66,7 @@ export function handleCancelDelivery(request: Request, response: Response): void
 
     cancelDelivery (
         cancelDeliveryRequest.deliveryFoodListingKey,
-        sessionData.appUserKey,
+        sessionData,
         cancelDeliveryRequest.cancelReason,
         cancelDeliveryRequest.foodRejected
     ).then(() => {
@@ -87,7 +87,7 @@ export function handleUpdateDeliveryState(request: Request, response: Response):
 
     updateDeliveryState (
         updateDeliveryStateRequest.deliveryFoodListingKey,
-        sessionData.appUserKey,
+        sessionData,
         updateDeliveryStateRequest.deliveryState
     ).then(() => {
         response.send(new FoodWebResponse(true, 'Successfully updated delivery state'));

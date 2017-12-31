@@ -8,33 +8,32 @@ CREATE OR REPLACE FUNCTION unclaimFoodListing
 )
 -- Return user information of (receiver/deliverer) app users who were affected by the unclaim.
 RETURNS TABLE (
-    claimedFoodListingKey       ClaimedFoodListing.claimedFoodListingKey%TYPE,
-    claimedByAppUserKey         ClaimedFoodListing.claimedByAppUserKey%TYPE,
-    affectedNotificationData    JSON
+    claimedFoodListingKey   ClaimedFoodListing.claimedFoodListingKey%TYPE,
+    claimedByAppUserKey     ClaimedFoodListing.claimedByAppUserKey%TYPE,
+    unclaimNotificationData JSON
 )
 AS $$
-    DECLARE _unclaimedByDonor           BOOLEAN DEFAULT FALSE;  -- Flag to determine if unclaimedByAPpUserKey is for Donor or Receiver.
-    DECLARE _totalClaimedUnitsCount     INTEGER DEFAULT 0;      -- Determines total number of claimed units that can be unclaimed based on filter criteria (inputs).
-    DECLARE _remainingUnitsToUnclaim    INTEGER;                -- Keeps track of the remaining units left to be unclaimed (especially when triggered by removeFoodListing()).
-    DECLARE _allUnitsAffected           BOOLEAN;                -- Flag for determining whether or not all claimed units were affected or not for each ClaimedFoodListing.
-    DECLARE _foodTitle                  TEXT;
-    DECLARE _unitsLabel                 TEXT;
-    DECLARE _unclaimCandidate           RECORD;                 -- A row in the UnclaimCandidates TEMP TABLE defined below.
+    DECLARE _unclaimedByDonor               BOOLEAN DEFAULT FALSE;  -- Flag to determine if unclaimedByAPpUserKey is for Donor or Receiver.
+    DECLARE _totalClaimedUnitsCount         INTEGER DEFAULT 0;      -- Determines total number of claimed units that can be unclaimed based on filter criteria (inputs).
+    DECLARE _remainingUnitsToUnclaim        INTEGER;                -- Keeps track of the remaining units left to be unclaimed (especially when triggered by removeFoodListing()).
+    DECLARE _unclaimUnitsCountForListing    INTEGER;                -- Determs the number of units that are to be or were unclaimed for a single listing.
+    DECLARE _foodTitle                      TEXT;
+    DECLARE _unitsLabel                     TEXT;
+    DECLARE _unclaimCandidate               RECORD;                 -- A row in the UnclaimCandidates TEMP TABLE defined below.
 BEGIN
 
     -- Create a temporary table that will be filled with all of the Claimed Food Listing candidates for unclaiming (based on function args).
     DROP TABLE IF EXISTS UnclaimCandidates;
     CREATE TEMP TABLE UnclaimCandidates
     (
-        claimedFoodListingKey   INTEGER,
-        claimedByAppUserKey     INTEGER,
-        claimedUnitsCount       INTEGER,
-        claimedDate             TIMESTAMP,
-        deliveryFoodListingKey  INTEGER,
-        deliveryAppUserKey      INTEGER,
-        -- Following 2 are data pertaining to how these candidates are affected by the unclaim action (Needed for final return data).
-        affected                BOOLEAN     DEFAULT FALSE,
-        allRemoved              BOOLEAN     DEFAULT FALSE
+        claimedFoodListingKey       INTEGER,
+        claimedByAppUserKey         INTEGER,
+        originalClaimedUnitsCount   INTEGER,
+        claimedDate                 TIMESTAMP,
+        deliveryFoodListingKey      INTEGER,
+        deliveryAppUserKey          INTEGER,
+        -- Following data is pertaining to how these candidates are affected by the unclaim action (Needed for final return data).
+        unclaimedUnitsCount         INTEGER     DEFAULT 0
     );
 
 
@@ -82,7 +81,7 @@ BEGIN
       AND       DeliveryFoodListing.startTime IS NULL;
 
     -- Grab the total number of Claimed Food Listing units among the unclaim candidates for edit check.
-    SELECT      SUM(claimedUnitsCount)
+    SELECT      SUM(originalClaimedUnitsCount)
     INTO        _totalClaimedUnitsCount
     FROM        UnclaimCandidates;
 
@@ -124,48 +123,41 @@ BEGIN
     )
     LOOP
 
-        -- Determine if we are to remove the entire claim based on remaining number of units to unclaim.
-        _allUnitsAffected := ( _unclaimCandidate.claimedUnitsCount <= _remainingUnitsToUnclaim );
+        -- Determine number of units to unclaim based on remaining units to unclaim and number of units on claim.
+        _unclaimUnitsCountForListing := CASE (_unclaimCandidate.originalClaimedUnitsCount <= _remainingUnitsToUnclaim)
+                                            WHEN TRUE THEN  _unclaimCandidate.originalClaimedUnitsCount
+                                            ELSE            _remainingUnitsToUnclaim
+                                        END;
 
-        IF (_allUnitsAffected)
+        -- Update the claim units count.
+        UPDATE  ClaimedFoodListing
+        SET     claimedUnitsCount = ( claimedUnitsCount - _unclaimUnitsCountForListing )
+        WHERE   ClaimedFoodListing.claimedFoodListingKey = _unclaimCandidate.claimedFoodListingKey;
+
+        -- If we removed all units, and there's a scheduled delivery, then we must cancel the delivery.
+        IF (    _unclaimUnitsCountForListing = _unclaimCandidate.originalClaimedUnitsCount
+            AND _unclaimCandidate.deliveryFoodListingKey IS NOT NULL )
         THEN
 
-            -- Remove the claim entirely (units have reached 0).
-            DELETE FROM ClaimedFoodListing
-            WHERE       claimedFoodListingKey = _unclaimCandidate.claimedFoodListingKey;
-
-            IF (_unclaimCandidate.deliveryFoodListingKey IS NOT NULL)
-            THEN
-
-                -- If we have delivery scheduled for completely unclaimed food listing, then cancel the delivery.
-                PERFORM cancelDelivery (
-                    _unclaimCandidate.deliveryFoodListingKey,
-                    _unclaimedByAppUserKey,
-                    CASE(_unclaimedByDonor)
-                        WHEN TRUE THEN  'The Donor has removed some or all units on Food Listing causing Scheduled Delivery cancellation.'
-                        WHEN FALSE THEN 'The Receiver has unclaimed the Claimed Food Listing causing Scheduled Delivery cancellation.'
-                    END,
-                    FALSE
-                );
-
-            END IF;
-
-        ELSE
-
-            -- Update the claim units count.
-            UPDATE  ClaimedFoodListing
-            SET     claimedUnitsCount = (claimedUnitsCount - _remainingUnitsToUnclaim)
-            WHERE   claimedFoodListingKey = _unclaimCandidate.claimedFoodListingKey;
+            -- If we have delivery scheduled for completely unclaimed food listing, then cancel the delivery.
+            PERFORM cancelDelivery (
+                _unclaimCandidate.deliveryFoodListingKey,
+                _unclaimedByAppUserKey,
+                CASE(_unclaimedByDonor)
+                    WHEN TRUE THEN  'The Donor has removed some or all units on Food Listing causing Scheduled Delivery cancellation.'
+                    WHEN FALSE THEN 'The Receiver has unclaimed the Claimed Food Listing causing Scheduled Delivery cancellation.'
+                END,
+                FALSE
+            );
 
         END IF;
 
         -- Make sure to update unclaim candidates data to mark this candidate as affected for purpose of generating return value.
         UPDATE  UnclaimCandidates
-        SET     affected = TRUE,
-                allRemoved = _allUnitsAffected
-        WHERE   claimedFoodListingKey = _unclaimCandidate.claimedFoodListingKey;
+        SET     unclaimedUnitsCount = _unclaimUnitsCountForListing
+        WHERE   UnclaimCandidates.claimedFoodListingKey = _unclaimCandidate.claimedFoodListingKey;
 
-        _remainingUnitsToUnclaim := (_remainingUnitsToUnclaim - _unclaimCandidate.claimedUnitsCount); -- Update the number of remaining Claimed Food Listing units.
+        _remainingUnitsToUnclaim := ( _remainingUnitsToUnclaim - _unclaimUnitsCountForListing ); -- Update the number of remaining Claimed Food Listing units.
         EXIT WHEN (_remainingUnitsToUnclaim <= 0); -- Exit loop here since we have removed all of the units from ClaimedFoodListings fitting argument criteria.
     
     END LOOP;
@@ -182,28 +174,25 @@ BEGIN
     RETURN QUERY
     SELECT      UnclaimCandidates.claimedFoodListingKey,
                 UnclaimCandidates.claimedByAppUserKey,
-                -- @ts-sql class="AffectedNotificationData" file="/server/src/receiver-donor/common-receiver-donor/affected-unclaim-notification.ts"
+                -- @ts-sql class="UnclaimNotification" file="/server/src/receiver-donor/common-receiver-donor/unclaim-notification.ts"
                 JSON_BUILD_OBJECT (
                     'foodTitle',            _foodTitle,
-                    'unitsCount',           UnclaimCandidates.unitsCount,
+                    'oldClaimedUnitsCount', UnclaimCandidates.originalClaimedUnitsCount,
+                    'newClaimedUnitsCount', ( UnclaimCandidates.originalClaimedUnitsCount - UnclaimCandidates.unclaimedUnitsCount ),
                     'unitsLabel',           _unitsLabel,
-                    'allUnitsAffected',     _allUnitsAffected,
                     'receiverSessionData',  ( SELECT sessionData FROM getAppUserSessionData(UnclaimCandidates.claimedByAppUserKey) ),
                     'delivererSessionData', CASE
-                                                WHEN UnclaimedCandidates.deliveryAppUserKey IS NOT NULL
-                                                     THEN ( SELECT sessionData FROM getAppUserSessionData(UnclaimedCandidates.deliveryAppUserKey) )
+                                                WHEN UnclaimCandidates.deliveryAppUserKey IS NOT NULL
+                                                     THEN ( SELECT sessionData FROM getAppUserSessionData(UnclaimCandidates.deliveryAppUserKey) )
                                                 ELSE NULL
                                             END
-                ) AS affectedNotificationData
+                ) AS unclaimNotificationData
     -- Results from here should be very small in number, and therefore, this shouldn't be inefficient without indexes.
     FROM        UnclaimCandidates
-    WHERE       UnclaimCandidates.affected = TRUE;
+    WHERE       UnclaimCandidates.unclaimedUnitsCount > 0;
 
 END;
 $$ LANGUAGE plpgsql;
 
-/*
-SELECT * FROM ClaimedFoodListing;
-SELECT * FROM unclaimFoodListing(1);
-SELECT * FROM ClaimedFoodListing;
-*/
+
+--SELECT * FROM unclaimFoodListing(52, 1, 100);

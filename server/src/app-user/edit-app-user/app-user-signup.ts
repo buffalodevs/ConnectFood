@@ -1,12 +1,11 @@
 'use strict';
 import { SessionData, AppUserInfo } from '../../common-util/session-data';
 import { addOrUpdateAppUser } from './app-user-add-update';
-
 import { logSqlQueryExec } from '../../logging/sql-logger';
 import { query } from '../../database-util/connection-pool';
+import { sendEmail, MailConfig } from '../../common-util/email';
 
-let nodemailer = require("nodemailer-promise");
-require('dotenv');
+import { AppUserType } from '../../../../shared/app-user/app-user-info';
 
 
 /**
@@ -85,28 +84,30 @@ export function signupVerify(appUserKey: number, verificationToken: String): Pro
 
 function sendVerificationEmail(sessionData: SessionData) : Promise<SessionData> {
 
-    let verificationLink = process.env.HOST_ADDRESS + '/appUser/verify?appUserKey='
-                         + sessionData.appUserKey + '&verificationToken=' + sessionData.verificationToken;
+    const verificationLink = process.env.HOST_ADDRESS + '/appUser/verify?appUserKey='
+                           + sessionData.appUserKey + '&verificationToken=' + sessionData.verificationToken;
 
-    let sendEmail = nodemailer.config({
-        email: process.env.NOREPLY_EMAIL,
-        password: process.env.NOREPLY_PASSWORD,
-        server: process.env.NOREPLY_SERVER
-    });
-    
+    const appUserInfo: AppUserInfo = sessionData.appUserInfo;
+    const receiverName: string = (appUserInfo.appUserType === AppUserType.Deliverer) ? ( appUserInfo.firstName + ' ' + appUserInfo.lastName )
+                                                                                     : appUserInfo.organizationName;
 
-    let mailOptions = {
-        subject: 'Verify Your Account With Food Web',            
-        senderName: 'Food Web',
-        receiver: sessionData.appUserInfo.email,
-        html: `Dear User,<br><br>
-               Welcome to Food Web!<br><br>
-               Please click <a href ="` + verificationLink + `">here</a> to verify your account with us.<br><br>
-               Thank you,<br><br>The Food Web Team`
-    };
+    const htmlStr: string = `
+        <p>
+            Welcome to Food Web!
+            Please click <a href ="` + verificationLink + `">here</a> to verify your account with us.
+        </p>
+    `
+        
+    let mailConfig: MailConfig = new MailConfig (
+        'Verify Your Food Web Account',
+        receiverName,
+        appUserInfo.email,
+        appUserInfo.appUserType,
+        htmlStr
+    );
 
-    return sendEmail(mailOptions)
-        .then((info) => {
+    return sendEmail(mailConfig)
+        .then(() => {
             return Promise.resolve(sessionData);
         })
         .catch((err) => {

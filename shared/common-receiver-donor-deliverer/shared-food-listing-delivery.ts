@@ -1,4 +1,4 @@
-import { AppUserInfo, TimeRange } from '../app-user/app-user-info';
+import { AppUserInfo, TimeRange, AppUserType } from '../app-user/app-user-info';
 import { GPSCoordinate } from "../common-util/geocode";
 
 
@@ -9,7 +9,7 @@ export class FoodListingUser extends AppUserInfo {
     
     public constructor (
         email?: string,
-        appUserType?: string,
+        appUserType?: AppUserType,
         organizationName?: string,
         lastName?: string,
         firstName?: string,

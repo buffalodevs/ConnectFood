@@ -11,35 +11,20 @@ CREATE OR REPLACE FUNCTION cancelDelivery
 )
 RETURNS TABLE -- Returns the Delivery that has been cancelled.
 (
-    claimedFoodListingKey   ClaimedFoodListing.claimedFoodListingKey%TYPE,
-    deliveryFoodListingKey  DeliveryFoodListing.deliveryFoodListingKey%TYPE,
-    delivery                JSON
+    cancelledDeliveryFoodListingKey CancelledDeliveryFoodListing.cancelledDeliveryFoodListingKey%TYPE,
+    deliveryUpdateNotification      JSON
 )
 AS $$
     DECLARE _cancelledDeliveryFoodListingKey    CancelledDeliveryFoodListing.cancelledDeliveryFoodListingKey%TYPE;
-    DECLARE _deliveryAppUserKey                 AppUser.appUserKey%TYPE;
+    DECLARE _deliveryUpdateNotification         JSON;
 BEGIN
 
     -- TODO: Check that the cancelling app user and claimed food listing exist!
     -- TODO: Ensure that the cancelling app user is authorized (must be the donor, receiver, or deliverer only)!
     --       Additionally, the Donor and Receiver cannot cancel the delivery after it has been started (startTime IS NOT NULL)!
 
-    -- Create temp table to hold return results before cancellation occurs.
-    CREATE TEMP TABLE CancelledDelivery
-    (
-        claimedFoodListingKey   INTEGER,
-        deliveryFoodListingKey  INTEGER,
-        delivery                JSON
-    );
-
-    -- Grab data used for getting Delivery data of the cancelled delivery.
-    SELECT  DeliveryFoodListing.deliveryAppUserKey
-    INTO    _deliveryAppUserKey
-    FROM    DeliveryFoodListing
-    WHERE   DeliveryFoodListing.deliveryFoodListingKey = _deliveryFoodListingKey;
-
-    INSERT INTO CancelledDelivery
-    SELECT * FROM getDeliveries(_deliveryAppUserKey, 0, 1, _deliveryFoodListingKey);
+    _deliveryUpdateNotification := generateDeliveryUpdateNotification(_deliveryFoodListingKey, 'unscheduled'::DeliveryState, NULL, NULL,
+                                                                      TRUE, _cancelReason, _foodRejected);
 
     INSERT INTO CancelledDeliveryFoodListing
     (
@@ -54,10 +39,13 @@ BEGIN
         _cancelledByAppUserKey,
         _cancelReason,
         _foodRejected
-    );
+    )
+    RETURNING   CancelledDeliveryFoodListing.cancelledDeliveryFoodListingKey
+    INTO        _cancelledDeliveryFoodListingKey;
 
     RETURN QUERY
-    SELECT * FROM CancelledDelivery;
+    SELECT  _cancelledDeliveryFoodListingKey,
+            _deliveryUpdateNotification;
 
 END;
 $$ LANGUAGE plpgsql;

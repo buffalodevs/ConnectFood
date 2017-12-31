@@ -9,8 +9,14 @@ CREATE OR REPLACE FUNCTION updateDeliveryState
      _deliveryState             DeliveryState,
      _stateUpdateTimestamp      TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
 )
-RETURNS DeliveryFoodListing.deliveryFoodListingKey%TYPE -- The deliveryFoodListing primary key.
+-- Return data so that update notifications may be sent to concerned users (Donors and Receivers).
+RETURNS TABLE
+(
+    deliveryFoodListingKey      DeliveryFoodListing.deliveryFoodListingKey%TYPE,
+    deliveryUpdateNotification  JSON
+)
 AS $$
+    DECLARE _deliveryUpdateNotification JSON;
 BEGIN
 
     -- TODO: Ensure that delivery app user is associated with this delivery food listing (has rights to update)!
@@ -18,6 +24,7 @@ BEGIN
     --       The delivery state would be at least 2 steps (states) behind or ahead of the current one that it is on.
     --       This allows the deliverer to undo at most one state transition at a time, and progress it one state at a time!
 
+    _deliveryUpdateNotification := generateDeliveryUpdateNotification(_deliveryFoodListingKey, _deliveryState);
 
     UPDATE  DeliveryFoodListing
     SET     startTime   =   CASE (_deliveryState)
@@ -36,7 +43,9 @@ BEGIN
                             END
     WHERE   deliveryFoodListingKey = _deliveryFoodListingKey;    
 
-    RETURN _deliveryFoodListingKey;
+    RETURN QUERY
+    SELECT  _deliveryFoodListingKey,
+            _deliveryUpdateNotification;
 
 END;
 $$ LANGUAGE plpgsql;

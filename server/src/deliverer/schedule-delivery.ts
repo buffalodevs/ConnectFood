@@ -2,12 +2,14 @@
 import { query, QueryResult } from './../database-util/connection-pool';
 import { fixNullQueryArgs } from '../database-util/prepared-statement-util';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
+import { SessionData } from '../common-util/session-data';
+import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotification } from './delivery-update-notification';
 
 import { DateFormatter } from '../../../shared/common-util/date-formatter';
 import { Delivery } from '../../../shared/deliverer/delivery';
 
 
-export function scheduleDelivery(claimedFoodListingKey: number, deliveryAppUserKey: number, startImmediately: boolean, scheduledStartTime: Date): Promise<void> {
+export function scheduleDelivery(claimedFoodListingKey: number, delivererSessionData: SessionData, startImmediately: boolean, scheduledStartTime: Date): Promise<void> {
 
     // scheduledStartTime was likely converted to a string in the JSON request message!
     DateFormatter.ensureIsDate(scheduledStartTime);
@@ -15,7 +17,7 @@ export function scheduleDelivery(claimedFoodListingKey: number, deliveryAppUserK
     let queryString: string = 'SELECT * FROM scheduleDelivery($1, $2, $3, $4)';
     let queryArgs: any[] = [
         claimedFoodListingKey,
-        deliveryAppUserKey,
+        delivererSessionData.appUserKey,
         startImmediately,
         DateFormatter.dateToDateTimeString(scheduledStartTime)
     ];
@@ -24,19 +26,9 @@ export function scheduleDelivery(claimedFoodListingKey: number, deliveryAppUserK
     logSqlQueryExec(queryString, queryArgs);
 
     return query(queryString, queryArgs)
-
         .then((queryResult: QueryResult) => {
-            
-            logSqlQueryResult(queryResult.rows);
-
-            if (queryResult.rowCount === 1) {
-                console.log('Successfully scheduled a new Delivery');
-                return emailScheduledNotification(queryResult.rows[0].delivery, startImmediately, scheduledStartTime);
-            }
-
-            throw new Error('An incorrect number of rows have returned from the scheduleDelivery() SQL function call');
+            return handleScheduleDeliveryResult(delivererSessionData, queryResult);
         })
-
         .catch((err: Error) => {
             console.log(err);
             throw new Error('Sorry, an unexpected error occured when ' + (startImmediately ? 'starting' : 'scheduling') + ' the delivery');
@@ -44,9 +36,21 @@ export function scheduleDelivery(claimedFoodListingKey: number, deliveryAppUserK
 }
 
 
-export function emailScheduledNotification(scheduledDelivery: Delivery, startImmediately: boolean, scheduledStartTime: Date): Promise<void> {
+/**
+ * Handles query result and emails scheduled delivery notifications to involved Donor and Receiver.
+ * @param delivererSessionData The session information for the deliverer.
+ * @param queryResult The result of the scheduleDelivery() SQL query.
+ * @return On success, a promise that resolves to nothing. On failure, an error is thrown.
+ */
+function handleScheduleDeliveryResult(delivererSessionData: SessionData, queryResult: QueryResult): Promise<void> {
+
+    logSqlQueryResult(queryResult.rows);
     
-    
-    
-    return Promise.resolve();
+    if (queryResult.rowCount === 1) {
+        console.log('Successfully scheduled a new Delivery');
+        const deliveryUpdateNotification: DeliveryUpdateNotification = queryResult.rows[0].deliveryupdatenotification;
+        return notifyReceiverAndDonorOfDeliveryUpdate(delivererSessionData, deliveryUpdateNotification);
+    }
+
+    throw new Error('An incorrect number of rows have returned from the scheduleDelivery() SQL function call');
 }

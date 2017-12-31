@@ -30,7 +30,7 @@ export class DeliveryUtilService {
      * @return The total driving distance for the delivery (in miles).
      */
     public calcTotalDrivingDistance(delivery: Delivery): number {
-        return (Math.round(delivery.donorInfo.drivingDistance + delivery.receiverInfo.drivingDistance * 100) / 100);
+        return (Math.round((delivery.donorInfo.drivingDistance + delivery.receiverInfo.drivingDistance) * 100) / 100);
     }
 
 
@@ -40,7 +40,7 @@ export class DeliveryUtilService {
      * @return The total driving time for a delivery (in minutes).
      */
     public calcTotalDrivingTime(delivery: Delivery): number {
-        return (Math.round(delivery.donorInfo.drivingTime + delivery.receiverInfo.drivingTime * 100) / 100);
+        return (Math.round((delivery.donorInfo.drivingTime + delivery.receiverInfo.drivingTime) * 100) / 100);
     }
 
 

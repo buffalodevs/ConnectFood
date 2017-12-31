@@ -12,9 +12,9 @@ CREATE OR REPLACE FUNCTION removeFoodListing
 )
 -- Return user information of (receiver/deliverer) app users who were affected by the removal of the donation.
 RETURNS TABLE (
-    claimedFoodListingKey       ClaimedFoodListing.claimedFoodListingKey%TYPE,
-    claimedByAppUserKey         ClaimedFoodListing.claimedByAppUserKey%TYPE,
-    affectedNotificationData    JSON
+    claimedFoodListingKey   ClaimedFoodListing.claimedFoodListingKey%TYPE,
+    claimedByAppUserKey     ClaimedFoodListing.claimedByAppUserKey%TYPE,
+    unclaimNotificationData JSON
 )
 AS $$
     DECLARE _donorOnHandUnitsCount          FoodListing.availableUnitsCount%TYPE;
@@ -22,11 +22,11 @@ AS $$
     DECLARE _claimedUnitsDeleteCount        ClaimedFoodListing.claimedUnitsCount%TYPE;
 BEGIN
 
-    DROP TABLE IF EXISTS AffectedNotificationData;
-    CREATE TEMP TABLE AffectedNotificationData (
-        claimedFoodListingKey       INTEGER,
-        claimedByAppUserKey         INTEGER,
-        affectedNotificationData    JSON
+    DROP TABLE IF EXISTS RemovalInfo;
+    CREATE TEMP TABLE RemovalInfo (
+        claimedFoodListingKey   INTEGER,
+        claimedByAppUserKey     INTEGER,
+        unclaimNotificationData JSON
     );
 
     -- Make sure the food listing we are to delete exists and was donated by user issuing this command.
@@ -78,7 +78,7 @@ BEGIN
     -- Unclaim the number of claimed units that we are to delete.
     IF (_claimedUnitsDeleteCount > 0)
     THEN
-        INSERT INTO     AffectedNotificationData
+        INSERT INTO     RemovalInfo
         SELECT * FROM   unclaimFoodListing(_foodListingKey, _donatedByAppUserKey, _claimedUnitsDeleteCount);
     END IF;
 
@@ -94,10 +94,11 @@ BEGIN
     IF (_availableUnitsCount = 0
         -- No units in claimed or delivery states.
         AND NOT EXISTS(
-                SELECT 1 FROM FoodListing
-                INNER JOIN ClaimedFoodListing  ON FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
-                LEFT JOIN  DeliveryFoodListing ON ClaimedFoodListing.claimedFoodListingKey = DeliveryFoodListing.claimedFoodListingKey
-                WHERE FoodListing.foodListingKey = _foodListingKey
+            SELECT      1
+            FROM        FoodListing
+            INNER JOIN  ClaimedFoodListing  ON FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
+            LEFT JOIN   DeliveryFoodListing ON ClaimedFoodListing.claimedFoodListingKey = DeliveryFoodListing.claimedFoodListingKey
+            WHERE       FoodListing.foodListingKey = _foodListingKey
         )
     )
     THEN
@@ -113,7 +114,7 @@ BEGIN
     END IF;
 
     RETURN QUERY
-    SELECT * FROM AffectedNotificationData;
+    SELECT * FROM RemovalInfo;
 
 END;
 $$ LANGUAGE plpgsql;

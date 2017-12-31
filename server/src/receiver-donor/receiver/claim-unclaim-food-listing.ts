@@ -3,7 +3,7 @@ import { connect, query, Client, QueryResult } from '../../database-util/connect
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 import { FoodListing } from '../food-listing';
 import { SessionData } from '../../common-util/session-data';
-import { AffectedUnclaimNotification, notifyAffectedDeliverer } from '../common-receiver-donor/affected-unclaim-notification';
+import { UnclaimNotificationData, notifyDelivererOfUnclaim } from '../common-receiver-donor/unclaim-notification';
 
 
 export function claimFoodListing(foodListingKey: number, receiverSessionData: SessionData, unitsCount: number): Promise<void> {
@@ -45,10 +45,10 @@ function claimOrUnclaimFoodListing(foodListingKey: number, receiverSessionData: 
  */
 function handleUnclaimQueryResult(receiverSessionData: SessionData, result: QueryResult): Promise<void> {
     
-    let affectedUnclaimNotification: AffectedUnclaimNotification = result.rows[0].affectedumclaimnotification;
+    let unclaimNotificationData: UnclaimNotificationData = result.rows[0].unclaimnotificationdata;
 
     // Next, if the removal resulted in total unclaiming of food that had a scheduled delivery, then notify deliverer as well.
-    if (affectedUnclaimNotification.delivererSessionData != null && affectedUnclaimNotification.allUnitsAffected) {
-        return notifyAffectedDeliverer(receiverSessionData, 'receiver', affectedUnclaimNotification);
+    if (unclaimNotificationData.delivererSessionData != null && unclaimNotificationData.newClaimedUnitsCount === 0) {
+        return notifyDelivererOfUnclaim(receiverSessionData, 'receiver', unclaimNotificationData);
     }
 }

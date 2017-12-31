@@ -34,40 +34,11 @@ WHERE       FoodLIsting.foodTitle = 'Test';*/
 --DELETE FROM FoodListing WHERE foodTitle = 'Test';
 
 
-SELECT      FoodListing.foodListingKey,
-                    ARRAY_AGG (
-                                            JSON_BUILD_OBJECT (
-                                                'receiverInfo',       CASE
-                                                                        WHEN (ReceiverAppUser.appUserKey IS NOT NULL) THEN (
-                                                                            SELECT  sessionData->'appUserInfo'
-                                                                            FROM    getAppUserSessionData(ReceiverAppUser.appUserKey)
-                                                                        )
-                                                                        ELSE NULL
-                                                                        END,
-                                                'delivererInfo',      CASE
-                                                                        WHEN (DeliveryAppUser.appUserKey IS NOT NULL) THEN (
-                                                                            SELECT  sessionData->'appUserInfo'
-                                                                            FROM    getAppUserSessionData(DeliveryAppUser.appUserKey)
-                                                                        )
-                                                                        ELSE NULL
-                                                                        END,
-                                                'deliveryStateInfo',  NULL
-                                            )
-                                        )
-        FROM        FoodListing
-        INNER JOIN  FoodListingFoodTypeMap ON FoodListing.foodListingKey = FoodListingFoodTypeMap.foodListingKey
-    
-            LEFT JOIN   ClaimedFoodListing      ON  FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
-            LEFT JOIN   AppUser ReceiverAppUser ON  ClaimedFoodListing.claimedByAppUserKey = ReceiverAppUser.appUserKey
-            LEFT JOIN   DeliveryFoodListing     ON  ClaimedFoodListing.claimedFoodListingKey = DeliveryFoodListing.claimedFoodListingKey
-                                                -- Make sure we do not include cancelled deliveries!
-                                                AND NOT EXISTS (
-                                                        SELECT  1
-                                                        FROM    CancelledDeliveryFoodListing
-                                                        WHERE   CancelledDeliveryFoodListing.deliveryFoodListingKey
-                                                                = DeliveryFoodListing.deliveryFoodListingKey
-                                                    )
-            LEFT JOIN   AppUser DeliveryAppUser ON  DeliveryFoodListing.deliveryAppUserKey = DeliveryAppUser.appUserKey
-     
-        GROUP BY FoodListing.foodListingKey, ClaimedFoodListing.claimedFoodListingKey
-        ORDER BY FoodListing.postDate DESC
+SELECT DeliveryFoodListing.scheduledStartTime FROM FoodListing 
+LEFT JOIN ClaimedFoodListing ON ClaimedFoodListing.foodListingKey = FoodListing.foodListingKey
+LEFT JOIN DeliveryFoodListing ON DeliveryFoodListing.claimedFoodListingKey = ClaimedFoodLIsting.claimedFoodLIstingKey
+                              AND NOT EXISTS (
+                                  SELECT 1 FROM CancelledDeliveryFoodListing
+                                  WHERE CancelledDeliveryFoodLIsting.deliveryFoodLIstingKey = DeliveryFoodListing.deliveryFOodLIstingKey
+                              )
+WHERE foodTitle = 'Lots of beans';

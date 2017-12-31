@@ -71,7 +71,7 @@ export class FoodListingRemoveComponent implements OnChanges {
         this.showProgressSpinner = true;
         
         // Listen for result.
-        observer.finally(() => { this.showProgressSpinner = true; })
+        observer.finally(() => { this.showProgressSpinner = false; })
                 .subscribe (
                     (success: boolean) => {
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, SimpleChanges, OnChanges } from '@angular/core';
 
 import { GPSCoordinate } from '../../../../../shared/common-util/geocode';
 import { Address } from '../../../../../shared/app-user/app-user-info';
@@ -9,44 +9,78 @@ import { Address } from '../../../../../shared/app-user/app-user-info';
     templateUrl: './slick-map.component.html',
     styleUrls: ['./slick-map.component.css']
 })
-export class SlickMapComponent implements OnInit {
+export class SlickMapComponent implements OnChanges {
 
     @Input() private gpsCenterCoordinate: GPSCoordinate;
     @Input() private zoom: number;
     @Input() private diameterMi: number;
-    @Input() private addresses: Address[] = [];
-    @Input() private addressNames: string[] = [];
+    @Input() private addresses: Address[];
+    @Input() private addressNames: string[];
+
+    private readonly BASE_GOOGLE_MAPS_HREF;
+    private googleMapsHref: string;
 
 
-    public ngOnInit() {
+    public constructor() {
+        this.addresses = [];
+        this.addressNames = [];
+        this.BASE_GOOGLE_MAPS_HREF = 'https://www.google.com/maps/dir';
+        this.googleMapsHref = this.BASE_GOOGLE_MAPS_HREF;
+    }
 
-        // Fill in any missing addressNames slots with empty strings to ensure 1:1 correlation between addresses and names!
-        while (this.addressNames.length < this.addresses.length) {
-            this.addressNames.push('');
+
+    public ngOnChanges(changes: SimpleChanges): void {
+
+        // Whenever new addresses is entered, then regenerate the link to google maps.
+        if (changes.addresses) {
+            this.googleMapsHref = this.generateGoogleMapsHref(this.addresses);            
         }
 
-        // If the center GPS coordinate was not explicitely provided, then attempt to calculate it from address GPS coordinates.
-        this.gpsCenterCoordinate = (this.gpsCenterCoordinate != null) ? this.gpsCenterCoordinate
-                                                                      : this.calcCenterFromAddresses(this.addresses);
+        if (changes.gpsCenterCoordinate || changes.addresses) {
 
-        // If the zoom factor was not explicitely provided, then attempt to calculate it from provided diameter.
-        if (this.zoom == null) {
-            this.zoom = (this.diameterMi != null) ? this.calcZoomFromMapDiameter(this.diameterMi)
-                                                  : 8;
+            // If the center GPS coordinate was not explicitely provided, then attempt to calculate it from address GPS coordinates.
+            this.gpsCenterCoordinate = (this.gpsCenterCoordinate != null) ? this.gpsCenterCoordinate
+                                                                          : this.calcCenterFromAddresses(this.addresses);
+        }
+
+        if (changes.zoom || changes.diameterMi) {
+
+            // If the zoom factor was not explicitely provided, then attempt to calculate it from provided diameter.
+            if (this.zoom == null) {
+                this.zoom = (this.diameterMi != null) ? this.calcZoomFromMapDiameter(this.diameterMi)
+                                                      : 8;
+            }
         }
     }
 
 
     /**
-     * Generates a Google Maps directions web page link based on a contained set of addresses (provided originally as input to component).
+     * Gets a Google Maps directions web page link based on a contained set of addresses (provided originally as input to component).
      * @return The Google Maps directions web page link.
      */
-    public genGoogleMapsHref(): string {
-        
-        let href: string = 'https://www.google.com/maps/dir';
+    public getGoogleMapsHref(): string {
+        return this.googleMapsHref;
+    }
 
-        for (let i: number = 0; i < this.addresses.length; i++) {
-            href += ('/' + this.addresses[i].address + '+' + this.addresses[i].city + '+' + this.addresses[i].state + '+' + this.addresses[i].zip);
+
+    /**
+     * Generates a Google Maps link href from given addresses.
+     * @param addresses The addresses form which to generate the Google Maps link href.
+     * @return The generated href.
+     */
+    private generateGoogleMapsHref(addresses: Address[]): string {
+        
+        let href: string = this.BASE_GOOGLE_MAPS_HREF;
+
+        if (addresses != null) {
+
+            for (let i: number = 0; i < this.addresses.length; i++) {
+
+                // If address is valid, then include it in link.
+                if (this.addresses[i] != null) {
+                    href += ('/' + this.addresses[i].address + '+' + this.addresses[i].city + '+' + this.addresses[i].state + '+' + this.addresses[i].zip);
+                }
+            }
         }
 
         return href;
@@ -65,8 +99,11 @@ export class SlickMapComponent implements OnInit {
         let longitudeSum: number = 0;
 
         for (let i: number = 0; i < addresses.length; i++) {
-            latitudeSum += addresses[i].gpsCoordinate.latitude;
-            longitudeSum += addresses[i].gpsCoordinate.longitude;
+
+            if (addresses[i] != null) {
+                latitudeSum += addresses[i].gpsCoordinate.latitude;
+                longitudeSum += addresses[i].gpsCoordinate.longitude;
+            }
         }
 
         return new GPSCoordinate(latitudeSum / addresses.length, longitudeSum / addresses.length);

@@ -106,6 +106,8 @@ BEGIN
             ) AS delivery
     FROM        FoodListing
     INNER JOIN  ClaimedFoodListing                              ON  FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
+                                                                -- Do not include claims that have been completely unclaimed (0 remaining claimed units).
+                                                                AND ClaimedFoodListing.claimedUnitsCount <> 0
                                                                 -- Do not include rejected cancelled deliveries!
                                                                 AND NOT EXISTS (
                                                                     SELECT      1

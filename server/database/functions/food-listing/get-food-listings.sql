@@ -84,7 +84,9 @@ BEGIN
 
         -- Get any delivery information so that donor and receiver can see delivery state of Food Listing.
         _queryBase := _queryBase || '
-            LEFT JOIN   ClaimedFoodListing ON FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
+            LEFT JOIN   ClaimedFoodListing  ON  FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
+                                            -- Always exclude claimed food listings that have been completely unclaimed (0 remaining claimed units)!
+                                            AND ClaimedFoodListing.claimedUnitsCount <> 0
         ';
 
         -- Do we want only the invoking user's claimed food listings and have filter pertaining to specified claimer?
@@ -251,6 +253,7 @@ BEGIN
                                                                                                     )
                                                 INNER JOIN  AppUser DeliveryAppUser     ON  DeliveryFoodListing.deliveryAppUserKey = DeliveryAppUser.appUserKey
                                                 WHERE       ClaimedFoodListing.foodListingKey = FoodListing.foodListingKey
+                                                  AND       ClaimedFoodListing.claimedUnitsCount <> 0 -- Exclude claims that have been completely unclaimed (0 units remaining)!
                                             ),
                     
                     -- @ts-sql class="FoodListingUnits" file="/shared/food-listing/food-listing.ts"

@@ -12,16 +12,21 @@ CREATE OR REPLACE FUNCTION scheduleDelivery
 )
 RETURNS TABLE -- Returns the new Delivery that has been scheduled/started.
 (
-    claimedFoodListingKey   ClaimedFoodListing.claimedFoodListingKey%TYPE,
-    deliveryFoodListingKey  DeliveryFoodListing.deliveryFoodListingKey%TYPE,
-    delivery                JSON
+    deliveryFoodListingKey      DeliveryFoodListing.deliveryFoodListingKey%TYPE,
+    deliveryUpdateNotification  JSON
 )
 AS $$
-    DECLARE _deliveryFoodListingKey DeliveryFoodListing.deliveryFoodListingKey%TYPE;
-    DECLARE _currentTimestamp       TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+    DECLARE _deliveryFoodListingKey     DeliveryFoodListing.deliveryFoodListingKey%TYPE;
+    DECLARE _deliveryUpdateNotification JSON;
+    DECLARE _scheduledStartTimestamp    TIMESTAMP;
 BEGIN
 
     -- TODO: Check that the delivery app user and claimed food listing exist!
+
+    _scheduledStartTimestamp := CASE (_startImmediately)
+                                    WHEN TRUE THEN  CURRENT_TIMESTAMP
+                                    ELSE            TO_TIMESTAMP(_scheduledStartTime, 'MM/DD/YYYY hh:mi AM')
+                                END;
 
     INSERT INTO DeliveryFoodListing
     (
@@ -33,21 +38,27 @@ BEGIN
     (
         _claimedFoodListingKey,
         _deliveryAppUserKey,
-        CASE (_startImmediately)
-            WHEN TRUE THEN  _currentTimestamp
-            ELSE            TO_TIMESTAMP(_scheduledStartTime, 'MM/DD/YYYY hh:mi AM')
-        END
+        _scheduledStartTimestamp
     )
     RETURNING   DeliveryFoodListing.deliveryFoodListingKey
     INTO        _deliveryFoodListingKey;
 
-    -- If starting immediately, then update the state of the new delivery to started!
+    -- If starting immediately, then update the state of the new delivery to started (and returned update notification will be for started state change, not scheduled)!
     IF (_startImmediately) THEN
-        PERFORM updateDeliveryState(_deliveryFoodListingKey, _deliveryAppUserKey, 'started', _currentTimestamp);
+
+        SELECT  deliveryUpdateNotification
+        INTO    _deliveryUpdateNotification
+        FROM    updateDeliveryState(_deliveryFoodListingKey, _deliveryAppUserKey, 'started', _currentTimestamp);
+
+    -- Else, we need to set the delivery update notification for the scheduled state change here!
+    ELSE
+        _deliveryUpdateNotification := generateDeliveryUpdateNotification(_deliveryFoodListingKey, 'scheduled'::DeliveryState,
+                                                                          'unscheduled'::DeliveryState, _scheduledStartTimestamp);
     END IF;
 
     RETURN QUERY
-    SELECT * FROM getDeliveries(_deliveryAppUserKey, 0, 1, _deliveryFoodListingKey);
+    SELECT  _deliveryFoodListingKey,
+            _deliveryUpdateNotification;
 
 END;
 $$ LANGUAGE plpgsql;

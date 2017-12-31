@@ -24,21 +24,42 @@ BEGIN
         -- TODO: Need to perform an edit check that ensures we are not claiming more parts than what is available!!!!
     END IF;
 
-    -- The constraints on included insert columns will ensure that the AppUser and FoodListing exist.
-    INSERT INTO ClaimedFoodListing
-    (
-        claimedByAppUserKey,
-        foodListingKey,
-        claimedUnitsCount
+    -- If this is a brand new claim on the food listing for this user.
+    IF NOT EXISTS (
+        SELECT  1
+        FROM    ClaimedFoodListing
+        WHERE   ClaimedFoodListing.foodListingKey = _foodListingKey
+          AND   ClaimedFoodListing.claimedByAppUserKey = _claimedByAppUserKey
     )
-    VALUES
-    (
-        _claimedByAppUserKey,
-        _foodListingKey,
-        _claimUnitsCount
-    )
-    RETURNING   claimedFoodListingKey
-    INTO        _claimedFoodListingKey;
+    THEN
+
+        -- The constraints on included insert columns will ensure that the AppUser and FoodListing exist.
+        INSERT INTO ClaimedFoodListing
+        (
+            claimedByAppUserKey,
+            foodListingKey,
+            claimedUnitsCount
+        )
+        VALUES
+        (
+            _claimedByAppUserKey,
+            _foodListingKey,
+            _claimUnitsCount
+        )
+        RETURNING   ClaimedFoodListing.claimedFoodListingKey
+        INTO        _claimedFoodListingKey;
+
+    -- Else this is adding claimed units to a claim that already exists.
+    ELSE
+
+        UPDATE      ClaimedFoodListing
+        SET         claimedUnitsCount = ( claimedUnitsCount + _claimUnitsCount )
+        WHERE       ClaimedFoodListing.foodListingKey = _foodListingKey
+          AND       ClaimedFoodListing.claimedByAppUserKey = _claimedByAppUserKey
+        RETURNING   ClaimedFoodListing.claimedFoodLIstingKey
+        INTO        _claimedFoodListingKey;
+
+    END IF;
 
     -- VERY IMPORTANT: Update the remaining available units count!
     UPDATE  FoodListing

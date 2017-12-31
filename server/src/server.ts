@@ -34,15 +34,17 @@ import { handleGetDomainValues } from './domain/domain-controller';
 
 
 // Configure paths to client JS files and public resource files (such as images).
-const clientBuildDir: string = global['rootDir'] + 'client/dist/';
-const publicDir: string = global['rootDir'] + 'public';
+global['clientBuildDir'] = ( global['rootDir'] + 'client/dist/' );
+global['assetsDir'] = ( global['clientBuildDir'] + 'assets/' );
+global['clientEmailDir'] = ( global['rootDir'] + 'client/email/' );
+global['publicDir'] = ( global['rootDir'] + 'public' );
 
 
 // Initialize & Configure Express App (Establish App-Wide Middleware).
 let app: Application = express();
 app.use(bodyParser.json( { limit: '500KB' } ));
-app.use(express.static(clientBuildDir));
-app.use(express.static(publicDir));
+app.use(express.static(global['clientBuildDir']));
+app.use(express.static(global['publicDir']));
 SessionData.sessionBootstrap(app);
 app.set('port', (process.env.PORT || 5000));
 module.exports = app; // Make available for mocha testing suites.
@@ -84,9 +86,16 @@ app.get('/public/*', function(request, response) {
 });
 
 
+// Food Web's Main Asset Files Such as Icon and Banner Images.
+app.get('/assets/*', function(request, response) {
+    const assetFile: string = request.url.split('/assets/')[1];
+    response.sendFile(path.resolve(global['assetsDir'] + assetFile));
+});
+
+
 // All Remaining Routes Handler (for serving our main web page).
 app.get('*', function (request, response) {
-    response.sendFile(path.join(clientBuildDir + '/index.html'));
+    response.sendFile(path.join(global['clientBuildDir'] + '/index.html'));
 });
 
 

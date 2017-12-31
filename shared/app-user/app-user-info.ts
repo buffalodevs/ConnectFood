@@ -4,6 +4,16 @@ import { TimeRange } from './time-range';
 export { TimeRange };
 
 
+/**
+ * TODO: Set the enum values based off of SQL values so we have garunteed consistency.
+ */
+export enum AppUserType {
+    Receiver = 'Receiver',
+    Donor = 'Donor',
+    Deliverer = 'Deliverer'
+}
+
+
 export interface Address {
     address?: string;
     city?: string;
@@ -20,7 +30,7 @@ export class AppUserInfo implements Address {
     
     public constructor (
         public email?: string,
-        public appUserType?: string,
+        public appUserType?: AppUserType,
         public organizationName?: string,
         public lastName?: string,
         public firstName?: string,
