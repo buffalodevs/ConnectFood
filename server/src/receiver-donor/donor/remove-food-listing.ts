@@ -2,7 +2,7 @@
 import { connect, query, Client, QueryResult } from '../../database-util/connection-pool';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 import { SessionData } from '../../common-util/session-data';
-import { UnclaimNotificationData, notifyReceiverOfUnclaim, notifyDelivererOfUnclaim } from '../common-receiver-donor/unclaim-notification';
+import { UnclaimNotificationData, notifyReceiverOfUnclaim, notifyDelivererOfLostDelivery } from '../common-receiver-donor/unclaim-notification';
 
 
 /**
@@ -36,12 +36,12 @@ function notifyAffectedAppUsers(donorSessionData: SessionData, result: QueryResu
 
     // First notify affected receiver that their food has been unclaimed as a result of removal.
     let unclaimNotificationData: UnclaimNotificationData = result.rows[resultRowIndex].unclaimnotificationdata;
-    return notifyReceiverOfUnclaim(donorSessionData, unclaimNotificationData)
+    return notifyReceiverOfUnclaim(unclaimNotificationData)
         .then(() => {
 
             // Next, if the removal resulted in total unclaiming of food that had a scheduled delivery, then notify deliverer as well.
             if (unclaimNotificationData.delivererSessionData != null && unclaimNotificationData.newClaimedUnitsCount === 0) {
-                return notifyDelivererOfUnclaim(donorSessionData, 'donor', unclaimNotificationData)
+                return notifyDelivererOfLostDelivery(donorSessionData, 'donor', unclaimNotificationData)
                     .then(() => {
 
                         // Make recursive call with index of next row as subject of next call.

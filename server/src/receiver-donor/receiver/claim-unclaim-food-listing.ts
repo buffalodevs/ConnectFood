@@ -3,7 +3,7 @@ import { connect, query, Client, QueryResult } from '../../database-util/connect
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 import { FoodListing } from '../food-listing';
 import { SessionData } from '../../common-util/session-data';
-import { UnclaimNotificationData, notifyDelivererOfUnclaim } from '../common-receiver-donor/unclaim-notification';
+import { UnclaimNotificationData, notifyDelivererOfLostDelivery, notifyDonorOfLostDelivery } from '../common-receiver-donor/unclaim-notification';
 
 
 export function claimFoodListing(foodListingKey: number, receiverSessionData: SessionData, unitsCount: number): Promise<void> {
@@ -47,8 +47,12 @@ function handleUnclaimQueryResult(receiverSessionData: SessionData, result: Quer
     
     let unclaimNotificationData: UnclaimNotificationData = result.rows[0].unclaimnotificationdata;
 
-    // Next, if the removal resulted in total unclaiming of food that had a scheduled delivery, then notify deliverer as well.
+    // Next, if the removal resulted in total unclaiming of food that had a scheduled delivery, then notify deliverer and donor as well.
     if (unclaimNotificationData.delivererSessionData != null && unclaimNotificationData.newClaimedUnitsCount === 0) {
-        return notifyDelivererOfUnclaim(receiverSessionData, 'receiver', unclaimNotificationData);
+        
+        return notifyDelivererOfLostDelivery(receiverSessionData, 'receiver', unclaimNotificationData)
+            .then(() => {
+                return notifyDonorOfLostDelivery(unclaimNotificationData);
+            });
     }
 }

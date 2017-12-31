@@ -60,6 +60,7 @@
                 margin-top: 10px;
                 padding-top: 5px;
                 padding-bottom: 5px;
+                text-align: center;
             }
 
             #footer-img {
@@ -106,23 +107,21 @@
                                 {{ bodyContents }}
             
                                 <p>
-                                    <div>
-                                        Sincerely,<br>
-                                        Food Web
-                                    </div>
-
-                                    <a href="{{ process.env.HOST_ADDRESS }}">
-                                        <img id="footer-img" src="{{ process.env.HOST_ADDRESS }}/assets/IconImg.png">
-                                    </a>
+                                    Sincerely,<br>
+                                    Food Web
                                 </p>
             
                             </div>
 
                         </div>        
         
-                        <footer class="email-doc-member">
+                        <footer align="center" class="email-doc-member">
+
+                            <a href="{{ process.env.HOST_ADDRESS }}">
+                                <img id="footer-img" src="{{ process.env.HOST_ADDRESS }}/assets/IconImg.png">
+                            </a>
                             
-                            <span>Food Web &copy; 2017</span>
+                            <div>Food Web &copy; 2017</div>
         
                         </footer>
 

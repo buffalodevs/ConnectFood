@@ -28,6 +28,7 @@ BEGIN
     (
         claimedFoodListingKey       INTEGER,
         claimedByAppUserKey         INTEGER,
+        donatedByAppUserKey         INTEGER,
         originalClaimedUnitsCount   INTEGER,
         claimedDate                 TIMESTAMP,
         deliveryFoodListingKey      INTEGER,
@@ -62,11 +63,13 @@ BEGIN
     INSERT INTO UnclaimCandidates
     SELECT      ClaimedFoodListing.claimedFoodListingKey,
                 ClaimedFoodListing.claimedByAppUserKey,
+                FoodListing.donatedByAppUserKey,
                 ClaimedFoodListing.claimedUnitsCount,
                 ClaimedFoodListing.claimedDate,
                 DeliveryFoodListing.deliveryFoodListingKey,
                 DeliveryFOodListing.deliveryAppUserKey
     FROM        ClaimedFoodListing
+    INNER JOIN  FoodListing         ON  ClaimedFoodListing.foodListingKey = FoodListing.foodListingKey
     LEFT JOIN   DeliveryFoodListing ON  ClaimedFoodListing.claimedFoodListingKey = DeliveryFoodListing.claimedFoodListingKey
                                     -- Make sure we don't include delivery info of cancelled deliveries!
                                     AND NOT EXISTS (
@@ -74,7 +77,7 @@ BEGIN
                                         FROM    CancelledDeliveryFoodListing
                                         WHERE   CancelledDeliveryFoodListing.deliveryFoodListingKey = DeliveryFoodListing.deliveryFoodListingKey
                                     )
-    WHERE       foodListingKey = _foodListingKey
+    WHERE       ClaimedFoodListing.foodListingKey = _foodListingKey
       -- If unclaimed by Donor, then we can remove units from all claims of given food listing. But, if unclaimed by Receiver, only Receiver's claim is subject!
       AND       (_unclaimedByDonor OR ClaimedFoodListing.claimedByAppUserKey = _unclaimedByAppUserKey)
       -- The claimed food listings (to be unclaimed) should not have yet entered the started delivery state!
@@ -180,6 +183,7 @@ BEGIN
                     'oldClaimedUnitsCount', UnclaimCandidates.originalClaimedUnitsCount,
                     'newClaimedUnitsCount', ( UnclaimCandidates.originalClaimedUnitsCount - UnclaimCandidates.unclaimedUnitsCount ),
                     'unitsLabel',           _unitsLabel,
+                    'donorSessionData',     ( SELECT sessionData FROM getAppUserSessionData(UnclaimCandidates.donatedByAppUserKey) ),
                     'receiverSessionData',  ( SELECT sessionData FROM getAppUserSessionData(UnclaimCandidates.claimedByAppUserKey) ),
                     'delivererSessionData', CASE
                                                 WHEN UnclaimCandidates.deliveryAppUserKey IS NOT NULL

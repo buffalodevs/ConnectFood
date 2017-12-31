@@ -1,7 +1,7 @@
 import { SessionData } from "../../common-util/session-data";
 import { sendEmail, MailConfig } from "../../common-util/email";
 
-import { AppUserType } from "../../../../shared/app-user/app-user-info";
+import { AppUserType, AppUserInfo } from "../../../../shared/app-user/app-user-info";
 
 
 /**
@@ -14,6 +14,7 @@ export class UnclaimNotificationData {
         public oldClaimedUnitsCount: number,
         public newClaimedUnitsCount: number,
         public unitsLabel: string,
+        public donorSessionData: SessionData,
         public receiverSessionData: SessionData,
         public delivererSessionData: SessionData
     ) {}
@@ -25,7 +26,7 @@ export class UnclaimNotificationData {
  * @param donorSessionData Data concerning the donor who submitted the remove/unclaim operation.
  * @param unclaimNotificationData Data required to notify all affected parties of the remove/unclaim operation.
  */
-export function notifyReceiverOfUnclaim(donorSessionData: SessionData, unclaimNotificationData: UnclaimNotificationData): Promise<void> {
+export function notifyReceiverOfUnclaim(unclaimNotificationData: UnclaimNotificationData): Promise<void> {
     
     const receiverEmail: string = unclaimNotificationData.receiverSessionData.appUserInfo.email;
     const receiverOrganization: string = unclaimNotificationData.receiverSessionData.appUserInfo.organizationName;
@@ -35,7 +36,7 @@ export function notifyReceiverOfUnclaim(donorSessionData: SessionData, unclaimNo
     const newUnitsCount: number = unclaimNotificationData.newClaimedUnitsCount;
     const unitsUnclaimedCount: number = ( oldUnitsCount - newUnitsCount );
     const foodTitle: string = unclaimNotificationData.foodTitle;
-    const donorOrganization: string = donorSessionData.appUserInfo.organizationName;
+    const donorOrganization: string = unclaimNotificationData.donorSessionData.appUserInfo.organizationName;
 
     let unitsUnclaimedText: string = '';
     let unitsRemainingText: string = '';
@@ -47,10 +48,6 @@ export function notifyReceiverOfUnclaim(donorSessionData: SessionData, unclaimNo
 
     let htmlContents: string = `
         <p>
-            Dear ` + receiverOrganization + `,
-        </p>
-
-        <p>
             We regret to inform you that ` + unitsUnclaimedText +
             `your claimed food titled <b>` + foodTitle + `</b> has been removed by the donor <b>` + donorOrganization + `</b>.<br>` +
             unitsRemainingText + `
@@ -58,7 +55,7 @@ export function notifyReceiverOfUnclaim(donorSessionData: SessionData, unclaimNo
 
         <p>
             We are sorry for any inconvenience that this has caused you. Please browse and claim other available food donations
-            at our <a href="` + process.env.HOST_ADDRESS + `/receive">Receive</a> tab.
+            on our website at our <a href="` + process.env.HOST_ADDRESS + `/receive">Receive</a> tab.
         </p>
     `
 
@@ -76,12 +73,55 @@ export function notifyReceiverOfUnclaim(donorSessionData: SessionData, unclaimNo
 
 
 /**
- * Notifies an affected deliverers of the removal/unclaim of Food Listing.
+ * Notifies an affected donor of a lost delivery due to the unclaiming of the related Food Listing.
+ * @param unclaimNotificationData Data required to notify all affected parties of the lost delivery as a result of an unclaim operation.
+ */
+export function notifyDonorOfLostDelivery(unclaimNotificationData: UnclaimNotificationData): Promise<void> {
+
+    const donorEmail: string = unclaimNotificationData.donorSessionData.appUserInfo.email;
+    const donorOrganization: string = unclaimNotificationData.donorSessionData.appUserInfo.organizationName;
+    const receiverOrganization: string = unclaimNotificationData.receiverSessionData.appUserInfo.organizationName;
+    const foodTitle: string = unclaimNotificationData.foodTitle;
+    const delivererAppUserInfo: AppUserInfo = unclaimNotificationData.delivererSessionData.appUserInfo;
+    const delivererName: string = ( delivererAppUserInfo.firstName + ' ' + delivererAppUserInfo.lastName );
+
+    let htmlContents: string = `
+        <p>
+            We regret to inform you that the receiver <b>` + receiverOrganization + `</b>
+            has removed all claims to your donated food titled <b>` + foodTitle + `</b>.
+        </p>
+
+        <p>
+            Therefore, the corresponding delivery has been cancelled. The deliverer
+            named <b>` + delivererName + `</b> has also been notified about the cancellation.
+        </p>
+
+        <p>
+            We are sorry for any inconvenience that this has caused you.<br>
+            Please wait patiently for another receiver to claim your donation.
+        </p>
+    `
+
+    let mailConfig: MailConfig = new MailConfig (
+        ( 'Update of Claimed Food Titled: ' + foodTitle ),
+        donorOrganization,
+        donorEmail,
+        AppUserType.Donor,
+        htmlContents
+    )
+
+    return sendEmail(mailConfig)
+        .catch((err: Error) => { console.log(err); });
+}
+
+
+/**
+ * Notifies an affected deliverers of the lost delivery as a result of a removal/unclaim of Food Listing.
  * @param sourceSessionData Data concerning the receiver or donor who submitted the remove/unclaim operation.
  * @param sourceAppUserType The type of the user (receiver or donor) who submitted the remove/unclaim operation.
  * @param unclaimNotificationData Data required to notify all affected parties of the remove/unclaim operation.
  */
-export function notifyDelivererOfUnclaim(sourceSessionData: SessionData, sourceAppUserType: string, unclaimNotificationData: UnclaimNotificationData): Promise<void> {
+export function notifyDelivererOfLostDelivery(sourceSessionData: SessionData, sourceAppUserType: string, unclaimNotificationData: UnclaimNotificationData): Promise<void> {
     
     const delivererEmail: string = unclaimNotificationData.delivererSessionData.appUserInfo.email;
     const delivererName: string = ( unclaimNotificationData.delivererSessionData.appUserInfo.firstName + ' ' +
@@ -91,10 +131,6 @@ export function notifyDelivererOfUnclaim(sourceSessionData: SessionData, sourceA
 
     let htmlContents: string = `
         <p>
-            Dear ` + delivererName + `,
-        </p>
-
-        <p>
             We regret to inform you that your scheduled delivery titled
             <b>` + foodTitle + `</b> has been removed by the ` + sourceAppUserType + `
             <b>` + sourceOrganization + `</b>.
@@ -102,7 +138,7 @@ export function notifyDelivererOfUnclaim(sourceSessionData: SessionData, sourceA
 
         <p>
             We are sorry for any inconvenience that this has caused you. Please browse and schedule other deliveries
-            at our <a href="` + process.env.HOST_ADDRESS + `/deliver">Deliver</a> tab.
+            on our website at our <a href="` + process.env.HOST_ADDRESS + `/deliver">Deliver</a> tab.
         </p>
     `;
 
