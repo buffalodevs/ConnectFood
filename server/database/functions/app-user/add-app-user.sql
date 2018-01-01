@@ -53,12 +53,8 @@ BEGIN
     -- Add the new user's contact info.
     PERFORM addContactInfo (_appUserKey, _address, _latitude, _longitude, _city, _state, _zip, _phone);
 
-    -- **** TODO: Get rid of this check once we fully implement signup with time ranges!!!
-    IF (_availabilityTimeRanges IS NOT NULL)
-    THEN
-        -- Add the new user's availability times.
-        PERFORM updateAvailability (_appUserKey, _availabilityTimeRanges);
-    END IF;
+    -- Add the new user's availability times.
+    PERFORM updateAvailability (_appUserKey, _availabilityTimeRanges);
 
     -- Add the new user's organization data if the user is and oragnization.
     IF (_organizationName IS NOT NULL)

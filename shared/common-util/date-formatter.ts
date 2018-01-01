@@ -1,3 +1,4 @@
+import * as moment from "moment";
 import { Validation } from "./validation";
 
 
@@ -240,5 +241,39 @@ export class DateFormatter {
             case 'saturday':    return 6;
             default:            throw new Error('Weekday string must be a valid day of the week, but this string was provided: ' + weekdayString);
         }
+    }
+
+
+    /**
+     * Sets a given date to the next occurence of a given weekday after today while preserving the time.
+     * @param weekday The weekday index (where [0, 6] = [Sunday, Saturday]).
+     * @param date The date to set.
+     * @return The new date that has been set to the given weekday with time preserved.
+     */
+    public static setDateToWeekday(weekday: number, date: Date): Date {
+
+        // Note: moment.js iso time starts with weekday Monday = 1 to Sunday = 7, but we want Sunday = 0 to Saturday = 6 as our app standard, so subtract 1 from weekday!
+        let retDate: Date = moment(date).add(1, 'days').startOf('isoWeek').add(weekday - 1, 'days')
+                            .add(date.getHours(), 'hours').add(date.getMinutes(), 'minutes').toDate();
+
+        // If the calculated date is a weekday of this week on or before today, then push it to next week.
+        return ( retDate.getDay() <= (new Date()).getDay() ) ? moment(retDate).add(7, 'days').toDate()
+                                                             : retDate;
+    }
+
+
+    /**
+     * Generates a date object from a given weekday and time. The generated Date object will be set on the next occurence of a given weekday after today at the specified time.
+     * @param weekday The weekday index (where [0, 6] = [Sunday, Saturday]).
+     * @param time The time to set for the generated date. Must be in wall clock time format: /^([1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/ OR '12:00 AM' to '11:59 PM'.
+     * @return The generated date object.
+     *         NOTE: If the time is not in correct format, then null is returned.
+     */
+    public static genDateFromWeekdayAndTime(weekday: number, time: string): Date {
+
+        let date: Date = DateFormatter.setWallClockTimeForDate(new Date(), time);
+
+        return (date != null) ? DateFormatter.setDateToWeekday(weekday, date)
+                              : null;
     }
 }

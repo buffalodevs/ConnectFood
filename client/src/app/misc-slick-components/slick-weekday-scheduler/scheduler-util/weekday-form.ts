@@ -58,7 +58,7 @@ export class WeekdayForm extends FormGroup {
         // Then, go through each weekday form array and add in time ranges.
         for (let i: number = 0; i < timeRanges.length; i++) {
             
-            let weekday: string = DateFormatter.covertWeekdayIntToString(timeRanges[i].weekday);
+            let weekday: string = DateFormatter.covertWeekdayIntToString(timeRanges[i].startTime.getDay());
             (<FormArray>this.get(weekday)).push(new FormControl(timeRanges[i]));
         }
     }

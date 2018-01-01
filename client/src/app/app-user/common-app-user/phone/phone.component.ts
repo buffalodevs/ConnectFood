@@ -91,7 +91,7 @@ export class PhoneComponent implements OnInit, ControlValueAccessor {
      * Writes a new value to the contained view model. This function is part of the ControlValueAccessor
      * interface and is implicitely called by directives (such as ngModel) when the data within this component
      * should be updated by a parent component.
-     * @param timeRange The value to write.
+     * @param value The value to write.
      */
     public writeValue(value: string): void {
         this.phoneControl.setValue(value);

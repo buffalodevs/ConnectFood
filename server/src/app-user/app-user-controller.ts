@@ -7,9 +7,9 @@ import { updateAppUser } from './edit-app-user/app-user-update';
 import { SessionData, AppUserInfo } from "../common-util/session-data";
 
 import { FoodWebResponse } from "../../../shared/message-protocol/food-web-response";
-import { LoginRequest, LoginResponse } from '../../../shared/app-user/login-message';
-import { SignupRequest } from '../../../shared/app-user/signup-message';
-import { UpdateAppUserRequest, UpdateAppUserResponse } from '../../../shared/app-user/update-app-user-message';
+import { LoginRequest, LoginResponse } from '../../../shared/app-user/message/login-message';
+import { SignupRequest } from '../../../shared/app-user/message/signup-message';
+import { UpdateAppUserRequest, UpdateAppUserResponse } from '../../../shared/app-user/message/update-app-user-message';
 
 
 /**

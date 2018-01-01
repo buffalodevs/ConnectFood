@@ -6,6 +6,7 @@ import { ScheduleDeliveryService } from '../../delivery-services/schedule-delive
 import { Delivery } from '../../../../../../../shared/deliverer/delivery';
 import { DeliveryState } from '../../../../../../../shared/deliverer/message/get-deliveries-message';
 import { DateFormatter } from '../../../../../../../shared/common-util/date-formatter';
+import { TimeRange } from '../../../../../../../shared/app-user/app-user-info';
 
 
 @Component({

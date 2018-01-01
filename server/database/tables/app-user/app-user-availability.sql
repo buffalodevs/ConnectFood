@@ -1,6 +1,6 @@
 -- Holds availability (schedule) data for each user. Determines when each user is available for pickup (donor) and/or delivery (receiver).
 
-DROP TABLE AppUserAvailability CASCADE;
+--DROP TABLE AppUserAvailability CASCADE;
 CREATE TABLE IF NOT EXISTS AppUserAvailability
 (
     appUserAvailabilityKey SERIAL PRIMARY KEY

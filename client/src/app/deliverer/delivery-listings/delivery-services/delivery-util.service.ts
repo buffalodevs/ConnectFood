@@ -1,5 +1,6 @@
 "use strict";
 import { Injectable } from '@angular/core';
+
 import { Delivery, DeliveryState, DeliveryUtil } from '../../../../../../shared/deliverer/delivery-util';
 import { TimeRange } from '../../../../../../shared/app-user/time-range';
 import { DateFormatter } from '../../../../../../shared/common-util/date-formatter';
@@ -61,11 +62,14 @@ export class DeliveryUtilService {
         for (let i: number = 0; i < delivery.possibleDeliveryTimes.length; i++) {
 
             // First, see if our current day of week matches the time range's day of week.
-            if (currentDateTime.getDay() === delivery.possibleDeliveryTimes[i].weekday) {
+            if (currentDateTime.getDay() === delivery.possibleDeliveryTimes[i].startTime.getDay()) {
+
+                const startWallClockTimeStr: string = DateFormatter.dateToWallClockString(delivery.possibleDeliveryTimes[i].startTime);
+                const endWallClockTimeStr: string = DateFormatter.dateToWallClockString(delivery.possibleDeliveryTimes[i].endTime);
 
                 // Convert times into a date (based on today), and get milliseconds since epoch for easy comparison with current date-time.
-                const startTimeMs: number = DateFormatter.setWallClockTimeForDate(new Date(), delivery.possibleDeliveryTimes[i].startTime).getTime();
-                const endTimeMs: number = DateFormatter.setWallClockTimeForDate(new Date(), delivery.possibleDeliveryTimes[i].endTime).getTime();
+                const startTimeMs: number = DateFormatter.setWallClockTimeForDate(new Date(), startWallClockTimeStr).getTime();
+                const endTimeMs: number = DateFormatter.setWallClockTimeForDate(new Date(), endWallClockTimeStr).getTime();
 
                 if (currentTimeMs >= startTimeMs && currentTimeMs <= (endTimeMs - totalDeliveryTimeMs))
                 {  return true;  }

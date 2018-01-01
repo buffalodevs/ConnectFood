@@ -23,7 +23,7 @@ export function getPossibleDeliveryTimes(claimedFoodListingKey: number, myAppUse
 
             for (let i: number = 0; i < results.rowCount; i++) {
                 let possibleDeliveryTime: any = results.rows[i].getPossibleDeliveryTimes;
-                possibleDeliveryTimes.push(new TimeRange(possibleDeliveryTime.startDate, possibleDeliveryTime.endDate));
+                possibleDeliveryTimes.push(new TimeRange(new Date(possibleDeliveryTime.startDate), new Date(possibleDeliveryTime.endDate)));
             }
 
             return possibleDeliveryTimes;

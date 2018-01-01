@@ -5,7 +5,7 @@ import { checkPassword } from '../common-app-user/password-util';
 import { SessionData, AppUserInfo } from "../../common-util/session-data";
 
 import { TimeRange } from '../../../../shared/app-user/time-range';
-import { AppUserErrorMsgs} from '../../../../shared/app-user/app-user-error-msgs';
+import { AppUserErrorMsgs} from '../../../../shared/app-user/message/app-user-error-msgs';
 
 
 /**

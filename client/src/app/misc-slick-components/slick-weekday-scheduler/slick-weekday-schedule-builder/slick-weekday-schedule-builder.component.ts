@@ -166,7 +166,5 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
     /**
      * @param onTouched 
      */
-    public registerOnTouched(onTouched: string): void {
-        // TODO - not really necessary...
-    }
+    public registerOnTouched(onTouched: string): void {}  // TODO - not really necessary...
 }

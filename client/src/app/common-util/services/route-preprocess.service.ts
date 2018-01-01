@@ -7,7 +7,7 @@ import { RequestService, Response } from './request.service';
 import { SessionDataService } from './session-data.service';
 import { LoginComponent } from '../../app-user/login/login.component'
 
-import { LoginResponse } from './../../../../../shared/app-user/login-message';
+import { LoginResponse } from './../../../../../shared/app-user/message/login-message';
 
 
 /**
@@ -79,6 +79,10 @@ export class RoutePreprocessService implements CanActivate {
             // After done with login dialog, if we are logged in, then we can redirect to original intended link!
             if (this.authSessionService.sessionDataAvailable()) {
                 this.router.navigate([toUrl]);
+            }
+            // Otherwise, simply navigate to page that notifies user that login is required.
+            else {
+                this.router.navigate(['/loginRequired']);
             }
         });
     }

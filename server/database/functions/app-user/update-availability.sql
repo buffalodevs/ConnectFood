@@ -11,12 +11,8 @@ CREATE OR REPLACE FUNCTION updateAvailability
 )
 RETURNS VOID
 AS $$
-    DECLARE _weekday        INTEGER;
-    DECLARE _startTime      TEXT;
-    DECLARE _endTime        TEXT;
-    DECLARE _weekdayDate    TEXT;
-    DECLARE _startTimestamp AppUserAvailability.startTime%TYPE;
-    DECLARE _endTimestamp   AppUserAvailability.endTime%TYPE;
+    DECLARE _startTime  AppUserAvailability.startTime%TYPE;
+    DECLARE _endTime    AppUserAvailability.endTime%TYPE;
 BEGIN
 
     -- First delete all current availability entries for the given App User.
@@ -29,26 +25,12 @@ BEGIN
     LOOP
 
         -- Convert time in TEXT format to time in TIMESTAMP format.
-        _weekday := _timeRanges[i]->>'weekday';
-        _startTime := _timeRanges[i]->>'startTime';
-        _endTime := _timeRanges[i]->>'endTime';
-
-        _weekdayDate := CASE (_weekday)
-                            WHEN 0 THEN '11/12/2017'
-                            WHEN 1 THEN '11/13/2017'
-                            WHEN 2 THEN '11/14/2017'
-                            WHEN 3 THEN '11/15/2017'
-                            WHEN 4 THEN '11/16/2017'
-                            WHEN 5 THEN '11/17/2017'
-                            WHEN 6 THEN '11/18/2017'
-                        END;
-
-        _startTimestamp := TO_TIMESTAMP(_weekdayDate || ' ' || _startTime, 'MM/DD/YYYY hh12:mi AM');
-        _endTimestamp := TO_TIMESTAMP(_weekdayDate || ' ' || _endTime, 'MM/DD/YYYY hh12:mi AM');
+        _startTime := convertToAvailabilityTime (utcTextToTimestamp(_timeRanges[i]->>'startTime'));
+        _endTime := convertToAvailabilityTime (utcTextToTimestamp(_timeRanges[i]->>'endTime'));
 
         -- Perform the insert.
         INSERT INTO AppUserAvailability (appUserKey, startTime, endTime)
-        VALUES      (_appUserKey, _startTimestamp, _endTimestamp);
+        VALUES      (_appUserKey, _startTime, _endTime);
 
     END LOOP;
     
@@ -57,7 +39,10 @@ $$ LANGUAGE plpgsql;
 
 
 /*
-SELECT * FROM updateAvailability( 1, array[JSON_BUILD_OBJECT('weekday', 0, 'startTime', '9:00 AM', 'endTime', '1:00 PM')] );
+SELECT * FROM updateAvailability( 1, array[
+                                        JSON_BUILD_OBJECT('startTime', '2017-12-31T12:00:00.179Z', 'endTime', '2017-12-31T23:00:00.179Z')
+                                     ]
+                                );
 
 SELECT  AppUser.email,
         appUserAvailability.startTime,

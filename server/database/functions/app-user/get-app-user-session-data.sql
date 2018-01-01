@@ -50,9 +50,8 @@ AS $$
                                                                     SELECT  ARRAY_AGG (
                                                                                 -- @ts-sql class="TimeRangeStr" file="/shared/app-user/time-range.ts"
                                                                                 JSON_BUILD_OBJECT (
-                                                                                    'weekday',      (SELECT EXTRACT(DOW FROM AppUserAvailability.startTime)),
-                                                                                    'startTime',    TO_CHAR(AppUserAvailability.startTime, 'HH12:MI AM'),
-                                                                                    'endTime',      TO_CHAR(AppUserAvailability.endTime, 'HH12:MI AM')
+                                                                                    'startTime',    timestampToUtcText(AppUserAvailability.startTime),
+                                                                                    'endTime',      timestampToUtcText(AppUserAvailability.endTime)
                                                                                 )
                                                                             )
                                                                     FROM    AppUserAvailability

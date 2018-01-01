@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { RequestService, Response } from '../../common-util/services/request.service';
 import { SessionDataService } from '../../common-util/services/session-data.service';
 
-import { UpdateAppUserRequest, UpdateAppUserResponse } from '../../../../../shared/app-user/update-app-user-message';
+import { UpdateAppUserRequest, UpdateAppUserResponse } from '../../../../../shared/app-user/message/update-app-user-message';
 import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
 

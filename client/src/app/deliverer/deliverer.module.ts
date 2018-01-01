@@ -21,7 +21,6 @@ import { DeliveryCartComponent } from './delivery-cart/delivery-cart.component';
 
 import { RoutePreprocessService } from '../common-util/services/route-preprocess.service';
 import { VehicleTypesService } from '../domain/vehicle-types/vehicle-types.service';
-import { GetDeliveriesService } from './delivery-listings/delivery-services/get-deliveries.service';
 import { DeliveryUtilService } from './delivery-listings/delivery-services/delivery-util.service';
 import { ManageDeliveryService } from './delivery-listings/delivery-services/manage-deliveries.service';
 import { ScheduleDeliveryService } from './delivery-listings/delivery-services/schedule-delivery.service';
@@ -73,7 +72,6 @@ const delivererRoutes: Routes = [
         SlickWeekdaySchedulerModule
     ],
     providers: [
-        GetDeliveriesService,
         DeliveryUtilService,
         ScheduleDeliveryService,
         ManageDeliveryService

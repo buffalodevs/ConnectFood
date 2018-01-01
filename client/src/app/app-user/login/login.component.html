@@ -9,7 +9,7 @@
                                  : "Sign In"}}
             </h1>
 
-            <div id="close-container">
+            <div id="close-container" *ngIf="showCloseButton">
                 <button type="button" class="modal-close" (click)="close()">&times;</button>
             </div>
             

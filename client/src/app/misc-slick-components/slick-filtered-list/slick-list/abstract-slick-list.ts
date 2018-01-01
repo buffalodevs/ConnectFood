@@ -61,6 +61,7 @@ export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilt
      * @param moreListings The additional listings that have been retrieved.
      */
     private onGetMoreListings(moreListings: Array<LIST_T>): void {
+        this.onReceivedListData(moreListings);
         this.listData = this.listData.concat(moreListings);
     }
 
@@ -77,8 +78,19 @@ export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilt
 
         observer.finally(() => { this.showProgressSpinner = false; })
                 .subscribe((listData: Array<LIST_T>) => {
+                    this.onReceivedListData(listData);
                     this.listData = listData;
                 });
+    }
+
+
+    /**
+     * Invoked whenever list data has been received.
+     * This is invoked before the data is displayed.
+     * @param listData The list data that has been received.
+     */
+    protected onReceivedListData(listData: Array<LIST_T>): void {
+        // Child class can override this to manipulate data before it is displayed.
     }
 
 
@@ -122,12 +134,12 @@ export abstract class AbstractSlickList <LIST_T, FILTERS_T extends SlickListFilt
 
     /**
      * Removes the selected listing.
-     * @param close Default is true. Determines whether or not to also close any open dialog.
+     * @param closeDialog Default is true. Determines whether or not to also close any open dialog.
      */
-    public removeSelectedListing(close: boolean = true): void {
+    public removeSelectedListing(closeDialog: boolean = true): void {
 
         // Close any modal details popup related to the listing we are deleting.
-        if (close && this.slickListDialog != null && this.slickListDialog.isOpen()) {
+        if (closeDialog && this.slickListDialog != null && this.slickListDialog.isOpen()) {
             this.slickListDialog.close();
         }
         

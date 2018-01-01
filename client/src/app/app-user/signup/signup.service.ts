@@ -5,7 +5,7 @@ import { RequestService, Response } from "../../common-util/services/request.ser
 import { SessionDataService } from "../../common-util/services/session-data.service";
 
 import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
-import { SignupRequest } from "../../../../../shared/app-user/signup-message";
+import { SignupRequest } from "../../../../../shared/app-user/message/signup-message";
 import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
 
 

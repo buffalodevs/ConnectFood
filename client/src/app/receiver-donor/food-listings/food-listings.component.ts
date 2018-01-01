@@ -4,7 +4,7 @@ import { Observable } from "rxjs/Observable";
 
 import { AbstractSlickList } from './../../misc-slick-components/slick-filtered-list/slick-list/abstract-slick-list';
 import { AbstractSlickListDialog } from '../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
-import { GetFoodListingsService } from './food-listing-services/get-food-listings.service';
+import { GetListingsService } from '../../misc-slick-components/slick-filtered-list/slick-list/get-listings.service';
 
 import { FoodListing } from '../../../../../shared/receiver-donor/food-listing';
 import { FoodListingsFilters } from "../../../../../shared/receiver-donor/food-listings-filters";
@@ -13,8 +13,7 @@ import { FoodListingsFilters } from "../../../../../shared/receiver-donor/food-l
 @Component({
     selector: 'food-listings',
     templateUrl: './food-listings.component.html',
-    styleUrls: ['./food-listings.component.css'],
-    providers: [GetFoodListingsService]
+    styleUrls: ['./food-listings.component.css']
 })
 export class FoodListingsComponent extends AbstractSlickList <FoodListing, FoodListingsFilters> {
 
@@ -37,7 +36,7 @@ export class FoodListingsComponent extends AbstractSlickList <FoodListing, FoodL
 
 
     public constructor (
-        getFoodListingsService: GetFoodListingsService
+        getFoodListingsService: GetListingsService <FoodListing, FoodListingsFilters>
     ) {
         super(getFoodListingsService, '/receiverDonor/getFoodListings');
     }

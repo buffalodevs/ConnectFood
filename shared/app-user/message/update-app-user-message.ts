@@ -1,5 +1,5 @@
-import { AppUserInfo } from './app-user-info';
-import { FoodWebResponse } from '../message-protocol/food-web-response';
+import { AppUserInfo } from '../app-user-info';
+import { FoodWebResponse } from '../../message-protocol/food-web-response';
 
 
 /**

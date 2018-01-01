@@ -26,7 +26,7 @@ RETURNS TABLE
 AS $$
     DECLARE _availableNow                   BOOLEAN     DEFAULT FALSE;
     DECLARE _maxDistanceMeters              INTEGER     DEFAULT NULL;
-    DECLARE _nowRelativeAvailabilityTimes   TIMESTAMP;
+    DECLARE _nowRelativeToAvailabilityTimes TIMESTAMP;
 BEGIN
 
     -- Calculate the max distance in meters if provided as argument (in miles).
@@ -59,7 +59,7 @@ BEGIN
         _availableNow := TRUE;
 
         -- Get current time, but relative to App User Availability timestamps.
-        _nowRelativeAvailabilityTimes := nowRelativeAvailabilityTimes();
+        _nowRelativeToAvailabilityTimes := convertToAvailabilityTime(CURRENT_TIMESTAMP);
 
     END IF;
     
@@ -145,10 +145,10 @@ BEGIN
                                                         AND DonorAvailability.endTime > DelivererAvailability.startTime
                                                         AND DonorAvailability.startTime < DelivererAvailability.endTime))
       -- When receiver and donor are both available now to handle delivery.
-      AND       (_availableNow = FALSE              OR (    ReceiverAvailability.endTime > _nowRelativeAvailabilityTimes
-                                                        AND ReceiverAvailability.startTime < _nowRelativeAvailabilityTimes
-                                                        AND DonorAvailability.endTime > _nowRelativeAvailabilityTimes
-                                                        AND DonorAvailability.startTime < _nowRelativeAvailabilityTimes))
+      AND       (_availableNow = FALSE              OR (    ReceiverAvailability.endTime > _nowRelativeToAvailabilityTimes
+                                                        AND ReceiverAvailability.startTime < _nowRelativeToAvailabilityTimes
+                                                        AND DonorAvailability.endTime > _nowRelativeToAvailabilityTimes
+                                                        AND DonorAvailability.startTime < _nowRelativeToAvailabilityTimes))
       -- Apply delivery state filters
       AND       (_deliveryState IS NULL             OR _deliveryState = (SELECT * FROM getDeliveryState(DeliveryFoodListing.scheduledStartTime,
                                                                                                         DeliveryFoodListing.startTime,
@@ -169,4 +169,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 
---SELECT * FROM getDeliveries(1, 0, 10);
+SELECT * FROM getDeliveries(1, 0, 10);

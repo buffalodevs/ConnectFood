@@ -21,5 +21,5 @@ export class FoodWebResponse {
          * Indicates if there is a need for the user to have their signup confirmed before performing certain functionality.
          */
         public signupConfirmRequired: boolean = false
-    ) { }
+    ) {}
 }

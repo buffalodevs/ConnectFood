@@ -134,7 +134,7 @@ export class RequestService {
 
 
     /**
-     * 
+     * A generic response mapping to basic boolean result.
      * @param response The response received from the server.
      * @return If the related operation on the server was successful, then true.
      *         If it was unsuccessful, and due to a resolvable error (such as required login), then false.

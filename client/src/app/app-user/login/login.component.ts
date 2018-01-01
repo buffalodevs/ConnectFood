@@ -22,11 +22,13 @@ export class LoginComponent extends DialogComponent<null, boolean> implements On
     private displayRecoveryResponseMessage: boolean;
     private loginForm: FormGroup;
     private loginError: string;
+    private showCloseButton: boolean;
     private showProgressSpinner: boolean;
 
 
     public constructor(
         public dialogService: DialogService,
+        private router: Router,
         private formBuilder: FormBuilder,
         private loginService: LoginService,
         private passwordRecoveryService: PasswordRecoveryService
@@ -35,11 +37,14 @@ export class LoginComponent extends DialogComponent<null, boolean> implements On
 
         this.forgotPassword = false;
         this.displayRecoveryResponseMessage = false;
+        this.showCloseButton = false;
         this.showProgressSpinner = false;
     }
 
 
     public ngOnInit(): void {
+
+        this.showCloseButton = ( this.router.url !== '/login' );
 
         this.loginForm = this.formBuilder.group({
             email: [null, Validators.required],
@@ -87,9 +92,15 @@ export class LoginComponent extends DialogComponent<null, boolean> implements On
 
                     (data: FoodWebResponse) => {
                         if (data.success) {
+                            
                             this.loginError = null;
                             this.forgotPassword ? this.displayRecoveryResponseMessage = true
                                                 : this.close();
+
+                            // If we are on login page or the signup page, then navigate to home on successful sign in.
+                            if (this.router.url === '/login' || this.router.url === '/signup') {
+                                this.router.navigate(['/home']);
+                            }
                         }
                         // Otherwise, failure occured.
                         else { this.loginError = data.message; }

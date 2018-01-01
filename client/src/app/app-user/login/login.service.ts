@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { SessionDataService } from '../../common-util/services/session-data.service';
 
-import { LoginRequest, LoginResponse } from '../../../../../shared/app-user/login-message';
+import { LoginRequest, LoginResponse } from '../../../../../shared/app-user/message/login-message';
 import { FoodWebResponse } from '../../../../../shared/message-protocol/food-web-response';
 
 

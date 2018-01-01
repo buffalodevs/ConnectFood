@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { AppUserInfo } from "./../../../../../shared/app-user/app-user-info";
+import { AppUserInfo, TimeRange } from "./../../../../../shared/app-user/app-user-info";
 import { StringManipulation } from '../../../../../shared/common-util/string-manipulation';
-import { TimeRange } from '../../../../../shared/app-user/time-range';
 
 
 @Injectable()
@@ -22,7 +21,29 @@ export class SessionDataService {
      * @param appUserInfo The App User info to update the client session data with.
      */
     public updateAppUserSessionData(appUserInfo: AppUserInfo): void {
+
+        if (appUserInfo != null) {
+            this.ensureAvailabilityContainsDates(appUserInfo);
+        }
+
         SessionDataService.appUserInfo = appUserInfo;
+    }
+
+
+    /**
+     * Ensures that the availability member of appUserInfo (if not null) contains dates in the Time Ranges (not JSON ISO date strings).
+     * If it contains JSON ISO date strings, then it converts them to dates.
+     * @param appUserInfo The appUserInfo object to check the availability member of.
+     *                    NOTE: This may be internally modified!
+     */
+    private ensureAvailabilityContainsDates(appUserInfo: AppUserInfo): void {
+
+        if (appUserInfo.availability === null)  return;
+
+        for (let i: number = 0; i < appUserInfo.availability.length; i++) {
+            // Constructor for TimeRange automatically does conversion from JSON string to date if necessary!
+            appUserInfo.availability[i] = new TimeRange(appUserInfo.availability[i].startTime, appUserInfo.availability[i].endTime);
+        }
     }
 
 

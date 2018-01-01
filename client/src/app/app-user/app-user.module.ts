@@ -11,6 +11,7 @@ import { SlickWeekdaySchedulerModule } from '../misc-slick-components/slick-week
 
 import { PhoneComponent } from './common-app-user/phone/phone.component';
 import { LoginComponent } from './login/login.component';
+import { LoginRequiredComponent } from './login-required/login-required.component';
 import { SignupComponent } from './signup/signup.component';
 import { AppUserInfoComponent } from './app-user-info/app-user-info.component';
 
@@ -21,6 +22,14 @@ import { AppUserTypesService } from '../domain/app-user-types/app-user-types.ser
 
 
 const appUserRoutes: Routes = [
+    {
+        path: 'login',
+        component: LoginComponent
+    },
+    {
+        path: 'loginRequired',
+        component: LoginRequiredComponent
+    },
     {
         path: 'signup',
         component: SignupComponent,
@@ -46,6 +55,7 @@ const appUserRoutes: Routes = [
     declarations: [
         PhoneComponent,
         LoginComponent,
+        LoginRequiredComponent,
         SignupComponent,
         AppUserInfoComponent
     ],

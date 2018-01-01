@@ -1,4 +1,4 @@
-import { AppUserInfo } from './app-user-info';
+import { AppUserInfo } from './../app-user-info';
 
 
 /**

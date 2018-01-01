@@ -11,7 +11,7 @@ import { AbstractModelDrivenComponent } from '../../common-util/components/abstr
 import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
 import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
-import { AppUserErrorMsgs } from '../../../../../shared/app-user/app-user-error-msgs';
+import { AppUserErrorMsgs } from '../../../../../shared/app-user/message/app-user-error-msgs';
 
 
 @Component({

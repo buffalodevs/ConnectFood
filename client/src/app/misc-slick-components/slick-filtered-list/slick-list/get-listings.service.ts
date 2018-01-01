@@ -8,7 +8,7 @@ import { SlickListResponse } from './slick-list-message/slick-list-response';
 
 
 @Injectable()
-export class GetListingsService<LIST_T, FILTERS_T extends SlickListFilters> {
+export class GetListingsService <LIST_T, FILTERS_T extends SlickListFilters> {
     
     private retrievalOffset: number;
     private noMoreListingsToRetrieve: boolean;

@@ -34,11 +34,14 @@ WHERE       FoodLIsting.foodTitle = 'Test';*/
 --DELETE FROM FoodListing WHERE foodTitle = 'Test';
 
 
-SELECT DeliveryFoodListing.scheduledStartTime FROM FoodListing 
+/*SELECT DeliveryFoodListing.scheduledStartTime FROM FoodListing 
 LEFT JOIN ClaimedFoodListing ON ClaimedFoodListing.foodListingKey = FoodListing.foodListingKey
 LEFT JOIN DeliveryFoodListing ON DeliveryFoodListing.claimedFoodListingKey = ClaimedFoodLIsting.claimedFoodLIstingKey
                               AND NOT EXISTS (
                                   SELECT 1 FROM CancelledDeliveryFoodListing
                                   WHERE CancelledDeliveryFoodLIsting.deliveryFoodLIstingKey = DeliveryFoodListing.deliveryFOodLIstingKey
                               )
-WHERE foodTitle = 'Lots of beans';
+WHERE foodTitle = 'Lots of beans';*/
+
+
+SELECT * FROM AppUserAvailability;

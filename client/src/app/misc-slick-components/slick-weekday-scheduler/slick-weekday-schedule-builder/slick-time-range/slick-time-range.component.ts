@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, forwardRef, OnChanges, SimpleChanges, SimpleChange } from '@angular/core';
 import { ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, FormControl, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
+import * as moment from 'moment';
 
 import { SlickTimeRangeValidationService, ValidationService, Validation } from './slick-time-range-validation.service';
 import { AbstractModelDrivenComponent } from '../../../../common-util/components/abstract-model-driven-component';
@@ -61,16 +62,15 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
     public ngOnInit(): void {
 
         this.form = this.formBuilder.group({
-            'weekday':      [null],
             'startTime':    [null, Validators.required],
             'endTime':      [null, Validators.required]
         }, { validator: this.validationService.timeOrder() });
 
         // Set required validators for contained Slick Input Group controls.
         this.groupValidators = [
-            [Validators.required, Validators.pattern(Validation.HH_REGEX)],
-            [Validators.required, Validators.pattern(Validation.MM_REGEX)],
-            [Validators.required, Validators.pattern(Validation.AM_OR_PM_REGEX)]
+            [ Validators.required, Validators.pattern(Validation.HH_REGEX) ],
+            [ Validators.required, Validators.pattern(Validation.MM_REGEX) ],
+            [ Validators.required, Validators.pattern(Validation.AM_OR_PM_REGEX) ]
         ];
 
         // Listen for any form changes and notify any listening components of change.
@@ -78,6 +78,7 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
             this.onChange(this.readValue());
         });
 
+        // ngOnInit() happens after ngOnChanges, so make sure we handle latest validate value here in uniform way!
         this.ngOnChanges({ validate: new SimpleChange(this.validate, this.validate, false) });
     }
 
@@ -114,13 +115,14 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
         let endTime: string = this.form.controls.endTime.value;
 
         // Take calendar base date and construct new date with additional times. If time strings are missing parts, then null is generated here!
-        let startDate: Date = DateFormatter.setWallClockTimeForDate(new Date(), startTime);
-        let endDate: Date = DateFormatter.setWallClockTimeForDate(new Date(), endTime);
+        let startDate: Date = DateFormatter.genDateFromWeekdayAndTime(this.weekday, startTime); 
+        let endDate: Date = DateFormatter.genDateFromWeekdayAndTime(this.weekday, endTime);
+
+        const datesCorrectFormat: boolean = ( startDate != null && endDate != null );  
 
         // If the date strings are in correct format and they are in correct temporal order.
-        const datesCorrectFormat: boolean = ( startDate != null && endDate != null );
         if (datesCorrectFormat && startDate.valueOf() < endDate.valueOf()) {
-            timeRange = new TimeRange(this.weekday, startTime, endTime);
+            timeRange = new TimeRange(startDate, endDate);
         }
 
         return timeRange;
@@ -140,11 +142,14 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
 
         // If given a non-null value, then write it.
         if (timeRange !== null) {
-            this.form.setValue(timeRange);
+            this.form.setValue({
+                startTime:  DateFormatter.dateToWallClockString(timeRange.startTime),
+                endTime:    DateFormatter.dateToWallClockString(timeRange.endTime)
+            });
         }
         // Else we were given null, so set contained value back to empty.
         else {
-            this.form.setValue(new TimeRange(this.weekday, null, null));
+            this.form.setValue({ startTime: null, endTime: null });
         }
     }
 
@@ -159,12 +164,9 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
 
 
     /**
-     * 
      * @param onTouched 
      */
-    public registerOnTouched(onTouched: any): void {
-        // TODO - not really necessary...
-    }
+    public registerOnTouched(onTouched: any): void {} // TODO - not really necessary...
 
 
     /**

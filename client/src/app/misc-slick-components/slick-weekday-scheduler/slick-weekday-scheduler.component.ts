@@ -2,7 +2,7 @@ import { Component, OnInit, Input, OnChanges, forwardRef, SimpleChange, SimpleCh
 import { FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormArray, Validators } from '@angular/forms';
 
 import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
-import { AvailabilityTimes } from './scheduler-util/availability-times';
+import { AvailabilityTimeManagementService } from './scheduler-util/availability-time-management.service';
 import { WeekdayForm } from './scheduler-util/weekday-form';
 import { WeekdaySplitService } from './scheduler-util/weekday-split.service';
 import { ValidationService } from '../../common-util/services/validation.service';
@@ -20,7 +20,8 @@ import { TimeRange } from '../../../../../shared/app-user/time-range';
             provide: NG_VALUE_ACCESSOR,
             useExisting: forwardRef(() => SlickWeekdaySchedulerComponent),
             multi: true
-        }
+        },
+        AvailabilityTimeManagementService
     ]
 })
 export class SlickWeekdaySchedulerComponent extends AbstractModelDrivenComponent implements OnInit, OnChanges, ControlValueAccessor {
@@ -36,12 +37,12 @@ export class SlickWeekdaySchedulerComponent extends AbstractModelDrivenComponent
      * then this callback will be invoked whenever a change occurs.
      */
     private onChange: (value: Date) => void;
-    private availabilityTimes: AvailabilityTimes;
 
 
     public constructor (
         private formBuilder: FormBuilder,
-        protected validationService: ValidationService
+        protected validationService: ValidationService,
+        private availabilityTimeManagement: AvailabilityTimeManagementService
     ) {
         super(validationService);
 
@@ -51,7 +52,6 @@ export class SlickWeekdaySchedulerComponent extends AbstractModelDrivenComponent
         this.onChange = (value: Date) => {
             console.log('No onChange listener binding from parent');
         };
-        this.availabilityTimes = new AvailabilityTimes();
     }
 
 
@@ -78,7 +78,7 @@ export class SlickWeekdaySchedulerComponent extends AbstractModelDrivenComponent
         
         // Adjust the column splits based on the value of availabilityTimeRanges (number of weekdays we have data for).
         if (changes.availabilityTimeRanges) {
-            this.availabilityTimes.set(changes.availabilityTimeRanges.currentValue);
+            this.availabilityTimeManagement.set(changes.availabilityTimeRanges.currentValue);
         }
     }
 
@@ -125,7 +125,5 @@ export class SlickWeekdaySchedulerComponent extends AbstractModelDrivenComponent
     /**
      * @param onTouched 
      */
-    public registerOnTouched(onTouched: string): void {
-        // TODO - not really necessary...
-    }
+    public registerOnTouched(onTouched: string): void {}  // TODO - not really necessary...
 }

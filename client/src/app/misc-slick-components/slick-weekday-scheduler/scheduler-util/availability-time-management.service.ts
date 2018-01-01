@@ -1,4 +1,6 @@
 "use strict";
+import { Injectable } from '@angular/core';
+
 import { TimeRange } from '../../../../../../shared/app-user/time-range';
 import { DateFormatter } from '../../../../../../shared/common-util/date-formatter';
 import { WeekdaySplitService } from './weekday-split.service';
@@ -16,17 +18,17 @@ export const enum TimeGranularity {
 
 /**
  * Manager of availability date-times derived from availability time range data.
+ * Constructs all possible times that a user can select from for an action such as scheduling a delivery.
  */
-export class AvailabilityTimes {
+@Injectable()
+export class AvailabilityTimeManagementService {
 
     private nonEmptyWeekdays: string[];
     private availableTimes: Map<string, Date[]>;
     private displayAvailableTimes: Map<string, string[]>;
 
 
-    public constructor (
-        private timeGranularity: TimeGranularity = TimeGranularity.HALF_HOUR
-    ) {
+    public constructor () {
         this.nonEmptyWeekdays = [];
         this.availableTimes = new Map();
         this.displayAvailableTimes = new Map();
@@ -49,13 +51,14 @@ export class AvailabilityTimes {
 
 
     /**
-     * Sets contained available time Date-Time data from given time range data.
+     * Sets contained available time data from given time range data.
+     * These times fall in all given time ranges and are spaced out at a set time granularity for the user to select from.
      * @param timeRanges The time range data from which to extract all available times from.
+     * @param timeGranularity: The time granularity in which to space out generated availability times by.
      */
-    public set(timeRanges: TimeRange[]): void {
+    public set(timeRanges: TimeRange[], timeGranularity: TimeGranularity = TimeGranularity.HALF_HOUR): void {
 
         const MS_IN_DAY: number = 86400000;
-        let weekStartMs: number = DateFormatter.getDateOfWeekStart().getTime();
 
         // First, reset available times data.
         this.refresh();
@@ -63,18 +66,24 @@ export class AvailabilityTimes {
         // Then, iterate through time ranges.
         for (let i: number = 0; i < timeRanges.length; i++) {
 
-            // Extract start and end date-time data in Date object format.
-            const weekday: string = DateFormatter.covertWeekdayIntToString(timeRanges[i].weekday);
-            const baseDate: Date = new Date(weekStartMs + (timeRanges[i].weekday * MS_IN_DAY));
-            let startMs: number = DateFormatter.setWallClockTimeForDate(baseDate, timeRanges[i].startTime).getTime();
-            let endMs: number = ( DateFormatter.setWallClockTimeForDate(baseDate, timeRanges[i].endTime).getTime() - TimeGranularity.HALF_HOUR );
+            // Generate weekday index and string.
+            const weekdayIndex: number = timeRanges[i].startTime.getDay();
+            const weekdayStr: string = DateFormatter.covertWeekdayIntToString(weekdayIndex);
+
+            // Extract wall-clock time strings from time range.
+            let startWallClockStr: string = DateFormatter.dateToWallClockString(timeRanges[i].startTime);
+            let endWallClockStr: string = DateFormatter.dateToWallClockString(timeRanges[i].endTime);
+            
+            // Extract start and end date-time data in milliseconds since epoch format so we can generate all times in-between over given interval.
+            let startMs: number = DateFormatter.genDateFromWeekdayAndTime(weekdayIndex, startWallClockStr).getTime();
+            let endMs: number = ( DateFormatter.genDateFromWeekdayAndTime(weekdayIndex, endWallClockStr).getTime() - TimeGranularity.HALF_HOUR );
 
             // Generate each available time at timeGranularity interval apart.
-            for (let timeMs: number = startMs; timeMs < endMs; timeMs += this.timeGranularity) {
+            for (let timeMs: number = startMs; timeMs < endMs; timeMs += timeGranularity) {
 
                 const availabilityDate: Date = new Date(timeMs);
-                this.availableTimes.get(weekday).push(availabilityDate);
-                this.displayAvailableTimes.get(weekday).push(DateFormatter.dateToWallClockString(availabilityDate));
+                this.availableTimes.get(weekdayStr).push(availabilityDate);
+                this.displayAvailableTimes.get(weekdayStr).push(DateFormatter.dateToWallClockString(availabilityDate));
             }
         }
 
@@ -82,6 +91,9 @@ export class AvailabilityTimes {
     }
 
 
+    /**
+     * Sets the weekdays that are non-empty (have availability times to select from).
+     */
     private setNonEmptyWeekdays(): void {
 
         for (let i: number = 0; i < WeekdaySplitService.WEEKDAYS.length; i++) {
@@ -103,15 +115,19 @@ export class AvailabilityTimes {
 
 
     /**
-     * Gets the available times in a displayable string format (wall-clock time format).
-     * @param weekday The weekday to get the displayable time strings for.
-     * @return The times in wall-clock time string format.
+     * Gets the displayable form of an availability time for a given weekday at a given index.
+     * @param weekday The weekday of the array to look in for the time.
+     * @param index The index of the time to get within the weekday array.
+     * @return The displayable form of the availability time.
      */
-    public getDisplayForm(weekday: string): string[] {
-        return this.displayAvailableTimes.get(weekday);
+    public getDisplayFormAt(weekday: string, index: number): string {
+        return this.displayAvailableTimes.get(weekday)[index];
     }
 
 
+    /**
+     * Gets all weekdays that have availabiilty times in them for the user to select from.
+     */
     public getNonEmptyWeekdays(): string[] {
         return this.nonEmptyWeekdays;
     }

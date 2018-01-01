@@ -16,26 +16,23 @@ BEGIN
     RETURN QUERY
                 -- @ts-sql class="TimeRange" file="/shared/app-user/time-range.ts"
     SELECT      JSON_BUILD_OBJECT (
-                    'weekday',      (SELECT EXTRACT(DOW FROM DelivererAvailability.startTime)),
-                    'startTime',    TO_CHAR (
+                    'startTime',    timestampToUtcText (
                                         GREATEST (
                                             ReceiverAvailability.startTime,
                                             DonorAvailability.startTime,
                                             DelivererAvailability.startTime
-                                        ),
-                                        'HH12:MI AM'
+                                        )
                                     ),
-                    'endTime',      TO_CHAR (
+                    'endTime',      timestampToUtcText (
                                         LEAST (
                                             ReceiverAvailability.endTime,
                                             DonorAvailability.endTime,
                                             DelivererAvailability.endTime
-                                        ),
-                                        'HH12:MI AM'
+                                        )
                                     )
                 )
     FROM        ClaimedFoodListing
-    INNER JOIN  FoodListing                                 ON ClaimedFoodListing.claimedFoodListingKey = FoodListing.foodListingKey
+    INNER JOIN  FoodListing                                 ON ClaimedFoodListing.foodListingKey = FoodListing.foodListingKey
     INNER JOIN  AppUser ReceiverAppUser                     ON ClaimedFoodListing.claimedByAppUserKey = ReceiverAppUser.appUserKey
     INNER JOIN  AppUser DonorAppUser                        ON FoodListing.donatedByAppUserKey = DonorAppUser.appUserKey
     INNER JOIN  AppUser DeliveryAppUser                     ON _deliveryAppUserKey = DeliveryAppUser.appUserKey
@@ -43,7 +40,8 @@ BEGIN
     INNER JOIN  AppUserAvailability DonorAvailability       ON DonorAppUser.appUserKey = DonorAvailability.appUserKey
     INNER JOIN  AppUserAvailability DelivererAvailability   ON DeliveryAppUser.appUserKey = DelivererAvailability.appUserKey
                 -- Time overlap.
-    WHERE       ReceiverAvailability.endTime > DelivererAvailability.startTime
+    WHERE       ClaimedFoodListing.claimedFoodListingKey = _claimedFoodListingKey
+      AND       ReceiverAvailability.endTime > DelivererAvailability.startTime
       AND       ReceiverAvailability.startTime < DelivererAvailability.endTime
       AND       DonorAvailability.endTime > DelivererAvailability.startTime
       AND       DonorAvailability.startTime < DelivererAvailability.endTime
@@ -57,4 +55,5 @@ END;
 $$ LANGUAGE plpgsql;
 
 
---SELECT * FROM getPossibleDeliveryTimes(33, 1);
+--SELECT * FROM ClaimedFoodListing ORDER BY claimedFoodListingKey DESC;
+SELECT * FROM getPossibleDeliveryTimes(77, 1);

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http, Headers, Response, RequestOptionsArgs } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
-import { RecoverPasswordRequest } from '../../../../../shared/app-user/password-recovery-message';
+import { RecoverPasswordRequest } from '../../../../../shared/app-user/message/password-recovery-message';
 import { FoodWebResponse } from '../../../../../shared/message-protocol/food-web-response';
 
 

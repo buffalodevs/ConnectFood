@@ -9,7 +9,7 @@ import { hashPassword } from '../common-app-user/password-util';
 import { GPSCoordinate, getGPSCoordinate } from '../../../../shared/common-util/geocode';
 import { Validation } from '../../../../shared/common-util/validation';
 import { Address } from '../../../../shared/app-user/app-user-info';
-import { AppUserErrorMsgs } from '../../../../shared/app-user/app-user-error-msgs';
+import { AppUserErrorMsgs } from '../../../../shared/app-user/message/app-user-error-msgs';
 import { TimeRange } from '../../../../shared/app-user/time-range';
 
 

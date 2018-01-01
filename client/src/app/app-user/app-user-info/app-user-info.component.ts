@@ -13,7 +13,7 @@ import { FoodWebBusyConfig } from "../../common-util/etc/food-web-busy-config";
 import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 import { Validation } from "../../../../../shared/common-util/validation";
 import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
-import { AppUserErrorMsgs } from '../../../../../shared/app-user/app-user-error-msgs';
+import { AppUserErrorMsgs } from '../../../../../shared/app-user/message/app-user-error-msgs';
 import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
 
 

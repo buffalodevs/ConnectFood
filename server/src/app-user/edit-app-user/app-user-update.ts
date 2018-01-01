@@ -4,7 +4,7 @@ import { query, QueryResult } from "../../database-util/connection-pool";
 import { SessionData, AppUserInfo } from "../../common-util/session-data";
 import { login } from '../login-app-user/app-user-login';
 import { addOrUpdateAppUser } from "./app-user-add-update";
-import { AppUserErrorMsgs } from "../../../../shared/app-user/app-user-error-msgs";
+import { AppUserErrorMsgs } from "../../../../shared/app-user/message/app-user-error-msgs";
 
 
 /**
