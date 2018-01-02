@@ -2,7 +2,6 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { FormControl, AbstractControl } from '@angular/forms';
 import { Observable } from "rxjs/Observable";
 
-import { AbstractSlickFilteredList } from '../../misc-slick-components/slick-filtered-list/abstract-slick-filtered-list';
 import { DeliveryUtilService } from '../delivery-listings/delivery-services/delivery-util.service';
 import { DeliveryListingsComponent } from '../delivery-listings/delivery-listings.component';
 import { DeliveryListingsFiltersComponent } from '../delivery-listings/delivery-listings-filters/delivery-listings-filters.component';

@@ -2,8 +2,6 @@ import { Component, Input, ViewChild, Output, EventEmitter } from '@angular/core
 import { NgbModal, NgbModalRef, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
 import { Observable } from "rxjs/Observable";
 
-import { AbstractSlickListDialog } from './abstract-slick-list-dialog';
-
 
 @Component({
     selector: 'slick-list-dialog',

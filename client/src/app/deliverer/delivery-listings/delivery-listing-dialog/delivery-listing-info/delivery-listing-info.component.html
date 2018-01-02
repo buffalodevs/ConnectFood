@@ -69,6 +69,11 @@
                     <div class="inline-block">{{ deliveryUtilService.getReadableDeliveryState(delivery.deliveryStateInfo.deliveryState) }}</div>
                 </div>
 
+                <div *ngIf="delivery.deliveryStateInfo.scheduledStartTime != null">
+                    <b>Scheduled Start Time:</b>
+                    <div class="inline-block">{{ getReadableScheduledStartTime() }}</div>
+                </div>
+
             </slick-expansion-panel>
 
         </div>

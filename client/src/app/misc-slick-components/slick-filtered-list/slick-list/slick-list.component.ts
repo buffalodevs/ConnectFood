@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { AbstractSlickListDialog } from './slick-list-dialog/abstract-slick-list-dialog';
 import { GetListingsService } from './get-listings.service';
+import { SlickListDialogComponent } from './slick-list-dialog/slick-list-dialog.component';
 
 
 @Component({
@@ -23,7 +23,7 @@ export class SlickListComponent {
     /**
      * The Slick List Dialog associated with this list. Should be shadowed by child class so that list interaction with dialog is automatically handled in this base class.
      */
-    @Input() private dialog: AbstractSlickListDialog<any>;
+    @Input() private dialog: SlickListDialogComponent;
 
     /**
      * Emitted whenever there is an update to the held list data (a refresh, append, or removal will trigger this).
@@ -124,7 +124,7 @@ export class SlickListComponent {
 
         // If we wish to display the dialog and we have one set, then open it.
         if (displayDialog && this.dialog != null) {
-            this.dialog.open(this.getSelectedListing());
+            this.dialog.open();
         }
     }
 

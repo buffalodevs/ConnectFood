@@ -6,6 +6,7 @@ import { SessionDataService } from '../../../../common-util/services/session-dat
 import { Delivery, DeliveryState, DeliveryUtilService } from '../../delivery-services/delivery-util.service';
 import { ManageDeliveryService } from '../../delivery-services/manage-deliveries.service';
 import { FoodWebResponse } from '../../../../../../../shared/message-protocol/food-web-response';
+import { DateFormatter } from '../../../../../../../shared/common-util/date-formatter';
 
 
 @Component({
@@ -162,5 +163,18 @@ export class DeliveryListingInfoComponent implements OnChanges {
                 // If we get here, then we have encountered a fatal error...
                 alert(err.message);
             });
+    }
+
+
+    /**
+     * Gets human friendly readable version of scheduled start time.
+     * @return The readable version if not null, and if null, then null is returned.
+     */
+    private getReadableScheduledStartTime(): string {
+
+        const scheduledStartTime: Date = this.delivery.deliveryStateInfo.scheduledStartTime;
+
+        return (scheduledStartTime != null) ? ( DateFormatter.dateToMonthDayYearString(scheduledStartTime) + ' at ' + DateFormatter.dateToWallClockString(scheduledStartTime) )
+                                            : '';
     }
 }
