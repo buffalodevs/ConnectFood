@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { NgbModal, NgbModalRef, NgbModalOptions } from "@ng-bootstrap/ng-bootstrap";
 import { Observable } from "rxjs/Observable";
 
@@ -14,6 +14,8 @@ export class SlickListDialogComponent {
 
     @Input() private header;
 
+    @Output() private opened: EventEmitter<void>;
+
     @ViewChild('SlickListDialogTemplate') private slickListDialogTemplate: HTMLTemplateElement;
 
     private modalDialogContainerRef: NgbModalRef;
@@ -23,6 +25,7 @@ export class SlickListDialogComponent {
         private modalService: NgbModal
     ) {
         this.modalDialogContainerRef = null;
+        this.opened = new EventEmitter<void>();
     }
 
 
@@ -36,6 +39,8 @@ export class SlickListDialogComponent {
         };
 
         this.modalDialogContainerRef = this.modalService.open(this.slickListDialogTemplate, options);
+        this.opened.emit();
+
         this.modalDialogContainerRef.result
             .then(() => {})
             .catch((err: Error) => {

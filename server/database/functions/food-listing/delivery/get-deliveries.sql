@@ -59,7 +59,7 @@ BEGIN
         _availableNow := TRUE;
 
         -- Get current time, but relative to App User Availability timestamps.
-        _nowRelativeToAvailabilityTimes := convertToAvailabilityTime(CURRENT_TIMESTAMP);
+        _nowRelativeToAvailabilityTimes := convertToAvailabilityTime(CURRENT_TIMESTAMP::TIMESTAMP);
 
     END IF;
     

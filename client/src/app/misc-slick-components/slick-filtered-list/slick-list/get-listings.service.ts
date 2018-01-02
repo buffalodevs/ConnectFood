@@ -16,7 +16,8 @@ export class GetListingsService <LIST_T, FILTERS_T extends SlickListFilters> {
     private lastRoute: string;
     private lastFilters: FILTERS_T;
 
-    private onGetMoreListingsCallback: (moreListings: Array<LIST_T>) => void;
+    private onGetMoreListingsCallback: () => void;
+    private onReceivedMoreListingsCallback: (moreListings: Array<LIST_T>) => void;
 
     
     /**
@@ -25,12 +26,17 @@ export class GetListingsService <LIST_T, FILTERS_T extends SlickListFilters> {
      */
     public constructor (
         private requestService: RequestService,
-        @Optional() private retrievalAmount: number = 10
+        @Optional() private retrievalAmount: number
     ) {
+        if (this.retrievalAmount == null)  this.retrievalAmount = 10;
         this.retrievalOffset = 0;
         this.noMoreListingsToRetrieve = false;
         this.lastRoute = null;
         this.lastFilters = null;
+
+        // Swallow changes here if no callbacks assigned later.
+        this.onGetMoreListingsCallback = () => {};
+        this.onReceivedMoreListingsCallback = (moreListings: Array<LIST_T>) => {};
 
         // Register our load more listings handler that fires when scrolling near bottom.
         window.onscroll = this.listenForLoadMoreListings.bind(this);
@@ -38,11 +44,58 @@ export class GetListingsService <LIST_T, FILTERS_T extends SlickListFilters> {
 
 
     /**
-     * Sets the callback function that is notified when more listings have been retrieved due to scrolling webpage near to bottom.
+     * Sets the callback function that is notified whenever more liatings are going to be loaded (immediately before contacting server).
      * @param callback The callback function that will be set.
      */
-    public onGetMoreListings(callback: (moreListings: Array<LIST_T>) => void) {
+    public onGetMoreListings(callback: () => void): void {
         this.onGetMoreListingsCallback = callback;
+    }
+
+
+    /**
+     * Sets the callback function that is notified when more listings have been received due to scrolling webpage near to bottom.
+     * @param callback The callback function that will be set.
+     */
+    public onReceivedMoreListings(callback: (moreListings: Array<LIST_T>) => void): void {
+        this.onReceivedMoreListingsCallback = callback;
+    }
+
+
+    /**
+     * Listens for the user to scroll the listings near the bottom and then loads more listings.
+     */
+    private listenForLoadMoreListings(): void {
+
+        // Break out immediately if we cannot get any more liistings right now.
+        if (!this.canGetMoreListings())  return;
+
+        // Determine offset of load more threshold in pixels from bottom of page.
+        const THRESHOLD_OFFSET: number = 500;
+
+        // Get the current bottom scroll position and the threshold for loading more.
+        let currentScrollPosition: number = (window.scrollY + window.innerHeight);
+        let loadThresholdPosition: number = (document.body.offsetHeight - THRESHOLD_OFFSET);
+
+        // If we are near the bottom of the page, then load more listings!
+        if (this.lastFilters != null && (currentScrollPosition >= loadThresholdPosition)) {
+
+            this.onGetMoreListingsCallback();
+            let observer: Observable<Array<LIST_T>> = this.getListings(this.lastFilters, this.lastRoute, true);
+            
+            // Concatenate the resulting listings that come back!
+            observer.subscribe((listData: Array<LIST_T>) => {
+                this.onReceivedMoreListingsCallback(listData)   
+            });
+        }
+    }
+
+
+    /**
+     * Determines whether or not more listings can be retrieved (if we have reached end or not).
+     * @return true if more listings are available for retrieval, false if not.
+     */
+    private canGetMoreListings(): boolean {
+        return (!this.noMoreListingsToRetrieve && this.lastFilters != null && this.lastRoute != null);
     }
 
 
@@ -75,45 +128,6 @@ export class GetListingsService <LIST_T, FILTERS_T extends SlickListFilters> {
         // Generate request and listen for a response.
         let request: SlickListRequest<FILTERS_T> = this.generateListingsRequest(filters);
         return this.requestService.post(route, request).map(this.mapResponseToDataList.bind(this));
-    }
-
-
-    /**
-     * Listens for the user to scroll the listings near the bottom and then loads more listings.
-     */
-    private listenForLoadMoreListings(): void {
-
-        // Break out immediately if we cannot get any more liistings right now.
-        if (!this.canGetMoreListings())  return;
-
-        // Determine offset of load more threshold in pixels from bottom of page.
-        const THRESHOLD_OFFSET: number = 500;
-
-        // Get the current bottom scroll position and the threshold for loading more.
-        let currentScrollPosition: number = (window.scrollY + window.innerHeight);
-        let loadThresholdPosition: number = (document.body.offsetHeight - THRESHOLD_OFFSET);
-
-        // If we are near the bottom of the page, then load more listings!
-        if (this.lastFilters != null && (currentScrollPosition >= loadThresholdPosition)) {
-            
-            let observer: Observable<Array<LIST_T>> = this.getListings(this.lastFilters, this.lastRoute, true);
-            
-            // Concatenate the resulting listings that come back!
-            observer.subscribe((listData: Array<LIST_T>) => {
-                if (this.onGetMoreListingsCallback != null) {
-                    this.onGetMoreListingsCallback(listData)   
-                }
-            });
-        }
-    }
-
-
-    /**
-     * Determines whether or not more listings can be retrieved (if we have reached end or not).
-     * @return true if more listings are available for retrieval, false if not.
-     */
-    private canGetMoreListings(): boolean {
-        return (!this.noMoreListingsToRetrieve && this.lastFilters != null && this.lastRoute != null);
     }
 
 

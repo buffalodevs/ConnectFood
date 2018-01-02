@@ -80,4 +80,34 @@ export class DeliveryUtil {
 
         throw new Error('Incorrect Delivery State provided to getReadableDeliveryState() method');
     }
+
+
+    /**
+     * Custom deserializes any received delivery data before it is displayed/used.
+     * Here, we ensure that all JSON ISO string format dates are converted to Date objects.
+     * @param deliveryData The received delivery data.
+     */
+    public static deserializeDeliveryData(deliveryData: Array<Delivery>): void {
+        
+        for (let i: number = 0; i < deliveryData.length; i++) {
+
+            if (deliveryData[i].possibleDeliveryTimes != null) {
+                this.convertJSONStringsToDates(deliveryData[i].possibleDeliveryTimes);
+            }
+        }
+    }
+
+
+    /**
+     * Converts JSON ISO date strings to Date objects.
+     * @param possibleDeliveryTimes The possible delivery times containing JSON ISO date strings
+     *                              NOTE: This will be internally modified!
+     */
+    private static convertJSONStringsToDates(possibleDeliveryTimes: TimeRange[]): void {
+
+        for (let i: number = 0; i < possibleDeliveryTimes.length; i++) {
+            // Constructing new Time Range will convert any input ISO strings to dates automatically!
+            possibleDeliveryTimes[i] = new TimeRange(possibleDeliveryTimes[i].startTime, possibleDeliveryTimes[i].endTime);
+        }
+    }
 }

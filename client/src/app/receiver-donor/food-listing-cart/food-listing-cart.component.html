@@ -1,8 +1,8 @@
-<slick-filtered-list>
+<slick-filtered-list [filters]="filters" [listings]="listings">
         
     <ng-container filters>
 
-        <food-listings-filters #filters [formGroup]="filters" header="Cart Filters" [defaultAvailableAfterDateNow]="false">
+        <food-listings-filters #filters [formGroup]="filters" header="Cart Filters" [additionalFilters]="additionalFilters" [defaultAvailableAfterDateNow]="false">
             <ng-container top>
 
                 <h5>Cart Type:</h5>
@@ -33,7 +33,24 @@
     </ng-container>
 
     <ng-container listings>
-        <food-listings #listings [header]="getFoodListingsTitle()" [isClaimedCart]="isClaimedCart()" [isDonatedCart]="isDonatedCart()"></food-listings>
+        <slick-list #listings route="/receiverDonor/getFoodListings" [header]="getListingsTitle(filters.value)"
+         [dialog]="foodListingsDialog" (dataUpdated)="foodListings = $event">
+
+            <food-listings [foodListings]="foodListings" (selectListing)="listings.selectListing($event)"></food-listings>
+
+        </slick-list>
     </ng-container>
 
 </slick-filtered-list>
+
+
+<slick-list-dialog #foodListingsDialog [header]="listings.getLastValidSelection()?.foodTitle" (opened)="dialogContents.refreshDialogState()">
+        
+    <food-listing-dialog #dialogContents
+        [isClaimedCart]="filters.get('listingsStatus').value === LISTINGS_STATUS.myClaimedListings"
+        [isDonatedCart]="filters.get('listingsStatus').value === LISTINGS_STATUS.myDonatedListings"
+        [foodListing]="listings.getLastValidSelection()" (close)="foodListingsDialog.close()"
+        (removeListing)="listings.removeSelectedListing(false)">
+    </food-listing-dialog>
+
+</slick-list-dialog>

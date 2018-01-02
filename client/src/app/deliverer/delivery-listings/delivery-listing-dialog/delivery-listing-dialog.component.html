@@ -1,17 +1,13 @@
-<slick-list-dialog #SlickListDialogComponent [header]="dialogData?.foodTitle">
-
-    <div class="modal-body" *ngIf="isOpen()">
+<ng-container *ngIf="deliveryListing != null">
         
-        <delivery-listing-info [delivery]="dialogData" [isCart]="isCart" *ngIf="isDialogState('DeliveryInfo')" (close)="close()"
-         (toSchedule)="toSchedule()" (toCancelReason)="toCancelReason()" (removeListing)="removeListing.emit(false)">
-        </delivery-listing-info>
+    <delivery-listing-info [delivery]="deliveryListing" [isCart]="isCart" *ngIf="isDialogState('DeliveryInfo')" (close)="close.emit()"
+     (toSchedule)="toSchedule()" (toCancelReason)="toCancelReason()" (removeListing)="removeListing.emit(false)">
+    </delivery-listing-info>
 
-        <delivery-listing-schedule [delivery]="dialogData" *ngIf="isDialogState('Schedule')" (removeListing)="removeListing.emit(false)" (close)="close()">
-        </delivery-listing-schedule>
+    <delivery-listing-schedule [delivery]="deliveryListing" *ngIf="isDialogState('Schedule')" (removeListing)="removeListing.emit(false)" (close)="close.emit()">
+    </delivery-listing-schedule>
 
-        <delivery-listing-cancel [delivery]="dialogData" *ngIf="isDialogState('CancelReason')" (removeListing)="removeListing.emit(false)" (close)="close()">
-        </delivery-listing-cancel>
+    <delivery-listing-cancel [delivery]="deliveryListing" *ngIf="isDialogState('CancelReason')" (removeListing)="removeListing.emit(false)" (close)="close.emit()">
+    </delivery-listing-cancel>
     
-    </div>
-
-</slick-list-dialog>
+</ng-container>

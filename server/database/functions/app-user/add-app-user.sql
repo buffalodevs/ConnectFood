@@ -15,22 +15,21 @@ CREATE OR REPLACE FUNCTION addAppUser
     _zip                    ContactInfo.zip%TYPE,
     _phone                  ContactInfo.phone%TYPE,
     _appUserType            AppUser.appUserType%TYPE,
-    -- @ts-sql class="TimeRange" file="/shared/availability/time-range.ts"
-    _availabilityTimeRanges JSON[]                      DEFAULT NULL,
-    _organizationName       Organization.name%TYPE      DEFAULT NULL
+    _availabilityTimeRanges JSON[],
+    _organizationName       Organization.name%TYPE,
+    _taxId                  Organization.taxId%TYPE
 )
 -- Returns the new App User's information.
 RETURNS TABLE
 (
     appUserKey  AppUser.appUserKey%TYPE,
-    password    AppUserPassword.password%TYPE,
     sessionData JSON
 )
 AS $$
-    DECLARE _appUserKey         AppUser.appUserKey%TYPE;
+    DECLARE _appUserKey AppUser.appUserKey%TYPE;
 BEGIN
 
-    -- First, ensure that email does not already exist (fail fast)!
+    -- Ensure that email does not already exist (fail fast)!
     IF EXISTS (
         SELECT  1
         FROM    AppUser
@@ -40,27 +39,28 @@ BEGIN
         RAISE EXCEPTION 'Duplicate email provided';
     END IF;
 
+
     -- Add the new user and get reference to entry.
     INSERT INTO AppUser (email, lastName, firstName, appUserType)                  
     VALUES      (_email, _lastName, _firstName, _appUserType)
     RETURNING   AppUser.appUserKey
     INTO        _appUserKey;
 
-    -- Add the new user's password.
+    -- Insert the new user's password.
     INSERT INTO AppUserPassword (appUserKey, password)
     VALUES      (_appUserKey, _password);
 
     -- Add the new user's contact info.
-    PERFORM addContactInfo (_appUserKey, _address, _latitude, _longitude, _city, _state, _zip, _phone);
+    PERFORM addOrUpdateContactInfo (_appUserKey, _address, _latitude, _longitude, _city, _state, _zip, _phone);
 
-    -- Add the new user's availability times.
-    PERFORM updateAvailability (_appUserKey, _availabilityTimeRanges);
+    -- Add or update the new user's availability times (same work for both operations... does total refresh).
+    PERFORM addOrUpdateAvailability (_appUserKey, _availabilityTimeRanges);
 
     -- Add the new user's organization data if the user is and oragnization.
     IF (_organizationName IS NOT NULL)
     THEN
-        INSERT INTO Organization (appUserKey, name)
-        VALUES      (_appUserKey, _organizationName);
+        INSERT INTO Organization (appUserKey, name, taxId)
+        VALUES      (_appUserKey, _organizationName, _taxId);
     END IF;
 
     -- Add the new user to table of unverified app users (needs email verification).

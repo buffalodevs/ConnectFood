@@ -1,7 +1,5 @@
-import { Component, OnInit, Input, Output, ViewChild } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormControl } from '@angular/forms';
-
-import { FoodTypesComponent } from "../../../domain/food-types/food-types.component";
 
 import { FoodListingsFilters } from "../../../../../../shared/receiver-donor/food-listings-filters";
 
@@ -13,20 +11,38 @@ import { FoodListingsFilters } from "../../../../../../shared/receiver-donor/foo
 })
 export class FoodListingsFiltersComponent extends FormGroup implements OnInit {
 
-    @Input() private header: string = 'Filters';
-    @Input() private defaultAvailableAfterDateNow: boolean = true;
+    @Input() private header: string;
+    @Input() private defaultAvailableAfterDateNow: boolean;
+    /**
+     * Additional filter controls and associated names.
+     */
+    @Input() private additionalFilters: Map<string, AbstractControl>;
 
 
     public constructor () {
         super({});
+
+        this.header = 'Filters';
+        this.defaultAvailableAfterDateNow = true;
     }
 
 
     public ngOnInit(): void {
+
         // Actual form group initialization requires Input to be evaluated, so must be in init!
         this.addControl('foodTypes', new FormControl(null));
         this.addControl('perishable', new FormControl(true));
         this.addControl('notPerishable', new FormControl(true));
         this.addControl('availableAfterDate', new FormControl(this.defaultAvailableAfterDateNow ? new Date() : null));
+
+        // Add any parent specified additional filter controls.
+        if (this.additionalFilters != null) {
+
+            let additionalFiltersKeys: string[] = Array.from(this.additionalFilters.keys());
+            for(let additionalFilterControlName of additionalFiltersKeys) {
+                
+                this.addControl(additionalFilterControlName, this.additionalFilters.get(additionalFilterControlName));
+            }
+        }
     }
 }

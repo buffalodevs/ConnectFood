@@ -59,6 +59,10 @@
                 <div class="col-md-6">
                     <div class="limit-width">
 
+                        <div class="form-group">
+                            <tax-id required="true" [validate]="validate.get('taxId')" formControlName="taxId" *ngIf="isOrganization()"></tax-id>
+                        </div>
+
                         <md-input-container class="form-group">
                             <input mdInput placeholder="Password" type="password" formControlName="password" autocomplete="new-password">
                             <md-error *ngIf="hasError('primary.password')">{{ errorMsgFor('primary.password') }}</md-error>

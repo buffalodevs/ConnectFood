@@ -20,7 +20,8 @@ CREATE OR REPLACE FUNCTION updateAppUser
     _appUserType            AppUser.appUserType%TYPE            DEFAULT NULL,
     -- @ts-sql class="TimeRange" file="/shared/availability/time-range.ts"
     _availability           JSON[]                              DEFAULT NULL,
-    _organizationName       Organization.name%TYPE              DEFAULT NULL
+    _organizationName       Organization.name%TYPE              DEFAULT NULL,
+    _taxId                  Organization.taxId%TYPE             DEFAULT NULL
 )
 -- Returns the new App User's information.
 RETURNS TABLE
@@ -52,15 +53,13 @@ BEGIN
     WHERE   AppUser.appUserKey = _appUserKey;
 
     -- Update any ContactInfo fields related to AppUser being updated.
-    PERFORM updateContactInfo(_appUserKey, _address, _latitude, _longitude, _city, _state, _zip, _phone);
+    PERFORM addOrUpdateContactInfo(_appUserKey, _address, _latitude, _longitude, _city, _state, _zip, _phone);
 
     -- Update any Organization fields related to AppUser being updated.
-    IF (_organizationName IS NOT NULL)
-    THEN
-        UPDATE  Organization
-        SET     name = _organizationName
-        WHERE   Organization.appUserKey = _appUserKey;
-    END IF;
+    UPDATE  Organization
+    SET     name = COALESCE(_organizationName, name),
+            taxId = COALESCE(_taxId, taxId)
+    WHERE   Organization.appUserKey = _appUserKey;
 
     -- Update password related to AppUser being updated. We keep track of all old passwords, so this is an insert!
     IF (_password IS NOT NULL)
@@ -71,7 +70,7 @@ BEGIN
 
     IF (_availability IS NOT NULL)
     THEN
-        PERFORM updateAvailability(_appUserKey, _availability);
+        PERFORM addOrUpdateAvailability(_appUserKey, _availability);
     END IF;
 
     RETURN QUERY

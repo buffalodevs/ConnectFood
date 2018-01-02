@@ -1,10 +1,7 @@
-import { Component, OnInit, Input, Output, ViewChild, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 
-import { AbstractSlickListDialog } from '../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
-import { SlickListDialogComponent } from '../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component';
 import { DeliveryUtilService } from '../delivery-services/delivery-util.service';
-import { CancelDeliveryService } from '../delivery-services/cancel-delivery.service';
 
 import { Delivery, DeliveryState } from '../../../../../../shared/deliverer/delivery';
 
@@ -23,24 +20,21 @@ enum DeliveryDialogState {
 @Component({
     selector: 'delivery-listing-dialog',
     templateUrl: './delivery-listing-dialog.component.html',
-    styleUrls: [
-        './delivery-listing-dialog.component.css',
-        './../delivery-listings.component.css',
-        './../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
-    ]
+    styleUrls: ['./delivery-listing-dialog.component.css']
 })
-export class DeliveryListingDialogComponent extends AbstractSlickListDialog <Delivery> {
+export class DeliveryListingDialogComponent {
 
+    /**
+     * The current delivery listing to display/manipulate.
+     */
+    @Input() private deliveryListing: Delivery;
     /**
      * Set to true if the Delivery Listings are for a Delivery Cart. Default is false.
      */
     @Input() private isCart: boolean;
 
-    /**
-     * This is a shadow of the slickListDialog member in AbstractSlickListDialog.
-     * It is all that is needed to make basic dialog functions work (open, close, etc).
-     */
-    @ViewChild('SlickListDialogComponent') protected slickListDialog: SlickListDialogComponent;
+    @Output() private removeListing: EventEmitter<void>;
+    @Output() private close: EventEmitter<void>;
 
     private deliveryDialogState: DeliveryDialogState;
 
@@ -48,16 +42,15 @@ export class DeliveryListingDialogComponent extends AbstractSlickListDialog <Del
     public constructor (
         private deliveryUtilService: DeliveryUtilService // Referenced in HTML template
     ) {
-        super();
-
         this.isCart = false;
-        this.deliveryDialogState = DeliveryDialogState.DeliveryInfo;
+        this.removeListing = new EventEmitter<void>();
+        this.close = new EventEmitter<void>();
+        this.refreshDialogState();
     }
 
 
-    public open(dialogData: Delivery): void {
+    public refreshDialogState(): void {
         this.deliveryDialogState = DeliveryDialogState.DeliveryInfo;
-        super.open(dialogData);
     }
 
 

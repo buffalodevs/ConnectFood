@@ -69,6 +69,7 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
                 'appUserType':      [null, Validators.required],
                 'email':            [null, [Validators.required, Validators.pattern(Validation.EMAIL_REGEX)]],
                 'organizationName': [null, Validators.required],
+                'taxId':            [null, [Validators.required, Validators.pattern(Validation.TAX_ID_REGEX)]],
                 'firstName':        [null, Validators.required],
                 'lastName':         [null, Validators.required],
                 'password':         [null, [Validators.required, Validators.pattern(Validation.PASSWORD_REGEX)]],
@@ -98,19 +99,22 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
 
 
     /**
-     * Updates form requirements based off of the appUserType value.
+     * Updates form validation requirements based off of the appUserType value.
      */
     private listenAppUserTypeChange(): void {
 
         let organizationNameControl: FormControl = <FormControl>this.form.get('primary.organizationName');
+        let taxIdControl: FormControl = <FormControl>this.form.get('primary.taxId');
 
         if (this.isOrganization()) {
             this.adminPreStr = 'Admin';
             this.signupValidationService.setValidatorsAndRefresh(organizationNameControl, [Validators.required]);
+            this.signupValidationService.setValidatorsAndRefresh(taxIdControl, [Validators.required]);
         }
         else {
             this.adminPreStr = '';
             this.signupValidationService.setValidatorsAndRefresh(organizationNameControl, null);
+            this.signupValidationService.setValidatorsAndRefresh(taxIdControl, null);
         }
     }
 

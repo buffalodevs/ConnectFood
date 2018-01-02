@@ -33,6 +33,7 @@ AS $$
                 -- @ts-sql class="AppUserInfo" file="/shared/authentication/app-user-info.ts"
                 'appUserInfo',          JSON_BUILD_OBJECT (
                                             'email',            AppUser.email,
+                                            'appUserType',      AppUser.appUserType,
                                             'organizationName', Organization.name,
                                             'lastName',         AppUser.lastName,
                                             'firstName',        AppUser.firstName,
@@ -46,7 +47,7 @@ AS $$
                                                                     'longitude',        ST_X(ContactInfo.gpsCoordinate::GEOMETRY)
                                                                 ),
                                             'phone',            ContactInfo.phone,
-                                            'availability',     (   
+                                            'availability',     (
                                                                     SELECT  ARRAY_AGG (
                                                                                 -- @ts-sql class="TimeRangeStr" file="/shared/app-user/time-range.ts"
                                                                                 JSON_BUILD_OBJECT (
@@ -57,7 +58,7 @@ AS $$
                                                                     FROM    AppUserAvailability
                                                                     WHERE   AppUserAvailability.appUserKey = AppUser.appUserKey
                                                                 ),
-                                            'appUserType',      AppUser.appUserType
+                                            'taxId',            Organization.taxId
                                         ),
                 'verificationToken',    UnverifiedAppUser.verificationToken
             )

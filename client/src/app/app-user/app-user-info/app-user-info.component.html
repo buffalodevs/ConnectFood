@@ -28,7 +28,7 @@
 
             </div>
 
-            <div *ngIf="isOrganization" class="form-group">
+            <div class="form-group" *ngIf="isOrganization">
 
                 <h4>Organization Name:</h4>
 
@@ -37,7 +37,7 @@
                 </span>
 
                 <form [formGroup]="form" (ngSubmit)="save('organizationName')"
-                 [slick-progress-spinner]="editData.get('organizationName').showProgressSpinner" *ngIf="editData.get('organizationName').editing">
+                [slick-progress-spinner]="editData.get('organizationName').showProgressSpinner" *ngIf="editData.get('organizationName').editing">
 
                     <md-input-container floatPlaceholder="never">
                         <input mdInput id="organizationName" formControlName="organizationName" placeholder="Organization Name">
@@ -79,6 +79,27 @@
 
                     <button #saveName md-raised-button color="primary" class="button-sm" type="submit">Save</button>
                     <button md-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setManyEditable(['firstName', 'lastName'], false)">Cancel</button>
+
+                </form>
+
+            </div>
+
+            <div class="form-group" *ngIf="isOrganization">
+
+                <h4>Organization Tax Id:</h4>
+
+                <div class="form-group" *ngIf="!editData.get('taxId').editing">
+                    <span class="link-content" (click)="setEditable('taxId')" title="edit">
+                        {{ control('taxId').value }}<i class="material-icons">&#xe254;</i>
+                    </span>
+                </div>
+
+                <form [formGroup]="form" (ngSubmit)="save('taxId')" [slick-progress-spinner]="editData.get('taxId').showProgressSpinner" *ngIf="editData.get('taxId').editing">
+
+                    <tax-id id="tax-id" required="true" [includeLabel]="false" formControlName="taxId"></tax-id>
+                    
+                    <button md-raised-button color="primary" class="button-sm" type="submit">Save</button>
+                    <button md-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('taxId', false)">Cancel</button>
 
                 </form>
 

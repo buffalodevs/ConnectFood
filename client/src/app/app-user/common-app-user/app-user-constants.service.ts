@@ -6,8 +6,10 @@ export class AppUserConstantsService {
 
     public readonly STATE_LIST: string[];
     public readonly DYNAMIC_ZIP_REGEX: RegExp;
-    public readonly DYNAMIC_PHONE_3DIGITS: RegExp;
-    public readonly DYNAMIC_PHONE_4DIGITS: RegExp;
+    public readonly DYNAMIC_PHONE_3DIGITS_REGEX: RegExp;
+    public readonly DYNAMIC_PHONE_4DIGITS_REGEX: RegExp;
+    public readonly DYNAMIC_TAX_ID_2DIGITS_REGEX: RegExp;
+    public readonly DYNAMIC_TAX_ID_7DIGITS_REGEX: RegExp;
 
     public constructor() {
 
@@ -21,7 +23,10 @@ export class AppUserConstantsService {
 
         this.DYNAMIC_ZIP_REGEX = /^\d{1,5}$/;
 
-        this.DYNAMIC_PHONE_3DIGITS = /^\d{1,3}$/;
-        this.DYNAMIC_PHONE_4DIGITS = /^\d{1,4}$/;
+        this.DYNAMIC_PHONE_3DIGITS_REGEX = /^\d{1,3}$/;
+        this.DYNAMIC_PHONE_4DIGITS_REGEX = /^\d{1,4}$/;
+
+        this.DYNAMIC_TAX_ID_2DIGITS_REGEX = /^\d{1,2}$/;
+        this.DYNAMIC_TAX_ID_7DIGITS_REGEX = /^\d{1,7}$/;
     }
 }

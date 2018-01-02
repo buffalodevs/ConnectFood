@@ -11,7 +11,11 @@ import { VehicleTypesService } from '../../../domain/vehicle-types/vehicle-types
 })
 export class DeliveryListingsFiltersComponent extends FormGroup implements OnInit {
 
-    @Input() private header: string = 'Filters';
+    @Input() private header: string;
+    /**
+     * Additional filter controls and associated names.
+     */
+    @Input() private additionalFilters: Map<string, AbstractControl>;
 
     private readonly maxDistances: number[];
     private readonly maxTotalWeights: number[];
@@ -23,6 +27,7 @@ export class DeliveryListingsFiltersComponent extends FormGroup implements OnIni
     ) {
         super({});
 
+        this.header = 'Filters';
         this.maxDistances = [ 5, 10, 15, 20, 25 ];
         this.maxTotalWeights = [ null, 50, 100, 150, 200, 250 ];
         this.vehicleTypes = [];
@@ -40,5 +45,15 @@ export class DeliveryListingsFiltersComponent extends FormGroup implements OnIni
         this.addControl('maxDistance', new FormControl(medianDistanceMi));
         this.addControl('maxTotalWeight', new FormControl(null));
         this.addControl('vehicleType', new FormControl(null));
+
+        // Add any parent specified additional filter controls.
+        if (this.additionalFilters != null) {
+            
+            let additionalFiltersKeys: string[] = Array.from(this.additionalFilters.keys());
+            for(let additionalFilterControlName of additionalFiltersKeys) {
+                
+                this.addControl(additionalFilterControlName, this.additionalFilters.get(additionalFilterControlName));
+            }
+        }
     }
 }

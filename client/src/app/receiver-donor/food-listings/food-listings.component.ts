@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { Observable } from "rxjs/Observable";
 
@@ -15,29 +15,21 @@ import { FoodListingsFilters } from "../../../../../shared/receiver-donor/food-l
     templateUrl: './food-listings.component.html',
     styleUrls: ['./food-listings.component.css']
 })
-export class FoodListingsComponent extends AbstractSlickList <FoodListing, FoodListingsFilters> {
-
-    private readonly DEFAULT_IMG_URL = './../../assets/IconImg.png';
+export class FoodListingsComponent {
 
     /**
-     * Title of the Food Listings. Default is 'Food Listings'.
+     * The food listings that shall be displayed.
      */
-    @Input() private header: string = 'Food Listings';
+    @Input() private foodListings: FoodListing[];
+
     /**
-     * Determines if this dialog is displaying Food Listing info for a Receiver's Cart. Default is false.
+     * Emitted whenever a listing (given by an index) is to be selected.
      */
-    @Input() private isClaimedCart: boolean = false;
-    /**
-     * Determines if this dialog is displaying Food Listing info for a Donor's Cart. Default is false.
-     */
-    @Input() private isDonatedCart: boolean = false;
-
-    @ViewChild('FoodListingDialogComponent') protected slickListDialog: AbstractSlickListDialog <FoodListing>;
+    @Output() private selectListing: EventEmitter<number>;
 
 
-    public constructor (
-        getFoodListingsService: GetListingsService <FoodListing, FoodListingsFilters>
-    ) {
-        super(getFoodListingsService, '/receiverDonor/getFoodListings');
+    public constructor () {
+        this.foodListings = [];
+        this.selectListing = new EventEmitter<number>();
     }
 }

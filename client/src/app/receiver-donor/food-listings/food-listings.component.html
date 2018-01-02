@@ -1,73 +1,55 @@
-<h3>{{ header }}</h3>
-<hr>
+<!-- This is the Food Listings (generated via loop) -->
+<slick-list-item *ngFor="let foodListing of foodListings; let i = index">
 
-<div class="slick-list-item-container" [slick-progress-spinner]="shouldShowProgressSpinner()" [showBackdrop]="false">
-
-    <!-- This is the Food Listings (generated via loop) -->
-    <slick-list-item *ngFor="let foodListing of listData; let i = index">
-
-        <ng-container slick-list-item-left>
-            <img DefaultImg [src]="foodListing.imgUrl" alt="Image Not Available"/>
-        </ng-container>
-        
-        <ng-container slick-list-item-right-header>
-            <a (click)="selectListing(i)" title="Click for Details">{{ foodListing.foodTitle }}</a>
-        </ng-container>
-
-        <ng-container slick-list-item-header>
-            <a (click)="selectListing(i)" title="Click for Details">{{ foodListing.foodTitle }}</a>
-        </ng-container>
-        
-        <div slick-list-item-right-body class="row">
-        
-            <div id="right-body-col1" class="col-sm-6" *ngIf="!isDonatedCart">
-                        
-                <div class="space-bottom">
-                    <b>Donor Organization</b><br>
-                    <span class="inline-block">{{ foodListing.donorInfo.organizationName }}</span>
-                </div>
-        
-                <div class="space-bottom">
-                    <div>
-                        <b>Donor Address</b>
-                    </div>
-                    <div class="inline-block">
-                        <span>{{ foodListing.donorInfo.address }}</span><br>
-                        <span>
-                            {{ foodListing.donorInfo.city }}, {{ foodListing.donorInfo.state }}
-                        </span>
-                    </div>
-                </div>
-        
-            </div>
-        
-            <div class="col-sm-6">
-        
-                <div class="space-bottom">
-                    <b>Available Until</b><br>
-                    <span class="inline-block">{{ foodListing.availableUntilDate }}</span>
-                </div>
-        
-                <div id="food-types-container" class="space-bottom ">
-                    <b>Present Food Types</b><br>
-                    <food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true" [condensedDisplay]="true"></food-types>
-                </div>
-        
-            </div>
-        
-        </div>
-
-    </slick-list-item>
-
-</div>
-
-
-<!-- This is our modal dialog's contents. It is separated into its own (child) component.
-     Simply pass down transcluded HTML into this child component here! -->
-<food-listing-dialog #FoodListingDialogComponent [isClaimedCart]="isClaimedCart" [isDonatedCart]="isDonatedCart" [defaultImgUrl]="DEFAULT_IMG_URL">
-
-    <ng-container food-listing-dialog-footer>
-        <ng-content select="[food-listing-dialog-footer]"></ng-content>
+    <ng-container slick-list-item-left>
+        <img DefaultImg [src]="foodListing.imgUrl" alt="Image Not Available"/>
+    </ng-container>
+    
+    <ng-container slick-list-item-right-header>
+        <a (click)="selectListing.emit(i)" title="Click for Details">{{ foodListing.foodTitle }}</a>
     </ng-container>
 
-</food-listing-dialog>
+    <ng-container slick-list-item-header>
+        <a (click)="selectListing.emit(i)" title="Click for Details">{{ foodListing.foodTitle }}</a>
+    </ng-container>
+    
+    <div slick-list-item-right-body class="row">
+    
+        <div id="right-body-col1" class="col-sm-6" *ngIf="!isDonatedCart">
+                    
+            <div class="space-bottom">
+                <b>Donor Organization</b><br>
+                <span class="inline-block">{{ foodListing.donorInfo.organizationName }}</span>
+            </div>
+    
+            <div class="space-bottom">
+                <div>
+                    <b>Donor Address</b>
+                </div>
+                <div class="inline-block">
+                    <span>{{ foodListing.donorInfo.address }}</span><br>
+                    <span>
+                        {{ foodListing.donorInfo.city }}, {{ foodListing.donorInfo.state }}
+                    </span>
+                </div>
+            </div>
+    
+        </div>
+    
+        <div class="col-sm-6">
+    
+            <div class="space-bottom">
+                <b>Available Until</b><br>
+                <span class="inline-block">{{ foodListing.availableUntilDate }}</span>
+            </div>
+    
+            <div id="food-types-container" class="space-bottom ">
+                <b>Present Food Types</b><br>
+                <food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true" [condensedDisplay]="true"></food-types>
+            </div>
+    
+        </div>
+    
+    </div>
+
+</slick-list-item>

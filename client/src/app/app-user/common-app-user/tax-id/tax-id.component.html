@@ -1,0 +1,18 @@
+<span *ngIf="includeLabel" id="tax-id-label">Organization Tax ID:</span>
+
+<slick-input-group #taxIdForm id="tax-id-form" [formGroup]="taxIdForm" [validate]="validate"
+ concatPattern="`first2Digits`-`last7Digits`" [validators]="groupValidators" [formControl]="taxIdControl">
+
+    <md-input-container class="first-2digits" [floatPlaceholder]="floatPlaceholder">
+        <input mdInput placeholder="##" [InputFilter]="appUserConstants.DYNAMIC_TAX_ID_2DIGITS_REGEX" formControlName="first2Digits">
+    </md-input-container>
+
+    <span class="tax-id-hyphen">-</span>
+
+    <md-input-container class="last-7digits" [floatPlaceholder]="floatPlaceholder">
+        <input mdInput placeholder="#######" [InputFilter]="appUserConstants.DYNAMIC_TAX_ID_7DIGITS_REGEX" formControlName="last7Digits">
+    </md-input-container>
+
+</slick-input-group>
+
+<br>

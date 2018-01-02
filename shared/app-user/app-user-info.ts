@@ -40,6 +40,7 @@ export class AppUserInfo implements Address {
         public zip?: number,
         public gpsCoordinate: GPSCoordinate = new GPSCoordinate(),
         public phone?: string,
-        public availability?: TimeRange[]
+        public availability?: TimeRange[],
+        public taxId?: string
     ) {}
 }

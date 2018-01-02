@@ -118,4 +118,14 @@ export class DeliveryUtilService {
     public getReadableDeliveryState(deliveryState: DeliveryState): string {
         return DeliveryUtil.getReadableDeliveryState(deliveryState);
     }
+
+
+    /**
+     * Custom deserializes any received delivery data before it is displayed/used.
+     * Here, we ensure that all JSON ISO string format dates are converted to Date objects.
+     * @param deliveryData The received delivery data.
+     */
+    public deserializeDeliveryData(deliveryData: Delivery[]): void {
+        DeliveryUtil.deserializeDeliveryData(deliveryData);
+    }
 }

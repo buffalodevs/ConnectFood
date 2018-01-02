@@ -1,7 +1,7 @@
-<slick-filtered-list>
+<slick-filtered-list #filteredList [filters]="filters" [listings]="listings">
 
     <ng-container filters>
-        <delivery-listings-filters #filters [formGroup]="filters" header="Search Filters">
+        <delivery-listings-filters #filters [formGroup]="filters" header="Search Filters" [additionalFilters]="additionalFilters">
 
             <ng-container bottom>
 
@@ -24,7 +24,23 @@
     </ng-container>
 
     <ng-container listings>
-        <delivery-listings header="Available Deliveries" #listings></delivery-listings>
+        <slick-list #listings route="/deliverer/getDeliveries" header="Available Deliveries" [dialog]="deliveryListingsDialog"
+         (dataUpdated)="deserializeDeliveryListings($event)">
+        
+            <delivery-listings [deliveryListings]="deliveryListings" (selectListing)="listings.selectListing($event)"></delivery-listings>
+        
+        </slick-list>
     </ng-container>
         
 </slick-filtered-list>
+
+
+<slick-list-dialog #deliveryListingsDialog [header]="listings.getLastValidSelection()?.foodTitle" (opened)="dialogContents.refreshDialogState()">
+
+    <delivery-listing-dialog #dialogContents
+        [deliveryListing]="listings.getLastValidSelection()"
+        [isCart]="false" (close)="deliveryListingsDialog.close()"
+        (removeListing)="listings.removeSelectedListing(false)">
+    </delivery-listing-dialog>
+
+</slick-list-dialog>

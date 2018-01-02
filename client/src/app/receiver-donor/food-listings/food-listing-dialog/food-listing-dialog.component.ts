@@ -1,8 +1,4 @@
-import { Component, Input, ViewChild } from '@angular/core';
-
-import { AbstractSlickListDialog } from '../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/abstract-slick-list-dialog';
-import { SlickListDialogComponent } from '../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component';
-import { ResponsiveService } from '../../../common-util/services/responsive.service';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 import { FoodListing } from './../../../../../../shared/receiver-donor/food-listing';
 
@@ -21,46 +17,44 @@ enum FoodListingDialogState {
 @Component({
     selector: 'food-listing-dialog',
     templateUrl: './food-listing-dialog.component.html',
-    styleUrls: [
-        './food-listing-dialog.component.css',
-        '../food-listings.component.css',
-        '../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
-    ]
+    styleUrls: ['./food-listing-dialog.component.css']
 })
-export class FoodListingDialogComponent extends AbstractSlickListDialog<FoodListing> {
+export class FoodListingDialogComponent {
 
     /**
      * Determines if this dialog is displaying Food Listing info for a Receiver's Cart. Default is false.
      */
-    @Input() private isClaimedCart: boolean = false;
+    @Input() private isClaimedCart: boolean;
     /**
      * Determines if this dialog is displaying Food Listing info for a Donor's Cart. Default is false.
      */
-    @Input() private isDonatedCart: boolean = false;
+    @Input() private isDonatedCart: boolean;
     /**
-     * Default replacement image URL if one is not provided or if the provided one does not exist.
+     * The food listing to display in the dialog.
      */
-    @Input() private defaultImgUrl: string = null;
+    @Input() private foodListing: FoodListing;
 
     /**
-     * This is a shadow of the slickListDialog member in AbstractSlickListDialog.
-     * It is all that is needed to make basic dialog functions work (open, close, etc).
+     * Emitted whenever the food listing being displayed (and manipualted) in the dialog should be removed.
      */
-    @ViewChild('SlickListDialogComponent') protected slickListDialog: SlickListDialogComponent;
+    @Output() private removeListing: EventEmitter<void>;
+    @Output() private close: EventEmitter<void>;
+
 
     private foodListingDialogState: FoodListingDialogState;
 
 
-    public constructor (
-        private responsiveService: ResponsiveService
-    ) {
-        super();
+    public constructor() {
+        this.isClaimedCart = false;
+        this.isDonatedCart = false;
+        this.removeListing = new EventEmitter<void>();
+        this.close = new EventEmitter<void>();
+        this.refreshDialogState();
     }
 
 
-    public open(dialogData: FoodListing): void {
+    public refreshDialogState(): void {
         this.foodListingDialogState = FoodListingDialogState.FoodListingInfo;
-        super.open(dialogData);
     }
 
 

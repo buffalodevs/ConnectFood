@@ -13,6 +13,10 @@
         
     </div>
 
-    <ng-content></ng-content>
+    <div class="modal-body" *ngIf="isOpen()">
+
+        <ng-content></ng-content>
+
+    </div>
 
 </ng-template>

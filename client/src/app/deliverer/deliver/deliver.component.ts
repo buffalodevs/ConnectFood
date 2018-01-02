@@ -1,11 +1,8 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormControl, AbstractControl } from '@angular/forms';
 
-import { AbstractSlickFilteredList } from '../../misc-slick-components/slick-filtered-list/abstract-slick-filtered-list';
-import { DeliveryListingsComponent } from '../delivery-listings/delivery-listings.component';
-import { DeliveryListingsFiltersComponent } from '../delivery-listings/delivery-listings-filters/delivery-listings-filters.component';
+import { DeliveryUtilService } from '../delivery-listings/delivery-services/delivery-util.service';
 
-import { DeliveryFilters } from '../../../../../shared/deliverer/delivery-filters';
 import { Delivery } from '../../../../../shared/deliverer/delivery';
 
 
@@ -14,28 +11,25 @@ import { Delivery } from '../../../../../shared/deliverer/delivery';
     templateUrl: './deliver.component.html',
     styleUrls: ['./deliver.component.css']
 })
-export class DeliverComponent extends AbstractSlickFilteredList<Delivery, DeliveryFilters> implements OnInit {    
+export class DeliverComponent {
+    
+    private deliveryListings: Delivery[];
+    private additionalFilters: Map<string, AbstractControl>
 
-    public constructor() {
-        super();
+
+    public constructor (
+        private deliveryUtilService: DeliveryUtilService
+    ) {
+        this.deliveryListings = []
+        this.additionalFilters = new Map<string, AbstractControl>([
+            [ 'matchAvailability', new FormControl(true) ],
+            [ 'unscheduledDeliveries', new FormControl(true) ]
+        ]);
     }
 
 
-    /**
-     * Executes after all input bindings have been established but before view children have been fully initialized.
-     */
-    public ngOnInit(): void {
-        this.filters.addControl('matchAvailability', new FormControl(true));
-    }
-
-
-    /**
-     * Handles filters updates by refreshing the Delivery Listings with unscheduled Deliveries only.
-     * @param filters The filters from the Delivery Listing Filters component.
-     */
-    protected onFiltersUpdate(filters: DeliveryFilters): void {
-        // Make sure we mark down that we only want unscheduled Deliveries!
-        filters.unscheduledDeliveries = true;
-        super.onFiltersUpdate(filters);
+    private deserializeDeliveryListings(deliveryListings: Delivery[]): void {
+        this.deliveryUtilService.deserializeDeliveryData(deliveryListings);
+        this.deliveryListings = deliveryListings;
     }
 }

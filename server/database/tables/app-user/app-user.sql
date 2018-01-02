@@ -21,7 +21,7 @@ ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS disabledDate           TIMESTAMP   
 ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS disabledReason         TEXT            DEFAULT NULL;
 
 -- Determine AppUser's primary function.
-ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS appUserType            AppUserType     NOT NULL DEFAULT 'Receiver';
+ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS appUserType            AppUserType     NOT NULL;
 
 
-CREATE INDEX IF NOT EXISTS appUser_fullNameIdx ON AppUser (lastName, firstName);
+CREATE INDEX IF NOT EXISTS appUser_fullNameIdx          ON AppUser (lastName, firstName);

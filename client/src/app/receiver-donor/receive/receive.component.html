@@ -1,7 +1,7 @@
-<slick-filtered-list>
+<slick-filtered-list #filteredList [filters]="filters" [listings]="listings">
 
     <ng-container filters>
-        <food-listings-filters #filters [formGroup]="filters" header="Search Filters">
+        <food-listings-filters #filters [formGroup]="filters" header="Search Filters" [additionalFilters]="additionalFilters">
 
             <ng-container bottom>
                 
@@ -18,8 +18,24 @@
         </food-listings-filters>
     </ng-container>
 
+
     <ng-container listings>
-        <food-listings header="Available Food" #listings></food-listings>
+        <slick-list #listings route="/receiverDonor/getFoodListings" header="Available Food" [dialog]="foodListingsDialog" (dataUpdated)="foodListings = $event">
+
+            <food-listings [foodListings]="foodListings" (selectListing)="listings.selectListing($event)"></food-listings>
+
+        </slick-list>
     </ng-container>
 
 </slick-filtered-list>
+
+
+<slick-list-dialog #foodListingsDialog [header]="listings.getLastValidSelection()?.foodTitle" (opened)="dialogContents.refreshDialogState()">
+        
+    <food-listing-dialog #dialogContents
+        [isClaimedCart]="false" [isDonatedCart]="false"
+        [foodListing]="listings.getLastValidSelection()" (close)="foodListingsDialog.close()"
+        (removeListing)="listings.removeSelectedListing(false)">
+    </food-listing-dialog>
+
+</slick-list-dialog>

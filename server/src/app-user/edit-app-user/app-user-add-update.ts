@@ -92,8 +92,8 @@ function addOrUpdateAppUserInSQL(appUserInfo: AppUserInfo, hashedPassword?: stri
 
     // Generate query string based off of either signing up or updating App User.
     let queryString: string = 'SELECT * FROM ';
-    if (isUpdate)   queryString += 'updateAppUser($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)';
-    else            queryString += 'addAppUser($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)';
+    if (isUpdate)   queryString += 'updateAppUser($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)';
+    else            queryString += 'addAppUser($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)';
 
     // Generate query args based off of either signing up or updating App User.
     let queryArgs: Array<any> = [ appUserInfo.email,
@@ -109,7 +109,8 @@ function addOrUpdateAppUserInSQL(appUserInfo: AppUserInfo, hashedPassword?: stri
                                   appUserInfo.phone,
                                   appUserInfo.appUserType,
                                   appUserInfo.availability,
-                                  appUserInfo.organizationName ];
+                                  appUserInfo.organizationName,
+                                  appUserInfo.taxId ];
     
     // If an update, then we will need additional appUserKey argument at beginning of list.
     if (isUpdate) queryArgs.unshift(appUserUpdateKey);

@@ -57,6 +57,17 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
         this.form = new FormGroup({});
         this.editData = new Map<string, EditData>();
 
+        this.initAppUserInfoFormElements(appUserInfo);
+        this.initNonAppUserInfoFormElements();
+    }
+
+
+    /**
+     * Initializes form elements that are part of the AppUserInfo object.
+     * @param appUserInfo The AppUserInfo object from which to initialize the elements.
+     */
+    private initAppUserInfoFormElements(appUserInfo: AppUserInfo): void {
+
         // Fill the form group model based off of the properties found in AppUserInfo.
         // Also, add edit flags based off of the properties.
         for (let property in appUserInfo) {
@@ -75,13 +86,22 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
                 this.editData.set(property, new EditData());
             }
         }
+    }
 
-        // Initialize form with elements that are not part of AppUserInfo object.
+
+    /**
+     * Initialize form elements that are not part of the AppUserInfo object (such as password).
+     */
+    private initNonAppUserInfoFormElements(): void {
+
         const passControlNames: string[] = ['password', 'currentPassword', 'confirmPassword'];
+
+        // Initialize password, currentPassword, and confirmPassword form elements.
         for (let i: number = 0; i < passControlNames.length; i++) {
             this.form.addControl(passControlNames[i], new FormControl('', [ Validators.required, Validators.pattern(Validation.PASSWORD_REGEX) ]));
             this.editData.set(passControlNames[i], new EditData());
         }
+
         this.form.setValidators(this.appUserValidationService.confirmPasswordEqual());
     }
 

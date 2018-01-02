@@ -55,16 +55,8 @@ input:not(.form-control) {
     transform: translateY(-3px);
 }
 
-:host ::ng-deep input {
+input {
     font-size: 20px;
-}
-
-:host ::ng-deep .phone-3digits {
-    width: 40px !important;
-}
-
-:host ::ng-deep .phone-4digits {
-    width: 55px !important;
 }
 
 md-icon {

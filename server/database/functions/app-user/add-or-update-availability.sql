@@ -1,12 +1,11 @@
-SELECT dropFunction ('updateAvailability');
+SELECT dropFunction ('addOrUpdateAvailability');
 
 /**
  * Updates the availability times for a given App User. It will completely overwrite old availability times (given that they exist).
  */
-CREATE OR REPLACE FUNCTION updateAvailability
+CREATE OR REPLACE FUNCTION addOrUpdateAvailability
 (
     _appUserKey     AppUserAvailability.appUserKey%TYPE,
-    -- @ts-sql class="TimeRange" file="/shared/app-user/time-range.ts"
     _timeRanges     JSON[]
 )
 RETURNS VOID

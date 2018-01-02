@@ -58,6 +58,11 @@ export class Validation {
      */
     public static readonly AM_OR_PM_REGEX: RegExp = /^([aApP][mM])$/;
 
+    /**
+     * Regular expression used for verifying Organization Tax ID (TIN) format.
+     */
+    public static readonly TAX_ID_REGEX: RegExp = /^\d{2}\-\d{7}$/;
+
     
     /**
      * Checks if an email string is in the correct format.
@@ -151,6 +156,16 @@ export class Validation {
      */
     public static amOrPmValidator(amOrPm: string): boolean {
         return Validation.AM_OR_PM_REGEX.test(amOrPm);
+    }
+
+
+    /**
+     * Checks if a tax ID string is in the correct format (##-#######).
+     * @param taxId The tax ID string to check.
+     * @return true if it is, false if not.
+     */
+    public static taxIdValidator(taxId: string): boolean {
+        return Validation.TAX_ID_REGEX.test(taxId);
     }
 
 
