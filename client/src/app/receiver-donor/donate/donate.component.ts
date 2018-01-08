@@ -2,7 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidatorFn, FormControl } from '@angular/forms';
 import { ImageCropperComponent, CropperSettings } from 'ng2-img-cropper';
 import { Observable } from 'rxjs/Observable';
-import { MdHorizontalStepper } from '@angular/material';
+import { MatHorizontalStepper } from '@angular/material';
+import 'rxjs/add/operator/finally';
 
 import { AddFoodListingService } from "../food-listings/food-listing-services/add-food-listing.service";
 import { DateFormatterPipe } from "../../common-util/pipes/date-formatter.pipe"
@@ -11,6 +12,8 @@ import { FoodTypesComponent } from "../../domain/food-types/food-types.component
 
 import { FoodListingUpload } from "../../../../../shared/receiver-donor/food-listing-upload";
 import { Validation } from '../../../../../shared/common-util/validation';
+import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
+import { ValidationService } from '../../common-util/services/validation.service';
 
 
 @Component({
@@ -19,9 +22,8 @@ import { Validation } from '../../../../../shared/common-util/validation';
     styleUrls: ['donate.component.css'],
     providers: [AddFoodListingService]
 })
-export class DonateComponent implements OnInit {
+export class DonateComponent extends AbstractModelDrivenComponent implements OnInit {
     
-    private foodForm: FormGroup;
     private validate: boolean;
     private dispUrl: string;
 
@@ -37,8 +39,11 @@ export class DonateComponent implements OnInit {
     public constructor (
         private formBuilder: FormBuilder,
         private addFoodListingService: AddFoodListingService,
-        private dateFormatter: DateFormatterPipe
+        private dateFormatter: DateFormatterPipe,
+        validationService: ValidationService,
     ) {
+        super(validationService);
+
         // Want to force validators to process on submit. Non-text fields will only validate on submit too!
         this.validate = false;
 
@@ -57,11 +62,21 @@ export class DonateComponent implements OnInit {
 
         this.foodTitleMaxLength = 100;
         this.showProgressSpinner = false;
-        this.foodForm = new FormGroup({});
+        this.form = new FormGroup({});
     }
 
 
     public ngOnInit(): void {
+        this.refreshFormControls();
+    }
+
+
+    /**
+     * Completely refreshes all form controls by clearing all controls out and (re)adding them.
+     */
+    private refreshFormControls(): void {
+
+        this.form = new FormGroup({});
 
         let foodListingUpload: FoodListingUpload = new FoodListingUpload();
 
@@ -86,7 +101,7 @@ export class DonateComponent implements OnInit {
                     case 'foodDescription': validators = null;                                                  break;
                 }
 
-                this.foodForm.addControl(property, new FormControl(null, validators));
+                this.form.addControl(property, new FormControl(null, validators));
             }
 
         }
@@ -140,12 +155,12 @@ export class DonateComponent implements OnInit {
     private toggleSplitIntoUnits(): void {
 
         if (this.isSplitIntoUnits()) {
-            this.foodForm.removeControl('availableUnitsCount');
-            this.foodForm.removeControl('unitsLabel');
+            this.form.removeControl('availableUnitsCount');
+            this.form.removeControl('unitsLabel');
         }
         else {
-            this.foodForm.addControl('availableUnitsCount', new FormControl(null, [ Validators.required, Validators.min(1) ]));
-            this.foodForm.addControl('unitsLabel', new FormControl(null, [ Validators.required ]));
+            this.form.addControl('availableUnitsCount', new FormControl(null, [ Validators.required, Validators.min(1) ]));
+            this.form.addControl('unitsLabel', new FormControl(null, [ Validators.required ]));
         }
     }
 
@@ -155,7 +170,7 @@ export class DonateComponent implements OnInit {
      * @return true if it has been split, false if not.
      */
     private isSplitIntoUnits(): boolean {
-        return ( this.foodForm.contains('availableUnitsCount') && this.foodForm.contains('unitsLabel') );
+        return ( this.form.contains('availableUnitsCount') && this.form.contains('unitsLabel') );
     }
 
 
@@ -163,7 +178,7 @@ export class DonateComponent implements OnInit {
      * If the form is valid, then it will proceed to the confirmation display.
      * @param stepper The horizontal stepper that will be invoked to proceed to confirmation display if form is valid.
      */
-    private ifValidProceedToReview(value: FoodListingUpload, valid: boolean, stepper: MdHorizontalStepper): void {
+    private ifValidProceedToReview(value: FoodListingUpload, valid: boolean, stepper: MatHorizontalStepper): void {
         this.validate = true;
         if (valid)  stepper.next();
     }
@@ -175,7 +190,7 @@ export class DonateComponent implements OnInit {
      * @param valid The valid state of the donation form.
      * @param stepper The stepper for this Donor Form.
      */
-    private submitDonation(value: FoodListingUpload, valid: boolean, stepper: MdHorizontalStepper): void {
+    private submitDonation(value: FoodListingUpload, valid: boolean, stepper: MatHorizontalStepper): void {
         
         let observer: Observable<number> = this.addFoodListingService.addFoodListing(value, this.image);
         this.showProgressSpinner = true;
@@ -196,26 +211,23 @@ export class DonateComponent implements OnInit {
     /**
      * Refreshes the Donation Form, allowing the user to donate another item.
      */
-    private donateAgain(stepper: MdHorizontalStepper): void {
-
-        this.foodForm.reset();
-        this.cropper.reset();
-        this.image = null;
-        this.validate = false;
+    private donateAgain(stepper: MatHorizontalStepper): void {
 
         // Must go back 2 tabs to get to start.
         stepper.previous();
         stepper.previous();
 
-        this.foodForm.markAsPristine();
-        this.foodForm.markAsUntouched();
+        this.validate = false;
+        this.form.reset();
+        this.cropper.reset();
+        this.image = null;
     }
 
 
     /**
      * Allows the user to return to edit a Donation just after submitting it.
      */
-    private editDonation(stepper: MdHorizontalStepper): void {
+    private editDonation(stepper: MatHorizontalStepper): void {
         this.validate = false;
         stepper.previous();
     }

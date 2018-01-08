@@ -1,4 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+
+import { SlickListDialogData, SlickListDialog } from '../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog';
 
 import { FoodListing } from './../../../../../../shared/receiver-donor/food-listing';
 
@@ -14,46 +17,38 @@ enum FoodListingDialogState {
 }
 
 
+/**
+ * Expected input data for this dialog.
+ * NOTE: Needed because this dialog will be globally generated and opened, and it cannot use traditional Input() slots.
+ */
+export class FoodListingDialogData extends SlickListDialogData<FoodListing> {
+
+    public constructor (
+        public header: string,
+        public isClaimedCart: boolean,
+        public isDonatedCart: boolean,
+        selectedListing?: FoodListing
+    ) {
+        super(selectedListing);
+    }
+}
+
+
 @Component({
     selector: 'food-listing-dialog',
     templateUrl: './food-listing-dialog.component.html',
     styleUrls: ['./food-listing-dialog.component.css']
 })
-export class FoodListingDialogComponent {
-
-    /**
-     * Determines if this dialog is displaying Food Listing info for a Receiver's Cart. Default is false.
-     */
-    @Input() private isClaimedCart: boolean;
-    /**
-     * Determines if this dialog is displaying Food Listing info for a Donor's Cart. Default is false.
-     */
-    @Input() private isDonatedCart: boolean;
-    /**
-     * The food listing to display in the dialog.
-     */
-    @Input() private foodListing: FoodListing;
-
-    /**
-     * Emitted whenever the food listing being displayed (and manipualted) in the dialog should be removed.
-     */
-    @Output() private removeListing: EventEmitter<void>;
-    @Output() private close: EventEmitter<void>;
-
+export class FoodListingDialogComponent extends SlickListDialog {
 
     private foodListingDialogState: FoodListingDialogState;
 
 
-    public constructor() {
-        this.isClaimedCart = false;
-        this.isDonatedCart = false;
-        this.removeListing = new EventEmitter<void>();
-        this.close = new EventEmitter<void>();
-        this.refreshDialogState();
-    }
-
-
-    public refreshDialogState(): void {
+    public constructor (
+        private dialogRef: MatDialogRef<FoodListingDialogComponent>,
+        @Inject(MAT_DIALOG_DATA) private dialogData: FoodListingDialogData
+    ) {
+        super();
         this.foodListingDialogState = FoodListingDialogState.FoodListingInfo;
     }
 

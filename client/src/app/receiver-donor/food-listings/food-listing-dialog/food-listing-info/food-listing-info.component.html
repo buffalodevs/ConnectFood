@@ -12,7 +12,7 @@
 
             <slick-expansion-panel>
                     
-                <ng-container md-panel-title>
+                <ng-container mat-panel-title>
                     Donor Info
                 </ng-container>
                 
@@ -62,7 +62,7 @@
 
             <slick-expansion-panel>
 
-                <ng-container md-panel-title>
+                <ng-container mat-panel-title>
                     Food Info
                 </ng-container>
 
@@ -71,7 +71,7 @@
                 </div>
 
                 <div class="space-bottom">
-                    <b>Perishable:</b>
+                    <b>Needs Refrigeration:</b>
                     <i class="material-icons" *ngIf="foodListing.perishable" style="color:green">check</i>
                     <i class="material-icons" *ngIf="!foodListing.perishable" style="color:red">clear</i>
                     <span>{{ foodListing.perishable ? 'Yes' : 'No'}}</span>
@@ -121,7 +121,7 @@
 
             <slick-expansion-panel [collapseWidth]="null">
                     
-                <ng-container md-panel-title>
+                <ng-container mat-panel-title>
                     Description
                 </ng-container>
         
@@ -138,8 +138,8 @@
 
 <div class="modal-button-group">
     
-    <button md-raised-button color="primary" class="button-md" (click)="toClaim.emit()" *ngIf="!isClaimedCart && !isDonatedCart">Claim</button>
-    <button md-raised-button color="primary" class="button-md warn-button" (click)="toUnclaim.emit()" *ngIf="isClaimedCart">Unclaim</button>
-    <button md-raised-button color="primary" class="button-md warn-button" (click)="toRemove.emit()" *ngIf="isDonatedCart">Remove</button>
+    <button mat-raised-button color="primary" class="button-md" (click)="toClaim.emit()" *ngIf="!isClaimedCart && !isDonatedCart">Claim</button>
+    <button mat-raised-button color="primary" class="button-md warn-button" (click)="toUnclaim.emit()" *ngIf="isClaimedCart">Unclaim</button>
+    <button mat-raised-button color="primary" class="button-md warn-button" (click)="toRemove.emit()" *ngIf="isDonatedCart">Remove</button>
 
 </div>

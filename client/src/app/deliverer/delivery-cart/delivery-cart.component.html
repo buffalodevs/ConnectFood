@@ -6,35 +6,21 @@
             <ng-container top>
                         
                 <h5>Delivery Status:</h5>
-                <md-select formControlName="deliveryState" placeholder="Any Status" floatPlaceholder="never" title="Only shows deliveries with given status">
-                    <md-option *ngFor="let deliveryState of deliveryStates" [value]="deliveryState">
+                <mat-select formControlName="deliveryState" placeholder="Any Status" floatPlaceholder="never" title="Only shows deliveries with given status">
+                    <mat-option *ngFor="let deliveryState of deliveryStates" [value]="deliveryState">
                         {{ (deliveryState == null) ? 'Any Status' : deliveryUtilService.getReadableDeliveryState(deliveryState) }} 
-                    </md-option>
-                </md-select>
+                    </mat-option>
+                </mat-select>
 
             </ng-container>
 
         </delivery-listings-filters>
     </ng-container>
 
+
+
     <ng-container listings>
-        <slick-list #listings route="/deliverer/getDeliveries" header="Scheduled Deliveries" [dialog]="deliveryListingsDialog"
-         (dataUpdated)="deserializeDeliveryListings($event)">
-
-            <delivery-listings [deliveryListings]="deliveryListings" (selectListing)="listings.selectListing($event)"></delivery-listings>
-
-        </slick-list>
+        <delivery-listings #listings header="Scheduled Deliveries" [isCart]="true"></delivery-listings>
     </ng-container>
         
 </slick-filtered-list>
-
-
-<slick-list-dialog #deliveryListingsDialog [header]="listings.getLastValidSelection()?.foodTitle" (opened)="dialogContents.refreshDialogState()">
-        
-    <delivery-listing-dialog #dialogContents
-        [deliveryListing]="listings.getLastValidSelection()"
-        [isCart]="true" (close)="deliveryListingsDialog.close()"
-        (removeListing)="listings.removeSelectedListing(false)">
-    </delivery-listing-dialog>
-
-</slick-list-dialog>

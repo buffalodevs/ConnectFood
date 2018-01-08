@@ -10,21 +10,21 @@
     <br>
 
     <h5>Available After:</h5>
-    <md-input-container title="Only food available on or after this date will appear." floatPlaceholder="never" (click)="picker.open()">
-        <input mdInput [mdDatepicker]="picker" placeholder="mm/dd/yyyy" formControlName="availableAfterDate" readonly="true">
-        <md-datepicker-toggle mdSuffix [for]="picker"></md-datepicker-toggle>
-        <md-datepicker touchUi="true" #picker></md-datepicker>
-    </md-input-container>
+    <mat-input-container title="Only food available on or after this date will appear." floatPlaceholder="never" (click)="picker.open()">
+        <input matInput [matDatepicker]="picker" placeholder="mm/dd/yyyy" formControlName="availableAfterDate" readonly="true">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker touchUi="true" #picker></mat-datepicker>
+    </mat-input-container>
     <br>
 
-    <h5>Perishability:</h5>
+    <h5>Refrigeration:</h5>
     <div>
         <label class="checkbox-compress">
-            <md-checkbox title="Check this if food that needs refrigeration should appear." formControlName="perishable">Perishable</md-checkbox>
+            <mat-checkbox title="Check this if food that needs refrigeration should appear." formControlName="perishable">Refrigerated Food</mat-checkbox>
         </label>
         <br>
         <label class="checkbox-compress">
-            <md-checkbox title="Check this if food that does not need refrigeration should appear." formControlName="notPerishable">Not Perishable</md-checkbox>
+            <mat-checkbox title="Check this if food that does not need refrigeration should appear." formControlName="notPerishable">Non-Refrigerated Food</mat-checkbox>
         </label>
     </div>
 

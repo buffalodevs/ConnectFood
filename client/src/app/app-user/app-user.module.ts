@@ -2,15 +2,12 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common'
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BusyModule } from 'angular2-busy';;
 
 import { CommonUtilModule } from '../common-util/common-util.module';
 import { AngularMaterialWrapperModule } from '../angular-material-wrapper/angular-material-wrapper.module';
 import { SlickInputGroupModule } from '../misc-slick-components/slick-input-group/slick-input-group.module';
 import { SlickWeekdaySchedulerModule } from '../misc-slick-components/slick-weekday-scheduler/slick-weekday-scheduler.module';
 
-import { TaxIdComponent } from './common-app-user/tax-id/tax-id.component';
-import { PhoneComponent } from './common-app-user/phone/phone.component';
 import { LoginComponent } from './login/login.component';
 import { LoginRequiredComponent } from './login-required/login-required.component';
 import { SignupComponent } from './signup/signup.component';
@@ -54,8 +51,6 @@ const appUserRoutes: Routes = [
 
 @NgModule({
     declarations: [
-        TaxIdComponent,
-        PhoneComponent,
         LoginComponent,
         LoginRequiredComponent,
         SignupComponent,
@@ -66,7 +61,6 @@ const appUserRoutes: Routes = [
         RouterModule.forChild(appUserRoutes),
         FormsModule,
         ReactiveFormsModule,
-        BusyModule,
         CommonUtilModule,
         AngularMaterialWrapperModule,
         SlickInputGroupModule,

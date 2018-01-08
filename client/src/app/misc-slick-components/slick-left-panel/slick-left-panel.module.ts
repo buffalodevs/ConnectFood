@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MdButtonModule } from '@angular/material';
+import { MatButtonModule } from '@angular/material';
 
 import { SlickLeftPanelComponent } from './slick-left-panel.component'
 
@@ -8,7 +8,7 @@ import { SlickLeftPanelComponent } from './slick-left-panel.component'
 @NgModule({
     imports: [
         CommonModule,
-        MdButtonModule
+        MatButtonModule
     ],
     declarations: [
         SlickLeftPanelComponent

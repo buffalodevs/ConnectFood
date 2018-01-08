@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, Response, RequestOptionsArgs } from '@angular/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { MatDialog } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
-import { DialogService } from "ng2-bootstrap-modal";
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/retry';
+import 'rxjs/add/observable/of';
 
 import { SessionDataService } from "./session-data.service";
 import { LoginComponent } from '../../app-user/login/login.component'
 
 import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
-import { Observer } from "rxjs/Observer";
-
-export { Response };
 
 
 /**
@@ -21,9 +21,9 @@ export { Response };
 export class RequestService {
 
     public constructor (
-        private http: Http,
-        private dialogService: DialogService,
-        private sessionDataService: SessionDataService
+        private http: HttpClient,
+        private sessionDataService: SessionDataService,
+        private dialog: MatDialog
     ) {}
 
 
@@ -34,30 +34,19 @@ export class RequestService {
      * @param url The destination URL for the request. Can be a relative URL.
      * @param body The body or payload of the request. This will be sent in JSON format.
      */
-    public post(url: string, body: any): Observable<Response> {
-        /* Wrap the request in a function so that it can recursively be called by response handler if necessary.
-           Such cases would include when the user must login and they successfully login (repeat request). */
-        let sendRequest = function(): Observable<Response> {
-            let options: RequestOptionsArgs = {
-                headers: new Headers({
-                    'Content-Type': 'application/json'
-                })
-            };
+    public post(url: string, body: any): Observable<FoodWebResponse> {
 
-            return Observable.create((observer: Observer<Response>) => {
-                this.http.post(url, body, options).subscribe((response: Response) => {
+        const options = {
+            headers: new HttpHeaders({
+                'Content-Type': 'application/json'
+            })
+        };
 
-                    // Make the response handler its own Observable because it can evaluate to a recursive call to sendRequest()!
-                    this.handleResponse(sendRequest, response).subscribe((response: Response) => {
-                        observer.next(response);
-                        observer.complete();
-                    });
-                });
-            });
-        }
-        .bind(this);
-
-        return sendRequest();
+        const postObservable: Observable<FoodWebResponse> = this.http.post<FoodWebResponse>(url, body, options);
+        
+        return postObservable.mergeMap((foodWebResponse: FoodWebResponse) => {
+            return this.handleResponse(postObservable, foodWebResponse);
+        });
     }
 
 
@@ -67,82 +56,54 @@ export class RequestService {
      * then it will resend the request. If not, then it will fail with appropriate error flag and message.
      * @param url The destination URL for the request. Can be a relative URL.
      */
-    public get(url: string): Observable<Response> {
-        /* Wrap the request in a function so that it can recursively be called by response handler if necessary.
-           Such cases would include when the user must login and they successfully login (repeat request). */
-        let sendRequest = function(): Observable<Response> {
+    public get(url: string): Observable<FoodWebResponse> {
 
-            return Observable.create((observer: Observer<Response>) => {
-                this.http.get(url).subscribe((response: Response) => {
-                    
-                    // Make the response handler its own Observable because it can evaluate to a recursive call to sendRequest()!
-                    this.handleResponse(sendRequest, response).subscribe((response: Response) => {
-                        observer.next(response);
-                        observer.complete();
-                    });
-                });
-            });
-        }
-        .bind(this);
+        const getObservable: Observable<FoodWebResponse> = this.http.get<FoodWebResponse>(url);
 
-        return sendRequest();
+        return getObservable.mergeMap((foodWebResponse: FoodWebResponse) => {
+            return this.handleResponse(getObservable, foodWebResponse);
+        });
     }
 
 
     /**
-     * Handles the response of either an HTTP POST or GET request. Determines if re-login is required and acts accordingly.
-     * @param retrySendRequestCallback A callback function that may be called to recursively retry the request.
-     * @param response The response of either an HTTP POST or GET request.
+     * Handles the response of either an HTTP POST or GET request.
+     * If login is required (due to session termination), then generates the login dialog, waits for dialog to submit or close, and resends the request.
+     * @param getOrPostObservable The original observable of the GET or POST request.
+     * @param foodWebResponse The response of either an HTTP POST or GET request. In the format of the message JSON body.
      */
-    private handleResponse(retrySendRequestCallback: () => Observable<Response>, response: Response): Observable<Response> {
-        let foodWebResponse: FoodWebResponse = response.json();
+    private handleResponse(getOrPostObservable: Observable<FoodWebResponse>, foodWebResponse: FoodWebResponse): Observable<FoodWebResponse> {
 
-        // Check if the user must confirm their signup in order to successfully perform the related request/action.
         if (foodWebResponse.signupConfirmRequired) {
             alert('Sorry, you must confirm your registration by following the email confirmation link sent to your email account before performing this action.');
         }
-        // Check if the user must login in order to successfully perform the related request/action.
         else if (foodWebResponse.loginRequired) {
-            // Mark the session ended (or not logged in) in this client.
-            this.sessionDataService.clearSessionData();
 
-            // Wrap login result in a newly created Observable.
-            return Observable.create((observer: Observer<Response>) => {
+            this.sessionDataService.clearSessionData(); // Mark the session ended (not logged in) in this client.
 
-                // Attempt login.
-                LoginComponent.display(this.dialogService).subscribe(() => {
+            // Attempt login (convert result promise to observable since we are chaining observables here).
+            return LoginComponent.display(this.dialog).mergeMap(() => {
 
-                    // If login successful, then re-send original request and go through this process recursively.
-                    if (this.sessionDataService.sessionDataAvailable()) {
-                        retrySendRequestCallback().subscribe((response: Response) => {
-                            observer.next(response);
-                            observer.complete();
-                        });
-                    }
-                    // Else login not successful so simply return original response with error information.
-                    else {
-                        observer.next(response);
-                        observer.complete();
-                    }
-                });
-            })
+                // If login successful, then re-send original request and go through this process recursively. Else, return original error response.
+                return this.sessionDataService.sessionDataAvailable() ? getOrPostObservable.retry()
+                                                                      : Observable.of(foodWebResponse);
+            });
         }
 
-        // No problems with signup confirmation or login detected!
-        return Observable.of(response);
+        // Either error not related to login encoutnered, or no error encountered.
+        return Observable.of(foodWebResponse);
     }
 
 
     /**
      * A generic response mapping to basic boolean result.
-     * @param response The response received from the server.
+     * @param foodWebResponse The response received from the server. In the form of the JSON body of the response.
      * @return If the related operation on the server was successful, then true.
      *         If it was unsuccessful, and due to a resolvable error (such as required login), then false.
      *         If it was unsuccessful, and due to a fatal error, then an Error is thrown.
      */
-    public genericResponseMap(response: Response): boolean {
+    public genericResponseMap(foodWebResponse: FoodWebResponse): boolean {
 
-        const foodWebResponse: FoodWebResponse = response.json();
         console.log(foodWebResponse.message);
         
         // On failure.

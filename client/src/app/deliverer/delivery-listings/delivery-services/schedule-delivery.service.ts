@@ -1,8 +1,9 @@
 "use strict";
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 
-import { RequestService, Response } from "../../../common-util/services/request.service";
+import { RequestService } from "../../../common-util/services/request.service";
 
 import { ScheduleDeliveryRequest } from '../../../../../../shared/deliverer/message/schedule-delivery-message';
 import { FoodWebResponse } from "./../../../../../../shared/message-protocol/food-web-response";

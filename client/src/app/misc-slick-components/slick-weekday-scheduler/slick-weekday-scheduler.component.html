@@ -1,15 +1,15 @@
 <form [formGroup]="form">
-    <md-radio-group formControlName="scheduledDate" class="row">
+    <mat-radio-group formControlName="scheduledDate" class="row">
     
         <slick-expansion-panel [expanded]="false" *ngFor="let weekday of availabilityTimeManagement.getNonEmptyWeekdays()" class="col-sm-12">
                     
-            <ng-container md-panel-title>{{ weekday }}</ng-container>
+            <ng-container mat-panel-title>{{ weekday }}</ng-container>
 
             <div class="row radio-container">
 
                 <div class="col-xs-6 col-sm-3 col-md-2" *ngFor="let availabilityTime of availabilityTimeManagement.get(weekday); let i = index">
 
-                    <md-radio-button [value]="availabilityTime">{{ availabilityTimeManagement.getDisplayFormAt(weekday, i) }}</md-radio-button>
+                    <mat-radio-button [value]="availabilityTime">{{ availabilityTimeManagement.getDisplayFormAt(weekday, i) }}</mat-radio-button>
 
                 </div>
 
@@ -17,7 +17,7 @@
             
         </slick-expansion-panel>
 
-    </md-radio-group>
+    </mat-radio-group>
 </form>
 
 <br>

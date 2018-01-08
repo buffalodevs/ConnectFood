@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, AfterViewInit, ViewChild, forwardRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
-import { MdAutocomplete, MdOption } from '@angular/material';
+import { MatAutocomplete, MatOption } from '@angular/material';
 
 import { StringManipulation } from '../../../../../shared/common-util/string-manipulation';
 
@@ -77,7 +77,7 @@ export class SlickAutoCompleteInputComponent implements OnInit, AfterViewInit {
     @Input() private selectOnBlur: boolean;
 
 
-    @ViewChild('autoComplete') private autoCompleteComponent: MdAutocomplete;
+    @ViewChild('autoComplete') private autoCompleteComponent: MatAutocomplete;
 
 
     /**
@@ -147,7 +147,7 @@ export class SlickAutoCompleteInputComponent implements OnInit, AfterViewInit {
      */
     private selectHighlightedElement(): void {
 
-        const selectOption: MdOption = this.autoCompleteComponent._keyManager.activeItem;
+        const selectOption: MatOption = this.autoCompleteComponent._keyManager.activeItem;
         if (selectOption != null)  selectOption.select();
     }
 

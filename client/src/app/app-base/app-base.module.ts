@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { BootstrapModalModule } from 'ng2-bootstrap-modal';
 
 import { CommonUtilModule } from '../common-util/common-util.module';
 import { AngularMaterialWrapperModule } from '../angular-material-wrapper/angular-material-wrapper.module';
@@ -31,7 +30,6 @@ const appBaseRoutes: Routes = [
         CommonModule,
         RouterModule.forChild(appBaseRoutes),
         NgbModule,
-        BootstrapModalModule,
         CommonUtilModule,
         AngularMaterialWrapperModule
     ],

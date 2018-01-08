@@ -68,9 +68,9 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
 
         // Set required validators for contained Slick Input Group controls.
         this.groupValidators = [
-            [ Validators.required, Validators.pattern(Validation.HH_REGEX) ],
-            [ Validators.required, Validators.pattern(Validation.MM_REGEX) ],
-            [ Validators.required, Validators.pattern(Validation.AM_OR_PM_REGEX) ]
+            [ Validators.required, Validators.pattern(this.validationService.HH_REGEX) ],
+            [ Validators.required, Validators.pattern(this.validationService.MM_REGEX) ],
+            [ Validators.required, Validators.pattern(this.validationService.AM_OR_PM_REGEX) ]
         ];
 
         // Listen for any form changes and notify any listening components of change.

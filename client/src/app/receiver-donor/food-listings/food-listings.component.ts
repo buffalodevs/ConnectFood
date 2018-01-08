@@ -1,8 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
-import { Observable } from "rxjs/Observable";
+import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
+import { MatDialogConfig, MatDialog } from '@angular/material';
 
-import { GetListingsService } from '../../misc-slick-components/slick-filtered-list/slick-list/get-listings.service';
+import { FoodListingDialogComponent, FoodListingDialogData } from './food-listing-dialog/food-listing-dialog.component';
+import { SlickListComponent } from '../../misc-slick-components/slick-filtered-list/slick-list/slick-list.component';
+import { GetListingsService } from '../../misc-slick-components/slick-filtered-list/slick-list/services/get-listings.service';
+import { ConsumableListingCacheService } from '../../misc-slick-components/slick-filtered-list/slick-list/services/consumable-listing-cache.service';
 
 import { FoodListing } from '../../../../../shared/receiver-donor/food-listing';
 import { FoodListingsFilters } from "../../../../../shared/receiver-donor/food-listings-filters";
@@ -11,23 +14,39 @@ import { FoodListingsFilters } from "../../../../../shared/receiver-donor/food-l
 @Component({
     selector: 'food-listings',
     templateUrl: './food-listings.component.html',
-    styleUrls: ['./food-listings.component.css']
+    styleUrls: ['./food-listings.component.css', '../../misc-slick-components/slick-filtered-list/slick-list/slick-list.component.css']
 })
-export class FoodListingsComponent {
+export class FoodListingsComponent extends SlickListComponent <FoodListing, FoodListingsFilters> {
+
+    @Input() private header: string;
+    @Input() private isClaimedCart: boolean;
+    @Input() private isDonatedCart: boolean;
+
+
+    public constructor (
+        getListingsService: GetListingsService <FoodListing, FoodListingsFilters>,
+        consumableListingCacheService: ConsumableListingCacheService <FoodListing>,
+        router: Router,
+        dialogService: MatDialog
+    ) {
+        super('/receiverDonor/getFoodListings', getListingsService, consumableListingCacheService, router, dialogService);
+
+        this.header = 'Food Listings';
+        this.isClaimedCart = false;
+        this.isDonatedCart = false;
+    }
+
 
     /**
-     * The food listings that shall be displayed.
+     * Selects a listing (and opens associated dialog) based on a given list index.
+     * @param selectedListIndex The index of the listing to select.
      */
-    @Input() private foodListings: FoodListing[];
+    public selectListing(selectedListIndex: number): void {
 
-    /**
-     * Emitted whenever a listing (given by an index) is to be selected.
-     */
-    @Output() private selectListing: EventEmitter<number>;
+        // Prepare dialog configuration upon selection by setting input data for dialog.
+        let dialogConfig: MatDialogConfig<FoodListingDialogData> = new MatDialogConfig<FoodListingDialogData>();
+        dialogConfig.data = new FoodListingDialogData(this.listData[selectedListIndex].foodTitle, this.isClaimedCart, this.isDonatedCart);
 
-
-    public constructor () {
-        this.foodListings = [];
-        this.selectListing = new EventEmitter<number>();
+        super.selectListing(selectedListIndex, FoodListingDialogComponent, dialogConfig);
     }
 }

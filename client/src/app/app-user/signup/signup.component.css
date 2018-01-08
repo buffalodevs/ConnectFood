@@ -5,7 +5,7 @@
     font-size: 20px;
 }
 
-md-radio-group {
+mat-radio-group {
     font-size: 20px;
     font-weight: bold;
 }
@@ -37,7 +37,7 @@ h2 {
     }
 }
 
-:host ::ng-deep md-input-container {
+:host ::ng-deep mat-input-container {
     width: 100%;
 }
 

@@ -1,27 +1,27 @@
 <form [formGroup]="form" class="container" *ngIf="!signupComplete" [slick-progress-spinner]="showProgressSpinner">
 
-    <md-horizontal-stepper #stepper [linear]="true">
+    <mat-horizontal-stepper #stepper [linear]="true">
 
-        <md-step [stepControl]="control('primary.appUserType')" [formGroup]="control('primary')" label="User Type">
+        <mat-step [stepControl]="control('primary.appUserType')" [formGroup]="control('primary')" label="User Type">
 
             <h3 class="center-text">What Type of User Are You</h3>
             <hr>
 
-            <md-radio-group class="row center-text space-bottom" (change)="stepper.next()" formControlName="appUserType">
+            <mat-radio-group class="row center-text space-bottom" (change)="stepper.next()" formControlName="appUserType">
 
                 <div class="col-md-4" *ngFor="let type of appUserTypes; let i = index">
-                    <md-radio-button name="accountType" [value]="type">{{ type }}</md-radio-button>
+                    <mat-radio-button name="accountType" [value]="type">{{ type }}</mat-radio-button>
                 </div>
 
-            </md-radio-group>
+            </mat-radio-group>
 
             <button #appUserTypeNext *ngIf="control('primary.appUserType').value != null"
-                md-raised-button color="primary" class="button-md" mdStepperNext>Next</button>
+                mat-raised-button color="primary" class="button-md" matStepperNext>Next</button>
 
-        </md-step>
+        </mat-step>
 
         
-        <md-step [stepControl]="control('primary')" [formGroup]="control('primary')" label="Primary Info">
+        <mat-step [stepControl]="control('primary')" [formGroup]="control('primary')" label="Primary Info">
 
             <!-- Next, get the user's primary information -->
             <h3 class="center-text">Identification and Password</h3>
@@ -32,24 +32,24 @@
                 <div class="col-md-6">
                     <div class="limit-width">
 
-                        <md-input-container class="form-group">
-                            <input mdInput [placeholder]="adminPreStr + ' Email'" type="email" name="username" formControlName="email" autocomplete="off">
-                            <md-error *ngIf="hasError('primary.email')">{{ errorMsgFor('primary.email') }}</md-error>
-                        </md-input-container>
+                        <mat-input-container class="form-group">
+                            <input matInput [placeholder]="adminPreStr + ' Email'" type="email" name="username" formControlName="email" autocomplete="off">
+                            <mat-error *ngIf="hasError('primary.email')">{{ errorMsgFor('primary.email') }}</mat-error>
+                        </mat-input-container>
 
-                        <md-input-container class="form-group" *ngIf="isOrganization()">
-                            <input mdInput placeholder="Organization Name" name="organizationName" formControlName="organizationName">
-                        </md-input-container>
+                        <mat-input-container class="form-group" *ngIf="isOrganization()">
+                            <input matInput placeholder="Organization Name" name="organizationName" formControlName="organizationName">
+                        </mat-input-container>
 
                         <div class="row">
 
-                            <md-input-container class="form-group col-md-6">
-                                <input mdInput [placeholder]="adminPreStr + ' First Name'" name="fname" formControlName="firstName">
-                            </md-input-container>
+                            <mat-input-container class="form-group col-md-6">
+                                <input matInput [placeholder]="adminPreStr + ' First Name'" name="fname" formControlName="firstName">
+                            </mat-input-container>
 
-                            <md-input-container class="form-group col-md-6">
-                                <input mdInput [placeholder]="adminPreStr + ' Last Name'" name="lname" formControlName="lastName">
-                            </md-input-container>
+                            <mat-input-container class="form-group col-md-6">
+                                <input matInput [placeholder]="adminPreStr + ' Last Name'" name="lname" formControlName="lastName">
+                            </mat-input-container>
 
                         </div>
                     
@@ -59,31 +59,32 @@
                 <div class="col-md-6">
                     <div class="limit-width">
 
-                        <div class="form-group">
-                            <tax-id required="true" [validate]="validate.get('taxId')" formControlName="taxId" *ngIf="isOrganization()"></tax-id>
-                        </div>
+                        <mat-input-container class="form-group" *ngIf="isOrganization()">
+                            <input matInput placeholder="Organization Tax ID" [textMask]="{ mask: appUserConstants.TAX_ID_MASK, placeholderChar: '\u2000' }"
+                                   formControlName="taxId">
+                        </mat-input-container>
 
-                        <md-input-container class="form-group">
-                            <input mdInput placeholder="Password" type="password" formControlName="password" autocomplete="new-password">
-                            <md-error *ngIf="hasError('primary.password')">{{ errorMsgFor('primary.password') }}</md-error>
-                        </md-input-container>
+                        <mat-input-container class="form-group">
+                            <input matInput placeholder="Password" type="password" formControlName="password" autocomplete="new-password">
+                            <mat-error *ngIf="hasError('primary.password')">{{ errorMsgFor('primary.password') }}</mat-error>
+                        </mat-input-container>
 
-                        <md-input-container class="form-group">
-                            <input mdInput placeholder="Confirm Password" type="password" formControlName="confirmPassword" autocomplete="new-password">
-                            <md-error *ngIf="hasError('primary.confirmPassword')">{{ errorMsgFor('primary.confirmPassword') }}</md-error>
-                        </md-input-container>
+                        <mat-input-container class="form-group">
+                            <input matInput placeholder="Confirm Password" type="password" formControlName="confirmPassword" autocomplete="new-password">
+                            <mat-error *ngIf="hasError('primary.confirmPassword')">{{ errorMsgFor('primary.confirmPassword') }}</mat-error>
+                        </mat-input-container>
 
                     </div>
                 </div>
 
             </div>
 
-            <button md-raised-button color="primary" class="button-md warn-button" type="button" mdStepperPrevious>Back</button>
-            <button md-raised-button color="primary" class="button-md" (click)="validate.set('primary', true)" mdStepperNext>Next</button>
+            <button mat-raised-button color="primary" class="button-md warn-button" type="button" matStepperPrevious>Back</button>
+            <button mat-raised-button color="primary" class="button-md" (click)="validate.set('primary', true)" matStepperNext>Next</button>
 
-        </md-step>
+        </mat-step>
 
-        <md-step [stepControl]="control('addressPhone')" [formGroup]="control('addressPhone')" label="Address & Phone">
+        <mat-step [stepControl]="control('addressPhone')" [formGroup]="control('addressPhone')" label="Address & Phone">
 
             <!-- Then, get the user's contact information -->
             <h3 class="center-text">Address and Phone</h3>
@@ -94,41 +95,41 @@
                 <div class="col-md-6">
                     <div class="limit-width">
 
-                        <md-input-container class="form-group">
-                            <input mdInput placeholder="Street Address" name="address" formControlName="address">
-                        </md-input-container>
+                        <mat-input-container class="form-group">
+                            <input matInput placeholder="Street Address" name="address" formControlName="address">
+                        </mat-input-container>
 
                         <div class="row">
 
-                            <md-input-container class="form-group col-md-5">
-                                <input mdInput placeholder="City" name="city" formControlName="city">
-                            </md-input-container>
+                            <mat-input-container class="form-group col-md-5">
+                                <input matInput placeholder="City" name="city" formControlName="city">
+                            </mat-input-container>
 
                             <slick-auto-complete-input [autoCompleteData]="appUserConstants.STATE_LIST" placeholder="State" [selectOnBlur]="true"
                                 [mustMatchAutoComplete]="true" class="col-md-3" [inputControl]="control('addressPhone.state')"></slick-auto-complete-input>
 
-                            <md-input-container id="zip" class="form-group col-md-4">
-                                <input mdInput placeholder="Zip" name="zip" [InputFilter]="appUserConstants.DYNAMIC_ZIP_REGEX" formControlName="zip">
-                                <md-error *ngIf="hasError('addressPhone.zip')">{{ errorMsgFor('addressPhone.zip') }}</md-error>
-                            </md-input-container>
+                            <mat-input-container id="zip" class="form-group col-md-4">
+                                <input matInput placeholder="Zip" name="zip" [InputFilter]="appUserConstants.DYNAMIC_ZIP_REGEX" formControlName="zip">
+                                <mat-error *ngIf="hasError('addressPhone.zip')">{{ errorMsgFor('addressPhone.zip') }}</mat-error>
+                            </mat-input-container>
 
                         </div>
                     </div>
 
                 </div>
 
-                <div class="col-md-6">
-                    <phone required="true" [validate]="validate.get('addressPhone')" formControlName="phone"></phone>
-                </div>
+                <mat-input-container class="form-group col-md-6">
+                    <input matInput placeholder="phone number" [textMask]="{ mask: appUserConstants.PHONE_MASK, placeholderChar: '\u2000' }" formControlName="phone">
+                </mat-input-container>
 
             </div>
 
-            <button md-raised-button color="primary" class="button-md warn-button" type="button" mdStepperPrevious>Back</button>
-            <button md-raised-button color="primary" class="button-md" (click)="validate.set('addressPhone', true)" mdStepperNext>Next</button>
+            <button mat-raised-button color="primary" class="button-md warn-button" type="button" matStepperPrevious>Back</button>
+            <button mat-raised-button color="primary" class="button-md" (click)="validate.set('addressPhone', true)" matStepperNext>Next</button>
 
-        </md-step>
+        </mat-step>
 
-        <md-step [stepControl]="form" [formGroup]="form" label="Availability">
+        <mat-step [stepControl]="form" [formGroup]="form" label="Availability">
 
             <!-- Then, get the user's weekly availability information -->
             <h3 class="center-text">Weekly Availability</h3>
@@ -136,12 +137,12 @@
 
             <slick-weekday-schedule-builder [validate]="validate.get('availability')" formControlName="availability"></slick-weekday-schedule-builder>
 
-            <button md-raised-button color="primary" class="button-md warn-button" type="button" mdStepperPrevious>Back</button>
-            <button md-raised-button color="primary" class="button-md" type="submit" (click)="signupUser(form.value, form.valid)">Submit</button>
+            <button mat-raised-button color="primary" class="button-md warn-button" type="button" matStepperPrevious>Back</button>
+            <button mat-raised-button color="primary" class="button-md" type="submit" (click)="signupUser(form.value, form.valid)">Submit</button>
 
-        </md-step>
+        </mat-step>
 
-    </md-horizontal-stepper>
+    </mat-horizontal-stepper>
 
     <div class="signup-error" *ngIf="signupError != null">{{ signupError }}</div>
 

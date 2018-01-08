@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 
-import { RequestService, Response } from "../../common-util/services/request.service";
+import { RequestService } from "../../common-util/services/request.service";
 import { SessionDataService } from "../../common-util/services/session-data.service";
 
 import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
@@ -21,11 +22,10 @@ export class SignupService {
     public signup(appUserSignupInfo: AppUserInfo, password: string): Observable<FoodWebResponse> {
 
         let body: SignupRequest = new SignupRequest(appUserSignupInfo, password);
-        let observer: Observable<Response> = this.requestService.post('/appUser/signup', body);
+        let observer: Observable<FoodWebResponse> = this.requestService.post('/appUser/signup', body);
         
-        return observer.map((response: Response): FoodWebResponse => {
+        return observer.map((signupResponse: FoodWebResponse): FoodWebResponse => {
             
-            let signupResponse: FoodWebResponse = response.json();
             console.log(signupResponse.message);
 
             // On successful signup, cache the App User's data in global front end session storage.

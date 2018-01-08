@@ -1,14 +1,14 @@
 <form [formGroup]="claimForm" *ngIf="!claimComplete" [slick-progress-spinner]="showProgressSpinner">
     
     <h5>{{ foodListing.unitsInfo.availableUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }} Are available. How many will you claim?</h5>
-    <md-input-container id="units-count" floatPlaceholder="never">
-        <input mdInput formControlName="unitsCount" InputFilter [min]="1" [max]="foodListing.unitsInfo.availableUnitsCount">
-        <span mdSuffix>/ {{ foodListing.unitsInfo.availableUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }}</span>
-    </md-input-container>
+    <mat-input-container id="units-count" floatPlaceholder="never">
+        <input matInput formControlName="unitsCount" InputFilter [min]="1" [max]="foodListing.unitsInfo.availableUnitsCount">
+        <span matSuffix>/ {{ foodListing.unitsInfo.availableUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }}</span>
+    </mat-input-container>
 
     <!-- Footer -->
     <div class="modal-button-group">    
-        <button md-raised-button color="primary" type="submit" class="button-md" (click)="claimSelectedFoodListing()">Confirm Claim</button>
+        <button mat-raised-button color="primary" type="submit" class="button-md" (click)="claimSelectedFoodListing()">Confirm Claim</button>
     </div>
 
 </form>
@@ -24,7 +24,7 @@
     </p>
 
     <div class="modal-button-group">
-        <button md-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>
+        <button mat-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>
     </div>
 
 </ng-container>

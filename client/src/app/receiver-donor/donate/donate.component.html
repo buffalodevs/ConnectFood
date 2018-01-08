@@ -1,20 +1,20 @@
 <div class="container" [slick-progress-spinner]="showProgressSpinner">
 
-    <md-horizontal-stepper #stepper>
+    <mat-horizontal-stepper #stepper>
 
         <!-- Step 1: Donation -->
-        <md-step>
+        <mat-step>
 
             <h1>Donor Form</h1>
             <hr>
 
-            <form class="row" [formGroup]="foodForm" (ngSubmit)="ifValidProceedToReview(foodForm.value, foodForm.valid, stepper)">
+            <form class="row" [formGroup]="form" (ngSubmit)="ifValidProceedToReview(form.value, form.valid, stepper)">
 
                 <div class="col-md-12 col-lg-5 mobile-center">
 
                     <div class="crop-container" [style.max-width.px]="cropperSettings.canvasWidth">
 
-                        <button md-raised-button type="button" color="primary" class="button-md file-upload-button"
+                        <button mat-raised-button type="button" color="primary" class="button-md file-upload-button"
                          [style.width.px]="cropperSettings.canvasWidth" (click)="hiddenFileInput.click()">Upload Image (Optional)</button>
             
                         <!-- This is an invisible file input triggerd by above button -->
@@ -39,11 +39,11 @@
                     <!-- foodTitle -->
                     <div class="form-group">
                         <h4 for="foodTitle">Title</h4>
-                        <md-form-field class="input-group" floatPlaceholder="never">
-                            <textarea #foodTitle mdInput mdTextareaAutosize id="foodTitle" placeholder="Donation Title"
-                                formControlName="foodTitle" [errorStateMatcher]="isInvalid.bind(this)" required [maxlength]="foodTitleMaxLength"></textarea>
-                            <md-hint align="end">{{ foodTitle.value.length }} / {{ foodTitleMaxLength }}</md-hint>
-                        </md-form-field>
+                        <mat-form-field class="input-group" floatPlaceholder="never">
+                            <textarea #foodTitle matInput matTextareaAutosize id="foodTitle" placeholder="Donation Title"
+                                formControlName="foodTitle" [maxlength]="foodTitleMaxLength" required></textarea>
+                            <mat-hint align="end">{{ foodTitle.value.length }} / {{ foodTitleMaxLength }}</mat-hint>
+                        </mat-form-field>
                     </div>
 
                     <div class="row">
@@ -51,22 +51,22 @@
                         <!-- availableUntilDate -->
                         <div class="form-group col-md-6">
                             <h4 for="availableUntilDate">Available Until</h4>
-                            <md-input-container class="input-group" floatPlaceholder="never">
-                                <input #availableUntilDate mdInput id="availableUntilDate" [mdDatepicker]="picker" placeholder="mm/dd/yyyy"
-                                    formControlName="availableUntilDate" [errorStateMatcher]="isInvalid.bind(this)" required>
-                                <md-datepicker-toggle mdSuffix [for]="picker"></md-datepicker-toggle>
-                                <md-datepicker touchUi="true" #picker opened="true"></md-datepicker>
-                            </md-input-container>
+                            <mat-input-container class="input-group" floatPlaceholder="never">
+                                <input #availableUntilDate matInput id="availableUntilDate" [matDatepicker]="picker" placeholder="mm/dd/yyyy"
+                                       formControlName="availableUntilDate" required>
+                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <mat-datepicker touchUi="true" #picker></mat-datepicker>
+                            </mat-input-container>
                         </div>
 
                         <!-- totalWeight -->
                         <div class="form-group col-md-6">
                             <h4 for="totalWeight">Estimated Weight</h4>
-                            <md-input-container floatPlaceholder="never">
-                                <input mdInput id="totalWeight" placeholder="weight (lbs)" formControlName="totalWeight"
-                                 type="number" min="0.5" step="0.5" [errorStateMatcher]="isInvalid.bind(this)" required>
-                                <span mdSuffix>lbs</span>
-                            </md-input-container>
+                            <mat-input-container floatPlaceholder="never">
+                                <input matInput id="totalWeight" placeholder="weight (lbs)" formControlName="totalWeight"
+                                 type="number" min="0.5" step="0.5" required>
+                                <span matSuffix>lbs</span>
+                            </mat-input-container>
                         </div>
 
                     </div>
@@ -79,41 +79,39 @@
 
                     <!-- perishable -->
                     <div class="form-group extra-bottom-margin">
-                        <h4>Perishable</h4>
-                        <md-radio-group #perishable [ngClass]="{'warn-foreground': isInvalid(foodForm.controls.perishable)}" formControlName="perishable" required>
-                            <md-radio-button name="perishable" id="perishable-yes" [value]="true">Yes</md-radio-button>
-                            <md-radio-button name="perishable" [value]="false">No</md-radio-button>
-                        </md-radio-group>
+                        <h4>Needs Refrigeration</h4>
+                        <mat-radio-group #perishable [ngClass]="{'warn-foreground': isInvalid(control('perishable'))}" formControlName="perishable" required>
+                            <mat-radio-button name="perishable" id="perishable-yes" [value]="true">Yes</mat-radio-button>
+                            <mat-radio-button name="perishable" [value]="false">No</mat-radio-button>
+                        </mat-radio-group>
                     </div>
 
                     <!-- foodDescription -->
                     <div class="form-group">
                         <h4 for="foodDescription">Description</h4>
-                        <md-input-container class="input-group" floatPlaceholder="never">
-                            <textarea #foodDescription mdInput mdTextareaAutosize id="foodDescription" placeholder="Donation Description"
-                                formControlName="foodDescription" [errorStateMatcher]="isInvalid.bind(this)"></textarea>
-                        </md-input-container>
+                        <mat-input-container class="input-group" floatPlaceholder="never">
+                            <textarea #foodDescription matInput matTextareaAutosize id="foodDescription" placeholder="Donation Description" formControlName="foodDescription">
+                            </textarea>
+                        </mat-input-container>
                     </div>
 
                     <!-- units -->
-                    <div class="form-group">
+                    <!-- <div class="form-group">
 
                         <ng-container *ngIf="isSplitIntoUnits()">
                             <h4>Donation Units</h4>
                             <div class="row">
 
-                                <!-- availableUnitsCount -->
                                 <div class="col-md-4">
-                                    <md-input-container floatPlaceholder="never">
-                                        <input mdInput placeholder="Units Count" formControlName="availableUnitsCount" type="number" min="1" [errorStateMatcher]="isInvalid.bind(this)" required>
-                                    </md-input-container>
+                                    <mat-input-container floatPlaceholder="never">
+                                        <input matInput placeholder="Units Count" formControlName="availableUnitsCount" type="number" min="1" required>
+                                    </mat-input-container>
                                 </div>
 
-                                <!-- unitsh4 -->
                                 <div class="col-md-8">
-                                    <md-input-container floatPlaceholder="never">
-                                        <input mdInput placeholder="Units Label" formControlName="unitsLabel" [errorStateMatcher]="isInvalid.bind(this)" required>
-                                    </md-input-container>
+                                    <mat-input-container floatPlaceholder="never">
+                                        <input matInput placeholder="Units Label" formControlName="unitsLabel" required>
+                                    </mat-input-container>
                                 </div>
                                 
                             </div>
@@ -123,18 +121,18 @@
                             <a (click)="toggleSplitIntoUnits()">{{ isSplitIntoUnits() ? 'Combine into single unit' : 'Split into multiple units' }}</a>
                         </span>
 
-                    </div>
+                    </div> -->
 
                     <!-- This button does not actually submit data to the server, but rather moves to the confirmation display -->
-                    <button md-raised-button type="submit" color="primary" class="button-md">Next</button>
+                    <button mat-raised-button type="submit" color="primary" class="button-md">Next</button>
 
                 </div>
             </form>
 
-        </md-step>
+        </mat-step>
 
         <!-- Step 2: Donation Review -->
-        <md-step>
+        <mat-step>
 
             <h1>Donation Review</h1>
             <hr>
@@ -152,59 +150,59 @@
 
                     <div class="form-group">
                         <h4>Title</h4>
-                        <div>{{ foodForm.get('foodTitle').value }}</div>
+                        <div>{{ control('foodTitle').value }}</div>
                     </div>
             
                     <div class="row">
                     
                         <div class="form-group col-md-6">
                             <h4>Available Until</h4>
-                            <div>{{ foodForm.get('availableUntilDate').value | dateFormatter }}</div>
+                            <div>{{ control('availableUntilDate').value | dateFormatter }}</div>
                         </div>
 
                         <div class="form-group col-md-6">
                             <h4>Estimated Weight</h4>
-                            <div>{{ foodForm.get('totalWeight').value }} lbs</div>
+                            <div>{{ control('totalWeight').value }} lbs</div>
                         </div>
 
                     </div>
             
                     <div class="form-group food-types-container">
                         <h4>Food Type(s)</h4>
-                        <food-types #foodTypesDisplay [displayOnly]="true" [initiallyChecked]="false" [ngModel]="foodForm.get('foodTypes').value"></food-types>
+                        <food-types #foodTypesDisplay [displayOnly]="true" [initiallyChecked]="false" [ngModel]="control('foodTypes').value"></food-types>
                     </div>
 
                     <div class="form-group">
-                        <h4>Perishable</h4>
-                        <i class="material-icons" *ngIf="foodForm.get('perishable').value" style="color:green">check</i>
-                        <i class="material-icons" *ngIf="!foodForm.get('perishable').value" style="color:red">clear</i>
-                        <span>{{ (foodForm.get('perishable').value === true) ? 'Yes' : 'No' }}</span>
+                        <h4>Needs Refrigeration</h4>
+                        <i class="material-icons" *ngIf="control('perishable').value" style="color:green">check</i>
+                        <i class="material-icons" *ngIf="!control('perishable').value" style="color:red">clear</i>
+                        <span>{{ (control('perishable').value === true) ? 'Yes' : 'No' }}</span>
                     </div>
             
                     <div class="form-group">
                         <h4>Description</h4>
-                        <div *ngIf="!isFormControlEmpty(foodForm.get('foodDescription'))">{{ foodForm.get('foodDescription').value }}</div>
-                        <div *ngIf="isFormControlEmpty(foodForm.get('foodDescription'))">-- None --</div>
+                        <div *ngIf="!isFormControlEmpty(control('foodDescription'))">{{ control('foodDescription').value }}</div>
+                        <div *ngIf="isFormControlEmpty(control('foodDescription'))">-- None --</div>
                     </div>
 
                     <div class="form-group" *ngIf="isSplitIntoUnits()">
                         <h4>Donation Units</h4>
-                        <div>{{ foodForm.get('availableUnitsCount').value }} {{ foodForm.get('unitsLabel').value }}</div>
+                        <div>{{ control('availableUnitsCount').value }} {{ control('unitsLabel').value }}</div>
                     </div>
 
                     <br>
-                    <button md-raised-button color="primary" class="button-md warn-button" type="button" (click)="editDonation(stepper)">Edit Donation</button>
-                    <button md-raised-button color="primary" class="button-md" type="button"
-                        (click)="submitDonation(foodForm.value, foodForm.valid, stepper)" style="margin-left:20px;">Confirm Donation</button>
+                    <button mat-raised-button color="primary" class="button-md warn-button" type="button" (click)="editDonation(stepper)">Edit Donation</button>
+                    <button mat-raised-button color="primary" class="button-md" type="button"
+                        (click)="submitDonation(form.value, form.valid, stepper)" style="margin-left:20px;">Confirm Donation</button>
 
                 </div>
 
             </div>
 
-        </md-step>
+        </mat-step>
 
         <!-- Step 2: Thank-you for Donating -->
-        <md-step>
+        <mat-step>
 
             <h1>Thank-you for Donating</h1>
             <hr>
@@ -222,13 +220,13 @@
                         You can also click <a [routerLink]="['/foodListingCart']" class="link-content">here</a> to view your cart.
                     </p>
 
-                    <button md-raised-button color="primary" class="button-md" type="button" (click)="donateAgain(stepper)">Donate Again</button>
+                    <button mat-raised-button color="primary" class="button-md" type="button" (click)="donateAgain(stepper)">Donate Again</button>
 
                 </div>
  
             </div>
 
-        </md-step>
+        </mat-step>
 
-    </md-horizontal-stepper>
+    </mat-horizontal-stepper>
 </div>

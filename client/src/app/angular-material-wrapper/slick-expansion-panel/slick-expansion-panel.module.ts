@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MdExpansionModule } from '@angular/material';
+import { MatExpansionModule } from '@angular/material';
 
 import { SlickExpansionPanelComponent } from './slick-expansion-panel.component';
 
@@ -11,7 +11,7 @@ import { SlickExpansionPanelComponent } from './slick-expansion-panel.component'
     ],
     imports: [
         CommonModule,
-        MdExpansionModule
+        MatExpansionModule
     ],
     exports: [
         SlickExpansionPanelComponent

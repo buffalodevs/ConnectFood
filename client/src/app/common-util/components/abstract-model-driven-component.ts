@@ -16,7 +16,7 @@ export abstract class AbstractModelDrivenComponent {
          * The validation service for this component.
          */
         protected validationService: ValidationService
-    ) { }
+    ) {}
 
 
     /**
@@ -31,7 +31,7 @@ export abstract class AbstractModelDrivenComponent {
 
     /**
      * Determines if a given control has any error(s).
-     * @param controlPath The path of the control relative to the base signupForm.
+     * @param controlPath The path of the control relative to the base form.
      * @param errorCode An optional error code to check for if a specific error is being examined. Default is null for any error.
      * true if an error(s) exist, false if not.
      */
@@ -46,7 +46,7 @@ export abstract class AbstractModelDrivenComponent {
 
     /**
      * Generates an error message for a given control (assuming the control has an error).
-     * @param controlPath The path of the control relative to the base signupForm.
+     * @param controlPath The path of the control relative to the base form.
      * @return The error message for the given control.
      */
     protected errorMsgFor(controlPath: string): string {

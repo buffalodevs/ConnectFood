@@ -84,6 +84,9 @@ const receiverDonorRoutes: Routes = [
     ],
     providers: [
         ManageFoodListingService
+    ],
+    entryComponents: [
+        FoodListingDialogComponent
     ]
 })
 export class ReceiverDonorModule {}

@@ -1,28 +1,29 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MdButtonModule } from '@angular/material';
+import { MatButtonModule, MatDialogModule } from '@angular/material';
 
 import { CommonUtilModule } from '../../../common-util/common-util.module';
-import { SlickListComponent } from './slick-list.component';
 import { SlickListItemComponent } from './slick-list-item/slick-list-item.component';
-import { SlickListDialogComponent } from './slick-list-dialog/slick-list-dialog.component';
+import { GetListingsService } from './services/get-listings.service';
+import { ConsumableListingCacheService } from './services/consumable-listing-cache.service';
 
 
 @NgModule({
     imports: [
         CommonModule,
-        MdButtonModule,
+        MatButtonModule,
+        MatDialogModule,
         CommonUtilModule
     ],
     declarations: [
-        SlickListComponent,
-        SlickListItemComponent,
-        SlickListDialogComponent
+        SlickListItemComponent
     ],
     exports: [
-        SlickListComponent,
-        SlickListItemComponent,
-        SlickListDialogComponent
+        SlickListItemComponent
+    ],
+    providers: [
+        GetListingsService,
+        ConsumableListingCacheService
     ]
 })
-export class SlickListModule { }
+export class SlickListModule {}

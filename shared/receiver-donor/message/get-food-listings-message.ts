@@ -5,14 +5,14 @@ import { FoodWebResponse } from '../../message-protocol/food-web-response';
 import { FoodListing } from "../food-listing";
 export { FoodListing };
 
-import { SlickListRequest } from '../../../client/src/app/misc-slick-components/slick-filtered-list/slick-list/slick-list-message/slick-list-request';
-import { SlickListResponse } from '../../../client/src/app/misc-slick-components/slick-filtered-list/slick-list/slick-list-message/slick-list-response';
+import { GetListingsRequest } from '../../../client/src/app/misc-slick-components/slick-filtered-list/slick-list/slick-list-message/slick-list-request';
+import { GetListingsResponse } from '../../../client/src/app/misc-slick-components/slick-filtered-list/slick-list/slick-list-message/slick-list-response';
 
 
 /**
  * The expected request for the get food listings operation. Should be sent from the client to the server.
  */
-export class GetFoodListingsRequest extends SlickListRequest <FoodListingsFilters> {
+export class GetFoodListingsRequest extends GetListingsRequest <FoodListingsFilters> {
 
     constructor(
         /**
@@ -28,7 +28,7 @@ export class GetFoodListingsRequest extends SlickListRequest <FoodListingsFilter
 /**
  * The expected response from the get food listings operation. Should be sent form the server to the client.
  */
-export class GetFoodListingsResponse extends SlickListResponse <FoodListing> {
+export class GetFoodListingsResponse extends GetListingsResponse <FoodListing> {
 
     constructor(
         /**

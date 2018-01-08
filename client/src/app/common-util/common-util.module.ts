@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpModule } from '@angular/http';
-import { MdProgressSpinnerModule } from '@angular/material';
+import { HttpClientModule } from '@angular/common/http';
+import { MatProgressSpinnerModule } from '@angular/material';
+import { TextMaskModule } from 'angular2-text-mask';
 
 import { SlickProgressSpinnerComponent } from './components/slick-progress-spinner/slick-progress-spinner.component';
 import { DateFormatterPipe } from './pipes/date-formatter.pipe';
@@ -30,15 +31,17 @@ import { ValidationService } from './services/validation.service';
     ],
     imports: [
         CommonModule,
-        HttpModule,
-        MdProgressSpinnerModule
+        HttpClientModule,
+        MatProgressSpinnerModule,
+        TextMaskModule
     ],
     exports: [
         SlickProgressSpinnerComponent,
         DateFormatterPipe,
         AutoFocusDirective,
         DefaultImgDirective,
-        InputFilterDirective
+        InputFilterDirective,
+        TextMaskModule
     ],
     providers: [
         DateFormatterPipe,

@@ -12,9 +12,9 @@
         <!-- Loop through segments of checkable Food Types based on number of columns -->
         <ng-container *ngFor="let foodTypeInd of foodTypeIndColumn">
 
-            <md-checkbox *ngIf="!displayOnly" [formControlName]="foodTypes[foodTypeInd]" class="checkbox-compress no-select">
+            <mat-checkbox *ngIf="!displayOnly" [formControlName]="foodTypes[foodTypeInd]" class="checkbox-compress no-select">
                 {{ foodTypes[foodTypeInd] }}
-            </md-checkbox>
+            </mat-checkbox>
 
             <!-- In display only mode only display text of Food Listings that have been selected (have associated value of true) -->
             <div *ngIf="displayOnly">

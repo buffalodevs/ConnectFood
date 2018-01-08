@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, Response, RequestOptionsArgs } from '@angular/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 
 import { RecoverPasswordRequest } from '../../../../../shared/app-user/message/password-recovery-message';
 import { FoodWebResponse } from '../../../../../shared/message-protocol/food-web-response';
@@ -9,9 +10,9 @@ import { FoodWebResponse } from '../../../../../shared/message-protocol/food-web
 @Injectable()
 export class PasswordRecoveryService {
 
-    constructor(
-        private http: Http
-    ) { }
+    public constructor (
+        private http: HttpClient
+    ) {}
 
 
     /**
@@ -21,19 +22,17 @@ export class PasswordRecoveryService {
      */
     public recoverPassword(email: string): Observable<FoodWebResponse> {
 
-        const requestOptions: RequestOptionsArgs = {
-            headers: new Headers({
+        const requestOptions = {
+            headers: new HttpHeaders({
                 'Content-Type': 'application/json'
             })
         };
         
-        let observer: Observable<Response> = this.http.post('/appUser/recoverPassword', new RecoverPasswordRequest(email), requestOptions);
+        let observer: Observable<FoodWebResponse> = this.http.post<FoodWebResponse>('/appUser/recoverPassword', new RecoverPasswordRequest(email), requestOptions);
 
-        return observer.map((response: Response): any => {
+        return observer.map((recoverPasswordResponse: FoodWebResponse): any => {
             
-            let recoverPasswordResponse: FoodWebResponse = response.json();
             console.log(recoverPasswordResponse.message);
-
             return recoverPasswordResponse;
         });
     }

@@ -75,6 +75,9 @@ const delivererRoutes: Routes = [
         DeliveryUtilService,
         ScheduleDeliveryService,
         ManageDeliveryService
+    ],
+    entryComponents: [
+        DeliveryListingDialogComponent
     ]
 })
 export class DelivererModule {}

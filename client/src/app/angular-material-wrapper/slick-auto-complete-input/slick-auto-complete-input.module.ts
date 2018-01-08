@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MdInputModule, MdAutocompleteModule } from '@angular/material';
+import { MatInputModule, MatAutocompleteModule } from '@angular/material';
 
 import { CommonUtilModule } from '../../common-util/common-util.module';
 import { SlickAutoCompleteInputComponent } from './slick-auto-complete-input.component';
@@ -15,8 +15,8 @@ import { SlickAutoCompleteInputComponent } from './slick-auto-complete-input.com
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        MdInputModule,
-        MdAutocompleteModule,
+        MatInputModule,
+        MatAutocompleteModule,
         CommonUtilModule
     ],
     exports: [

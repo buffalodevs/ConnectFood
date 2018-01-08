@@ -1,9 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 
 import { DeliveryUtilService } from '../delivery-services/delivery-util.service';
 
 import { Delivery, DeliveryState } from '../../../../../../shared/deliverer/delivery';
+import { SlickListDialogData, SlickListDialog } from '../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 
 /**
@@ -17,39 +19,38 @@ enum DeliveryDialogState {
 }
 
 
+/**
+ * Expected input data for this dialog.
+ * NOTE: Needed because this dialog will be globally generated and opened, and it cannot use traditional Input() slots.
+ */
+export class DeliveryListingDialogData extends SlickListDialogData<Delivery> {
+
+    public constructor (
+        public header: string,
+        public isCart: boolean,
+        selectedListing?: Delivery
+    ) {
+        super(selectedListing);
+    }
+}
+
+
 @Component({
     selector: 'delivery-listing-dialog',
     templateUrl: './delivery-listing-dialog.component.html',
     styleUrls: ['./delivery-listing-dialog.component.css']
 })
-export class DeliveryListingDialogComponent {
-
-    /**
-     * The current delivery listing to display/manipulate.
-     */
-    @Input() private deliveryListing: Delivery;
-    /**
-     * Set to true if the Delivery Listings are for a Delivery Cart. Default is false.
-     */
-    @Input() private isCart: boolean;
-
-    @Output() private removeListing: EventEmitter<void>;
-    @Output() private close: EventEmitter<void>;
+export class DeliveryListingDialogComponent extends SlickListDialog {
 
     private deliveryDialogState: DeliveryDialogState;
 
 
     public constructor (
+        private dialogRef: MatDialogRef<DeliveryListingDialogComponent>,
+        @Inject(MAT_DIALOG_DATA) private dialogData: DeliveryListingDialogData,
         private deliveryUtilService: DeliveryUtilService // Referenced in HTML template
     ) {
-        this.isCart = false;
-        this.removeListing = new EventEmitter<void>();
-        this.close = new EventEmitter<void>();
-        this.refreshDialogState();
-    }
-
-
-    public refreshDialogState(): void {
+        super();
         this.deliveryDialogState = DeliveryDialogState.DeliveryInfo;
     }
 

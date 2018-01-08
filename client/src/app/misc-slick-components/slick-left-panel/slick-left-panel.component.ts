@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, OnChanges, SimpleChanges, Input } from '@angular/core';
 
 
 @Component({
@@ -6,21 +6,81 @@ import { Component, Input } from '@angular/core';
     templateUrl: './slick-left-panel.component.html',
     styleUrls: ['./slick-left-panel.component.css']
 })
-export class SlickLeftPanelComponent {
+export class SlickLeftPanelComponent implements OnChanges {
 
     /**
-     * The title of the toggle button. Will show in the tooltip tab for the button on hover.
+     * The title of the toggle button. Will be displayed as the label for the button.
+     * Also, will be placed as the button tooltip if one is not given.
+     * If left undefined (null), then the button will not be given text, but rather a 3 (horizontal) line tab icon.
      */
     @Input() private buttonTitle: string;
+    /**
+     * Set to true if lowercase letters will be allowed to display for the button title/label.
+     * Otherwise, will default to false, and all letters will be capitalized.
+     */
+    @Input() private buttonTitleAllowLowercase: boolean;
+    /**
+     * The font size of the button title. Ignored if buttonTitle is not provided.
+     * Default is 25px;
+     */
+    @Input() private buttonTitleFontSizePx: number;
+    /**
+     * The tooltip that will be displayed for the button. If buttonTitle is given and this is null, then defaults to buttonTitle.
+     * If neither this or buttonTitle is provided, then defaults to Toggle.
+     */
+    @Input() private buttonTooltip: string;
     /**
      * Determines whether or not a back drop will be used when the panel is toggled to visible in mobile mode. Default is true.
      */
     @Input() private useBackDrop: boolean;
 
 
+    private readonly BASE_BUTTON_HEIGHT_PX: number;
+    private buttonTitleChars: string[];
+    private buttonHeightPx: number;
+
+
     public constructor() {
-        this.buttonTitle = 'toggle';
+        this.buttonTitle = null;
+        this.buttonTitleAllowLowercase = false;
+        this.buttonTitleFontSizePx = 20;
+        this.buttonTooltip = 'Toggle';
         this.useBackDrop = true;
+
+        this.BASE_BUTTON_HEIGHT_PX = 65;
+        this.updateButtonTitleChars(this.buttonTitle);
+    }
+
+
+    public ngOnChanges(changes: SimpleChanges): void {
+
+        if (changes.buttonTitle) {
+            this.updateButtonTitleChars(changes.buttonTitle.currentValue);
+        }
+    }
+
+
+    private updateButtonTitleChars(buttonTitle: string): void {
+
+        this.buttonTitleChars = []; // First refresh.
+
+        // Title is non-empty, so must prepare iterable characters array for template use.
+        if (this.buttonTitle != null) {
+
+            //Prepare iterable list of button title characters to display.
+            for (let i: number = 0; i < this.buttonTitle.length; i++) {
+
+                const titleChar: string = this.buttonTitleAllowLowercase ? this.buttonTitle.charAt(i)
+                                                                         : this.buttonTitle.charAt(i).toUpperCase();
+                this.buttonTitleChars.push(titleChar);
+            }
+
+            this.buttonHeightPx = ( (this.buttonTitleFontSizePx + 2) * this.buttonTitle.length ) + 30;
+        }
+        // Title is empty, so leave iterable button title char array empty.
+        else {
+            this.buttonHeightPx = this.BASE_BUTTON_HEIGHT_PX;
+        }
     }
 
 
@@ -60,6 +120,7 @@ export class SlickLeftPanelComponent {
     private toggleIntoView(slickLeftPanel: HTMLElement, slickLeftPanelButton: HTMLElement, backDrop: HTMLElement): void {
         // The toggle-into-view css class contains the translation.
         slickLeftPanel.classList.add('toggle-into-view');
+        slickLeftPanelButton.classList.add('hide');
         slickLeftPanelButton.classList.remove('green-glow');
         slickLeftPanelButton.style.right = '0px';
         if (this.useBackDrop)   backDrop.classList.add('show-back-drop');
@@ -76,7 +137,8 @@ export class SlickLeftPanelComponent {
     private toggleOutOfView(slickLeftPanel: HTMLElement, slickLeftPanelButton: HTMLElement, backDrop: HTMLElement): void {
         window.onclick = null;
         slickLeftPanel.classList.remove('toggle-into-view');
-        //slickLeftPanelButton.classList.add('green-glow');
+        slickLeftPanelButton.classList.add('green-glow');
+        slickLeftPanelButton.classList.remove('hide');
         backDrop.classList.remove('show-back-drop');
         backDrop.classList.remove('show-transparent-back-drop');
         slickLeftPanelButton.style.right = '-' + slickLeftPanelButton.offsetWidth + 'px';

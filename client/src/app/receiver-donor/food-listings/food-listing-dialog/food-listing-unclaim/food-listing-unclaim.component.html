@@ -3,10 +3,10 @@
     <ng-container *ngIf="foodListing.unitsInfo.myClaimedUnitsCount > 1">
 
         <h5>{{ foodListing.unitsInfo.myClaimedUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }} Are currently claimed. How many will you unclaim?</h5>
-        <md-input-container id="units-count" floatPlaceholder="never">
-            <input mdInput formControlName="unitsCount" InputFilter [min]="1" [max]="foodListing.unitsInfo.myClaimedUnitsCount">
-            <span mdSuffix>/ {{ foodListing.unitsInfo.myClaimedUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }}</span>
-        </md-input-container>
+        <mat-input-container id="units-count" floatPlaceholder="never">
+            <input matInput formControlName="unitsCount" InputFilter [min]="1" [max]="foodListing.unitsInfo.myClaimedUnitsCount">
+            <span matSuffix>/ {{ foodListing.unitsInfo.myClaimedUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }}</span>
+        </mat-input-container>
 
     </ng-container>
 
@@ -16,7 +16,7 @@
 
     <!-- Footer -->
     <div class="modal-button-group">    
-        <button md-raised-button color="primary" type="submit" class="button-md" (click)="unclaimSelectedFoodListing()">Confirm Unclaim</button>
+        <button mat-raised-button color="primary" type="submit" class="button-md" (click)="unclaimSelectedFoodListing()">Confirm Unclaim</button>
     </div>
 
 </form>
@@ -32,7 +32,7 @@
     </p>
 
     <div class="modal-button-group">
-        <button md-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>
+        <button mat-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>
     </div>
 
 </ng-container>

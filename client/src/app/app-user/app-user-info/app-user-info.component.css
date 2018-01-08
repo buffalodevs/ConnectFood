@@ -47,7 +47,7 @@ input:not(.form-control) {
     position: absolute;
 }
 
-.select-infix md-select {
+.select-infix mat-select {
     transform: translateY(-20px);
 }
 
@@ -59,12 +59,12 @@ input {
     font-size: 20px;
 }
 
-md-icon {
+mat-icon {
     cursor: pointer;
     cursor: hand;
 }
 
-:host ::ng-deep md-input-container {
+:host ::ng-deep mat-input-container {
     width: 100%;
 }
 

@@ -22,11 +22,11 @@
     font-size: 14px;
 }
 
-md-input-container {
+mat-input-container {
     max-width: 30px;
 }
 
-md-input-container, :host ::ng-deep input {
+mat-input-container, :host ::ng-deep input {
     text-align: center;
 }
 

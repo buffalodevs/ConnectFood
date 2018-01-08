@@ -1,13 +1,27 @@
-<ng-container *ngIf="deliveryListing != null">
-        
-    <delivery-listing-info [delivery]="deliveryListing" [isCart]="isCart" *ngIf="isDialogState('DeliveryInfo')" (close)="close.emit()"
-     (toSchedule)="toSchedule()" (toCancelReason)="toCancelReason()" (removeListing)="removeListing.emit(false)">
+<div class="modal-header">
+
+    <h5 class="header-text">{{ dialogData.header }}</h5>
+
+    <!-- Close button -->
+    <button type="button" class="modal-close" aria-label="Close" (click)="dialogRef.close()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    
+</div>
+    
+<div class="modal-body">
+
+    <delivery-listing-info *ngIf="isDialogState('DeliveryInfo')"
+        [delivery]="dialogData.selectedListing" [isCart]="dialogData.isCart" (close)="dialogRef.close()"
+        (toSchedule)="toSchedule()" (toCancelReason)="toCancelReason()" (removeListing)="removeSelectedListing.emit()">
     </delivery-listing-info>
 
-    <delivery-listing-schedule [delivery]="deliveryListing" *ngIf="isDialogState('Schedule')" (removeListing)="removeListing.emit(false)" (close)="close.emit()">
+    <delivery-listing-schedule *ngIf="isDialogState('Schedule')"
+        [delivery]="dialogData.selectedListing" (removeListing)="removeSelectedListing.emit()" (close)="dialogRef.close()">
     </delivery-listing-schedule>
 
-    <delivery-listing-cancel [delivery]="deliveryListing" *ngIf="isDialogState('CancelReason')" (removeListing)="removeListing.emit(false)" (close)="close.emit()">
+    <delivery-listing-cancel *ngIf="isDialogState('CancelReason')"
+        [delivery]="dialogData.selectedListing" (removeListing)="removeSelectedListing.emit()" (close)="dialogRef.close()">
     </delivery-listing-cancel>
-    
-</ng-container>
+        
+</div>

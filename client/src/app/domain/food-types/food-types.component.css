@@ -27,12 +27,12 @@
     color: lightgray;
 }
 
-md-checkbox {
+mat-checkbox {
     display: block;
     width: 100%;
 }
 
-::ng-deep md-checkbox.mat-checkbox-layout {
+::ng-deep mat-checkbox.mat-checkbox-layout {
     width: 100%;
     height: 100%;
 }

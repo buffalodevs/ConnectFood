@@ -2,25 +2,25 @@
     <img id="logo" class="navbar-brand" src="./assets/HeaderImg.jpg" [routerLink]="['/home']">
 
     <nav class="navbar navbar-toggleable-sm navbar-inverse bg-inverse no-select">
-        <button md-button class="navbar-toggler" (click)="isExpanded = !isExpanded" [attr.aria-expanded]="!isExpanded" aria-controls="navbarContent">
+        <button mat-button class="navbar-toggler" (click)="isExpanded = !isExpanded" [attr.aria-expanded]="!isExpanded" aria-controls="navbarContent">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" [ngbCollapse]="!isExpanded">
             <ul class="navbar-nav mr-auto">
-                <button md-button class='nav-link' [routerLink]="['/home']"><li class="nav-item">Home</li></button>
-                <button md-button class='nav-link' [routerLink]="['/donate']"><li class="nav-item">Donate</li></button>
-                <button md-button class='nav-link' [routerLink]="['/receive']"><li class="nav-item">Receive</li></button>
-                <button md-button class='nav-link' [routerLink]="['/deliver']"><li class="nav-item">Deliver</li></button>
+                <button mat-button class='nav-link' [routerLink]="['/home']"><li class="nav-item">Home</li></button>
+                <button mat-button class='nav-link' [routerLink]="['/donate']"><li class="nav-item">Donate</li></button>
+                <button mat-button class='nav-link' [routerLink]="['/receive']"><li class="nav-item">Receive</li></button>
+                <button mat-button class='nav-link' [routerLink]="['/deliver']"><li class="nav-item">Deliver</li></button>
             </ul>
 
             <ul class="navbar-nav navbar-right">
-                <button md-button *ngIf="!sessionDataAvailable() && router.url != '/login'" class='nav-link' (click)="showLogin()"><li class="nav-item">Login</li></button>
-                <button md-button *ngIf="!sessionDataAvailable()" class='nav-link' [routerLink]="['/signup']"><li class="nav-item">Signup</li></button>
-                <button md-button *ngIf="sessionDataAvailable()" class='nav-link' [routerLink]="['/deliveryCart']"><li class="nav-item">Delivery Cart</li></button>
-                <button md-button *ngIf="sessionDataAvailable()" class='nav-link' [routerLink]="['/foodListingCart']"><li class="nav-item">Food Cart</li></button>
-                <button md-button *ngIf="sessionDataAvailable()" class='nav-link' [routerLink]="['/appUserInfo']"><li class="nav-item">Account</li></button>
-                <button md-button *ngIf="sessionDataAvailable()" class='nav-link' (click)="logout()"><li class="nav-item">Logout</li></button>
+                <button mat-button *ngIf="!sessionDataAvailable() && router.url != '/login'" class='nav-link' (click)="showLogin()"><li class="nav-item">Login</li></button>
+                <button mat-button *ngIf="!sessionDataAvailable()" class='nav-link' [routerLink]="['/signup']"><li class="nav-item">Signup</li></button>
+                <button mat-button *ngIf="sessionDataAvailable()" class='nav-link' [routerLink]="['/deliveryCart']"><li class="nav-item">Delivery Cart</li></button>
+                <button mat-button *ngIf="sessionDataAvailable()" class='nav-link' [routerLink]="['/foodListingCart']"><li class="nav-item">Food Cart</li></button>
+                <button mat-button *ngIf="sessionDataAvailable()" class='nav-link' [routerLink]="['/appUserInfo']"><li class="nav-item">Account</li></button>
+                <button mat-button *ngIf="sessionDataAvailable()" class='nav-link' (click)="logout()"><li class="nav-item">Logout</li></button>
             </ul>
         </div>
     </nav>

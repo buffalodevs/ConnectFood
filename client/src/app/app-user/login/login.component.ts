@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { DialogComponent, DialogService } from "ng2-bootstrap-modal";
+import { Component, OnInit, Optional } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from "rxjs/Observable";
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog, MatDialogRef, MatDialogConfig } from '@angular/material';
+import { Observable } from "rxjs/Observable";
+import 'rxjs/add/operator/finally';
 
 import { LoginService } from './login.service';
 import { PasswordRecoveryService } from './password-recovery.service';
@@ -11,12 +12,12 @@ import { FoodWebResponse } from '../../../../../shared/message-protocol/food-web
 
 
 @Component({
-    selector: 'app-login',
+    selector: 'login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css'],
     providers: [LoginService, PasswordRecoveryService]
 })
-export class LoginComponent extends DialogComponent<null, boolean> implements OnInit {
+export class LoginComponent implements OnInit {
 
     private forgotPassword: boolean;
     private displayRecoveryResponseMessage: boolean;
@@ -26,15 +27,13 @@ export class LoginComponent extends DialogComponent<null, boolean> implements On
     private showProgressSpinner: boolean;
 
 
-    public constructor(
-        public dialogService: DialogService,
+    public constructor (
         private router: Router,
         private formBuilder: FormBuilder,
         private loginService: LoginService,
-        private passwordRecoveryService: PasswordRecoveryService
+        private passwordRecoveryService: PasswordRecoveryService,
+        @Optional() private dialogRef?: MatDialogRef <LoginComponent>
     ) {
-        super(dialogService);
-
         this.forgotPassword = false;
         this.displayRecoveryResponseMessage = false;
         this.showCloseButton = false;
@@ -55,21 +54,19 @@ export class LoginComponent extends DialogComponent<null, boolean> implements On
 
     /**
      * Displays the login dialog.
-     * @param dialogService The dialog service used to display the dialog popup and associated back-drop.
-     * @return An observable that will return a meaningless boolean. The observable resolves when the dialog closes.
+     * @param globalDialogService The global dialog service used to display the dialog popup and associated back-drop.
+     * @return A promise that is resolved when a modal is closed and rejected when a modal is dismissed.
      */
-    public static display(dialogService: DialogService): Observable<boolean> {
+    public static display(dialog: MatDialog): Observable <any> {
 
-        return dialogService.addDialog (
-            LoginComponent,
-            // Dialog Initalization Data
-            null,
-            // DialogOptions
-            {
-                closeByClickingOutside: true,
-                backdropColor: '#444',
-            }
-        );
+        let dialogConfig: MatDialogConfig = new MatDialogConfig();
+        dialogConfig.maxWidth = 400;
+        dialogConfig.hasBackdrop = true;
+        dialogConfig.backdropClass = 'login-dialog-backdrop';
+        dialogConfig.panelClass = 'login-dialog';
+        dialogConfig.autoFocus = false;
+
+        return dialog.open(LoginComponent, dialogConfig).afterClosed();
     }
 
 
@@ -95,10 +92,10 @@ export class LoginComponent extends DialogComponent<null, boolean> implements On
                             
                             this.loginError = null;
                             this.forgotPassword ? this.displayRecoveryResponseMessage = true
-                                                : this.close();
+                                                : (this.dialogRef != null) ? this.dialogRef.close() : undefined;
 
-                            // If we are on login page or the signup page, then navigate to home on successful sign in.
-                            if (this.router.url === '/login' || this.router.url === '/signup') {
+                            // If we are on login, login required, or signup page, then navigate to home on successful sign in.
+                            if (this.router.url === '/login' || this.router.url === '/signup' || this.router.url === '/loginRequired') {
                                 this.router.navigate(['/home']);
                             }
                         }
@@ -110,8 +107,6 @@ export class LoginComponent extends DialogComponent<null, boolean> implements On
                         console.log(err); // Shouldn't happen!
                     }
                 );
-
-        // TODO: We should put some loading symbol in login popup here!!!
     }
 
 

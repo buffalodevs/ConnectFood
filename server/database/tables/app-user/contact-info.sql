@@ -14,7 +14,7 @@ ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS state              CHAR(2)     
 ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS zip                INTEGER         NOT NULL;
 ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS gpsCoordinate      GEOGRAPHY       NOT NULL;
 
-ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS phone              CHAR(12)        NOT NULL;
+ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS phone              CHAR(14)        NOT NULL;
 
 
 -- Index for quick street address lookup.

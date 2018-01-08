@@ -1,4 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { StringManipulation } from '../../../../../../shared/common-util/string-manipulation';
 
 
 @Component({
@@ -8,10 +9,12 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 })
 export class SlickProgressSpinnerComponent implements OnChanges {
 
-    // For follwing, see Angular Material's MdSpinner component documentation!
+    // For follwing, see Angular Material's MatSpinner component documentation!
     @Input() private color: string;
     @Input() private mode: string;
     @Input() private value: number;
+    @Input() private maxWidth: number | string;
+    @Input() private maxHeight: number | string
 
     /**
      * Default is 0 ms. The delay time before the progress spinner is displayed.
@@ -45,6 +48,8 @@ export class SlickProgressSpinnerComponent implements OnChanges {
 
         this.color = 'accent';
         this.mode = 'indeterminate';
+        this.maxWidth = '100%';
+        this.maxHeight = '100%';
 
         this.delayMs = 0;
         this.minDurationMs = 0;
@@ -57,7 +62,22 @@ export class SlickProgressSpinnerComponent implements OnChanges {
 
 
     public ngOnChanges(changes: SimpleChanges): void {
+
+        // Ensure width is converted to style string if it is a number.
+        if (changes.maxWidth && this.maxWidth != null) {
+
+            this.maxWidth = StringManipulation.isString(this.maxWidth) ? this.maxWidth
+                                                                       : this.maxWidth + 'px';
+        }
+
+        // Ensure height is converted to style string if it is a number.
+        if (changes.maxHeight && this.maxHeight != null) {
+
+            this.maxHeight = StringManipulation.isString(this.maxHeight) ? this.maxHeight
+                                                                         : this.maxHeight + 'px';
+        }
         
+        // Whenever the triggerShowSpinner flag changes, we must set timeout for spinner display change.
         if (changes.triggerShowSpinner) {
 
             // If change is to null/undefined, then set to false.

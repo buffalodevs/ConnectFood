@@ -1,5 +1,5 @@
 import { Component, Input, ViewChild } from '@angular/core';
-import { MdExpansionPanel } from '@angular/material';
+import { MatExpansionPanel } from '@angular/material';
 
 import { ResponsiveService } from '../../common-util/services/responsive.service';
 
@@ -15,6 +15,8 @@ export class SlickExpansionPanelComponent {
     @Input() private collapseWidth: number;
     @Input() private minHeightStyle: string;
 
+    @ViewChild('panel') private panel: MatExpansionPanel;
+
 
     public constructor (
         private responsiveService: ResponsiveService
@@ -22,6 +24,11 @@ export class SlickExpansionPanelComponent {
         this.expanded = true;
         this.collapseWidth = 767;
         this.minHeightStyle = '100%';
+    }
+
+
+    public ngOnInit(): void {
+        this.expanded = this.initExpanded();
     }
 
 
@@ -51,7 +58,7 @@ export class SlickExpansionPanelComponent {
      * @param panel The expansion panel component.
      * @return The minimum height (style) for the expansion panel.
      */
-    private getMinHeight(panel: MdExpansionPanel): string {
+    private getMinHeight(panel: MatExpansionPanel): string {
         return (panel.expanded) ? this.minHeightStyle
                                 : null;
     }

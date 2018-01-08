@@ -8,7 +8,7 @@
         
                 <slick-expansion-panel class="col-md-12" *ngFor="let weekday of weekdaySplit" [formArrayName]="weekday">
                             
-                    <ng-container md-panel-title>{{ weekday }}</ng-container>
+                    <ng-container mat-panel-title>{{ weekday }}</ng-container>
 
                     <div *ngFor="let timeRange of control(weekday).controls; let i = index"
                      class="time-range-container" [ngClass]="{  'display-time-range-container': displayOnly,

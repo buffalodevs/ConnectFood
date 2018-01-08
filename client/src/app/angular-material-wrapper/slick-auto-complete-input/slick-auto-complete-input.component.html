@@ -1,13 +1,13 @@
-<md-input-container [floatPlaceholder]="floatPlaceholder" [id]="containerId" [ngClass]="containerClass">
+<mat-input-container [floatPlaceholder]="floatPlaceholder" [id]="containerId" [ngClass]="containerClass">
     
-    <input mdInput #inputField [type]="type" [placeholder]="placeholder" [id]="inputId" [ngClass]="inputClass"
-        [mdAutocomplete]="autoComplete" [formControl]="inputControl" (blur)="handleBlur()" [maxlength]="maxlength"
+    <input matInput #inputField [type]="type" [placeholder]="placeholder" [id]="inputId" [ngClass]="inputClass"
+        [matAutocomplete]="autoComplete" [formControl]="inputControl" (blur)="handleBlur()" [maxlength]="maxlength"
         [max]="max" [min]="min" [InputFilter]="inputFilter" [caseSensitive]="caseSensitiveMatch">
 
-    <md-autocomplete #autoComplete="mdAutocomplete" [id]="autoCompleteId" [ngClass]="autoCompleteClass" [hidden]="filtAutoCompleteData == null">
-        <md-option *ngFor="let data of filtAutoCompleteData" [value]="data">
+    <mat-autocomplete #autoComplete="matAutocomplete" [id]="autoCompleteId" [ngClass]="autoCompleteClass" [hidden]="filtAutoCompleteData == null">
+        <mat-option *ngFor="let data of filtAutoCompleteData" [value]="data">
             {{ data }}
-        </md-option>
-    </md-autocomplete>
+        </mat-option>
+    </mat-autocomplete>
 
-</md-input-container>
+</mat-input-container>

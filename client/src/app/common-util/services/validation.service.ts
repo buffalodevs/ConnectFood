@@ -1,4 +1,6 @@
+import { Pipe } from '@angular/core';
 import { AbstractControl, ValidatorFn, FormGroup, FormArray, FormControl, ValidationErrors } from '@angular/forms';
+import createAutoCorrectedDatePipe from 'text-mask-addons/dist/createAutoCorrectedDatePipe';
 
 import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
 import { Validation } from '../../../../../shared/common-util/validation';
@@ -6,9 +8,23 @@ import { Validation } from '../../../../../shared/common-util/validation';
 export { Validation };
 
 
-export class ValidationService {
+export class ValidationService extends Validation {
 
-    public constructor() {}
+    /**
+     * Configuration for a date text-mask (with auto correct functionality).
+     */
+    private readonly DATE_MASK_CONFIG: { mask: Array <string | RegExp>, keepCharPositions: boolean, pipe: Pipe };
+
+
+    public constructor() {
+        super();
+
+        this.DATE_MASK_CONFIG = {
+            mask: [ /\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/ ],
+            keepCharPositions: true,
+            pipe: createAutoCorrectedDatePipe('mm/dd/yyyy')
+        };
+    }
 
 
     /**
@@ -84,6 +100,24 @@ export class ValidationService {
 
 
     /**
+     * Removes all errors from a given form group (including all of its children).
+     * @param formGroup The form group to remove all errors from.
+     */
+    public removeAllFormErrors(formGroup: FormGroup): void {
+
+        for (let control in formGroup.controls) {
+
+            formGroup.controls[control].setErrors(null);
+
+            // If control is a form group (not a simple form control).
+            if (!(formGroup.controls[control] instanceof FormControl)) {
+                this.removeAllFormErrors(<FormGroup>formGroup.controls[control]);
+            }
+        }
+    }
+
+
+    /**
      * Internally modifies a given control by removing a given set of errors.
      * @param control The control from which to remove the given errors (WILL BE INTERNALLY MODIFIED).
      * @param removeErrs A list of the labels of errors to remove.
@@ -93,11 +127,11 @@ export class ValidationService {
         let curErrs: any = control.errors;
 
         if (curErrs != null && (removeErrs.length > 1 || curErrs[removeErrs[0]] != null)) {
-            let newErrs = {};
-            ObjectManipulation.shallowCopy(curErrs, newErrs, removeErrs, false);
-            newErrs = ObjectManipulation.isEmpty(newErrs) ? null
-                                                            : newErrs;
-            control.setErrors(newErrs);
+            let keepErrs = {};
+            ObjectManipulation.shallowCopy(curErrs, keepErrs, removeErrs, false);
+            keepErrs = ObjectManipulation.isEmpty(keepErrs) ? null
+                                                            : keepErrs;
+            control.setErrors(keepErrs);
         }
     }
 

@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
+import { MatDialog } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
-import { DialogService } from "ng2-bootstrap-modal";
+import 'rxjs/add/operator/map';
 
-import { RequestService, Response } from './request.service';
+import { RequestService } from './request.service';
 import { SessionDataService } from './session-data.service';
 import { LoginComponent } from '../../app-user/login/login.component'
 
@@ -27,8 +28,8 @@ export class RoutePreprocessService implements CanActivate {
     public constructor (
         private requestService: RequestService,
         private router: Router,
-        private dialogService: DialogService,
-        private authSessionService: SessionDataService
+        private authSessionService: SessionDataService,
+        private dialog: MatDialog
     ) { }
 
 
@@ -42,24 +43,23 @@ export class RoutePreprocessService implements CanActivate {
     public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
 
         // Check with server to check if we are logged in!
-        let observer: Observable<Response> = this.requestService.get('/appUser/reAuthenticate')
+        let observer: Observable<LoginResponse> = this.requestService.get('/appUser/reAuthenticate')
 
         // Finally, check the response from the server and react appropriately.
-        return observer.map((response: Response): boolean => {
+        return observer.map((reAuthenticateResponse: LoginResponse): boolean => {
 
-            let reAuthenticateResponse: LoginResponse = response.json();
-            console.log(reAuthenticateResponse.message);
+                console.log(reAuthenticateResponse.message);
 
-            // Make sure we update the session info we are holding.
-            this.authSessionService.updateAppUserSessionData(reAuthenticateResponse.appUserInfo);
+                // Make sure we update the session info we are holding.
+                this.authSessionService.updateAppUserSessionData(reAuthenticateResponse.appUserInfo);
 
-            // If not authenticated, and we are visiting a route that requires us to be logged in, then redirect to login.
-            if (!reAuthenticateResponse.success && RoutePreprocessService.LOGIN_RESTRICTED_ROUTES.indexOf(state.url) >= 0) {
-                this.attemptLoginAndRedirect(state.url);
-                return false;
-            }
+                // If not authenticated, and we are visiting a route that requires us to be logged in, then redirect to login.
+                if (!reAuthenticateResponse.success && RoutePreprocessService.LOGIN_RESTRICTED_ROUTES.indexOf(state.url) >= 0) {
+                    this.attemptLoginAndRedirect(state.url);
+                    return false;
+                }
 
-            return true;
+                return true;
         });
     }
 
@@ -71,10 +71,10 @@ export class RoutePreprocessService implements CanActivate {
     private attemptLoginAndRedirect(toUrl: string): void {
 
         // Generate the login dialog.
-        let dialogObserver: Observable<boolean> = LoginComponent.display(this.dialogService);
+        let dialogObservable: Observable<any> = LoginComponent.display(this.dialog);
 
         // Observe what the dialog result is.
-        dialogObserver.subscribe(() => {
+        dialogObservable.subscribe(() => {
             
             // After done with login dialog, if we are logged in, then we can redirect to original intended link!
             if (this.authSessionService.sessionDataAvailable()) {

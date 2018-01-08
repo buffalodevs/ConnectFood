@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MdCheckboxModule } from '@angular/material';
+import { MatCheckboxModule } from '@angular/material';
 
 import { FoodTypesComponent } from './food-types/food-types.component';
 import { FoodTypesService } from './food-types/food-types.service';
@@ -18,7 +18,7 @@ import { GetDomainValuesService } from './get-domain-values.service';
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        MdCheckboxModule
+        MatCheckboxModule
     ],
     exports: [
         FoodTypesComponent

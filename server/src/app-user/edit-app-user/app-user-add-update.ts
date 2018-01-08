@@ -26,7 +26,8 @@ export function addOrUpdateAppUser(appUserInfo: AppUserInfo, password?: string, 
     let isUpdate: boolean = appUserUpdateKey != null;
 
     // First validate given App User signup info.
-    let validationErr: Error = Validation.validateAppUserInfo(appUserInfo, password);
+    let validation: Validation = new Validation();
+    let validationErr: Error = validation.validateAppUserInfo(appUserInfo, password);
     if (validationErr != null)  throw validationErr;
 
     // Determine if we must hash a password. If it is a signup then we must have a password to hash,

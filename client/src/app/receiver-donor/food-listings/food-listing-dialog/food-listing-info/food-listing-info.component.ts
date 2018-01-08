@@ -9,11 +9,7 @@ import { FoodListing } from './../../../../../../../shared/receiver-donor/food-l
 @Component({
     selector: 'food-listing-info',
     templateUrl: './food-listing-info.component.html',
-    styleUrls: [
-        './food-listing-info.component.css',
-        '../../food-listings.component.css',
-        '../../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
-    ]
+    styleUrls: ['./food-listing-info.component.css', '../../food-listings.component.css']
 })
 export class FoodListingInfoComponent {
 

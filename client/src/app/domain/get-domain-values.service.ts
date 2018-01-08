@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs/Observable";
+import 'rxjs/add/operator/map';
 
-import { RequestService, Response } from "../common-util/services/request.service";
+import { RequestService } from "../common-util/services/request.service";
 
 import { GetDomainValuesResponse, GetDomainValuesRequest } from '../../../../shared/domain/get-domain-values-message';
 
@@ -36,28 +37,22 @@ export class GetDomainValuesService {
         }
         
         // Else we do not have cached Domain Values, or we should not use the cache, then we will contact the server.
-        let observer: Observable<Response> = this.requestService.post('/domain/getDomainValues', new GetDomainValuesRequest(domainName));
+        let observer: Observable<GetDomainValuesResponse> = this.requestService.post('/domain/getDomainValues', new GetDomainValuesRequest(domainName));
         
-        return observer.map((response: Response) => {
-            return this.extractDomainsFromResponse(response, domainName);
-        })
-        .catch((err: any, caught: Observable<string[]>) => {
-            console.log(err);
-            // TODO: Replace with error.
-            return Observable.of(['Option 1', 'Option 2', 'Option 3']); // For testing, simply return dummy results if the server cannot be reached.
+        return observer.map((getDomainValuesResponse: GetDomainValuesResponse) => {
+            return this.extractDomainsFromResponse(getDomainValuesResponse, domainName);
         });
     }
 
 
     /**
      * Extracts the domain values from the server response message.
-     * @param response The response message.
+     * @param getDomainValuesResponse The response message.
      * @param domainName The name of the domain that the values belong to.
      * @return A list of the extracted domain values.
      */
-    private extractDomainsFromResponse(response: Response, domainName: string): string[] {
+    private extractDomainsFromResponse(getDomainValuesResponse: GetDomainValuesResponse, domainName: string): string[] {
 
-        let getDomainValuesResponse: GetDomainValuesResponse = response.json();
         console.log(getDomainValuesResponse.message);
 
         if (getDomainValuesResponse.success) {

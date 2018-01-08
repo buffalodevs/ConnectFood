@@ -1,4 +1,4 @@
-md-input-container, input {
+mat-input-container, input {
     cursor: pointer;
     cursor: hand;
 }
@@ -7,10 +7,10 @@ md-input-container, input {
     border: none;
 }
 
-md-input-container, input, md-datepicker-toggle {
+mat-input-container, input, mat-datepicker-toggle {
     font-size: 18px;
 }
 
-md-input-container {
+mat-input-container {
     margin-bottom: 5px;
 }

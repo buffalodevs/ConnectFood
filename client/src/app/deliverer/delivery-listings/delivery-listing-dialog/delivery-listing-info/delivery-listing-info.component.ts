@@ -1,5 +1,6 @@
 import { Component, OnChanges, Input, ViewChild, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/finally';
 
 import { ScheduleDeliveryService } from '../../delivery-services/schedule-delivery.service';
 import { SessionDataService } from '../../../../common-util/services/session-data.service';
@@ -12,11 +13,7 @@ import { DateFormatter } from '../../../../../../../shared/common-util/date-form
 @Component({
     selector: 'delivery-listing-info',
     templateUrl: './delivery-listing-info.component.html',
-    styleUrls: [
-        './delivery-listing-info.component.css',
-        './../../delivery-listings.component.css',
-        './../../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
-    ]
+    styleUrls: ['./delivery-listing-info.component.css', './../../delivery-listings.component.css']
 })
 export class DeliveryListingInfoComponent implements OnChanges {
     

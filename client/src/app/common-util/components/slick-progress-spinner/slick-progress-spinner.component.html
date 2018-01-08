@@ -1,7 +1,7 @@
 <div class="progress-spinner-container" *ngIf="showSpinner">
 
     <div class="progress-spinner-backdrop" [style.opacity]="showBackdrop ? 0.5 : 0"></div>
-    <md-progress-spinner [color]="color" [mode]="mode" [value]="value"></md-progress-spinner>
+    <mat-progress-spinner [color]="color" [mode]="mode" [value]="value" [style.max-width]="maxWidth" [style.max-height]="maxHeight"></mat-progress-spinner>
 
 </div>
 

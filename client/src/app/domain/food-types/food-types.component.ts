@@ -120,7 +120,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
         }
         
         // If display column constraints change, then regenerate columns.
-        if (changes.maxNumColumns || changes.maxElementsPerColumn) {
+        if (changes.maxNumColumns || changes.maxElementsPerColumn || changes.condensedDisplay) {
             this.generateColumns();
         }
     }

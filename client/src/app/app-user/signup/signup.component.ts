@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/finally';
 
 import { AppUserTypesService } from '../../domain/app-user-types/app-user-types.service';
 import { SignupService } from './signup.service'
@@ -32,7 +33,7 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
     /**
      * Marks whether or not valiation should fire for a specific part of the form.
      */
-    private validate: Map<string, boolean>;
+    private validate: Map <string, boolean>;
     /**
      * Used to keep track of submission of signup so we can show progress spinner.
      */
@@ -52,7 +53,7 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
         this.signupComplete = false;
         this.adminPreStr = '';
         this.appUserTypesService.getAppUserTypes().subscribe((appUserTypes: string[]) => { this.appUserTypes = appUserTypes });
-        this.validate = new Map<string, boolean>();
+        this.validate = new Map <string, boolean>();
         this.showProgressSpinner = false;
     }
 
@@ -67,21 +68,21 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
 
             'primary': this.formBuilder.group({
                 'appUserType':      [null, Validators.required],
-                'email':            [null, [Validators.required, Validators.pattern(Validation.EMAIL_REGEX)]],
+                'email':            [null, [Validators.required, Validators.pattern(this.signupValidationService.EMAIL_REGEX)]],
                 'organizationName': [null, Validators.required],
-                'taxId':            [null, [Validators.required, Validators.pattern(Validation.TAX_ID_REGEX)]],
+                'taxId':            [null, [Validators.required, Validators.pattern(this.signupValidationService.TAX_ID_REGEX)]],
                 'firstName':        [null, Validators.required],
                 'lastName':         [null, Validators.required],
-                'password':         [null, [Validators.required, Validators.pattern(Validation.PASSWORD_REGEX)]],
-                'confirmPassword':  [null, [Validators.required, Validators.pattern(Validation.PASSWORD_REGEX)]]
+                'password':         [null, [Validators.required, Validators.pattern(this.signupValidationService.PASSWORD_REGEX)]],
+                'confirmPassword':  [null, [Validators.required, Validators.pattern(this.signupValidationService.PASSWORD_REGEX)]]
             }, { validator: this.signupValidationService.confirmPasswordEqual() }),
 
             'addressPhone': this.formBuilder.group({
                 'address':          [null, Validators.required],
                 'city':             [null, Validators.required],
                 'state':            [null, [Validators.required, Validators.minLength(2), Validators.maxLength(2)]],
-                'zip':              [null, [Validators.required, Validators.pattern(Validation.ZIP_REGEX)]],
-                'phone':            [null, [Validators.required, Validators.pattern(Validation.PHONE_REGEX)]]
+                'zip':              [null, [Validators.required, Validators.pattern(this.signupValidationService.ZIP_REGEX)]],
+                'phone':            [null, [Validators.required, Validators.pattern(this.signupValidationService.PHONE_REGEX)]]
             }),
 
             'availability': [null, Validators.required]

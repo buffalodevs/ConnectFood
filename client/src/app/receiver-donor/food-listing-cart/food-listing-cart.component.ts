@@ -45,4 +45,24 @@ export class FoodListingCartComponent {
         return (filters.listingsStatus === LISTINGS_STATUS.myClaimedListings ? 'Claimed Food'
                                                                              : 'Donated Food');
     }
+
+
+    /**
+     * Determines if the cart type is claimed cart.
+     * @param filters The filters value to determine the cart type from.
+     * @return true if claimed cart, false if not.
+     */
+    private isClaimedCart(filters: FoodListingsFilters): boolean {
+        return ( filters.listingsStatus === LISTINGS_STATUS.myClaimedListings );
+    }
+
+
+    /**
+     * Determines if the cart type is donated cart.
+     * @param filters The filters value to determine the cart type from.
+     * @return true if donated cart, false if not.
+     */
+    private isDonatedCart(filters: FoodListingsFilters): boolean {
+        return ( filters.listingsStatus === LISTINGS_STATUS.myDonatedListings );
+    }
 }

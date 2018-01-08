@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, Response, RequestOptionsArgs } from '@angular/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 
 import { SessionDataService } from '../../common-util/services/session-data.service';
 
@@ -11,10 +12,10 @@ import { FoodWebResponse } from '../../../../../shared/message-protocol/food-web
 @Injectable()
 export class LoginService {
 
-    constructor(
-        private http: Http,
+    public constructor (
+        private http: HttpClient,
         private sessionDataService: SessionDataService
-    ) { }
+    ) {}
 
 
     /**
@@ -26,18 +27,17 @@ export class LoginService {
      */
     public login(email: string, password: string): Observable<FoodWebResponse> {
 
-        const requestOptions: RequestOptionsArgs = {
-            headers: new Headers({
+        const requestOptions = {
+            headers: new HttpHeaders({
                 'Content-Type': 'application/json'
             })
         };
 
         // NOTE: Should user raw http request here instead of RequestService wrapper since RequestService depends on this LoginService (prevent circular dependency)!
-        let observer: Observable<Response> = this.http.post('/appUser/login', new LoginRequest(email, password), requestOptions);
+        const observer: Observable<LoginResponse> = this.http.post<LoginResponse>('/appUser/login', new LoginRequest(email, password), requestOptions);
 
-        return observer.map((response: Response): any /* AppUserInfo */ => {
+        return observer.map((loginResponse: LoginResponse): any /* AppUserInfo */ => {
 
-            let loginResponse: LoginResponse = response.json();
             console.log(loginResponse.message);
 
             if (loginResponse.success) {

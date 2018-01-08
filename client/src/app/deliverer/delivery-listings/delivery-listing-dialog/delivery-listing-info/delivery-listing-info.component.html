@@ -17,7 +17,7 @@
             
             <slick-expansion-panel class="col-lg-6 col-md-12 desktop-space-bottom">
                         
-                <ng-container md-panel-title>Donor Contact</ng-container>
+                <ng-container mat-panel-title>Donor Contact</ng-container>
                 
                 <span class="inline-block">{{ delivery.donorInfo.organizationName }}</span><br>
                 <span>{{ delivery.donorInfo.address }}</span><br>
@@ -30,7 +30,7 @@
             
             <slick-expansion-panel class="col-lg-6 col-md-12 desktop-space-bottom">
                         
-                <ng-container md-panel-title>Receiver Contact</ng-container>
+                <ng-container mat-panel-title>Receiver Contact</ng-container>
 
                 <span class="inline-block">{{ delivery.receiverInfo.organizationName }}</span><br>
                 <span>{{ delivery.receiverInfo.address }}</span><br>
@@ -43,7 +43,7 @@
 
             <slick-expansion-panel class="col-lg-12">
 
-                <ng-container md-panel-title>Delivery Info</ng-container>
+                <ng-container mat-panel-title>Delivery Info</ng-container>
 
                 <div>
                     <b>Total Driving Distance:</b>
@@ -83,11 +83,11 @@
     <!-- Footer Buttons -->
     <div class="modal-button-group">
         
-        <button md-raised-button color="primary" class="button-md" (click)="toSchedule.emit()" *ngIf="!isCart">Schedule Delivery</button>
-        <button md-raised-button color="primary" class="button-md" (click)="startDelivery()" *ngIf="showMappings.get('startButton')">Start Delivery</button>
-        <button md-raised-button color="primary" class="button-md" (click)="markPickedUp()" *ngIf="showMappings.get('markPickedUpButton')">Mark Picked Up</button>
-        <button md-raised-button color="primary" class="button-md" (click)="markDroppedOff()" *ngIf="showMappings.get('markDroppedOffButton')">Mark Dropped Off</button>
-        <button md-raised-button color="primary" class="button-md warn-button" (click)="toCancelReason.emit()" *ngIf="showMappings.get('cancelButton')">Cancel Delivery</button>
+        <button mat-raised-button color="primary" class="button-md" (click)="toSchedule.emit()" *ngIf="!isCart">Schedule Delivery</button>
+        <button mat-raised-button color="primary" class="button-md" (click)="startDelivery()" *ngIf="showMappings.get('startButton')">Start Delivery</button>
+        <button mat-raised-button color="primary" class="button-md" (click)="markPickedUp()" *ngIf="showMappings.get('markPickedUpButton')">Mark Picked Up</button>
+        <button mat-raised-button color="primary" class="button-md" (click)="markDroppedOff()" *ngIf="showMappings.get('markDroppedOffButton')">Mark Dropped Off</button>
+        <button mat-raised-button color="primary" class="button-md warn-button" (click)="toCancelReason.emit()" *ngIf="showMappings.get('cancelButton')">Cancel Delivery</button>
 
     </div>
 
@@ -104,7 +104,7 @@
     </p>
 
     <div class="modal-button-group">
-        <button md-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>
+        <button mat-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>
     </div>
 
 </ng-container>
@@ -116,7 +116,7 @@
     <p>Both the Donor and Receiver will automatically be notified concerning the delivery status change.</p>
 
     <div class="modal-button-group">
-        <button md-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>
+        <button mat-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>
     </div>
 
 </ng-container>

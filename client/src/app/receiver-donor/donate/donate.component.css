@@ -18,11 +18,11 @@ img {
     max-width: 400px;
 }
 
-md-form-field, md-input-container {
+mat-form-field, mat-input-container {
     width: 100%;
 }
 
-.inline-error, md-form-field, md-input-container {
+.inline-error, mat-form-field, mat-input-container {
     font-size: 20px;
 }
 

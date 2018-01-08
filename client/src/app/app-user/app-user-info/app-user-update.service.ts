@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 
-import { RequestService, Response } from '../../common-util/services/request.service';
+import { RequestService } from '../../common-util/services/request.service';
 import { SessionDataService } from '../../common-util/services/session-data.service';
 
 import { UpdateAppUserRequest, UpdateAppUserResponse } from '../../../../../shared/app-user/message/update-app-user-message';
@@ -27,11 +28,10 @@ export class AppUserUpdateService {
     public updateAppUserInfo(appUserInfoUpdate: AppUserInfo, newPassword?: string, currentPassword?: string): Observable<FoodWebResponse> {
 
         let body: UpdateAppUserRequest = new UpdateAppUserRequest(appUserInfoUpdate, newPassword, currentPassword);
-        let observer: Observable<Response> = this.requestService.post('/appUser/updateAppUser', body);
+        let observer: Observable<UpdateAppUserResponse> = this.requestService.post('/appUser/updateAppUser', body);
 
-        return observer.map((response: Response): FoodWebResponse => {
+        return observer.map((appUserUpdateResponse: UpdateAppUserResponse): FoodWebResponse => {
 
-            let appUserUpdateResponse: UpdateAppUserResponse = response.json();
             console.log(appUserUpdateResponse.message);
 
             // Immediately update client session data on success!

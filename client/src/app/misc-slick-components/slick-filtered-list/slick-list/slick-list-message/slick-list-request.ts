@@ -1,23 +1,24 @@
-/**
- * Abstract base class for list filters. Contains retrieval range data for selecting only a limited segment of results from the server.
- * The list loads segments of data in a fashion similar to a Facebook news feed (using this data).
- */
-export abstract class SlickListFilters {
+import { SlickListFilters } from "../../slick-list-filters/slick-list-filters";
 
-    protected constructor (
-        public retrievalOffset?: number,
-        public retrievalAmount?: number
-    ) { }
+
+/**
+ * Request object used to retrieve list data from the server.
+ * Intended to be extended, but also can be used as is.
+ */
+export class GetListingsRequest <FILTERS_T extends SlickListFilters> {
+
+    public constructor (
+        public filters?: FILTERS_T
+    ) {}
 }
 
 
 /**
- * (Base) class for a request object used to retrieve list data from the server.
- * Intended to be extended, but also can be used as is.
+ * Request object used to retrieve a single listing from the server.
  */
-export class SlickListRequest<FILTERS_T extends SlickListFilters> {
+export class GetListingRequest {
 
     public constructor (
-        public filters?: FILTERS_T
-    ) { }
+        public listingId?: number | string
+    ) {}
 }

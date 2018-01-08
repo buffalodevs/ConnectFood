@@ -8,9 +8,9 @@
                 <br>
                 <h5>Availability Schedule:</h5>
                 <div class="form-group">
-                    <md-checkbox formControlName="matchAvailability" title="Check this to ensure each donor is available when you are.">
+                    <mat-checkbox formControlName="matchAvailability" title="Check this to ensure each donor is available when you are.">
                         Match Availability
-                    </md-checkbox>
+                    </mat-checkbox>
                 </div>
 
             </ng-container>
@@ -19,23 +19,9 @@
     </ng-container>
 
 
+
     <ng-container listings>
-        <slick-list #listings route="/receiverDonor/getFoodListings" header="Available Food" [dialog]="foodListingsDialog" (dataUpdated)="foodListings = $event">
-
-            <food-listings [foodListings]="foodListings" (selectListing)="listings.selectListing($event)"></food-listings>
-
-        </slick-list>
+        <food-listings #listings header="Availabile Food"></food-listings>
     </ng-container>
 
 </slick-filtered-list>
-
-
-<slick-list-dialog #foodListingsDialog [header]="listings.getLastValidSelection()?.foodTitle" (opened)="dialogContents.refreshDialogState()">
-        
-    <food-listing-dialog #dialogContents
-        [isClaimedCart]="false" [isDonatedCart]="false"
-        [foodListing]="listings.getLastValidSelection()" (close)="foodListingsDialog.close()"
-        (removeListing)="listings.removeSelectedListing(false)">
-    </food-listing-dialog>
-
-</slick-list-dialog>

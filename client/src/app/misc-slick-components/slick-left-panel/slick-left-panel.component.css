@@ -15,6 +15,7 @@
     z-index: 100;
     padding-left: 10px;
     padding-right: 10px;
+    overflow: visible;
     word-wrap: break-word;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -25,11 +26,13 @@
 
 #slick-left-panel-button {
     position: absolute;
-    height: 100%;
+    height: 65px;
     width: 34px;
     min-width: 0px;
-    right: -34px;
-    top:0;
+    padding: 0px;
+    right: -34px !important;
+    top: 10px;
+    opacity: 1;
     visibility: hidden;
     z-index: 101;
     border-top-right-radius: 10%;
@@ -42,15 +45,39 @@
     -moz-transition: right 0.5s linear;
     -ms-transition: right 0.5s linear;
     -o-transition: right 0.5s linear;
+    transition: opacity 0.5s linear;
+    -webkit-transition: opacity 0.5s linear;
+    -moz-transition: opacity 0.5s linear;
+    -ms-transition: opacity 0.5s linear;
+    -o-transition: opacity 0.5s linear;
     outline: none;
+}
+
+.hide {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.vertical-line {
+    display: inline-block;
+    height: 30px;
+    border-left: 3px solid gray;
+}
+
+#mid-vertical-line {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+#button-title div {
+    color: gray;
 }
 
 @media only screen and (max-width: 991px) {
 
     #slick-left-panel {
         position: absolute;
-        padding-right: 34px; /* Make room for the button overlap! */
-        border-top-right-radius: 10%;
+        /* padding-right: 34px; /* Make room for the button overlap! */
         border-bottom-right-radius: 10%;
         width: calc(100vw - 20px);
         right: 100%; /* The default state in mobile mode is to be off the screen to the left */

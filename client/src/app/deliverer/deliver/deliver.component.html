@@ -8,14 +8,14 @@
                 <br>
                 <h5>Availability Schedule:</h5>
                 <div class="form-group">
-                    <md-radio-group name="availability" formControlName="matchAvailability">
-                        <md-radio-button name="availability" [value]="true" title="Shows deliveries that are available according to your weekly availability schedule">
+                    <mat-radio-group name="availability" formControlName="matchAvailability">
+                        <mat-radio-button name="availability" [value]="true" title="Shows deliveries that are available according to your weekly availability schedule">
                             Match Availability
-                        </md-radio-button><br>
-                        <md-radio-button name="availability" [value]="false" title="Shows deliveries that are avaialble to start delivery immediately">
+                        </mat-radio-button><br>
+                        <mat-radio-button name="availability" [value]="false" title="Shows deliveries that are avaialble to start delivery immediately">
                             Available Now
-                        </md-radio-button>
-                    </md-radio-group>
+                        </mat-radio-button>
+                    </mat-radio-group>
                 </div>
 
             </ng-container>
@@ -23,24 +23,10 @@
         </delivery-listings-filters>
     </ng-container>
 
+
+
     <ng-container listings>
-        <slick-list #listings route="/deliverer/getDeliveries" header="Available Deliveries" [dialog]="deliveryListingsDialog"
-         (dataUpdated)="deserializeDeliveryListings($event)">
-        
-            <delivery-listings [deliveryListings]="deliveryListings" (selectListing)="listings.selectListing($event)"></delivery-listings>
-        
-        </slick-list>
+        <delivery-listings #listings header="Available Deliveries"></delivery-listings>
     </ng-container>
         
 </slick-filtered-list>
-
-
-<slick-list-dialog #deliveryListingsDialog [header]="listings.getLastValidSelection()?.foodTitle" (opened)="dialogContents.refreshDialogState()">
-
-    <delivery-listing-dialog #dialogContents
-        [deliveryListing]="listings.getLastValidSelection()"
-        [isCart]="false" (close)="deliveryListingsDialog.close()"
-        (removeListing)="listings.removeSelectedListing(false)">
-    </delivery-listing-dialog>
-
-</slick-list-dialog>

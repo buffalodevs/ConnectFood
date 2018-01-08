@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { DialogService } from "ng2-bootstrap-modal";
+import { MatDialog } from '@angular/material';
 import { Observable } from "rxjs/Observable";
 import { Router, NavigationStart } from '@angular/router';
+import 'rxjs/add/operator/filter';
 
 import { BannerService } from '../../common-util/services/banner.service';
 import { SessionDataService } from '../../common-util/services/session-data.service';
@@ -19,7 +20,7 @@ export class HeaderComponent {
 
     public constructor (
         private router: Router,
-        private dialogService: DialogService,
+        private dialog: MatDialog,
         private sessionDataService: SessionDataService,
         private logoutService: LogoutService,
         private bannerService: BannerService
@@ -33,9 +34,7 @@ export class HeaderComponent {
 
 
     private showLogin(): void {
-        let dialogObserver: Observable<boolean> = LoginComponent.display(this.dialogService); 
-        // Necessary so that observable action takes place!
-        dialogObserver.subscribe(() => {});
+        LoginComponent.display(this.dialog); 
     }
 
 

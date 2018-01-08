@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MdInputModule, MdRadioModule, MdExpansionModule } from '@angular/material';
+import { MatInputModule, MatRadioModule, MatExpansionModule } from '@angular/material';
 
 import { CommonUtilModule } from '../../common-util/common-util.module';
 import { SlickTimeRangeComponent } from './slick-weekday-schedule-builder/slick-time-range/slick-time-range.component';
@@ -23,9 +23,9 @@ import { WeekdaySplitService } from './scheduler-util/weekday-split.service';
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        MdInputModule,
-        MdRadioModule,
-        MdExpansionModule,
+        MatInputModule,
+        MatRadioModule,
+        MatExpansionModule,
         CommonUtilModule,
         SlickAutoCompleteInputModule,
         SlickExpansionPanelModule,

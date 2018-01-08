@@ -1,36 +1,37 @@
-<div class="modal-dialog">
+<div id="login-container">
 
-    <div class="modal-content">
+    <div id="login">
 
         <div class="modal-header">
 
             <h1 class="modal-title">
                 {{forgotPassword ? "Password Recovery"
-                                 : "Sign In"}}
+                                    : "Sign In"}}
             </h1>
 
             <div id="close-container" *ngIf="showCloseButton">
-                <button type="button" class="modal-close" (click)="close()">&times;</button>
+                <button type="button" class="modal-close" (click)="dialogRef.close()">&times;</button>
             </div>
             
         </div>
 
+
         <!-- Regular Modal Dialog Body -->
         <form ngNativeValidate *ngIf="!displayRecoveryResponseMessage" class="modal-body" (ngSubmit)="loginUser($event)" id="login-form"
-         [formGroup]="loginForm" [slick-progress-spinner]="showProgressSpinner">
+            [formGroup]="loginForm" [slick-progress-spinner]="showProgressSpinner">
 
             <div>
-                <md-form-field>
-                    <input mdInput placeholder="email" name="email" AutoFocus formControlName="email" type="text" spellcheck="false" required>
-                </md-form-field>
+                <mat-form-field>
+                    <input matInput placeholder="email" name="email" AutoFocus formControlName="email" type="text" spellcheck="false" required>
+                </mat-form-field>
 
-                <md-form-field *ngIf="!forgotPassword">
-                    <input mdInput placeholder="password" name="password" formControlName="password" type="password" required>
-                </md-form-field>
+                <mat-form-field *ngIf="!forgotPassword">
+                    <input matInput placeholder="password" name="password" formControlName="password" type="password" required>
+                </mat-form-field>
             </div>
             
             <div id="login-button-div">
-                <button id="login-button" md-raised-button color="primary" class="button-md" type="submit">
+                <button id="login-button" mat-raised-button color="primary" class="button-md" type="submit">
                     {{forgotPassword ? "Recover"
                                         : "Login"}}
                 </button>
@@ -51,9 +52,10 @@
             <p>Please click on the link in the email message to reset your password.</p>
             <p>Thank-you!</p>
             <div id="login-button-div">
-                <button id="login-button" md-raised-button color="primary" class="button-md" (click)="close()">Close</button>
+                <button id="login-button" mat-raised-button color="primary" class="button-md" (click)="close()">Close</button>
             </div>
         </div>
+
 
         <div id="login-err" class="modal-footer warn-foreground" *ngIf="loginError != null">
             {{loginError}}

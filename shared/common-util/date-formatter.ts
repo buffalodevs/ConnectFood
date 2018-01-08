@@ -151,7 +151,8 @@ export class DateFormatter {
      * Checks if a given string is in a proper wall clock format: /^([1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/
      */
     public static isWallClockFormat(time: string): boolean {
-        return (Validation.TIME_REGEX).test(time);
+        const validation: Validation = new Validation();
+        return (validation.TIME_REGEX).test(time);
     }
 
 

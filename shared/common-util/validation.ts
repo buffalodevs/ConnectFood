@@ -11,57 +11,73 @@ export class Validation {
     /**
      * Regular expression used for verifying email correctness.
      */
-    public static readonly EMAIL_REGEX: RegExp = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+    public readonly EMAIL_REGEX: RegExp;
 
     /**
      * Regular expression used for verifying password correctness.
      */
-    public static readonly PASSWORD_REGEX: RegExp = /^[a-zA-Z0-9!@#$%^&*]{6,20}$/;
+    public readonly PASSWORD_REGEX: RegExp;
 
     /**
      * Regular expression used for verifying 10 digit phone numbers with dashes.
      */
-    public static readonly PHONE_REGEX: RegExp = /^\d{3}\-\d{3}\-\d{4}$/;
+    public readonly PHONE_REGEX: RegExp;
 
     /**
      * Regular expression used for verifying that the state input is in a correct format.
      */
-    public static readonly STATE_REGEX: RegExp = /^[a-zA-Z]{2}$/;
+    public readonly STATE_REGEX: RegExp;
 
     /**
      * Regular expression used for verifying 5 digit ZIP codes.
      */
-    public static readonly ZIP_REGEX: RegExp = /^\d{5}$/;
+    public readonly ZIP_REGEX: RegExp;
 
     /**
      * Regular expression used for verifying date string (mm/dd/yyyy) format.
      */
-    public static readonly DATE_REGEX: RegExp = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+    public readonly DATE_REGEX: RegExp;
 
     /**
      * Regular expression used for verifying wall clock time string (hh:mm [AM|PM]) format.
      */
-    public static readonly TIME_REGEX: RegExp = /^(0?[1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/;
+    public readonly TIME_REGEX: RegExp;
 
     /**
      * Regular expression used for verifying hour format.
      */
-    public static readonly HH_REGEX: RegExp = /^(0?[1-9]|1[0-2]?)$/;
+    public readonly HH_REGEX: RegExp;
 
     /**
      * Regular expression used for verifying minute format.
      */
-    public static readonly MM_REGEX: RegExp = /^([0-5][0-9])$/;
+    public readonly MM_REGEX: RegExp;
 
     /**
      * Regular expression used for verifying Am or Pm string (non-case sensitive) format.
      */
-    public static readonly AM_OR_PM_REGEX: RegExp = /^([aApP][mM])$/;
+    public readonly AM_OR_PM_REGEX: RegExp;
 
     /**
      * Regular expression used for verifying Organization Tax ID (TIN) format.
      */
-    public static readonly TAX_ID_REGEX: RegExp = /^\d{2}\-\d{7}$/;
+    public readonly TAX_ID_REGEX: RegExp;
+
+
+    public constructor() {
+
+        this.EMAIL_REGEX = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+        this.PASSWORD_REGEX = /^[a-zA-Z0-9!@#$%^&*]{6,20}$/;
+        this.PHONE_REGEX = /^\(\d{3}\) \d{3}\-\d{4}$/;
+        this.STATE_REGEX = /^[a-zA-Z]{2}$/;
+        this.ZIP_REGEX = /^\d{5}$/;
+        this.DATE_REGEX = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+        this.TIME_REGEX = /^(0?[1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/;
+        this.HH_REGEX = /^(0?[1-9]|1[0-2]?)$/;
+        this.MM_REGEX = /^([0-5][0-9])$/;
+        this.AM_OR_PM_REGEX = /^([aApP][mM])$/;
+        this.TAX_ID_REGEX = /^\d{2}\-\d{7}$/;
+    }
 
     
     /**
@@ -69,8 +85,8 @@ export class Validation {
      * @param email The email string to check.
      * @return true if it is, false if not.
      */
-    public static emailValidator(email: string): boolean {
-        return Validation.EMAIL_REGEX.test(email);
+    public emailValidator(email: string): boolean {
+        return this.EMAIL_REGEX.test(email);
     }
 
      
@@ -79,8 +95,8 @@ export class Validation {
      * @param password The password string to check.
      * @return true if it is, false if not.
      */
-    public static passwordValidator(password: string): boolean {
-        return Validation.PASSWORD_REGEX.test(password);
+    public passwordValidator(password: string): boolean {
+        return this.PASSWORD_REGEX.test(password);
     }
 
 
@@ -89,13 +105,13 @@ export class Validation {
      * @param phone The phone number string to check.
      * @return true if it is, false if not.
      */
-    public static phoneValidator(phone: string): boolean {
-        return Validation.PHONE_REGEX.test(phone);
+    public phoneValidator(phone: string): boolean {
+        return this.PHONE_REGEX.test(phone);
     }
 
 
-    public static stateValidator(state: string): boolean {
-        return Validation.STATE_REGEX.test(state);
+    public stateValidator(state: string): boolean {
+        return this.STATE_REGEX.test(state);
     }
 
 
@@ -104,8 +120,8 @@ export class Validation {
      * @param zip The ZIP code to check.
      * @return true if it is, false if not.
      */
-    public static zipValidator(zip: string): boolean {
-        return Validation.ZIP_REGEX.test(zip);
+    public zipValidator(zip: string): boolean {
+        return this.ZIP_REGEX.test(zip);
     }
 
     
@@ -114,8 +130,8 @@ export class Validation {
      * @param date The date string to check.
      * @return true if it is, false if not.
      */
-    public static dateValidator(date: string): boolean {
-        return Validation.DATE_REGEX.test(date);    
+    public dateValidator(date: string): boolean {
+        return this.DATE_REGEX.test(date);    
     }
 
 
@@ -124,8 +140,8 @@ export class Validation {
      * @param time The time string to check.
      * @return true if it is, false if not.
      */
-    public static timeValidator(time: string): boolean {
-        return Validation.TIME_REGEX.test(time);
+    public timeValidator(time: string): boolean {
+        return this.TIME_REGEX.test(time);
     }
 
 
@@ -134,8 +150,8 @@ export class Validation {
      * @param hour The hour string to check.
      * @return true if it is, false if not.
      */
-    public static hourValidator(hour: string): boolean {
-        return Validation.HH_REGEX.test(hour);
+    public hourValidator(hour: string): boolean {
+        return this.HH_REGEX.test(hour);
     }
 
 
@@ -144,8 +160,8 @@ export class Validation {
      * @param minute The minute string to check.
      * @return true if it is, false if not.
      */
-    public static minuteValidator(minute: string): boolean {
-        return Validation.MM_REGEX.test(minute);
+    public minuteValidator(minute: string): boolean {
+        return this.MM_REGEX.test(minute);
     }
 
 
@@ -154,8 +170,8 @@ export class Validation {
      * @param amOrPm The Am or Pm string to check.
      * @return true if it is, false if not.
      */
-    public static amOrPmValidator(amOrPm: string): boolean {
-        return Validation.AM_OR_PM_REGEX.test(amOrPm);
+    public amOrPmValidator(amOrPm: string): boolean {
+        return this.AM_OR_PM_REGEX.test(amOrPm);
     }
 
 
@@ -164,8 +180,8 @@ export class Validation {
      * @param taxId The tax ID string to check.
      * @return true if it is, false if not.
      */
-    public static taxIdValidator(taxId: string): boolean {
-        return Validation.TAX_ID_REGEX.test(taxId);
+    public taxIdValidator(taxId: string): boolean {
+        return this.TAX_ID_REGEX.test(taxId);
     }
 
 
@@ -175,17 +191,17 @@ export class Validation {
      * @param password The password to validate.
      * @return On successful validation, null. On unsuccess, then an error is returned.
      */
-    public static validateAppUserInfo(appUserInfo: AppUserInfo, password: string): Error {
+    public validateAppUserInfo(appUserInfo: AppUserInfo, password: string): Error {
 
-        if (appUserInfo.email != null && !Validation.emailValidator(appUserInfo.email)) {
+        if (appUserInfo.email != null && !this.emailValidator(appUserInfo.email)) {
             return new Error('Provided email not in correct format.');
         }
 
-        if (password != null && !Validation.passwordValidator(password)) {
+        if (password != null && !this.passwordValidator(password)) {
             return new Error('Incorrect password format. Password must contain a minimum of 6 characters and at least one number');
         }
 
-        if (appUserInfo.zip != null && !Validation.zipValidator(appUserInfo.zip.toString())) {
+        if (appUserInfo.zip != null && !this.zipValidator(appUserInfo.zip.toString())) {
             return new Error('Incorrect ZIP code format. The ZIP code must contain exactly 5 digits.');
         }
 

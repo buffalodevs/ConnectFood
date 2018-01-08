@@ -1,56 +1,45 @@
 <slick-filtered-list [filters]="filters" [listings]="listings">
         
     <ng-container filters>
-
         <food-listings-filters #filters [formGroup]="filters" header="Cart Filters" [additionalFilters]="additionalFilters" [defaultAvailableAfterDateNow]="false">
+
             <ng-container top>
 
                 <h5>Cart Type:</h5>
                 <div class="form-group">
-                    <md-radio-group formControlName="listingsStatus">
+                    <mat-radio-group formControlName="listingsStatus">
 
                         <label for="claimed" class="checkbox-compress">
-                            <md-radio-button type="radio" id="claimed" name="listingsStatus" [value]="LISTINGS_STATUS.myClaimedListings"
+                            <mat-radio-button type="radio" id="claimed" name="listingsStatus" [value]="LISTINGS_STATUS.myClaimedListings"
                                 title="Check this to only show my claimed food.">
                                 Claimed
-                            </md-radio-button>
+                            </mat-radio-button>
                         </label>
                         <br>
 
                         <label for="donated" class="checkbox-compress">
-                            <md-radio-button type="radio" id="donated" name="listingsStatus" [value]="LISTINGS_STATUS.myDonatedListings"
+                            <mat-radio-button type="radio" id="donated" name="listingsStatus" [value]="LISTINGS_STATUS.myDonatedListings"
                                 title="Check this to only show my donated food.">
                                 Donated
-                            </md-radio-button>
+                            </mat-radio-button>
                         </label>
 
-                    </md-radio-group>
+                    </mat-radio-group>
                 </div>
 
             </ng-container>
-        </food-listings-filters>
 
+        </food-listings-filters>
     </ng-container>
 
+
+
     <ng-container listings>
-        <slick-list #listings route="/receiverDonor/getFoodListings" [header]="getListingsTitle(filters.value)"
-         [dialog]="foodListingsDialog" (dataUpdated)="foodListings = $event">
-
-            <food-listings [foodListings]="foodListings" (selectListing)="listings.selectListing($event)"></food-listings>
-
-        </slick-list>
+        <food-listings #listings
+            [header]="getListingsTitle(filters.value)"
+            [isClaimedCart]="isClaimedCart(filters.value)"
+            [isDonatedCart]="isDonatedCart(filters.value)">
+        </food-listings>
     </ng-container>
 
 </slick-filtered-list>
-
-
-<slick-list-dialog #foodListingsDialog [header]="listings.getLastValidSelection()?.foodTitle" (opened)="dialogContents.refreshDialogState()">
-        
-    <food-listing-dialog #dialogContents
-        [isClaimedCart]="filters.get('listingsStatus').value === LISTINGS_STATUS.myClaimedListings"
-        [isDonatedCart]="filters.get('listingsStatus').value === LISTINGS_STATUS.myDonatedListings"
-        [foodListing]="listings.getLastValidSelection()" (close)="foodListingsDialog.close()"
-        (removeListing)="listings.removeSelectedListing(false)">
-    </food-listing-dialog>
-
-</slick-list-dialog>

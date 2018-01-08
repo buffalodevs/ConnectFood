@@ -4,15 +4,15 @@
      concatPattern="`hh`:`mm` `am`" [validators]="groupValidators" formControlName="startTime">
         <span id="start-time-form">
 
-            <md-input-container floatPlaceholder="never">
-                <input mdInput placeholder="hh" formControlName="hh" [InputFilter]="DYNAMIC_HH_REG_EXP">
-            </md-input-container>
+            <mat-input-container floatPlaceholder="never">
+                <input matInput placeholder="hh" formControlName="hh" [InputFilter]="DYNAMIC_HH_REG_EXP">
+            </mat-input-container>
 
             <span>:</span>
 
-            <md-input-container floatPlaceholder="never">
-                <input #startMM mdInput placeholder="mm" formControlName="mm" [InputFilter]="DYNAMIC_MM_REG_EXP" (blur)="ensureMinutes2Digits(startTimeForm.controls.mm)">
-            </md-input-container>
+            <mat-input-container floatPlaceholder="never">
+                <input #startMM matInput placeholder="mm" formControlName="mm" [InputFilter]="DYNAMIC_MM_REG_EXP" (blur)="ensureMinutes2Digits(startTimeForm.controls.mm)">
+            </mat-input-container>
 
             <slick-auto-complete-input containerId="am-pm" [autoCompleteData]="['Am', 'Pm']" placeholder="Am" floatPlaceholder="never"
             [mustMatchAutoComplete]="true" [selectOnBlur]="true" [inputControl]="startTimeForm.get('am')"></slick-auto-complete-input>
@@ -28,15 +28,15 @@
      concatPattern="`hh`:`mm` `am`" [validators]="groupValidators" formControlName="endTime">
         <span id="end-time-form">
             
-            <md-input-container floatPlaceholder="never">
-                <input mdInput placeholder="hh" formControlName="hh" [InputFilter]="DYNAMIC_HH_REG_EXP">
-            </md-input-container>
+            <mat-input-container floatPlaceholder="never">
+                <input matInput placeholder="hh" formControlName="hh" [InputFilter]="DYNAMIC_HH_REG_EXP">
+            </mat-input-container>
 
             <span>:</span>
 
-            <md-input-container floatPlaceholder="never">
-                <input #endMM mdInput placeholder="mm" formControlName="mm" [InputFilter]="DYNAMIC_MM_REG_EXP" (blur)="ensureMinutes2Digits(endTimeForm.controls.mm)">
-            </md-input-container>
+            <mat-input-container floatPlaceholder="never">
+                <input #endMM matInput placeholder="mm" formControlName="mm" [InputFilter]="DYNAMIC_MM_REG_EXP" (blur)="ensureMinutes2Digits(endTimeForm.controls.mm)">
+            </mat-input-container>
 
             <slick-auto-complete-input containerId="am-pm" [autoCompleteData]="['Am', 'Pm']" placeholder="Am" floatPlaceholder="never"
             [mustMatchAutoComplete]="true" [selectOnBlur]="true" [inputControl]="endTimeForm.get('am')"></slick-auto-complete-input>

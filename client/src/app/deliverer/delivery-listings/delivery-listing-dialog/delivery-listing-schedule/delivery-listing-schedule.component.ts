@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import 'rxjs/add/operator/finally';
 
 import { ScheduleDeliveryService } from '../../delivery-services/schedule-delivery.service';
 
@@ -12,10 +13,7 @@ import { TimeRange } from '../../../../../../../shared/app-user/app-user-info';
 @Component({
     selector: 'delivery-listing-schedule',
     templateUrl: './delivery-listing-schedule.component.html',
-    styleUrls: [
-        './delivery-listing-schedule.component.css',
-        './../../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
-    ],
+    styleUrls: ['./delivery-listing-schedule.component.css'],
 })
 export class DeliveryListingScheduleComponent {
 

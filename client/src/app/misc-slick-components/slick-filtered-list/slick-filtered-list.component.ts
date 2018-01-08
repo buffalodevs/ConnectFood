@@ -12,7 +12,7 @@ import { SlickListComponent } from './slick-list/slick-list.component';
 export class SlickFilteredListComponent {
 
     @Input() private filters: FormGroup;
-    @Input() private listings: SlickListComponent;
+    @Input() private listings: SlickListComponent<any>;
 
     public constructor() {}
 

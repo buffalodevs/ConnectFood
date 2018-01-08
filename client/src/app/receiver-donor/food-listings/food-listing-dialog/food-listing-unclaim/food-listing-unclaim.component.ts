@@ -1,6 +1,7 @@
 import { Component, Input, ViewChild, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/finally';
 
 import { ResponsiveService } from '../../../../common-util/services/responsive.service';
 import { ManageFoodListingService } from '../../food-listing-services/manage-food-listing.service';
@@ -11,11 +12,7 @@ import { FoodListing } from './../../../../../../../shared/receiver-donor/food-l
 @Component({
     selector: 'food-listing-unclaim',
     templateUrl: './food-listing-unclaim.component.html',
-    styleUrls: [
-        './food-listing-unclaim.component.css',
-        '../../food-listings.component.css',
-        '../../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog.component.css'
-    ]
+    styleUrls: ['./food-listing-unclaim.component.css']
 })
 export class FoodListingUnclaimComponent implements OnChanges {
 

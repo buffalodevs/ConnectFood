@@ -1,12 +1,31 @@
-<ng-container *ngIf="foodListing != null">
+<div class="modal-header">
 
-    <food-listing-info [foodListing]="foodListing" [isClaimedCart]="isClaimedCart" [isDonatedCart]="isDonatedCart" *ngIf="isDialogState('FoodListingInfo')"
-        (toClaim)="toClaim()" (toUnclaim)="toUnclaim()" (toRemove)="toRemove()"></food-listing-info>
+    <h5 class="header-text">{{ dialogData.header }}</h5>
 
-    <food-listing-claim [foodListing]="foodListing" *ngIf="isDialogState('Claim')" (removeListing)="removeListing.emit()" (close)="close.emit()"></food-listing-claim>
+    <!-- Close button -->
+    <button type="button" class="modal-close" aria-label="Close" (click)="dialogRef.close()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    
+</div>
 
-    <food-listing-unclaim [foodListing]="foodListing" *ngIf="isDialogState('Unclaim')" (removeListing)="removeListing.emit()" (close)="close.emit()"></food-listing-unclaim>
+<div class="modal-body">
 
-    <food-listing-remove [foodListing]="foodListing" *ngIf="isDialogState('Remove')" (removeListing)="removeListing.emit()" (close)="close.emit()"></food-listing-remove>
+    <food-listing-info *ngIf="isDialogState('FoodListingInfo')"
+        [foodListing]="dialogData.selectedListing" [isClaimedCart]="dialogData.isClaimedCart" [isDonatedCart]="dialogData.isDonatedCart"
+        (toClaim)="toClaim()" (toUnclaim)="toUnclaim()" (toRemove)="toRemove()">
+    </food-listing-info>
 
-</ng-container>
+    <food-listing-claim *ngIf="isDialogState('Claim')"
+        [foodListing]="dialogData.selectedListing" (removeListing)="removeSelectedListing.emit()" (close)="dialogRef.close()">
+    </food-listing-claim>
+
+    <food-listing-unclaim *ngIf="isDialogState('Unclaim')"
+        [foodListing]="dialogData.selectedListing" (removeListing)="removeSelectedListing.emit()" (close)="dialogRef.close()">
+    </food-listing-unclaim>
+
+    <food-listing-remove *ngIf="isDialogState('Remove')"
+        [foodListing]="dialogData.selectedListing" (removeListing)="removeSelectedListing.emit()" (close)="dialogRef.close()">
+    </food-listing-remove>
+
+</div>

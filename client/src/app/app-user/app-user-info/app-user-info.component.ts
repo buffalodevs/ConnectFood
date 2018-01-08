@@ -1,14 +1,13 @@
 import { Component } from '@angular/core';
 import { FormGroup, Validators, AbstractControl, FormControl, ValidatorFn } from '@angular/forms';
 import { Observable } from "rxjs/Observable";
-import { Subscription } from "rxjs/Subscription";
+import 'rxjs/add/operator/finally';
 
 import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
 import { AppUserValidationService } from '../common-app-user/app-user-validation.service';
 import { AppUserConstantsService } from '../common-app-user/app-user-constants.service';
 import { AppUserUpdateService } from "./app-user-update.service";
 import { SessionDataService } from "../../common-util/services/session-data.service";
-import { FoodWebBusyConfig } from "../../common-util/etc/food-web-busy-config";
  
 import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
 import { Validation } from "../../../../../shared/common-util/validation";
@@ -43,7 +42,7 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
 
     public constructor (
         private appUserValidationService: AppUserValidationService,
-        private appUserConstantsService: AppUserConstantsService,
+        private appUserConstants: AppUserConstantsService,
         private appUserUpdateService: AppUserUpdateService,
         private sessionDataService: SessionDataService
     ) {
@@ -77,8 +76,8 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
 
                 // Add additional needed validators for email and password fields.
                 switch (property) {
-                    case 'email':       validators.push(Validators.pattern(Validation.EMAIL_REGEX));    break;
-                    case 'zip':         validators.push(Validators.pattern(Validation.ZIP_REGEX));      break;
+                    case 'email':       validators.push(Validators.pattern(this.appUserValidationService.EMAIL_REGEX));    break;
+                    case 'zip':         validators.push(Validators.pattern(this.appUserValidationService.ZIP_REGEX));      break;
                 }
 
                 let initValue: any = (appUserInfo[property] == null) ? '' : appUserInfo[property];
@@ -98,7 +97,7 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
 
         // Initialize password, currentPassword, and confirmPassword form elements.
         for (let i: number = 0; i < passControlNames.length; i++) {
-            this.form.addControl(passControlNames[i], new FormControl('', [ Validators.required, Validators.pattern(Validation.PASSWORD_REGEX) ]));
+            this.form.addControl(passControlNames[i], new FormControl('', [ Validators.required, Validators.pattern(this.appUserValidationService.PASSWORD_REGEX) ]));
             this.editData.set(passControlNames[i], new EditData());
         }
 
