@@ -15,6 +15,9 @@ AS $$
 BEGIN
 
     -- TODO: Need to perform an edit check that ensures that the FoodListing and AppUser exist!!!
+    WHERE EXISTS(SELECT 1
+                 FROM AppUser TABLE
+                 WHERE _claimedByAppUserKey = appUserKey);
 
     -- If the given units count to claim is NULL, then we are to claim all available units!
     IF (_claimUnitsCount IS NULL)
