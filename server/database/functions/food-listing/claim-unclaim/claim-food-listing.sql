@@ -15,16 +15,29 @@ AS $$
 BEGIN
 
     -- TODO: Need to perform an edit check that ensures that the FoodListing and AppUser exist!!!
-    WHERE EXISTS(SELECT 1
+    -- DONE:
+    IF NOT EXISTS(SELECT 1
                  FROM AppUser TABLE
-                 WHERE _claimedByAppUserKey = appUserKey);
-
+                 WHERE _claimedByAppUserKey = appUserKey)
+    THEN
+        RAISE EXCEPTION 'This appUserKey does not exist.';
+    IF NOT EXISTS(SLECT 1
+                  FROM FoodListing TABLE
+                  WHERE _foodListingKey = foodListingKey)
+    THEN
+        RAISE EXCEPTION 'This foodListingKey does not exist in the FoodListing table';
+        
     -- If the given units count to claim is NULL, then we are to claim all available units!
     IF (_claimUnitsCount IS NULL)
     THEN
         _claimUnitsCount := (SELECT getAvailableUnitsCount(_foodListingKey));
-    --ELSE
+    -- ELSE
+    ELSE
         -- TODO: Need to perform an edit check that ensures we are not claiming more parts than what is available!!!!
+        -- DONE:
+        IF (_claimUnitsCount > (SELECT getAvailableUnitsCount(_foodListingKey)))
+        THEN
+            RAISE EXCEPTION 'You are trying to claim more parts than is available.';
     END IF;
 
     -- If this is a brand new claim on the food listing for this user.
