@@ -67,7 +67,7 @@ BEGIN
     PERFORM addUnverifiedAppUser(_appUserKey);
 
     RETURN QUERY
-    SELECT * FROM getAppUserSessionData(_appUserKey);
+    SELECT getAppUserSessionData.appUserKey, getAppUserSessionData.sessionData FROM getAppUserSessionData(_appUserKey);
 
 END;
 $$ LANGUAGE plpgsql;

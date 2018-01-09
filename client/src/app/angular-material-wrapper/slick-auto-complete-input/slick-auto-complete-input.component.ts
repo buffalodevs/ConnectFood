@@ -18,7 +18,7 @@ import { StringManipulation } from '../../../../../shared/common-util/string-man
         }
     ]
 })
-export class SlickAutoCompleteInputComponent implements OnInit, AfterViewInit {
+export class SlickAutoCompleteInputComponent implements OnInit, AfterViewInit, ControlValueAccessor {
 
     // Standard html attributes.
     @Input() private containerId: string;
@@ -35,10 +35,6 @@ export class SlickAutoCompleteInputComponent implements OnInit, AfterViewInit {
     @Input() private floatPlaceholder: string;
 
     
-    /**
-     * The form control that is to be bound to the contained input field.
-     */
-    @Input() private inputControl: FormControl;
     /**
      * A list of auto-complete data to display when focusing on the input control.
      */
@@ -86,6 +82,10 @@ export class SlickAutoCompleteInputComponent implements OnInit, AfterViewInit {
      */
     private onChange: (value: string) => void;
     /**
+     * View model for contained input control.
+     */
+    private inputControl: FormControl;
+    /**
      * Filtered auto-complete data based on what is present in input field.
      * NOTE: If autoCompleteFilter is not set to true, then this should always remain equal to the autoCompleteData input!
      */
@@ -105,19 +105,18 @@ export class SlickAutoCompleteInputComponent implements OnInit, AfterViewInit {
         this.mustMatchAutoComplete = false;
         this.selectOnBlur = false;
         this.onChange = (value: any) => {}; // If no change listener given later, then all change will be swallowed here!
+        this.inputControl = new FormControl();
     }
 
 
     public ngOnInit(): void {
-
-        if (this.inputControl == null)  throw new Error('inputControl component input cannot be null. Did you incorrectly bind to inputControlName or inputControl instead?')
 
         // Check to see if input filter should be based on auto complete data.
         if (this.mustMatchAutoComplete) {
             this.inputFilter = this.autoCompleteData;
         }
 
-        this.filtAutoCompleteData = this.autoCompleteData;
+        this.filtAutoCompleteData = this.autoCompleteData; // The input control is blank, so no filter applied yet.
         this.inputControl.valueChanges.subscribe(this.listenForChange.bind(this));
     }
 
@@ -135,21 +134,23 @@ export class SlickAutoCompleteInputComponent implements OnInit, AfterViewInit {
 
 
     /**
-     * Handles the blur of the input conrol (when it loses focus).
+     * Writes a value to the underlying input control.
+     * @param value The new value to write.
      */
-    private handleBlur(): void {
-        if (this.selectOnBlur)  this.selectHighlightedElement();
+    public writeValue(value: string): void {
+        this.inputControl.setValue(value);
     }
 
 
     /**
-     * Selects the highlighted auto complete element.
+     * Registers a change listener in the underlying input control.
+     * Associated with ngModel or formControl directives.
+     * @param onChange The change listener function.
      */
-    private selectHighlightedElement(): void {
-
-        const selectOption: MatOption = this.autoCompleteComponent._keyManager.activeItem;
-        if (selectOption != null)  selectOption.select();
+    public registerOnChange(onChange: (value: string) => void): void {
+        this.onChange = onChange;
     }
+    
 
 
     /**
@@ -174,8 +175,28 @@ export class SlickAutoCompleteInputComponent implements OnInit, AfterViewInit {
 
         // Highlight first match (by setting active).
         if (this.highlightFirstMatch) {
-            this.highlightMatch(value);
+
+            // Does the first element match the input (contain input as substring at least)?
+            const firstMatchesInput: boolean = value.length !== 0 && this.isFilterOrFloatSet()
+                                             && StringManipulation.checkForSubstring(this.filtAutoCompleteData[0], value, this.caseSensitiveMatch);
+            if (firstMatchesInput)  this.highlightFirstOption();
         }
+
+        // Notify parent component's listener of change.
+        this.onChange(value);
+    }
+
+
+    /**
+     * Sets the active highlight index to the first option of the auto complete.
+     */
+    private highlightFirstOption(): void {
+
+        setTimeout(() => {
+
+            if (this.autoCompleteComponent.panel == null)  return;            
+            this.autoCompleteComponent._keyManager.setFirstItemActive();
+        }, 100);
     }
 
     
@@ -199,51 +220,31 @@ export class SlickAutoCompleteInputComponent implements OnInit, AfterViewInit {
 
 
     /**
-     * Highlights the first auto complete match within filtered data (if there is one).
-     * @param value THe value to match against.
-     */
-    private highlightMatch(value: string): void {
-
-        // If we are using filters and the first auto complete element (partially or fully) matches the input value.
-        if (value.length !== 0 && this.isAutoCompleteFilterSet() && StringManipulation.checkForSubstring(this.filtAutoCompleteData[0], value, this.caseSensitiveMatch)) {
-            this.setHighlightInd(0);
-        }
-
-        // Else if we are not using any filters, then check each element for nearest match.
-        else if (value.length !== 0 && !this.isAutoCompleteFilterSet()) {
-            const closestMatchInd: number = StringManipulation.getSubstringMatchInd(this.filtAutoCompleteData, value, 0, true, false, this.caseSensitiveMatch);
-            this.setHighlightInd(closestMatchInd)
-        }
-        
-        // Else remove any active highlight.
-        else {
-            this.setHighlightInd(null);
-        }
-    }
-
-
-    /**
      * Determines if some filter is set for the auto complete.
      * @return true if one is set, false if not.
      */
-    private isAutoCompleteFilterSet(): boolean {
+    private isFilterOrFloatSet(): boolean {
         return ( this.autoCompleteFilter || this.autoCompleteFloat );
     }
 
 
     /**
-     * Sets the active highlight index for the auto complete.
-     * @param highlightInd The active highlight index.
+     * Handles the blur of the input conrol (when it loses focus).
      */
-    private setHighlightInd(highlightInd: number): void {
-
-        setTimeout(() => {
-
-            if (this.autoCompleteComponent.panel == null)  return;
-            const optionHeight: number = ( this.autoCompleteComponent.panel.nativeElement.scrollHeight / this.filtAutoCompleteData.length );
-            
-            this.autoCompleteComponent._keyManager.setActiveItem(highlightInd);
-            this.autoCompleteComponent._setScrollTop(((highlightInd != null) ? highlightInd : 0) * optionHeight);
-        }, 0);
+    private handleBlur(): void {
+        if (this.selectOnBlur)  this.selectHighlightedElement();
     }
+
+
+    /**
+     * Selects the highlighted auto complete element.
+     */
+    private selectHighlightedElement(): void {
+
+        const selectOption: MatOption = this.autoCompleteComponent._keyManager.activeItem;
+        if (selectOption != null)  selectOption.select();
+    }
+
+
+    public registerOnTouched(fn: any): void {}
 }

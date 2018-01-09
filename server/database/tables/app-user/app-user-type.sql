@@ -13,7 +13,7 @@ END$$;
 
 -- Fill the Enum with all of our App User Types. Each one has an external string representation, but is internally an integer!
 ALTER TYPE AppUserType ADD VALUE IF NOT EXISTS 'Receiver';
-ALTER TYPE AppUserType ADD VALUE IF NOT EXISTS 'Donor';
-ALTER TYPE AppUserType ADD VALUE IF NOT EXISTS 'Driver';
+ALTER TYPE AppUserType ADD VALUE IF NOT EXISTS 'Donor';;
+ALTER TYPE AppUserType ADD VALUE IF NOT EXISTS 'Deliverer';
 
 SELECT unnest(enum_range(NULL::AppUserType)) AS appUserType;

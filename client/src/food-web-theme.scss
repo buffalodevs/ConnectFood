@@ -334,3 +334,18 @@ $inputGroupTextColor: #2779aa;
     color: green;
     text-decoration: none;
 }
+
+
+/* NGB Typeahead styles using them color */
+ngb-typeahead-window {
+    margin-top: 7px !important;
+    margin-bottom: 14px !important;
+    max-height: 200px;
+    overflow-y: auto !important;
+    box-shadow: 5px 5px 18px #888888;
+}
+
+
+ngb-typeahead-window .dropdown-item.active, ngb-typeahead-window .dropdown-item:active {
+    background-color: mat-color($food-web-accent);
+}

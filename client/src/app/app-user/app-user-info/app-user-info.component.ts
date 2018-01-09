@@ -6,6 +6,7 @@ import 'rxjs/add/operator/finally';
 import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
 import { AppUserValidationService } from '../common-app-user/app-user-validation.service';
 import { AppUserConstantsService } from '../common-app-user/app-user-constants.service';
+import { TypeaheadService } from '../../misc-slick-components/slick-type-ahead/type-ahead.service';
 import { AppUserUpdateService } from "./app-user-update.service";
 import { SessionDataService } from "../../common-util/services/session-data.service";
  
@@ -43,6 +44,7 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
     public constructor (
         private appUserValidationService: AppUserValidationService,
         private appUserConstants: AppUserConstantsService,
+        private typeaheadService: TypeaheadService,
         private appUserUpdateService: AppUserUpdateService,
         private sessionDataService: SessionDataService
     ) {

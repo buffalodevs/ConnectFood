@@ -30,7 +30,7 @@ mat-input-container, :host ::ng-deep input {
     text-align: center;
 }
 
-:host ::ng-deep #am-pm {
+.am-pm {
     width: 30px;
     text-align: center;
     padding-left: 10px;

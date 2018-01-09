@@ -2,9 +2,11 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common'
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { CommonUtilModule } from '../common-util/common-util.module';
 import { AngularMaterialWrapperModule } from '../angular-material-wrapper/angular-material-wrapper.module';
+import { SlickTypeaheadModule } from '../misc-slick-components/slick-type-ahead/type-ahead.module';
 import { SlickInputGroupModule } from '../misc-slick-components/slick-input-group/slick-input-group.module';
 import { SlickWeekdaySchedulerModule } from '../misc-slick-components/slick-weekday-scheduler/slick-weekday-scheduler.module';
 
@@ -63,6 +65,7 @@ const appUserRoutes: Routes = [
         ReactiveFormsModule,
         CommonUtilModule,
         AngularMaterialWrapperModule,
+        SlickTypeaheadModule,
         SlickInputGroupModule,
         SlickWeekdaySchedulerModule
     ],

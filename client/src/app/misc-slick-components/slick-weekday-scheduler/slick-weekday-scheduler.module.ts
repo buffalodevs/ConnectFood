@@ -4,10 +4,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule, MatRadioModule, MatExpansionModule } from '@angular/material';
 
 import { CommonUtilModule } from '../../common-util/common-util.module';
+import { SlickTypeaheadModule } from '../slick-type-ahead/type-ahead.module';
 import { SlickTimeRangeComponent } from './slick-weekday-schedule-builder/slick-time-range/slick-time-range.component';
 import { SlickWeekdayScheduleBuilderComponent } from './slick-weekday-schedule-builder/slick-weekday-schedule-builder.component';
 import { SlickWeekdaySchedulerComponent } from './slick-weekday-scheduler.component';
-import { SlickAutoCompleteInputModule } from '../../angular-material-wrapper/slick-auto-complete-input/slick-auto-complete-input.module';
 import { SlickExpansionPanelModule } from '../../angular-material-wrapper/slick-expansion-panel/slick-expansion-panel.module';
 import { SlickInputGroupModule } from '../slick-input-group/slick-input-group.module';
 import { WeekdaySplitService } from './scheduler-util/weekday-split.service';
@@ -27,7 +27,7 @@ import { WeekdaySplitService } from './scheduler-util/weekday-split.service';
         MatRadioModule,
         MatExpansionModule,
         CommonUtilModule,
-        SlickAutoCompleteInputModule,
+        SlickTypeaheadModule,
         SlickExpansionPanelModule,
         SlickInputGroupModule
     ],

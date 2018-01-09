@@ -27,7 +27,6 @@ CREATE OR REPLACE FUNCTION updateAppUser
 RETURNS TABLE
 (
     appUserKey  AppUser.appUserKey%TYPE,
-    password    AppUserPassword.password%TYPE,
     sessionData JSON
 )
 AS $$
@@ -74,7 +73,7 @@ BEGIN
     END IF;
 
     RETURN QUERY
-    SELECT * FROM getAppUserSessionData(_appUserKey);
+    SELECT getAppUserSessionData.appUserKey, getAppUserSessionData.sessionData FROM getAppUserSessionData(_appUserKey);
     
 END;
 $$ LANGUAGE plpgsql;

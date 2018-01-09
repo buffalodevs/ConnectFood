@@ -14,8 +14,10 @@
                 <input #startMM matInput placeholder="mm" formControlName="mm" [InputFilter]="DYNAMIC_MM_REG_EXP" (blur)="ensureMinutes2Digits(startTimeForm.controls.mm)">
             </mat-input-container>
 
-            <slick-auto-complete-input containerId="am-pm" [autoCompleteData]="['Am', 'Pm']" placeholder="Am" floatPlaceholder="never"
-            [mustMatchAutoComplete]="true" [selectOnBlur]="true" [inputControl]="startTimeForm.get('am')"></slick-auto-complete-input>
+            <mat-input-container class="am-pm" floatPlaceholder="never">
+                <input #amPmInput matInput placeholder="Am" formControlName="am" [InputFilter]="['Am', 'Pm']"
+                    [ngbTypeahead]="typeaheadService.genOptionsFilter(amPmInput, ['Am', 'Pm'])" container="body" [placement]="typeaheadService.PLACEMENT">
+            </mat-input-container>
 
         </span>
     </slick-input-group>
@@ -38,8 +40,10 @@
                 <input #endMM matInput placeholder="mm" formControlName="mm" [InputFilter]="DYNAMIC_MM_REG_EXP" (blur)="ensureMinutes2Digits(endTimeForm.controls.mm)">
             </mat-input-container>
 
-            <slick-auto-complete-input containerId="am-pm" [autoCompleteData]="['Am', 'Pm']" placeholder="Am" floatPlaceholder="never"
-            [mustMatchAutoComplete]="true" [selectOnBlur]="true" [inputControl]="endTimeForm.get('am')"></slick-auto-complete-input>
+            <mat-input-container class="am-pm" floatPlaceholder="never">
+                <input #amPmInput matInput placeholder="Am" formControlName="am" [InputFilter]="['Am', 'Pm']"
+                    [ngbTypeahead]="typeaheadService.genOptionsFilter(amPmInput, ['Am', 'Pm'])" container="body" [placement]="typeaheadService.PLACEMENT">
+            </mat-input-container>
 
          </span>
     </slick-input-group>

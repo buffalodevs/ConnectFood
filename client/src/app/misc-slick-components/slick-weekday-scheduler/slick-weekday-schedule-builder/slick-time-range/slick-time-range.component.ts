@@ -2,8 +2,9 @@ import { Component, OnInit, Input, forwardRef, OnChanges, SimpleChanges, SimpleC
 import { ControlValueAccessor, FormGroup, NG_VALUE_ACCESSOR, FormControl, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
 import * as moment from 'moment';
 
-import { SlickTimeRangeValidationService, ValidationService, Validation } from './slick-time-range-validation.service';
 import { AbstractModelDrivenComponent } from '../../../../common-util/components/abstract-model-driven-component';
+import { SlickTimeRangeValidationService, } from './slick-time-range-validation.service';
+import { TypeaheadService } from '../../../slick-type-ahead/type-ahead.service';
 
 import { DateFormatter } from '../../../../../../../shared/common-util/date-formatter';
 import { TimeRange } from '../../../../../../../shared/app-user/time-range';
@@ -48,7 +49,8 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
 
     public constructor (
         private formBuilder: FormBuilder,
-        protected validationService: SlickTimeRangeValidationService
+        protected validationService: SlickTimeRangeValidationService,
+        private typeaheadService: TypeaheadService
     ) {
         super(validationService);
 
