@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS FoodListing
 --The Posted by key refers to the app user organization map key
 ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS donatedByAppUserKey            INTEGER         NOT NULL REFERENCES AppUser (appUserKey);
 
-ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS foodTitle                      VARCHAR(100)    NOT NULL;
+ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS foodTitle                      VARCHAR(30)     NOT NULL;
 
 ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS foodDescription                TEXT            DEFAULT NULL;
 

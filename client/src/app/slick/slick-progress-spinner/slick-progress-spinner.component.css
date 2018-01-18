@@ -16,8 +16,7 @@ mat-progress-spinner {
 }
 
 :host ::ng-deep .sticky-spinner {
-    left: 50%;
-    margin: 0px;
+    margin: auto;
 }
 
 .progress-spinner-backdrop {

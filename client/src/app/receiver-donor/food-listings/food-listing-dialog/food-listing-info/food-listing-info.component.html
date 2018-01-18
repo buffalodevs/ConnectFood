@@ -40,7 +40,7 @@
 
                 <div class="space-bottom">
                     <b>Donor Phone:</b>
-                    <a href="tel:{{ foodListing.donorInfo.phone }}" class=".no-word-wrap link-content">{{ foodListing.donorInfo.phone }}</a>
+                    <a href="tel:{{ foodListing.donorInfo.phone }}" class="no-word-wrap link-content">{{ foodListing.donorInfo.phone }}</a>
                 </div>
 
                 <div class="space-bottom">
@@ -55,7 +55,13 @@
 
             </slick-expansion-panel>
 
-        </div> <!-- Donor Description (Column 1) -->
+        </div> <!-- Donor Description (Column 1 Non-Donor Cart) -->
+
+        <div *ngIf="isDonatedCart">
+
+            
+
+        </div> <!-- Receiver Description (Column 1 Donor Cart) -->
 
         <!-- Misc Description (Column 2) -->
         <div class="col-lg-6 col-md-12 desktop-space-bottom">
@@ -72,9 +78,11 @@
 
                 <div class="space-bottom">
                     <b>Needs Refrigeration:</b>
-                    <i class="material-icons" *ngIf="foodListing.perishable" style="color:green">check</i>
-                    <i class="material-icons" *ngIf="!foodListing.perishable" style="color:red">clear</i>
-                    <span>{{ foodListing.perishable ? 'Yes' : 'No'}}</span>
+                    <span class="no-word-wrap">
+                        <i class="material-icons" *ngIf="foodListing.perishable" style="color:green">check</i>
+                        <i class="material-icons" *ngIf="!foodListing.perishable" style="color:red">clear</i>
+                        <span>{{ foodListing.perishable ? 'Yes' : 'No'}}</span>
+                    </span>
                 </div>
                 
                 <div id="food-types-container" class="space-bottom">
@@ -82,7 +90,7 @@
                     <food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true" [condensedDisplay]="!responsiveService.widthGreaterThan(767)"></food-types>
                 </div>
 
-                <!-- Units Counts Container -->
+                <!-- Claimed indicator -->
                 <div class="space-bottom">
 
                     <div *ngIf="!isClaimedCart">

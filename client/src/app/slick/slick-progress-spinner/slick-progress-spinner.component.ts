@@ -42,10 +42,9 @@ export class SlickProgressSpinnerComponent implements OnChanges {
      */
     @Input() private showCondition: boolean;
     /**
-     * Determines whether or not to use a sticky top for the progress spinner.
-     * Default is false.
+     * ID of the container for a sticky top spinner. If given, then the spinner will have stick top behavior inside the given container.
      */
-    @Input() private spinnerStickyTop: boolean;
+    @Input() private spinnerStickyTopId: string;
     /**
      * Default is false. Set to true if testing spinner and it should be permanently displayed once first triggered.
      */
@@ -67,7 +66,7 @@ export class SlickProgressSpinnerComponent implements OnChanges {
         this.backdropColor = 'rgba(211, 211, 211, 0.5)';
         this.triggerShowSpinner = false;
         this.showCondition = true;
-        this.spinnerStickyTop = false;
+        this.spinnerStickyTopId = null;
         this.spinnerTest = false;
         this.showSpinner = false;
     }

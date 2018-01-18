@@ -1,7 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormControl } from '@angular/forms';
 
-import { FoodTypesService } from '../../domain/food-types/food-types.service';
 import { FoodListingsFilters } from "../../../../../shared/receiver-donor/food-listings-filters";
 
 
@@ -20,9 +19,7 @@ export class FoodListingsFiltersComponent extends FormGroup implements OnInit {
     @Input() private additionalFilters: Map<string, AbstractControl>;
 
 
-    public constructor (
-        private foodTypesService: FoodTypesService
-    ) {
+    public constructor() {
         super({});
 
         this.header = 'Filters';
@@ -32,24 +29,20 @@ export class FoodListingsFiltersComponent extends FormGroup implements OnInit {
 
     public ngOnInit(): void {
 
-        // Should resolve immedialtey!
-        this.foodTypesService.getFoodTypes().subscribe((foodTypes: string[]) => {
+        // Actual form group initialization requires Input to be evaluated, so must be in init!
+        this.addControl('foodTypes', new FormControl([]));
+        this.addControl('perishable', new FormControl(false));
+        this.addControl('notPerishable', new FormControl(false));
+        this.addControl('availableAfterDate', new FormControl(this.defaultAvailableAfterDateNow ? new Date() : null));
 
-            // Actual form group initialization requires Input to be evaluated, so must be in init!
-            this.addControl('foodTypes', new FormControl(foodTypes));
-            this.addControl('perishable', new FormControl(true));
-            this.addControl('notPerishable', new FormControl(true));
-            this.addControl('availableAfterDate', new FormControl(this.defaultAvailableAfterDateNow ? new Date() : null));
+        // Add any parent specified additional filter controls.
+        if (this.additionalFilters != null) {
 
-            // Add any parent specified additional filter controls.
-            if (this.additionalFilters != null) {
-
-                let additionalFiltersKeys: string[] = Array.from(this.additionalFilters.keys());
-                for(let additionalFilterControlName of additionalFiltersKeys) {
-                    
-                    this.addControl(additionalFilterControlName, this.additionalFilters.get(additionalFilterControlName));
-                }
+            let additionalFiltersKeys: string[] = Array.from(this.additionalFilters.keys());
+            for(let additionalFilterControlName of additionalFiltersKeys) {
+                
+                this.addControl(additionalFilterControlName, this.additionalFilters.get(additionalFilterControlName));
             }
-        })
+        }
     }
 }

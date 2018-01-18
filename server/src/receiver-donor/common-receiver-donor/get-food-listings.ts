@@ -32,7 +32,7 @@ export function getFoodListings(filters: FoodListingsFilters, myAppUserKey: numb
     let queryArgs: any[] = [ myAppUserKey, filters.retrievalOffset, filters.retrievalAmount,
                              foodTypesArg, perishableArg, availableAfterDateArg,
                              unclaimedListingsOnly, myDonatedListingsOnly, myClaimedListingsOnly,
-                             filters.matchAvailability ];
+                             filters.matchRegularAvailability ];
 
     // Replace any NULL query arguments with literals in query string.
     queryString = fixNullQueryArgs(queryString, queryArgs);

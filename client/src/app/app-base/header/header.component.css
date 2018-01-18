@@ -59,6 +59,12 @@
 	z-index: 100; /*Keep this on top!*/
 }
 
+#header-bottom-pad {
+    height: 30px;
+    width: 100%;
+    position: relative;
+}
+
 #logo {
 	height: 150px;
 	position: absolute;

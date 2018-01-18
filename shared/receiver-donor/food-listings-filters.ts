@@ -48,8 +48,8 @@ export class FoodListingsFilters {
          */
         public listingsStatus: LISTINGS_STATUS = LISTINGS_STATUS.unclaimedListings,
         /**
-         * Determines whether or not we should only pull back food listings where the associated Donors' availability schedules partially overlap with this user's.
+         * Determines whether or not we should only pull back food listings where the associated Donors' availability schedules partially overlap with this user's regular one.
          */
-        public matchAvailability?: boolean
+        public matchRegularAvailability?: boolean
     ) { }
 }

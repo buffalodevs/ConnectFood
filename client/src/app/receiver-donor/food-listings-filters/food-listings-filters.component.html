@@ -7,7 +7,7 @@
     <ng-content select="[top]"></ng-content>
 
     <h5>Food Types:</h5>
-    <food-types formControlName="foodTypes" [maxNumColumns]="1" title="Only food falling into the checked categories will appear."></food-types>
+    <food-types formControlName="foodTypes" [initiallyChecked]="false" [maxNumColumns]="1" title="Only food falling into the checked categories will appear."></food-types>
     <br>
 
     <h5>Available After:</h5>

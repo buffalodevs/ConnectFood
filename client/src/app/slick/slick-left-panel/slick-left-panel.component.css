@@ -104,7 +104,8 @@
         white-space: nowrap;
         top: 0px;
         width: 320px;
-        border-bottom-right-radius: 10%;
+        border-top-right-radius: 2%;
+        border-bottom-right-radius: 2%;
         box-shadow: 2px 2px 8px #888888;
         transition: width 0.5s, padding 0.5s;
         -webkit-transition: width 0.5s, padding 0.5s;
@@ -156,7 +157,8 @@
         white-space: nowrap;
         top: 0px;
         width: 320px;
-        border-bottom-right-radius: 10%;
+        border-top-right-radius: 2%;
+        border-bottom-right-radius: 2%;
         box-shadow: 2px 2px 8px #888888;
         transition: width 0.5s, padding 0.5s;
         -webkit-transition: width 0.5s, padding 0.5s;
@@ -206,7 +208,8 @@
         white-space: nowrap;
         top: 0px;
         width: 320px;
-        border-bottom-right-radius: 10%;
+        border-top-right-radius: 2%;
+        border-bottom-right-radius: 2%;
         box-shadow: 2px 2px 8px #888888;
         transition: width 0.5s, padding 0.5s;
         -webkit-transition: width 0.5s, padding 0.5s;
@@ -256,7 +259,8 @@
         white-space: nowrap;
         top: 0px;
         width: 320px;
-        border-bottom-right-radius: 10%;
+        border-top-right-radius: 2%;
+        border-bottom-right-radius: 2%;
         box-shadow: 2px 2px 8px #888888;
         transition: width 0.5s, padding 0.5s;
         -webkit-transition: width 0.5s, padding 0.5s;
