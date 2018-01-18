@@ -1,8 +1,0 @@
-mat-select {
-    width: 200px;
-    margin-bottom: 30px;
-}
-
-:host ::ng-deep .mat-select {
-    padding-top: 0px;
-}

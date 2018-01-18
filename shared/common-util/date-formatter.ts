@@ -1,5 +1,6 @@
 import * as moment from "moment";
 import { Validation } from "./validation";
+import * as _ from "lodash";
 
 
 class WallClockTime {
@@ -26,7 +27,7 @@ export class DateFormatter {
 
 
     // Pure static class!
-    private constructor() {}
+    public constructor() {}
 
 
     /**
@@ -36,9 +37,9 @@ export class DateFormatter {
      * @param date Object to check if type is date (will be converted to Date if not and is convertable).
      * @return A date object equivalent to the input.
      */
-    public static ensureIsDate(date: Date): Date {
+    public ensureIsDate(date: Date): Date {
         
-        if (!(date instanceof Date)) {
+        if (!_.isDate(date)) {
             date = new Date(date);
         }
         return date;
@@ -50,11 +51,11 @@ export class DateFormatter {
      * @param date The date to get the string format of.
      * @return The string format of the input date.
      */
-    public static dateToMonthDayYearString(date: Date): string {
+    public dateToMonthDayYearString(date: Date): string {
 
         if (date != null) {
             // Check to see if we are in fact passed a Date object (may have been stringified in JSON response)!
-            date = DateFormatter.ensureIsDate(date);
+            date = this.ensureIsDate(date);
 
             return ( (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear() );
         }
@@ -69,21 +70,19 @@ export class DateFormatter {
      * @param discardSeconds Set to false if seconds should be included. Default is true for discard seconds.
      * @return The wall clock time string for the given date.
      */
-    public static dateToWallClockString(date: Date, discardSeconds: boolean = true): string {
+    public dateToWallClockString(date: Date, discardSeconds: boolean = true): string {
 
         let wallClockString: string = '';
 
         if (date != null) {
             
             // Check to see if we are in fact passed a Date object (may have been stringified in JSON response)!
-            date = DateFormatter.ensureIsDate(date);
+            date = this.ensureIsDate(date);
 
-            wallClockString = date.toLocaleTimeString();
+            const stringFormatConfig: Intl.DateTimeFormatOptions = discardSeconds ? { hour: '2-digit', minute: '2-digit' }
+                                                                                  : { hour: '2-digit', minute: '2-digit', second: '2-digit' };
 
-            if (discardSeconds) {
-                let localTimeStringSplits: string[] = wallClockString.split(/:\d{2} /);
-                wallClockString = (localTimeStringSplits[0] + ' ' + localTimeStringSplits[1]);
-            }
+            wallClockString = date.toLocaleTimeString([], stringFormatConfig).replace('M', 'm');
         }
 
         return wallClockString;
@@ -95,11 +94,11 @@ export class DateFormatter {
      * @param date The date to get the wall clock hours from.
      * @return The wall clock hours from the given date.
      */
-    public static getWallClockHours(date: Date): number {
+    public getWallClockHours(date: Date): number {
 
         if (date != null) {
 
-            date = DateFormatter.ensureIsDate(date);
+            date = this.ensureIsDate(date);
 
             const millitaryHours: number = date.getHours();
             return (millitaryHours > 12) ? (millitaryHours - 12)
@@ -115,11 +114,11 @@ export class DateFormatter {
      * @param date The date from which to determine AM or PM from.
      * @return An AM or PM string based on the given date.
      */
-    public static getWallClockAmOrPm(date: Date): string {
+    public getWallClockAmOrPm(date: Date): string {
 
         if (date != null) {
 
-            date = DateFormatter.ensureIsDate(date);
+            date = this.ensureIsDate(date);
 
             return (date.getHours() > 12) ? 'PM'
                                           : 'AM';
@@ -135,12 +134,12 @@ export class DateFormatter {
      * @param time The time string of format: /^([1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/.
      * @return The input date with its time set. If an invalid time string is provided, then null is returned!
      */
-    public static setWallClockTimeForDate(date: Date, time: string): Date {
+    public setWallClockTimeForDate(date: Date, time: string): Date {
 
-        if (!DateFormatter.isWallClockFormat(time))  return null;
+        if (!this.isWallClockFormat(time))  return null;
 
         let timeDate: Date = new Date(date.valueOf());
-        let wallClockTime: WallClockTime = DateFormatter.parseWallClockTime(time);
+        let wallClockTime: WallClockTime = this.parseWallClockTime(time);
 
         timeDate.setHours(wallClockTime.getMillitaryHours(), wallClockTime.minutes, 0, 0);        
         return timeDate;
@@ -150,7 +149,7 @@ export class DateFormatter {
     /**
      * Checks if a given string is in a proper wall clock format: /^([1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/
      */
-    public static isWallClockFormat(time: string): boolean {
+    public isWallClockFormat(time: string): boolean {
         const validation: Validation = new Validation();
         return (validation.TIME_REGEX).test(time);
     }
@@ -161,7 +160,7 @@ export class DateFormatter {
      * @param time The time string to extract the wall clock time information from.
      * @return The wall clock time data.
      */
-    private static parseWallClockTime(time: string): WallClockTime {
+    private parseWallClockTime(time: string): WallClockTime {
 
         let hoursMinuntesSplit: string[] = time.split(':');
         let wallClockTime: WallClockTime = new WallClockTime();
@@ -179,13 +178,13 @@ export class DateFormatter {
      * @param date The date to convert to the string format.
      * @return The string format for the date.
      */
-    public static dateToDateTimeString(date: Date): string {
+    public dateToDateTimeString(date: Date): string {
 
         if (date != null) {
             // Check to see if we are in fact passed a Date object (may have been stringified in JSON response)!
-            date = DateFormatter.ensureIsDate(date);
+            date = this.ensureIsDate(date);
 
-            return ( DateFormatter.dateToMonthDayYearString(date) + ' ' + DateFormatter.dateToWallClockString(date) );
+            return ( this.dateToMonthDayYearString(date) + ' ' + this.dateToWallClockString(date) );
         }
 
         return '';
@@ -196,12 +195,9 @@ export class DateFormatter {
      * Gets the date corresponding to the first day (Sunday) of the current week.
      * @return The date of the first day of the current week.
      */
-    public static getDateOfWeekStart(): Date {
+    public getDateOfWeekStart(): Date {
 
-        let now: Date = new Date();
-        const weekday: number = now.getDay();
-        now.setDate(now.getDate() - weekday);
-        return now;
+        return moment().add(1, 'days').startOf('isoWeek').subtract(1, 'days').toDate();
     }
 
 
@@ -210,7 +206,7 @@ export class DateFormatter {
      * @param weekdayInt The integer in range [0, 6] representing a day of the week [Sunday, Saturday] accordingly.
      * @return The proper noun string representation of the day of the week.
      */
-    public static covertWeekdayIntToString(weekdayInt: number): string {
+    public covertWeekdayIntToString(weekdayInt: number): string {
 
         switch (weekdayInt) {
             case 0:     return 'Sunday';
@@ -230,7 +226,7 @@ export class DateFormatter {
      * @param weekdayString The string version of the day of the week (case insensitve).
      * @return The number representing the day of the week.
      */
-    public static convertWeekdayStringToInt(weekdayString: string): number {
+    public convertWeekdayStringToInt(weekdayString: string): number {
 
         switch (weekdayString.toLowerCase()) {
             case 'sunday':      return 0;
@@ -251,7 +247,7 @@ export class DateFormatter {
      * @param date The date to set.
      * @return The new date that has been set to the given weekday with time preserved.
      */
-    public static setDateToWeekday(weekday: number, date: Date): Date {
+    public setDateToWeekday(weekday: number, date: Date): Date {
 
         // Note: moment.js iso time starts with weekday Monday = 1 to Sunday = 7, but we want Sunday = 0 to Saturday = 6 as our app standard, so subtract 1 from weekday!
         let retDate: Date = moment(date).add(1, 'days').startOf('isoWeek').add(weekday - 1, 'days')
@@ -270,11 +266,11 @@ export class DateFormatter {
      * @return The generated date object.
      *         NOTE: If the time is not in correct format, then null is returned.
      */
-    public static genDateFromWeekdayAndTime(weekday: number, time: string): Date {
+    public genDateFromWeekdayAndTime(weekday: number, time: string): Date {
 
-        let date: Date = DateFormatter.setWallClockTimeForDate(new Date(), time);
+        let date: Date = this.setWallClockTimeForDate(new Date(), time);
 
-        return (date != null) ? DateFormatter.setDateToWeekday(weekday, date)
+        return (date != null) ? this.setDateToWeekday(weekday, date)
                               : null;
     }
 }

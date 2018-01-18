@@ -46,9 +46,15 @@ export class SessionData {
         if (process.env.DEVELOPER_MODE === 'true') {
             sessionOpts = {
                 secret:             process.env.SESSION_SECRET,
-                cookie:             { maxAge: ttlMs },
+                cookie:             {
+                                        expires: new Date(Date.now() + ttlMs), // NOTE: Must use expires date for IE compatibility!
+                                        maxAge: ttlMs, // The maximum age of the cookie (works in all browsers but IE...)
+                                        httpOnly: true, // Will not be accessible by Javascript (protects against XSS attacks).
+                                        secure: false // https connection not required to send cookie (fine for testing).
+                                    },
                 saveUninitialized:  false,
-                resave:             false
+                resave:             false,
+                rolling:            true // Should refresh the expires 
             };
         }
         // Production mode (Redis).
@@ -64,7 +70,8 @@ export class SessionData {
                 secret:             process.env.SESSION_SECRET,
                 store:              new RedisStore(redisOpts),
                 saveUninitialized:  false,
-                resave:             false
+                resave:             false,
+                rolling:            true
             }
         }
 

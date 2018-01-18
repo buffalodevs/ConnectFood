@@ -8,8 +8,11 @@
 
 <ng-container *ngIf="schedulingComplete">
         
-    <p>The delivery has been scheduled on <b>{{ getScheduledDate() }}</b> at <b>{{ getScheduledTime() }}</b>
-    <p>We will send you a reminder via text and email one hour prior to the delivery.</p>
+    <p>
+        The delivery has been scheduled on
+        <b>{{ dateFormatter.dateToMonthDayYearString(scheduleControl.value) }}</b> at <b>{{ dateFormatter.dateToWallClockString(scheduleControl.value) }}</b>
+        We will send you a reminder via text and email one hour prior to the delivery.
+    </p>
 
     <p>
         You can view, start, and update status information about the delivery in the

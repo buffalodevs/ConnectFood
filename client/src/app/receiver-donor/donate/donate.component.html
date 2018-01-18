@@ -19,7 +19,7 @@
             
                         <!-- This is an invisible file input triggerd by above button -->
                         <div class="file-upload" style="display:none;">
-                            <input #hiddenFileInput id="custom-input" type="file" (change)="fileChangeListener($event)">
+                            <input #hiddenFileInput id="custom-input" type="file" (change)="fileChangeListener($event, cropper)">
                         </div>
             
                         <img-cropper #cropper [image]="this" [settings]="cropperSettings"></img-cropper>
@@ -41,7 +41,7 @@
                         <h4 for="foodTitle">Title</h4>
                         <mat-form-field class="input-group" floatPlaceholder="never">
                             <textarea #foodTitle matInput matTextareaAutosize id="foodTitle" placeholder="Donation Title"
-                                formControlName="foodTitle" [maxlength]="foodTitleMaxLength" required></textarea>
+                                      formControlName="foodTitle" [maxlength]="foodTitleMaxLength" [errorStateMatcher]="this" required></textarea>
                             <mat-hint align="end">{{ foodTitle.value.length }} / {{ foodTitleMaxLength }}</mat-hint>
                         </mat-form-field>
                     </div>
@@ -53,7 +53,7 @@
                             <h4 for="availableUntilDate">Available Until</h4>
                             <mat-input-container class="input-group" floatPlaceholder="never">
                                 <input #availableUntilDate matInput id="availableUntilDate" [matDatepicker]="picker" placeholder="mm/dd/yyyy"
-                                       formControlName="availableUntilDate" required>
+                                       formControlName="availableUntilDate" [errorStateMatcher]="this" required>
                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                 <mat-datepicker touchUi="true" #picker></mat-datepicker>
                             </mat-input-container>
@@ -64,7 +64,7 @@
                             <h4 for="totalWeight">Estimated Weight</h4>
                             <mat-input-container floatPlaceholder="never">
                                 <input matInput id="totalWeight" placeholder="weight (lbs)" formControlName="totalWeight"
-                                 type="number" min="0.5" step="0.5" required>
+                                       type="number" min="0.5" step="0.5" [errorStateMatcher]="this" required>
                                 <span matSuffix>lbs</span>
                             </mat-input-container>
                         </div>
@@ -104,13 +104,14 @@
 
                                 <div class="col-md-4">
                                     <mat-input-container floatPlaceholder="never">
-                                        <input matInput placeholder="Units Count" formControlName="availableUnitsCount" type="number" min="1" required>
+                                        <input matInput placeholder="Units Count" formControlName="availableUnitsCount" type="number" min="1"
+                                               [errorStateMatcher]="this" required>
                                     </mat-input-container>
                                 </div>
 
                                 <div class="col-md-8">
                                     <mat-input-container floatPlaceholder="never">
-                                        <input matInput placeholder="Units Label" formControlName="unitsLabel" required>
+                                        <input matInput placeholder="Units Label" formControlName="unitsLabel" [errorStateMatcher]="this" required>
                                     </mat-input-container>
                                 </div>
                                 
@@ -220,7 +221,7 @@
                         You can also click <a [routerLink]="['/foodListingCart']" class="link-content">here</a> to view your cart.
                     </p>
 
-                    <button mat-raised-button color="primary" class="button-md" type="button" (click)="donateAgain(stepper)">Donate Again</button>
+                    <button mat-raised-button color="primary" class="button-md" type="button" (click)="donateAgain(stepper, cropper)">Donate Again</button>
 
                 </div>
  

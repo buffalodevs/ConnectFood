@@ -1,0 +1,294 @@
+#slick-left-panel-backdrop {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 100vh;
+    background: gray;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+    -webkit-transition: opacity 0.5s;
+    -moz-transition: opacity 0.5s;
+    -ms-transition: opacity 0.5s;
+    -o-transition: opacity 0.5s;
+    z-index: 60;
+}
+
+#slick-left-panel {
+    position: relative;
+    z-index: 70;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    background-color: white;
+    max-width: 262px;
+}
+
+#slick-left-panel-button-container {
+    position: absolute;
+    z-index: 65;
+}
+
+#slick-left-panel-button {
+    position: absolute;
+    min-width: 0px;
+    padding: 0px;
+    opacity: 1;
+    visibility: hidden;
+    z-index: 65;
+    border-top-right-radius: 10%;
+    border-bottom-right-radius: 10%;
+    border-top-left-radius: 0%;
+    border-bottom-left-radius: 0%;
+    margin-bottom: 0px;
+    outline: none;
+    left: 0px;
+}
+
+#slick-left-panel-button, #slick-left-panel-button i {
+    font-size: 20px;
+    width: 20px;
+    transition: right 0.25s, width 0.25s, font-size 0.25s;
+    -webkit-transition: right 0.25s, width 0.25s, font-size 0.25s;
+    -moz-transition: right 0.25s, width 0.25s, font-size 0.25s;
+    -ms-transition: right 0.25s, width 0.25s, font-size 0.25s;
+    -o-transition: right 0.25s, width 0.25s, font-size 0.25s;
+}
+
+#slick-left-panel-button:hover {
+    opacity: 1;
+}
+
+#slick-left-panel-button:hover, #slick-left-panel-button:hover i, #slick-left-panel-button:focus, #slick-left-panel-button:focus i {
+    font-size: 40px;
+    width: 40px;
+}
+
+#button-title {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    display: table;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#close-button {
+    position: absolute;
+    font-size: 30px;
+    top: -10px;
+    right: 0;
+    background-color: rgba(0,0,0,0);
+    border: none;
+    outline: none;
+    visibility: hidden;
+}
+
+#close-button:hover {
+    font-weight: bold;
+}
+
+@media only screen and (max-width: 1199px) {
+
+    .collapse-lg #slick-left-panel-contents {
+        padding: 10px;
+    }
+
+    .collapse-lg #slick-left-panel {
+        position: absolute;
+        overflow-y: auto;
+        overflow-x: hidden;
+        white-space: nowrap;
+        top: 0px;
+        width: 320px;
+        border-bottom-right-radius: 10%;
+        box-shadow: 2px 2px 8px #888888;
+        transition: width 0.5s, padding 0.5s;
+        -webkit-transition: width 0.5s, padding 0.5s;
+        -moz-transition: width 0.5s, padding 0.5s;
+        -ms-transition: width 0.5s, padding 0.5s;
+        -o-transition: width 0.5s, padding 0.5s;
+    }
+
+    .collapse-lg .toggle-panel-out-of-view {
+        width: 0px !important;
+    }
+
+    .collapse-lg .toggle-panel-out-of-view #close-button {
+        visibility: hidden;
+    }
+
+    .collapse-lg .hide-button {
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+
+    .collapse-lg .show-backdrop {
+        pointer-events: all !important;
+        opacity: 0.67 !important;
+    }
+
+    .collapse-lg #slick-left-panel-button {
+        visibility: visible;
+    }
+
+    .collapse-lg #close-button {
+        visibility: visible;
+    }
+
+}
+
+
+/* NOTE: following media queries are just repeats for different screen size panel collapses... can probably eliminate repeat using some css extension... */
+@media only screen and (max-width: 991px) {
+
+    .collapse-md #slick-left-panel-contents {
+        padding: 10px;
+    }
+
+    .collapse-md #slick-left-panel {
+        position: absolute;
+        overflow-y: auto;
+        overflow-x: hidden;
+        white-space: nowrap;
+        top: 0px;
+        width: 320px;
+        border-bottom-right-radius: 10%;
+        box-shadow: 2px 2px 8px #888888;
+        transition: width 0.5s, padding 0.5s;
+        -webkit-transition: width 0.5s, padding 0.5s;
+        -moz-transition: width 0.5s, padding 0.5s;
+        -ms-transition: width 0.5s, padding 0.5s;
+        -o-transition: width 0.5s, padding 0.5s;
+    }
+
+    .collapse-md .toggle-panel-out-of-view {
+        width: 0px !important;
+    }
+
+    .collapse-md .toggle-panel-out-of-view #close-button {
+        visibility: hidden;
+    }
+
+    .collapse-md .hide-button {
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+
+    .collapse-md .show-backdrop {
+        pointer-events: all !important;
+        opacity: 0.67 !important;
+    }
+
+    .collapse-md #slick-left-panel-button {
+        visibility: visible;
+    }
+
+    .collapse-md #close-button {
+        visibility: visible;
+    }
+
+}
+
+@media only screen and (max-width: 767px) {
+
+    .collapse-sm #slick-left-panel-contents {
+        padding: 10px;
+    }
+
+    .collapse-sm #slick-left-panel {
+        position: absolute;
+        overflow-y: auto;
+        overflow-x: hidden;
+        white-space: nowrap;
+        top: 0px;
+        width: 320px;
+        border-bottom-right-radius: 10%;
+        box-shadow: 2px 2px 8px #888888;
+        transition: width 0.5s, padding 0.5s;
+        -webkit-transition: width 0.5s, padding 0.5s;
+        -moz-transition: width 0.5s, padding 0.5s;
+        -ms-transition: width 0.5s, padding 0.5s;
+        -o-transition: width 0.5s, padding 0.5s;
+    }
+
+    .collapse-sm .toggle-panel-out-of-view {
+        width: 0px !important;
+    }
+
+    .collapse-sm .toggle-panel-out-of-view #close-button {
+        visibility: hidden;
+    }
+
+    .collapse-sm .hide-button {
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+
+    .collapse-sm .show-backdrop {
+        pointer-events: all !important;
+        opacity: 0.67 !important;
+    }
+
+    .collapse-sm #slick-left-panel-button {
+        visibility: visible;
+    }
+
+    .collapse-sm #close-button {
+        visibility: visible;
+    }
+
+}
+
+@media only screen and (max-width: 575px) {
+
+    .collapse-xs #slick-left-panel-contents {
+        padding: 10px;
+    }
+
+    .collapse-xs #slick-left-panel {
+        position: absolute;
+        overflow-y: auto;
+        overflow-x: hidden;
+        white-space: nowrap;
+        top: 0px;
+        width: 320px;
+        border-bottom-right-radius: 10%;
+        box-shadow: 2px 2px 8px #888888;
+        transition: width 0.5s, padding 0.5s;
+        -webkit-transition: width 0.5s, padding 0.5s;
+        -moz-transition: width 0.5s, padding 0.5s;
+        -ms-transition: width 0.5s, padding 0.5s;
+        -o-transition: width 0.5s, padding 0.5s;
+    }
+
+    .collapse-xs .toggle-panel-out-of-view {
+        width: 0px !important;
+    }
+
+    .collapse-xs .toggle-panel-out-of-view #close-button {
+        visibility: hidden;
+    }
+
+    .collapse-xs .hide-button {
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+
+    .collapse-xs .show-backdrop {
+        pointer-events: all !important;
+        opacity: 0.67 !important;
+    }
+
+    .collapse-xs #slick-left-panel-button {
+        visibility: visible;
+    }
+
+    .collapse-xs #close-button {
+        visibility: visible;
+    }
+
+}

@@ -6,8 +6,9 @@ import { ScheduleDeliveryService } from '../../delivery-services/schedule-delive
 import { SessionDataService } from '../../../../common-util/services/session-data.service';
 import { Delivery, DeliveryState, DeliveryUtilService } from '../../delivery-services/delivery-util.service';
 import { ManageDeliveryService } from '../../delivery-services/manage-deliveries.service';
+import { DateFormatterService } from '../../../../common-util/services/date-formatter.service';
+
 import { FoodWebResponse } from '../../../../../../../shared/message-protocol/food-web-response';
-import { DateFormatter } from '../../../../../../../shared/common-util/date-formatter';
 
 
 @Component({
@@ -43,7 +44,8 @@ export class DeliveryListingInfoComponent implements OnChanges {
         private sessionDataService: SessionDataService,
         private deliveryUtilService: DeliveryUtilService, // Referenced in HTML template
         private manageDeliveryService: ManageDeliveryService,
-        private scheduleDeliveryService: ScheduleDeliveryService
+        private scheduleDeliveryService: ScheduleDeliveryService,
+        private dateFormatter: DateFormatterService
     ) {
         this.toSchedule = new EventEmitter<void>();
         this.toCancelReason = new EventEmitter<void>();
@@ -171,7 +173,8 @@ export class DeliveryListingInfoComponent implements OnChanges {
 
         const scheduledStartTime: Date = this.delivery.deliveryStateInfo.scheduledStartTime;
 
-        return (scheduledStartTime != null) ? ( DateFormatter.dateToMonthDayYearString(scheduledStartTime) + ' at ' + DateFormatter.dateToWallClockString(scheduledStartTime) )
+        return (scheduledStartTime != null) ? ( this.dateFormatter.dateToMonthDayYearString(scheduledStartTime) + ' at ' +
+                                                this.dateFormatter.dateToWallClockString(scheduledStartTime) )
                                             : '';
     }
 }

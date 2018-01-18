@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { DateFormatter } from '../../../../../shared/common-util/date-formatter';
+import { DateFormatterService } from '../services/date-formatter.service';
 
 
 @Pipe({
@@ -7,7 +7,17 @@ import { DateFormatter } from '../../../../../shared/common-util/date-formatter'
 })
 export class DateFormatterPipe implements PipeTransform {
 
-    public transform(value: Date, args?: any): string {
-        return DateFormatter.dateToMonthDayYearString(value);
+    public constructor (
+        private dateFormatter: DateFormatterService
+    ) {}
+
+
+    /**
+     * Transforms a given date to a mm/dd/yyyy string.
+     * @param value The date.
+     * @return The string.
+     */
+    public transform(value: Date): string {
+        return this.dateFormatter.dateToMonthDayYearString(value);
     }
 }

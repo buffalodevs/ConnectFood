@@ -1,0 +1,17 @@
+#wrapper {
+    display: inline-block;
+    font-size: 18px;
+    text-align: left;
+}
+
+#to-separator {
+    font-weight: bold;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+#err-msg {
+    position: absolute;
+    bottom: 0px;
+    font-size: 14px;
+}

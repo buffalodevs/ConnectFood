@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-
 import { AppUserInfo, TimeRange } from "./../../../../../shared/app-user/app-user-info";
-import { StringManipulation } from '../../../../../shared/common-util/string-manipulation';
 
 
 @Injectable()

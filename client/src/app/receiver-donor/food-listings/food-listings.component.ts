@@ -1,11 +1,12 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialogConfig, MatDialog } from '@angular/material';
 
 import { FoodListingDialogComponent, FoodListingDialogData } from './food-listing-dialog/food-listing-dialog.component';
-import { SlickListComponent } from '../../misc-slick-components/slick-filtered-list/slick-list/slick-list.component';
-import { GetListingsService } from '../../misc-slick-components/slick-filtered-list/slick-list/services/get-listings.service';
-import { ConsumableListingCacheService } from '../../misc-slick-components/slick-filtered-list/slick-list/services/consumable-listing-cache.service';
+import { SlickListComponent } from '../../slick/slick-filtered-list/slick-list/slick-list.component';
+import { GetListingsService } from '../../slick/slick-filtered-list/slick-list/services/get-listings.service';
+import { ConsumableListingCacheService } from '../../slick/slick-filtered-list/slick-list/services/consumable-listing-cache.service';
+import { DateFormatterService } from '../../common-util/services/date-formatter.service';
 
 import { FoodListing } from '../../../../../shared/receiver-donor/food-listing';
 import { FoodListingsFilters } from "../../../../../shared/receiver-donor/food-listings-filters";
@@ -14,7 +15,7 @@ import { FoodListingsFilters } from "../../../../../shared/receiver-donor/food-l
 @Component({
     selector: 'food-listings',
     templateUrl: './food-listings.component.html',
-    styleUrls: ['./food-listings.component.css', '../../misc-slick-components/slick-filtered-list/slick-list/slick-list.component.css']
+    styleUrls: ['./food-listings.component.css', '../../slick/slick-filtered-list/slick-list/slick-list.component.css']
 })
 export class FoodListingsComponent extends SlickListComponent <FoodListing, FoodListingsFilters> {
 
@@ -24,12 +25,14 @@ export class FoodListingsComponent extends SlickListComponent <FoodListing, Food
 
 
     public constructor (
+        elementRef: ElementRef,
         getListingsService: GetListingsService <FoodListing, FoodListingsFilters>,
         consumableListingCacheService: ConsumableListingCacheService <FoodListing>,
         router: Router,
-        dialogService: MatDialog
+        dialogService: MatDialog,
+        private dateFormatter: DateFormatterService
     ) {
-        super('/receiverDonor/getFoodListings', getListingsService, consumableListingCacheService, router, dialogService);
+        super('/receiverDonor/getFoodListings', elementRef, getListingsService, consumableListingCacheService, router, dialogService);
 
         this.header = 'Food Listings';
         this.isClaimedCart = false;

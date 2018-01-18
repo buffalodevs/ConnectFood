@@ -1,0 +1,44 @@
+#filters {
+    border-right: 1px solid #D5D5D5;
+    padding: 10px;
+}
+
+#listings {
+    padding-top: 10px;
+}
+
+:host ::ng-deep #slick-left-panel {
+    max-width: 262px !important; /* NOTE: Same as #filters style above */
+}
+
+@media only screen and (max-width: 1199px) {
+
+    #filters {
+        position: absolute;
+        left: 0px;
+        padding: 0px;
+    }
+
+    #listings {
+        margin-left: 7px;
+        padding-right: 0px;
+        text-align: center;
+    }
+
+    .container {
+        margin-left: 0px;
+        margin-right: 0px;
+        padding-left: 10%;
+        padding-right: 10%;
+        width: 100%;
+    }
+}
+
+
+@media only screen and (max-width: 776px) {
+
+    .container {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+}

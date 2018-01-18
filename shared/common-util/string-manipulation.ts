@@ -1,50 +1,10 @@
-import { ArrayManipulation } from './array-manipulation';
+import * as _ from "lodash";
 
 
 /**
  * Pure static class that contains methods for string and array of string manipulation/analyzation.
  */
 export class StringManipulation {
-
-
-    /**
-     * Checks if the input is a string literal or string object.
-     * @param value The input to check.
-     * @return true if the input is a string literal or string object, false if not.
-     */
-    public static isString(value: any): boolean {
-        return ( typeof(value) === 'string' || value instanceof String );
-    }
-
-
-    /**
-     * Checks if the type of a given value is a string array.
-     * NOTE: Not 100% certainty b/c arrays in JavaScript can be mixed type (Best Effort)!
-     * @param value The value to check the type of.
-     */
-    public static isStringArr(value: any): boolean {
-        return ArrayManipulation.isArray(value) && (value.length === 0 || StringManipulation.isString(value[0]));
-    }
-
-
-    /**
-     * Checks if the input is an instance of a RegExp object.
-     * @param value The input to check.
-     * @return true if the input is an instance of a RegExp object, false if not.
-     */
-    public static isRegExp(value: any): boolean {
-        return ( value instanceof RegExp );
-    }
-
-
-    /**
-     * Escapes a given string's special characters for literal use in a regular expression.
-     * @param str The string that is to have its special characters escaped.
-     * @return The escaped string, ready for literal use in a regular expression.
-     */
-    public static escapeRegExp(str: string): string {
-        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-    }
 
 
     /**
@@ -55,7 +15,7 @@ export class StringManipulation {
      */
     public static strToBoolean(str: any): boolean {
 
-        if (StringManipulation.isString(str)) {
+        if (_.isString(str)) {
             return (str.toLowerCase() === 'true'); 
         }
 
@@ -136,7 +96,7 @@ export class StringManipulation {
 
         const matchStr: string = caseSensitive ? compareStr
                                                : compareStr.toLowerCase();
-        const matchRegExp: RegExp = new RegExp('^' + this.escapeRegExp(matchStr));
+        const matchRegExp: RegExp = new RegExp('^' + _.escapeRegExp(matchStr));
         
         let firstCharsHardMatches: string[] = [];
         let anySubStrSoftMatches: string[] = [];
@@ -194,7 +154,7 @@ export class StringManipulation {
 
         const matchStr: string = caseSensitive ? substring
                                                : substring.toLowerCase();
-        const matchRegExp: RegExp = new RegExp('^' + this.escapeRegExp(matchStr));
+        const matchRegExp: RegExp = new RegExp('^' + _.escapeRegExp(matchStr));
 
         for (let i: number = searchFrom; i < stringArr.length; i++) {
 

@@ -3,18 +3,15 @@ import { FormControl, AbstractControl } from '@angular/forms';
 import { Observable } from "rxjs/Observable";
 
 import { DeliveryUtilService } from '../delivery-listings/delivery-services/delivery-util.service';
-import { DeliveryListingsComponent } from '../delivery-listings/delivery-listings.component';
-import { DeliveryListingsFiltersComponent } from '../delivery-listings/delivery-listings-filters/delivery-listings-filters.component';
 
 import { DeliveryFilters } from '../../../../../shared/deliverer/delivery-filters';
-import { Delivery, DeliveryState } from '../../../../../shared/deliverer/delivery';
-import {  } from '@angular/forms/src/model';
+import { Delivery } from '../../../../../shared/deliverer/delivery';
 
 
 @Component({
     selector: 'delivery-cart',
     templateUrl: './delivery-cart.component.html',
-    styleUrls: ['./delivery-cart.component.css', '../delivery-listings/delivery-listings-filters/delivery-listings-filters.component.css']
+    styleUrls: ['./delivery-cart.component.css', '../delivery-listings-filters/delivery-listings-filters.component.css']
 })
 export class DeliveryCartComponent {
 

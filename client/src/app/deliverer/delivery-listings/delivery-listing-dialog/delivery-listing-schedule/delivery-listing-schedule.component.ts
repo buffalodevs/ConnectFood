@@ -3,10 +3,10 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import 'rxjs/add/operator/finally';
 
 import { ScheduleDeliveryService } from '../../delivery-services/schedule-delivery.service';
+import { DateFormatterService } from '../../../../common-util/services/date-formatter.service';
 
 import { Delivery } from '../../../../../../../shared/deliverer/delivery';
 import { DeliveryState } from '../../../../../../../shared/deliverer/message/get-deliveries-message';
-import { DateFormatter } from '../../../../../../../shared/common-util/date-formatter';
 import { TimeRange } from '../../../../../../../shared/app-user/app-user-info';
 
 
@@ -28,7 +28,8 @@ export class DeliveryListingScheduleComponent {
 
 
     public constructor (
-        private scheduleDeliveryService: ScheduleDeliveryService
+        private scheduleDeliveryService: ScheduleDeliveryService,
+        private dateFormatter: DateFormatterService
     ) {
         this.removeListing = new EventEmitter<void>();
         this.close = new EventEmitter<void>();
@@ -56,21 +57,5 @@ export class DeliveryListingScheduleComponent {
             (err: Error) => {
                 alert(err.message);
             });
-    }
-
-
-    /**
-     * Gets the scheduled date string.
-     */
-    private getScheduledDate(): string {
-        return DateFormatter.dateToMonthDayYearString(this.scheduleControl.value);
-    }
-
-
-    /**
-     * Gets the scheduled wall-clock time string.
-     */
-    private getScheduledTime(): string {
-        return DateFormatter.dateToWallClockString(this.scheduleControl.value);
     }
 }

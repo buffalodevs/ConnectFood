@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
-import { SlickListDialogData, SlickListDialog } from '../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog';
+import { SlickListDialogData, SlickListDialog } from '../../../slick/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog';
 
 import { FoodListing } from './../../../../../../shared/receiver-donor/food-listing';
 
@@ -21,7 +21,7 @@ enum FoodListingDialogState {
  * Expected input data for this dialog.
  * NOTE: Needed because this dialog will be globally generated and opened, and it cannot use traditional Input() slots.
  */
-export class FoodListingDialogData extends SlickListDialogData<FoodListing> {
+export class FoodListingDialogData extends SlickListDialogData <FoodListing> {
 
     public constructor (
         public header: string,
@@ -45,7 +45,7 @@ export class FoodListingDialogComponent extends SlickListDialog {
 
 
     public constructor (
-        private dialogRef: MatDialogRef<FoodListingDialogComponent>,
+        private dialogRef: MatDialogRef <FoodListingDialogComponent>,
         @Inject(MAT_DIALOG_DATA) private dialogData: FoodListingDialogData
     ) {
         super();

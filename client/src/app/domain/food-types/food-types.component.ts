@@ -83,6 +83,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
         // Simply initialize empty form here. We will fill it with Food Types from server (or client cache) in ngOnInit()!
         this.foodTypesForm = new FormGroup({});
         this.foodTypeIndsColumns = [];
+        this.onChange = (selectedFoodTypes: string[]) => {}; // If no change listener, then swallow changes here!
     }
 
 
@@ -143,7 +144,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
         }
 
         // Push changes to parent if it has registered an onChange listener (via ngModel or formControl).
-        if (this.onChange != null) this.onChange(this.selectedFoodTypes);
+        this.onChange(this.selectedFoodTypes);
     }
 
 
@@ -166,7 +167,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
      */
     public writeValue(selectedFoodTypes: string[]): void {
 
-        // Ingore undefined values!
+        // Ignore undefined values!
         if (selectedFoodTypes === undefined) return;
 
         // If given a non-null value, then write it.
@@ -182,7 +183,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
                 this.foodTypesForm.controls[selectedFoodTypes[i]].setValue(true, { emitEvent: false });
             }
 
-            this.foodTypesForm.updateValueAndValidity(); // trigger valueChanges so parent gets updated values and selectedFoodTypes updated.
+            this.foodTypesForm.updateValueAndValidity(); // trigger valueChanges so validation updates here in bulk (emitEvent is false above for efficiency).
         }
         // Else we were given null, so set contained value back to original checked (boolean) state.
         else {

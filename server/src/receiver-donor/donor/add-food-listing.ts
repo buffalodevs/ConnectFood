@@ -22,6 +22,7 @@ let storageBucket = require('@google-cloud/storage') ({
  */
 export function addFoodListing(foodListingUpload: FoodListingUpload, donorAppUserKey: number): Promise<any> {
 
+    const dateFormatter: DateFormatter = new DateFormatter();
     let imageName: string = null;
     let imageUrl: string = null;
 
@@ -38,7 +39,7 @@ export function addFoodListing(foodListingUpload: FoodListingUpload, donorAppUse
                       toPostgresArray(foodListingUpload.foodTypes),
                       foodListingUpload.foodTitle,
                       foodListingUpload.perishable,
-                      DateFormatter.dateToMonthDayYearString(foodListingUpload.availableUntilDate),
+                      dateFormatter.dateToMonthDayYearString(foodListingUpload.availableUntilDate),
                       foodListingUpload.totalWeight,
                       foodListingUpload.foodDescription,
                       imageUrl,

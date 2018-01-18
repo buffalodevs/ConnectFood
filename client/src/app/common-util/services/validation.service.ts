@@ -1,6 +1,7 @@
 import { Pipe } from '@angular/core';
 import { AbstractControl, ValidatorFn, FormGroup, FormArray, FormControl, ValidationErrors } from '@angular/forms';
 import createAutoCorrectedDatePipe from 'text-mask-addons/dist/createAutoCorrectedDatePipe';
+import * as _ from "lodash";
 
 import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
 import { Validation } from '../../../../../shared/common-util/validation';
@@ -105,15 +106,19 @@ export class ValidationService extends Validation {
      */
     public removeAllFormErrors(formGroup: FormGroup): void {
 
+        formGroup.setErrors(null, { emitEvent: false });
+
         for (let control in formGroup.controls) {
 
-            formGroup.controls[control].setErrors(null);
+            formGroup.controls[control].setErrors(null, { emitEvent: false });
 
             // If control is a form group (not a simple form control).
             if (!(formGroup.controls[control] instanceof FormControl)) {
                 this.removeAllFormErrors(<FormGroup>formGroup.controls[control]);
             }
         }
+
+        formGroup.updateValueAndValidity();
     }
 
 
@@ -129,7 +134,7 @@ export class ValidationService extends Validation {
         if (curErrs != null && (removeErrs.length > 1 || curErrs[removeErrs[0]] != null)) {
             let keepErrs = {};
             ObjectManipulation.shallowCopy(curErrs, keepErrs, removeErrs, false);
-            keepErrs = ObjectManipulation.isEmpty(keepErrs) ? null
+            keepErrs = _.isEmpty(keepErrs) ? null
                                                             : keepErrs;
             control.setErrors(keepErrs);
         }

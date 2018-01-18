@@ -1,57 +1,53 @@
-<h3>{{ header }}</h3>
+<h2 id="list-header">{{ header }}</h2>
 <hr>
 
 
-<div #slickList class="slick-list" [slick-progress-spinner]="showProgressSpinner" [showBackdrop]="false">
+<div #slickList class="slick-list" [slick-progress-spinner]="showProgressSpinner" [spinnerStickyTop]="true" backdropColor="white">
 
     <!-- This is the Food Listings (generated via loop) -->
     <slick-list-item *ngFor="let foodListing of listData; let i = index">
 
-        <ng-container slick-list-item-left>
+        <ng-container slick-list-item-img>
             <img DefaultImg [src]="foodListing.imgUrl" alt="Image Not Available"/>
-        </ng-container>
-        
-        <ng-container slick-list-item-right-header>
-            <a (click)="selectListing(i)" title="Click for Details">{{ foodListing.foodTitle }}</a>
         </ng-container>
 
         <ng-container slick-list-item-header>
             <a (click)="selectListing(i)" title="Click for Details">{{ foodListing.foodTitle }}</a>
         </ng-container>
+
+        <ng-container slick-list-item-body-header>
+            <a (click)="selectListing(i)" title="Click for Details">{{ foodListing.foodTitle }}</a>
+        </ng-container>
         
-        <div slick-list-item-right-body class="row">
+        <div slick-list-item-body id="slick-list-item-body" class="row">
         
-            <div id="right-body-col1" class="col-sm-6" *ngIf="!isDonatedCart">
+            <div class="col-lg-6" *ngIf="!isDonatedCart">
                         
                 <div class="space-bottom">
-                    <b>Donor Organization</b><br>
-                    <span class="inline-block">{{ foodListing.donorInfo.organizationName }}</span>
+                    <div><b>Donor</b></div>
+                    <span>{{ foodListing.donorInfo.organizationName }}</span>
                 </div>
-        
+
                 <div class="space-bottom">
-                    <div>
-                        <b>Donor Address</b>
-                    </div>
+                    <div><b>Donor Address</b></div>
                     <div class="inline-block">
                         <span>{{ foodListing.donorInfo.address }}</span><br>
-                        <span>
-                            {{ foodListing.donorInfo.city }}, {{ foodListing.donorInfo.state }}
-                        </span>
+                        <span>{{ foodListing.donorInfo.city }}, {{ foodListing.donorInfo.state }}</span>
                     </div>
                 </div>
         
             </div>
         
-            <div class="col-sm-6">
-        
-                <div class="space-bottom">
-                    <b>Available Until</b><br>
-                    <span class="inline-block">{{ foodListing.availableUntilDate }}</span>
+            <div class="col-lg-6 hide-phone">
+
+                <div class ="space-bottom" *ngIf="foodListing.donorInfo.drivingDistance != null">
+                    <div><b>Drive Distance</b></div>
+                    <span class="inline-block">{{ foodListing.donorInfo.drivingDistance + ' miles' }}</span>
                 </div>
-        
-                <div id="food-types-container" class="space-bottom ">
-                    <b>Present Food Types</b><br>
-                    <food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true" [condensedDisplay]="true"></food-types>
+
+                <div class="space-bottom">
+                    <div><b>Available Until</b></div>
+                    <span>{{ dateFormatter.dateToMonthDayYearString(foodListing.availableUntilDate) }}</span>
                 </div>
         
             </div>

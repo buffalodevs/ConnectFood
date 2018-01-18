@@ -1,0 +1,102 @@
+#slick-list-item-container {
+    text-align: left;
+}
+
+.list-div {
+    box-shadow: 0px 0px 8px;
+    margin-bottom: 10px;
+    border-radius: 3%;
+    padding: 15px;
+}
+
+.slick-list-item-header {
+    text-align: center;
+    border-bottom: 1px solid lightgray;
+    padding-bottom: 5px;
+}
+
+#slick-list-item-img {
+    float: left;
+    max-width: 300px;
+    width: 100%;
+    background-color: white;
+    margin-bottom: 15px;
+}
+
+#slick-list-item-img img {
+    display: block;
+}
+
+#slick-list-item-body-container {
+    font-size: 18px;
+    margin-bottom: 15px;
+    width: 100%;
+    min-height: 300px;
+    vertical-align: top;
+}
+
+#slick-list-item-body-header {
+    display: table;
+}
+
+#slick-list-item-body {
+    font-size: 16px;
+    text-align: left;
+    margin-left: 330px;
+}
+
+#slick-list-item-footer {
+    width: 100%;
+}
+
+.link-content {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+/* Mobile small screens only (phone) */
+@media only screen and (max-width: 991px) {
+
+    #slick-list-item-container {
+        text-align: center;
+    }
+
+    #slick-list-item-img {
+        display: inline-block;
+        float: none;
+    }
+
+    #slick-list-item-img img {
+        display: initial;
+    }
+
+    #slick-list-item-body-container {
+        display: inline-block;
+        width: auto;
+        min-height: auto;
+    }
+
+    #slick-list-item-body {
+        margin-left: 0px;
+    }
+}
+
+
+mat-card {
+    max-width: 300px;
+    height: 500px;
+    margin: 10px;
+}
+
+:host ::ng-deep .mat-card-image {
+    height: 100%;
+    max-height: 300px;
+    border-top: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+}
+
+mat-card-content {
+    height: 70px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}

@@ -4,14 +4,16 @@ import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AgmCoreModule } from '@agm/core';
 
+import { MatInputModule, MatButtonModule, MatSelectModule, MatRadioModule } from '@angular/material';
+
 import { CommonUtilModule } from '../common-util/common-util.module';
-import { AngularMaterialWrapperModule } from '../angular-material-wrapper/angular-material-wrapper.module';
-import { SlickFilteredListModule } from '../misc-slick-components/slick-filtered-list/slick-filtered-list.module';
-import { SlickMapModule } from '../misc-slick-components/slick-map/slick-map.module';
-import { SlickWeekdaySchedulerModule } from '../misc-slick-components/slick-weekday-scheduler/slick-weekday-scheduler.module';
+import { SlickExpansionPanelModule } from '../slick/slick-expansion-panel/slick-expansion-panel.module';
+import { SlickFilteredListModule } from '../slick/slick-filtered-list/slick-filtered-list.module';
+import { SlickMapModule } from '../slick/slick-map/slick-map.module';
+import { SlickWeekdaySchedulerModule } from '../slick/slick-scheduler/slick-weekday-scheduler/slick-weekday-scheduler.module';
 
 import { DeliveryListingsComponent } from './delivery-listings/delivery-listings.component';
-import { DeliveryListingsFiltersComponent } from './delivery-listings/delivery-listings-filters/delivery-listings-filters.component';
+import { DeliveryListingsFiltersComponent } from './delivery-listings-filters/delivery-listings-filters.component';
 import { DeliveryListingInfoComponent } from './delivery-listings/delivery-listing-dialog/delivery-listing-info/delivery-listing-info.component';
 import { DeliveryListingScheduleComponent } from './delivery-listings/delivery-listing-dialog/delivery-listing-schedule/delivery-listing-schedule.component';
 import { DeliveryListingCancelComponent } from './delivery-listings/delivery-listing-dialog/delivery-listing-cancel/delivery-listing-cancel.component';
@@ -64,9 +66,13 @@ const delivererRoutes: Routes = [
         RouterModule.forChild(delivererRoutes),
         FormsModule,
         ReactiveFormsModule,
+        MatInputModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatRadioModule,
         AgmCoreModule,
-        AngularMaterialWrapperModule,
         CommonUtilModule,
+        SlickExpansionPanelModule,
         SlickFilteredListModule,
         SlickMapModule,
         SlickWeekdaySchedulerModule

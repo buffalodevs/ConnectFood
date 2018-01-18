@@ -73,8 +73,11 @@ function generatePerishabilityArg(perishable: boolean, notPerishable: boolean): 
  * @return A string in the format mm/dd/yyyy that signifies the available after date argument. If no filter, then null for don't care. 
  */
 function generateAvailableAfterArg(availableAfterDate: Date): string {
+
+    const dateFormatter: DateFormatter = new DateFormatter();
+
     return (availableAfterDate == null) ? null
-                                        : DateFormatter.dateToMonthDayYearString(availableAfterDate);
+                                        : dateFormatter.dateToMonthDayYearString(availableAfterDate);
 }
 
 

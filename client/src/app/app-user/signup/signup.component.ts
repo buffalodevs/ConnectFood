@@ -7,7 +7,7 @@ import { AppUserTypesService } from '../../domain/app-user-types/app-user-types.
 import { SignupService } from './signup.service'
 import { AppUserConstantsService } from '../common-app-user/app-user-constants.service';
 import { AppUserValidationService, Validation } from '../common-app-user/app-user-validation.service';
-import { TypeaheadService } from '../../misc-slick-components/slick-type-ahead/type-ahead.service';
+import { SlickTypeaheadService } from '../../slick/slick-type-ahead/slick-type-ahead.service';
 import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
 
 import { AppUserInfo, AppUserType } from "../../../../../shared/app-user/app-user-info";
@@ -47,7 +47,7 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
         private signupValidationService: AppUserValidationService,
         private signupService: SignupService,
         private appUserConstants: AppUserConstantsService,
-        private typeaheadService: TypeaheadService
+        private typeaheadService: SlickTypeaheadService
     ) {
         super(signupValidationService);
 

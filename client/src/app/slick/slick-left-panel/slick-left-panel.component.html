@@ -1,0 +1,38 @@
+<span [ngClass]="{ 'collapse-xs': collapseScreenSize === 'xs', 
+                   'collapse-sm': collapseScreenSize === 'sm',
+                   'collapse-md': collapseScreenSize === 'md',
+                   'collapse-lg': collapseScreenSize === 'lg',
+                   'collapse-xl': collapseScreenSize === 'xl' }">
+
+    <div #slickLeftPanelBackdrop id="slick-left-panel-backdrop"></div>
+
+    <div #slickLeftPanel id="slick-left-panel" class="toggle-panel-out-of-view" [SlickScrollableSticky]="slickScrollableStickyConfig">
+
+        <div id="slick-left-panel-contents">
+            <ng-content></ng-content>
+            <button type="button" id="close-button" (click)="toggleOutOfView()">&times;</button>
+        </div>
+        
+    </div>
+
+    <div id="slick-left-panel-button-container" [SlickScrollableSticky]="{ scrollable: false }"> <!-- Use container to allow for simple button Y-position offset -->
+
+        <button mat-raised-button color="primary" class="green-glow" id="slick-left-panel-button" [title]="buttonTitle" [style.height.px]="buttonHeightPx"
+        #slickLeftPanelButton type="button" [style.top]="buttonTopOffsetPx + 'px'" (click)="togglePanelVisibility()">
+
+            <i class="material-icons" *ngIf="buttonIcon != null && buttonLabelChars.length === 0">{{ buttonIcon }}</i>
+
+            <span id="button-title" [style.font-size.px]="buttonLabelFontSizePx" *ngIf="buttonLabelChars.length !== 0">
+                <span *ngFor="let titleChar of buttonLabelChars">
+
+                    <div [style.height.px]="buttonLabelFontSizePx + 2" *ngIf="titleChar !== ' '">{{ titleChar }}</div>
+                    <div [style.height.px]="buttonLabelFontSizePx + 2" *ngIf="titleChar === ' '">&nbsp;</div>
+
+                </span>
+            </span>
+
+        </button>
+
+    </div>
+
+</span>

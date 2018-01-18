@@ -24,6 +24,7 @@ export function handleReAuthenticateRequest(request: Request, response: Response
         response.send(new LoginResponse(SessionData.loadSessionData(request).appUserInfo, true, 'Logged in'));
     }
     else {
+        SessionData.deleteSessionData(request);
         response.send(new LoginResponse(null, false, 'Not logged in'));
     }
 }

@@ -1,9 +1,9 @@
 <div *ngIf="!stateChangeComplete && !startComplete" [slick-progress-spinner]="showMappings.get('progressSpinner')">
 
     <!-- Body in the format of a Slick List Item! -->
-    <slick-list-item [includeDivider]="false">
+    <slick-list-item [includeBorder]="false">
         
-        <ng-container slick-list-item-left>
+        <ng-container slick-list-item-img>
 
             <slick-map #SlickMapComponent
                 [addresses]="[ sessionDataService.getAppUserSessionData(), delivery.donorInfo, delivery.receiverInfo ]"
@@ -13,7 +13,7 @@
 
         </ng-container>
 
-        <div slick-list-item-right-body class="row">
+        <div slick-list-item-body class="row">
             
             <slick-expansion-panel class="col-lg-6 col-md-12 desktop-space-bottom">
                         
@@ -24,7 +24,7 @@
                 <span class="space-bottom">
                     {{ delivery.donorInfo.city }}, {{ delivery.donorInfo.state }} {{ delivery.donorInfo.zip }}
                 </span><br>
-                <a href="tel:{{delivery.donorInfo.phone}}" class="link-content">{{ delivery.donorInfo.phone }}</a>
+                <a href="tel:{{delivery.donorInfo.phone}}" class="link-content no-word-wrap">{{ delivery.donorInfo.phone }}</a>
 
             </slick-expansion-panel>
             

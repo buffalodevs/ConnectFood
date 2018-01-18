@@ -3,13 +3,16 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { MatInputModule, MatButtonModule, MatStepperModule, MatRadioModule, MatCheckboxModule } from '@angular/material';
+
 import { CommonUtilModule } from '../common-util/common-util.module';
-import { AngularMaterialWrapperModule } from '../angular-material-wrapper/angular-material-wrapper.module';
-import { SlickFilteredListModule } from '../misc-slick-components/slick-filtered-list/slick-filtered-list.module';
+import { SlickDatePickerModule } from '../slick/slick-date-time/slick-date-picker/slick-date-picker.module';
+import { SlickExpansionPanelModule } from '../slick/slick-expansion-panel/slick-expansion-panel.module';
+import { SlickFilteredListModule } from '../slick/slick-filtered-list/slick-filtered-list.module';
 import { CommonFoodListingDomainsModule } from '../domain/common-food-listing-domains.module';
 import { ImageCropperModule } from 'ng2-img-cropper';
 
-import { FoodListingsFiltersComponent } from './food-listings/food-listings-filters/food-listings-filters.component';
+import { FoodListingsFiltersComponent } from './food-listings-filters/food-listings-filters.component';
 import { FoodListingDialogComponent } from './food-listings/food-listing-dialog/food-listing-dialog.component';
 import { FoodListingInfoComponent } from './food-listings/food-listing-dialog/food-listing-info/food-listing-info.component';
 import { FoodListingClaimComponent } from './food-listings/food-listing-dialog/food-listing-claim/food-listing-claim.component';
@@ -76,8 +79,14 @@ const receiverDonorRoutes: Routes = [
         RouterModule.forChild(receiverDonorRoutes),
         FormsModule,
         ReactiveFormsModule,
+        MatInputModule,
+        MatButtonModule,
+        MatStepperModule,
+        MatRadioModule,
+        MatCheckboxModule,
         CommonUtilModule,
-        AngularMaterialWrapperModule,
+        SlickDatePickerModule,
+        SlickExpansionPanelModule,
         SlickFilteredListModule,
         CommonFoodListingDomainsModule,
         ImageCropperModule
