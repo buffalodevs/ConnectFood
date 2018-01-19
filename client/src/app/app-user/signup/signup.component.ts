@@ -7,9 +7,10 @@ import { AppUserTypesService } from '../../domain/app-user-types/app-user-types.
 import { SignupService } from './signup.service'
 import { AppUserConstantsService } from '../common-app-user/app-user-constants.service';
 import { AppUserValidationService, Validation } from '../common-app-user/app-user-validation.service';
+import { SlickTypeaheadService } from '../../slick/slick-type-ahead/slick-type-ahead.service';
 import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
 
-import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
+import { AppUserInfo, AppUserType } from "../../../../../shared/app-user/app-user-info";
 import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
 import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
 import { AppUserErrorMsgs } from '../../../../../shared/app-user/message/app-user-error-msgs';
@@ -45,7 +46,8 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
         private appUserTypesService: AppUserTypesService,
         private signupValidationService: AppUserValidationService,
         private signupService: SignupService,
-        private appUserConstants: AppUserConstantsService
+        private appUserConstants: AppUserConstantsService,
+        private typeaheadService: SlickTypeaheadService
     ) {
         super(signupValidationService);
 
@@ -125,7 +127,7 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
      * @return true if the AppUser is an organization (Donor/Receiver), false if not (Driver).
      */
     private isOrganization(): boolean {
-        return ( this.form.get('primary.appUserType').value !== 'Driver' );
+        return ( this.form.get('primary.appUserType').value !== AppUserType.Deliverer );
     }
 
 

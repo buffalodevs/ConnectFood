@@ -1,12 +1,12 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 
 import { DeliveryUtilService } from './delivery-services/delivery-util.service';
-import { SlickListComponent } from '../../misc-slick-components/slick-filtered-list/slick-list/slick-list.component';
+import { SlickListComponent } from '../../slick/slick-filtered-list/slick-list/slick-list.component';
 import { SessionDataService } from '../../common-util/services/session-data.service';
-import { GetListingsService } from '../../misc-slick-components/slick-filtered-list/slick-list/services/get-listings.service';
-import { ConsumableListingCacheService } from '../../misc-slick-components/slick-filtered-list/slick-list/services/consumable-listing-cache.service';
+import { GetListingsService } from '../../slick/slick-filtered-list/slick-list/services/get-listings.service';
+import { ConsumableListingCacheService } from '../../slick/slick-filtered-list/slick-list/services/consumable-listing-cache.service';
 import { DeliveryListingDialogData, DeliveryListingDialogComponent } from './delivery-listing-dialog/delivery-listing-dialog.component';
 
 import { Delivery } from '../../../../../shared/deliverer/delivery';
@@ -16,7 +16,7 @@ import { DeliveryFilters } from '../../../../../shared/deliverer/delivery-filter
 @Component({
     selector: 'delivery-listings',
     templateUrl: './delivery-listings.component.html',
-    styleUrls: ['./delivery-listings.component.css', '../../misc-slick-components/slick-filtered-list/slick-list/slick-list.component.css']
+    styleUrls: ['./delivery-listings.component.css', '../../slick/slick-filtered-list/slick-list/slick-list.component.css']
 })
 export class DeliveryListingsComponent extends SlickListComponent <Delivery, DeliveryFilters> {
 
@@ -25,6 +25,7 @@ export class DeliveryListingsComponent extends SlickListComponent <Delivery, Del
 
 
     public constructor (
+        elementRef: ElementRef,
         getListingsService: GetListingsService <Delivery, DeliveryFilters>,
         consumableListingCacheService: ConsumableListingCacheService <Delivery>,
         router: Router,
@@ -32,7 +33,7 @@ export class DeliveryListingsComponent extends SlickListComponent <Delivery, Del
         private sessionDataService: SessionDataService, // Referenced in HTML template
         private deliveryUtilService: DeliveryUtilService
     ) {
-        super('/deliverer/getDeliveries', getListingsService, consumableListingCacheService, router, dialogService);
+        super('/deliverer/getDeliveries', elementRef, getListingsService, consumableListingCacheService, router, dialogService);
 
         this.header = 'Delivery Listings';
         this.isCart = false;

@@ -1,19 +1,17 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidatorFn, FormControl } from '@angular/forms';
 import { ImageCropperComponent, CropperSettings } from 'ng2-img-cropper';
+import { MatHorizontalStepper, ErrorStateMatcher } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
-import { MatHorizontalStepper } from '@angular/material';
 import 'rxjs/add/operator/finally';
 
+import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
+import { ValidationService } from '../../common-util/services/validation.service';
 import { AddFoodListingService } from "../food-listings/food-listing-services/add-food-listing.service";
 import { DateFormatterPipe } from "../../common-util/pipes/date-formatter.pipe"
 
-import { FoodTypesComponent } from "../../domain/food-types/food-types.component";
-
 import { FoodListingUpload } from "../../../../../shared/receiver-donor/food-listing-upload";
 import { Validation } from '../../../../../shared/common-util/validation';
-import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
-import { ValidationService } from '../../common-util/services/validation.service';
 
 
 @Component({
@@ -22,7 +20,7 @@ import { ValidationService } from '../../common-util/services/validation.service
     styleUrls: ['donate.component.css'],
     providers: [AddFoodListingService]
 })
-export class DonateComponent extends AbstractModelDrivenComponent implements OnInit {
+export class DonateComponent extends AbstractModelDrivenComponent implements OnInit, ErrorStateMatcher {
     
     private validate: boolean;
     private dispUrl: string;
@@ -32,8 +30,6 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
 
     private foodTitleMaxLength: number;
     private showProgressSpinner: boolean;
-
-    @ViewChild('cropper', undefined) private cropper: ImageCropperComponent;
 
 
     public constructor (
@@ -112,19 +108,31 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
      * Triggered whenever a file (image) is changed.
      * @param event The file change event.
      */
-    private fileChangeListener(event): void {
+    private fileChangeListener(event: any, cropper: ImageCropperComponent): void {
 
         let image: HTMLImageElement = new Image();
         let file: File = event.target.files[0];
         let myReader: FileReader = new FileReader();
-        let self = this;
 
         myReader.onloadend = (loadEvent: any) => {
             image.src = loadEvent.target.result;
-            self.cropper.setImage(image);
+            cropper.setImage(image);
         };
      
         myReader.readAsDataURL(file);
+    }
+
+
+    /**
+     * Custom check for error state of mat-input controls.
+     * NOTE: This is necessary since stepper will put form in submitted state and by default mat-input controls show error style when form has been submitted.
+     *       When resetting the form, there is no known way yet to reset the state of the stepper so the form is not marked as submitted.
+     *       This work around checks a validate flag that is set when the form is submitted and reset when the form should be reset for another donation.
+     * @param control The form field/control to check.
+     * @return true if it is invalid, false if it is valid.
+     */
+    public isErrorState(control: FormControl | null): boolean {
+        return control.errors != null && (control.touched || this.validate);;
     }
 
 
@@ -179,6 +187,7 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
      * @param stepper The horizontal stepper that will be invoked to proceed to confirmation display if form is valid.
      */
     private ifValidProceedToReview(value: FoodListingUpload, valid: boolean, stepper: MatHorizontalStepper): void {
+
         this.validate = true;
         if (valid)  stepper.next();
     }
@@ -210,16 +219,20 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
 
     /**
      * Refreshes the Donation Form, allowing the user to donate another item.
+     * @param stepper The contained stepper.
+     * @param cropper The contained image cropper.
      */
-    private donateAgain(stepper: MatHorizontalStepper): void {
+    private donateAgain(stepper: MatHorizontalStepper, cropper: ImageCropperComponent): void {
 
-        // Must go back 2 tabs to get to start.
-        stepper.previous();
-        stepper.previous();
+        // Return stepper to first tab.
+        stepper.selectedIndex = 0;
 
+        // Reset form and validation.
         this.validate = false;
         this.form.reset();
-        this.cropper.reset();
+
+        // Reset image cropper.
+        cropper.reset();
         this.image = null;
     }
 

@@ -1,0 +1,12 @@
+:host ::ng-deep .mat-select {
+    padding-top: 0px;
+}
+
+:host ::ng-deep .mat-form-field-wrapper {
+    max-width: 200px;
+    margin-bottom: 10px;
+}
+
+:host ::ng-deep .mat-form-field-infix {
+    border-top: none;
+}

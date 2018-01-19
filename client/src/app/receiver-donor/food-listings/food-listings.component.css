@@ -1,11 +1,28 @@
+#list-header {
+    text-align: center;
+}
+
 #food-types-container {
     max-width: 300px;
 }
 
-#right-body-col1 {
-    max-width: 300px; 
-}
-
 img {
     max-width: 100%;
+}
+
+@media only screen and (max-width: 991px) {
+
+    #slick-list-item-body > div {
+        display: inline-block;
+        width: auto;
+        text-align: left;
+    }
+
+}
+
+@media only screen and (max-width: 767px) {
+
+    .hide-phone {
+        display: none !important;
+    }
 }

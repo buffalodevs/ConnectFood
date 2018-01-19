@@ -32,7 +32,7 @@ export function getFoodListings(filters: FoodListingsFilters, myAppUserKey: numb
     let queryArgs: any[] = [ myAppUserKey, filters.retrievalOffset, filters.retrievalAmount,
                              foodTypesArg, perishableArg, availableAfterDateArg,
                              unclaimedListingsOnly, myDonatedListingsOnly, myClaimedListingsOnly,
-                             filters.matchAvailability ];
+                             filters.matchRegularAvailability ];
 
     // Replace any NULL query arguments with literals in query string.
     queryString = fixNullQueryArgs(queryString, queryArgs);
@@ -73,8 +73,11 @@ function generatePerishabilityArg(perishable: boolean, notPerishable: boolean): 
  * @return A string in the format mm/dd/yyyy that signifies the available after date argument. If no filter, then null for don't care. 
  */
 function generateAvailableAfterArg(availableAfterDate: Date): string {
+
+    const dateFormatter: DateFormatter = new DateFormatter();
+
     return (availableAfterDate == null) ? null
-                                        : DateFormatter.dateToMonthDayYearString(availableAfterDate);
+                                        : dateFormatter.dateToMonthDayYearString(availableAfterDate);
 }
 
 

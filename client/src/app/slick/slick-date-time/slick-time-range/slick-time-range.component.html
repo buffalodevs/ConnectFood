@@ -1,0 +1,15 @@
+<div id="wrapper" [formGroup]="form">
+
+    <slick-time [validate]="validate" formControlName="startTime" *ngIf="!displayOnly"></slick-time>
+    <span *ngIf="displayOnly">{{ control('startTime').value }}</span>
+
+    <span id="to-separator">to</span>
+
+    <slick-time [validate]="validate" formControlName="endTime" *ngIf="!displayOnly"></slick-time>
+    <span *ngIf="displayOnly">{{ control('endTime').value }}</span>
+
+    <div id="err-msg" class="warn-foreground" *ngIf="hasError('.') != null">
+        <span>{{ errorMsgFor('.') }}</span>
+    </div>
+
+</div>

@@ -22,7 +22,7 @@ export class DeliverComponent {
     ) {
         this.deliveryListings = []
         this.additionalFilters = new Map<string, AbstractControl>([
-            [ 'matchAvailability', new FormControl(true) ],
+            [ 'matchRegularAvailability', new FormControl(true) ],
             [ 'unscheduledDeliveries', new FormControl(true) ]
         ]);
     }

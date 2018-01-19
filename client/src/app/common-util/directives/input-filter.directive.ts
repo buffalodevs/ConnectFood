@@ -1,5 +1,5 @@
 import { Directive, OnInit, ElementRef, Input } from '@angular/core';
-
+import * as _ from "lodash";
 import { StringManipulation } from '../../../../../shared/common-util/string-manipulation'
 
 
@@ -69,10 +69,10 @@ export class InputFilterDirective implements OnInit {
         }
 
         // Check string filter value (either regex or substring matching).
-        if (    (StringManipulation.isRegExp(this.filter) && !newValue.match(this.filter))
-            ||  (StringManipulation.isString(this.filter) && !newValue.includes(this.caseSensitive ? this.filter
+        if (    (_.isRegExp(this.filter) && !newValue.match(this.filter))
+            ||  (_.isString(this.filter) && !newValue.includes(this.caseSensitive ? this.filter
                                                                                                    : this.filter.toLowerCase()))
-            ||  (StringManipulation.isStringArr(this.filter) && !StringManipulation.isSubstringInArray(this.filter, newValue, true, this.caseSensitive)) )
+            ||  (_.isArray(this.filter) && !StringManipulation.isSubstringInArray(this.filter, newValue, true, this.caseSensitive)) )
         {  event.preventDefault();  }
     }
 

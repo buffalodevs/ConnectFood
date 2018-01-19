@@ -127,7 +127,7 @@
                 </span>
             </div>
 
-            <form [formGroup]="form" (ngSubmit)="saveMany(['address', 'city', 'state', 'zip'])"
+            <form [formGroup]="form" (ngSubmit)="saveMany(['address', 'city', 'state', 'zip'])" class="form-group"
              [slick-progress-spinner]="editData.get('address').showProgressSpinner" *ngIf="editData.get('address').editing">
 
                 <mat-input-container floatPlaceholder="never" class="form-group">
@@ -140,8 +140,10 @@
                         <input matInput placeholder="City" name="city" formControlName="city">
                     </mat-input-container>
 
-                    <slick-auto-complete-input id="state" [autoCompleteData]="appUserConstants.STATE_LIST" floatPlaceholder="never" placeholder="State"
-                    [selectOnBlur]="true" [mustMatchAutoComplete]="true" class="col-md-3" [inputControl]="control('state')"></slick-auto-complete-input>
+                    <mat-input-container floatPlaceholder="never" class="form-group col-md-3">
+                        <input #stateInput matInput placeholder="state" name="state" formControlName="state" [InputFilter]="appUserConstants.STATE_LIST"
+                         [ngbTypeahead]="typeaheadService.genOptionsFilter(stateInput, appUserConstants.STATE_LIST)" container="body" [placement]="typeaheadService.PLACEMENT">
+                    </mat-input-container>
 
                     <mat-input-container floatPlaceholder="never" class="form-group col-md-4">
                         <input matInput placeholder="Zip" name="zip" [InputFilter]="appUserConstants.DYNAMIC_ZIP_REGEX" formControlName="zip">
@@ -207,7 +209,7 @@
 
         </div>
 
-    </div><br><br>
+    </div><br><br><br>
 
     <h2>Password</h2>
     <hr>

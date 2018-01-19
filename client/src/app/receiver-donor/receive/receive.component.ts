@@ -20,7 +20,7 @@ export class ReceiveComponent {
         this.foodListings = [];
         this.additionalFilters = new Map<string, AbstractControl>([
             ['listingsStatus', new FormControl(LISTINGS_STATUS.unclaimedListings)],
-            ['matchAvailability', new FormControl(true)]
+            ['matchRegularAvailability', new FormControl(true)]
         ]);
     }
 }

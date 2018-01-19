@@ -1,0 +1,15 @@
+<div id="slick-filtered-list" class="container" [style.min-height.px]="originalHeight">
+    <div class="row">
+
+        <div id="filters" class="col-lg-0 col-xl-3 no-pad">
+            <slick-left-panel buttonIcon="search" [buttonTitle]="slickLeftPanelButtonTitle" stickyContainerId="slick-filtered-list" collapseScreenSize="lg">
+                <ng-content select="[filters]"></ng-content>
+            </slick-left-panel>
+        </div>
+
+        <div id="listings" class="col-lg-12 col-xl-9">
+            <ng-content select="[listings]"></ng-content>
+        </div>
+        
+    </div>
+</div>

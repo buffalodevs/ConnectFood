@@ -11,15 +11,17 @@ import { Delivery } from '../../../shared/deliverer/delivery';
 
 export function scheduleDelivery(claimedFoodListingKey: number, delivererSessionData: SessionData, startImmediately: boolean, scheduledStartTime: Date): Promise<void> {
 
+    const dateFormatter: DateFormatter = new DateFormatter();
+
     // scheduledStartTime was likely converted to a string in the JSON request message!
-    DateFormatter.ensureIsDate(scheduledStartTime);
+    dateFormatter.ensureIsDate(scheduledStartTime);
 
     let queryString: string = 'SELECT * FROM scheduleDelivery($1, $2, $3, $4)';
     let queryArgs: any[] = [
         claimedFoodListingKey,
         delivererSessionData.appUserKey,
         startImmediately,
-        DateFormatter.dateToDateTimeString(scheduledStartTime)
+        dateFormatter.dateToDateTimeString(scheduledStartTime)
     ];
 
     queryString = fixNullQueryArgs(queryString, queryArgs);

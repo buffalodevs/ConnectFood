@@ -1,4 +1,4 @@
-import { StringManipulation } from "../../../shared/common-util/string-manipulation";
+import * as _ from "lodash";
 import { AppUserType } from "../../../shared/app-user/app-user-info";
 
 let nodemailer = require("nodemailer-promise");
@@ -11,9 +11,10 @@ let _sendEmail = nodemailer.config({
 });
 require('dotenv');
 
+
 const EMAIL_CONTAINER_HTML_PATH: string = 'email-container.html';
-const INJECT_VARIABLE_OPEN_BRACE: string = StringManipulation.escapeRegExp('{{');
-const INJECT_VARIABLE_CLOSE_BRACE: string = StringManipulation.escapeRegExp('}}');
+const INJECT_VARIABLE_OPEN_BRACE: string = _.escapeRegExp('{{');
+const INJECT_VARIABLE_CLOSE_BRACE: string = _.escapeRegExp('}}');
 
 
 /**
@@ -216,7 +217,7 @@ function injectVariables(injectIntoHTMLStr: string, injectionVariables: Map<stri
 
     for(let variableName of variableNamesArr) {
 
-        const escapedVariableName = StringManipulation.escapeRegExp(variableName);
+        const escapedVariableName = _.escapeRegExp(variableName);
         const replaceRegex: RegExp = new RegExp(INJECT_VARIABLE_OPEN_BRACE + '\\s?' + escapedVariableName + '\\s?' + INJECT_VARIABLE_CLOSE_BRACE, 'g');
         
         injectIntoHTMLStr = injectIntoHTMLStr.replace(replaceRegex, injectionVariables.get(variableName).toString());

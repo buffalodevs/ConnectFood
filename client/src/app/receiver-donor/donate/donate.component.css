@@ -6,6 +6,20 @@ img {
     max-width: 100%;
 }
 
+i {
+    cursor: pointer;
+    cursor: hand;
+    border-radius: 50%;
+}
+
+i:hover {
+    background-color: rgb(236, 235, 235);
+}
+
+i:active {
+    background-color: rgb(200, 255, 200);
+}
+
 #perishable-yes {
     margin-right: 20px;
 }

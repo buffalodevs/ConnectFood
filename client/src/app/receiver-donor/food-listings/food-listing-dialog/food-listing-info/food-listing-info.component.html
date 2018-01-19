@@ -1,11 +1,11 @@
 <!-- The body of the dialog is in the format of a slick list item! -->
-<slick-list-item [includeDivider]="false">
+<slick-list-item [includeBorder]="false">
                 
-    <ng-container slick-list-item-left>
+    <ng-container slick-list-item-img>
         <img DefaultImg [src]="foodListing.imgUrl" alt="Image Not Available"/>
     </ng-container>
     
-    <div slick-list-item-right-body class="row">
+    <div slick-list-item-body class="row">
     
         <!-- Donor Description (Column 1) -->
         <div class="col-lg-6 col-md-12 desktop-space-bottom" *ngIf="!isDonatedCart">
@@ -40,12 +40,12 @@
 
                 <div class="space-bottom">
                     <b>Donor Phone:</b>
-                    <a href="tel:{{ foodListing.donorInfo.phone }}" class="inline-block" class="link-content">{{ foodListing.donorInfo.phone }}</a>
+                    <a href="tel:{{ foodListing.donorInfo.phone }}" class="no-word-wrap link-content">{{ foodListing.donorInfo.phone }}</a>
                 </div>
 
                 <div class="space-bottom">
                     <b>Donor Email:</b>
-                    <a href="mailto:{{ foodListing.donorInfo.email }}" class="inline-block" class="link-content">{{ foodListing.donorInfo.email }}</a>
+                    <a href="mailto:{{ foodListing.donorInfo.email }}" class="inline-block link-content">{{ foodListing.donorInfo.email }}</a>
                 </div>
 
                 <div class ="space-bottom" *ngIf="foodListing.donorInfo.drivingDistance != null">
@@ -55,7 +55,13 @@
 
             </slick-expansion-panel>
 
-        </div> <!-- Donor Description (Column 1) -->
+        </div> <!-- Donor Description (Column 1 Non-Donor Cart) -->
+
+        <div *ngIf="isDonatedCart">
+
+            
+
+        </div> <!-- Receiver Description (Column 1 Donor Cart) -->
 
         <!-- Misc Description (Column 2) -->
         <div class="col-lg-6 col-md-12 desktop-space-bottom">
@@ -72,9 +78,11 @@
 
                 <div class="space-bottom">
                     <b>Needs Refrigeration:</b>
-                    <i class="material-icons" *ngIf="foodListing.perishable" style="color:green">check</i>
-                    <i class="material-icons" *ngIf="!foodListing.perishable" style="color:red">clear</i>
-                    <span>{{ foodListing.perishable ? 'Yes' : 'No'}}</span>
+                    <span class="no-word-wrap">
+                        <i class="material-icons" *ngIf="foodListing.perishable" style="color:green">check</i>
+                        <i class="material-icons" *ngIf="!foodListing.perishable" style="color:red">clear</i>
+                        <span>{{ foodListing.perishable ? 'Yes' : 'No'}}</span>
+                    </span>
                 </div>
                 
                 <div id="food-types-container" class="space-bottom">
@@ -82,7 +90,7 @@
                     <food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true" [condensedDisplay]="!responsiveService.widthGreaterThan(767)"></food-types>
                 </div>
 
-                <!-- Units Counts Container -->
+                <!-- Claimed indicator -->
                 <div class="space-bottom">
 
                     <div *ngIf="!isClaimedCart">
@@ -117,7 +125,7 @@
 
         </div> <!-- Misc Description (Column 2) -->
 
-        <div class="col-md-12">
+        <div class="col-md-12" *ngIf="foodListing.foodDescription != null">
 
             <slick-expansion-panel [collapseWidth]="null">
                     

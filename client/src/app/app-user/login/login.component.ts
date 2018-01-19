@@ -85,10 +85,12 @@ export class LoginComponent implements OnInit {
         this.showProgressSpinner = true;
 
         observer.finally(() => { this.showProgressSpinner = false; })
-                .subscribe(
+                .subscribe (
+                    (response: FoodWebResponse) => {
 
-                    (data: FoodWebResponse) => {
-                        if (data.success) {
+                        console.log(response.message);
+
+                        if (response.success) {
                             
                             this.loginError = null;
                             this.forgotPassword ? this.displayRecoveryResponseMessage = true
@@ -100,7 +102,7 @@ export class LoginComponent implements OnInit {
                             }
                         }
                         // Otherwise, failure occured.
-                        else { this.loginError = data.message; }
+                        else { this.loginError = response.message; }
                     },
 
                     (err: Error) => {

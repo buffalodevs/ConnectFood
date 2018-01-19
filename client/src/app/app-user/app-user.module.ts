@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common'
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { MatInputModule, MatButtonModule, MatStepperModule, MatRadioModule } from '@angular/material';
+
 import { CommonUtilModule } from '../common-util/common-util.module';
-import { AngularMaterialWrapperModule } from '../angular-material-wrapper/angular-material-wrapper.module';
-import { SlickInputGroupModule } from '../misc-slick-components/slick-input-group/slick-input-group.module';
-import { SlickWeekdaySchedulerModule } from '../misc-slick-components/slick-weekday-scheduler/slick-weekday-scheduler.module';
+import { SlickTypeaheadModule } from '../slick/slick-type-ahead/slick-type-ahead.module';
+import { SlickInputGroupModule } from '../slick/slick-input-group/slick-input-group.module';
+import { SlickWeekdayScheduleBuilderModule } from '../slick/slick-scheduler/slick-weekday-schedule-builder/slick-weekday-schedule-builder.module';
 
 import { LoginComponent } from './login/login.component';
 import { LoginRequiredComponent } from './login-required/login-required.component';
@@ -61,10 +63,14 @@ const appUserRoutes: Routes = [
         RouterModule.forChild(appUserRoutes),
         FormsModule,
         ReactiveFormsModule,
+        MatInputModule,
+        MatButtonModule,
+        MatStepperModule,
+        MatRadioModule,
         CommonUtilModule,
-        AngularMaterialWrapperModule,
+        SlickTypeaheadModule,
         SlickInputGroupModule,
-        SlickWeekdaySchedulerModule
+        SlickWeekdayScheduleBuilderModule
     ],
     entryComponents: [
         LoginComponent

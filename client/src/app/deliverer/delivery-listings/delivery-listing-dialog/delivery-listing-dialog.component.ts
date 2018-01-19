@@ -4,7 +4,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { DeliveryUtilService } from '../delivery-services/delivery-util.service';
 
 import { Delivery, DeliveryState } from '../../../../../../shared/deliverer/delivery';
-import { SlickListDialogData, SlickListDialog } from '../../../misc-slick-components/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog';
+import { SlickListDialogData, SlickListDialog } from '../../../slick/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 

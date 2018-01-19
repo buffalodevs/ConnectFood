@@ -1,0 +1,44 @@
+.slick-list {
+    position: relative;
+    min-height: 400px;
+    padding: 8px; /* Give extra room for border shadow of each slick-list-item */
+}
+
+:host ::ng-deep .slick-list .mat-progress-spinner {
+    margin-top: 65px;
+    max-width: 300px !important;
+    max-height: 300px !important;
+}
+
+
+::ng-deep .slick-list-dialog-backdrop {
+    background-color: #444;
+    opacity: 0.9 !important;
+}
+
+
+::ng-deep .slick-list-dialog {
+    position: relative !important;
+    max-height: 95vh !important;
+}
+
+
+::ng-deep .slick-list-dialog .mat-dialog-container {
+    margin-bottom: 30px;
+    max-height: 95vh !important;
+    padding: 0px !important;
+    border-radius: 8px !important;
+}
+
+
+::ng-deep .slick-list-dialog .modal-body {
+    max-height: 80vh;
+    overflow: auto;
+}
+
+
+@media only screen and (max-width: 776px) {
+    ::ng-deep .slick-list-dialog {
+        max-width: 95vw !important;
+    }
+}

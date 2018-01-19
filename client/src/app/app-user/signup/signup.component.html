@@ -1,4 +1,4 @@
-<form [formGroup]="form" class="container" *ngIf="!signupComplete" [slick-progress-spinner]="showProgressSpinner">
+<form [formGroup]="form" class="container" *ngIf="!signupComplete" [slick-progress-spinner]="showProgressSpinner" maxWidth="200px" maxHeight="200px">
 
     <mat-horizontal-stepper #stepper [linear]="true">
 
@@ -105,8 +105,10 @@
                                 <input matInput placeholder="City" name="city" formControlName="city">
                             </mat-input-container>
 
-                            <slick-auto-complete-input [autoCompleteData]="appUserConstants.STATE_LIST" placeholder="State" [selectOnBlur]="true"
-                                [mustMatchAutoComplete]="true" class="col-md-3" [inputControl]="control('addressPhone.state')"></slick-auto-complete-input>
+                            <mat-input-container class="form-group col-md-3">
+                                <input #stateInput matInput placeholder="state" name="state" formControlName="state"
+                                 [ngbTypeahead]="typeaheadService.genOptionsFilter(stateInput, appUserConstants.STATE_LIST)" container="body">
+                            </mat-input-container>
 
                             <mat-input-container id="zip" class="form-group col-md-4">
                                 <input matInput placeholder="Zip" name="zip" [InputFilter]="appUserConstants.DYNAMIC_ZIP_REGEX" formControlName="zip">

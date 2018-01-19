@@ -45,23 +45,6 @@ export class ObjectManipulation {
 
 
     /**
-     * Checks to see if the given object is empty (has no properties of its own).
-     * @param obj The object to check.
-     * @return true if obj is empty, flase if not.
-     */
-    public static isEmpty(obj: any): boolean {
-
-        for (let property in obj) {
-            if (obj.hasOwnProperty(property)) {
-                return false;
-            }
-        }
-    
-        return true;
-    }
-
-
-    /**
      * Applies a given function to all properties that are members of a given object.
      * @param obj The object from which to get the properties (keys) from.
      * @param fn The function to apply to each property of obj.

@@ -1,5 +1,4 @@
 import { DateFormatter } from "../common-util/date-formatter";
-import { StringManipulation } from "../common-util/string-manipulation";
 
 
 /**
@@ -18,8 +17,10 @@ export class TimeRange {
          */
         public endTime?: Date
     ) {
+        const dateFormatter: DateFormatter = new DateFormatter();
+
         // Ensure that input dates are in-fact dates and not string equivalents, and convert if date strings.
-        this.startTime = DateFormatter.ensureIsDate(this.startTime);
-        this.endTime = DateFormatter.ensureIsDate(this.endTime);
+        this.startTime = dateFormatter.ensureIsDate(this.startTime);
+        this.endTime = dateFormatter.ensureIsDate(this.endTime);
     }
 }

@@ -38,6 +38,16 @@ export class FoodListingCartComponent {
 
 
     /**
+     * Gets the title of the filters panel based on the listings status (cart type).
+     * @param filters The filters value.
+     */
+    private getFiltersTitle(filters: FoodListingsFilters): string {
+        return (filters.listingsStatus === LISTINGS_STATUS.myClaimedListings ? 'Find Claims'
+                                                                             : 'Find Donations');
+    }
+
+
+    /**
      * Gets the title of the listings based on the listings status (cart type).
      * @param filters The filters value.
      */

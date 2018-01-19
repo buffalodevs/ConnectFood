@@ -2,7 +2,7 @@
 <hr>
 
 
-<div #slickList class="slick-list" [slick-progress-spinner]="showProgressSpinner" [showBackdrop]="false">
+<div id="delivery-listings" class="slick-list" [slick-progress-spinner]="showProgressSpinner" spinnerStickyTopId="delivery-listings" backdropColor="white">
     
     <slick-list-item *ngFor="let deliveryListing of listData; let i = index;">
 
@@ -10,7 +10,7 @@
             <a (click)="selectListing(i)" title="Click for Details">{{ deliveryListing.foodTitle }}</a>
         </ng-container>
 
-        <ng-container slick-list-item-left>
+        <ng-container slick-list-item-img>
 
             <slick-map #SlickMapComponent
                 [addresses]="[ sessionDataService.getAppUserSessionData(), deliveryListing.donorInfo, deliveryListing.receiverInfo ]"
@@ -21,13 +21,13 @@
         </ng-container>
 
 
-        <ng-container slick-list-item-right-header>
+        <ng-container slick-list-item-body-header>
             <a (click)="selectListing(i)" title="Click for Details">{{ deliveryListing.foodTitle }}</a>
         </ng-container>
 
-        <div slick-list-item-right-body class="row">
+        <div slick-list-item-body id="slick-list-item-body" class="row">
 
-            <div class="col-sm-6" id="right-body-col1">
+            <div class="col-lg-6">
             
                 <div class="space-bottom">
                     <b>Donor</b><br>
@@ -38,7 +38,7 @@
 
             </div>
 
-            <div class="col-sm-6">
+            <div class="col-lg-6">
 
                 <div class="space-bottom">
                     <b>Receiver</b><br>
@@ -49,23 +49,22 @@
 
             </div>
 
-            <div class="col-lg-12">
-                <b>Total Driving Distance:</b>
+            <div class="col-lg-12 hide-mobile">
+
+                <b>Total Drive Distance:</b>
                 <div class="inline-block">
                     {{ deliveryUtilService.calcTotalDrivingDistance(deliveryListing) }} miles
-                </div>
-            </div>
+                </div><br>
 
-            <div class="col-lg-12">
-                <b>Total Driving Time:</b>
+                <b>Total Drive Time:</b>
                 <div class="inline-block">
                     {{ deliveryUtilService.calcTotalDrivingTime(deliveryListing) }} minutes
-                </div>
-            </div>
+                </div><br>
 
-            <div class="col-lg-12">
-                <a [href]="SlickMapComponent.getGoogleMapsHref()" target="_blank" class="link-content">Get Directions</a>
-            </div>
+                <div>
+                    <a [href]="SlickMapComponent.getGoogleMapsHref()" target="_blank" class="link-content">Get Directions</a>
+                </div>
+            </div>            
 
         </div>
         

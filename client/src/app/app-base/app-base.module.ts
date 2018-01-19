@@ -2,9 +2,9 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { MatButtonModule } from '@angular/material';
 
 import { CommonUtilModule } from '../common-util/common-util.module';
-import { AngularMaterialWrapperModule } from '../angular-material-wrapper/angular-material-wrapper.module';
 
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
@@ -30,8 +30,8 @@ const appBaseRoutes: Routes = [
         CommonModule,
         RouterModule.forChild(appBaseRoutes),
         NgbModule,
-        CommonUtilModule,
-        AngularMaterialWrapperModule
+        MatButtonModule,
+        CommonUtilModule
     ],
     exports: [
         HeaderComponent,

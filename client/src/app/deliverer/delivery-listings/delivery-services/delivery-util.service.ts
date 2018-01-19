@@ -1,6 +1,8 @@
 "use strict";
 import { Injectable } from '@angular/core';
 
+import { DateFormatterService } from '../../../common-util/services/date-formatter.service';
+
 import { Delivery, DeliveryState, DeliveryUtil } from '../../../../../../shared/deliverer/delivery-util';
 import { TimeRange } from '../../../../../../shared/app-user/time-range';
 import { DateFormatter } from '../../../../../../shared/common-util/date-formatter';
@@ -12,7 +14,9 @@ export { Delivery, DeliveryState };
 export class DeliveryUtilService {
 
 
-    public constructor() {}
+    public constructor (
+        private dateFormatter: DateFormatterService
+    ) {}
 
 
     /**
@@ -64,12 +68,12 @@ export class DeliveryUtilService {
             // First, see if our current day of week matches the time range's day of week.
             if (currentDateTime.getDay() === delivery.possibleDeliveryTimes[i].startTime.getDay()) {
 
-                const startWallClockTimeStr: string = DateFormatter.dateToWallClockString(delivery.possibleDeliveryTimes[i].startTime);
-                const endWallClockTimeStr: string = DateFormatter.dateToWallClockString(delivery.possibleDeliveryTimes[i].endTime);
+                const startWallClockTimeStr: string = this.dateFormatter.dateToWallClockString(delivery.possibleDeliveryTimes[i].startTime);
+                const endWallClockTimeStr: string = this.dateFormatter.dateToWallClockString(delivery.possibleDeliveryTimes[i].endTime);
 
                 // Convert times into a date (based on today), and get milliseconds since epoch for easy comparison with current date-time.
-                const startTimeMs: number = DateFormatter.setWallClockTimeForDate(new Date(), startWallClockTimeStr).getTime();
-                const endTimeMs: number = DateFormatter.setWallClockTimeForDate(new Date(), endWallClockTimeStr).getTime();
+                const startTimeMs: number = this.dateFormatter.setWallClockTimeForDate(new Date(), startWallClockTimeStr).getTime();
+                const endTimeMs: number = this.dateFormatter.setWallClockTimeForDate(new Date(), endWallClockTimeStr).getTime();
 
                 if (currentTimeMs >= startTimeMs && currentTimeMs <= (endTimeMs - totalDeliveryTimeMs))
                 {  return true;  }

@@ -1,21 +1,23 @@
 <slick-filtered-list #filteredList [filters]="filters" [listings]="listings">
 
-    <ng-container filters>
-        <delivery-listings-filters #filters [formGroup]="filters" header="Search Filters" [additionalFilters]="additionalFilters">
+    <slick-left-panel buttonIcon="search" filters>
+        <delivery-listings-filters #filters [formGroup]="filters" header="Find Deliveries" [additionalFilters]="additionalFilters">
 
             <ng-container top>
                         
                 <h5>Delivery Status:</h5>
-                <mat-select formControlName="deliveryState" placeholder="Any Status" floatPlaceholder="never" title="Only shows deliveries with given status">
-                    <mat-option *ngFor="let deliveryState of deliveryStates" [value]="deliveryState">
-                        {{ (deliveryState == null) ? 'Any Status' : deliveryUtilService.getReadableDeliveryState(deliveryState) }} 
-                    </mat-option>
-                </mat-select>
+                <mat-form-field floatPlaceholder="never">
+                    <mat-select formControlName="deliveryState" placeholder="Any Status" title="Only shows deliveries with given status">
+                        <mat-option *ngFor="let deliveryState of deliveryStates" [value]="deliveryState">
+                            {{ (deliveryState == null) ? 'Any Status' : deliveryUtilService.getReadableDeliveryState(deliveryState) }} 
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
 
             </ng-container>
 
         </delivery-listings-filters>
-    </ng-container>
+    </slick-left-panel>
 
 
 

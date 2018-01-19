@@ -23,7 +23,7 @@ export function getDeliveries(filters: DeliveryFilters, myAppUserKey: number, my
     let queryArgs: any[] = [ myAppUserKey, filters.retrievalOffset, filters.retrievalAmount,
                              filters.deliveryFoodListingKey, filters.claimedFoodListingKey,
                              filters.maxDistance, filters.maxTotalWeight, filters.unscheduledDeliveries,
-                             filters.myScheduledDeliveries, filters.matchAvailability, filters.deliveryState ];
+                             filters.myScheduledDeliveries, filters.matchRegularAvailability, filters.deliveryState ];
 
     // Replace any NULL query arguments with literals in query string.
     queryString = fixNullQueryArgs(queryString, queryArgs);

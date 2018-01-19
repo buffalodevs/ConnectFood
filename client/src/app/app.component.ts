@@ -8,13 +8,20 @@ import { Component } from '@angular/core';
 export class AppComponent {
 
     private readonly FOOTER_HEIGHT: number;
-    private readonly BODY_HEIGHT: number;
     private readonly BODY_MARGIN: number;
+    private bodyHeight: number;
 
 
     public constructor() {
         this.FOOTER_HEIGHT = 25;
         this.BODY_MARGIN = 30;
-        this.BODY_HEIGHT = window.innerHeight - (this.FOOTER_HEIGHT + this.BODY_MARGIN);
+
+        window.addEventListener('resize', this.recalcMinBodyHeight.bind(this));
+        this.recalcMinBodyHeight();
+    }
+
+
+    private recalcMinBodyHeight(): void {
+        this.bodyHeight = window.innerHeight - ( this.FOOTER_HEIGHT + this.BODY_MARGIN );
     }
 }
