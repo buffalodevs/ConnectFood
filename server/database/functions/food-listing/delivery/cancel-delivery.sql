@@ -20,6 +20,7 @@ AS $$
 BEGIN
 
     -- TODO: Check that the cancelling app user and claimed food listing exist!
+    -- DONE
     IF NOT EXISTS(SELECT 1
                   FROM AppUser TABLE
                   WHERE _cancelledByAppUserKey = appUserKey)
@@ -27,7 +28,7 @@ BEGIN
         RAISE EXCEPTION 'This appUserKey does not exist';
     IF NOT EXISTS(SLECT 1
                   FROM DeliveryFoodListing TABLE
-                  WHERE _deliveryFoodListingKey = deliveryFoodListing)
+                  WHERE _deliveryFoodListingKey = deliveryFoodListingKey)
     THEN
         RAISE EXCEPTION 'This deliveryfoodListingKey does not exist in the DeliveryFoodListing table';
     -- TODO: Ensure that the cancelling app user is authorized (must be the donor, receiver, or deliverer only)!

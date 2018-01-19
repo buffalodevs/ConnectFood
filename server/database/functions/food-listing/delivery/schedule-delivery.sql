@@ -22,6 +22,17 @@ AS $$
 BEGIN
 
     -- TODO: Check that the delivery app user and claimed food listing exist!
+    -- DONE
+    IF NOT EXISTS(SELECT 1
+                  FROM DeliveryFoodListing TABLE
+                  WHERE _deliveryAppUserKey = deliveryAppUserKey)
+    THEN 
+        RAISE EXCEPTION 'This appUserKey does not exist in the DeliveryFoodListing table';
+    IF NOT EXISTS(SLECT 1
+                  FROM DeliveryFoodListing TABLE
+                  WHERE _claimedFoodListingKey = claimedFoodListingKey)
+    THEN
+        RAISE EXCEPTION 'This claimedFoodListingKey does not exist in the DeliveryFoodListing table';
 
     _scheduledStartTimestamp := CASE (_startImmediately)
                                     WHEN TRUE THEN  CURRENT_TIMESTAMP
