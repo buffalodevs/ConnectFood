@@ -31,8 +31,14 @@ BEGIN
                   WHERE _deliveryFoodListingKey = deliveryFoodListingKey)
     THEN
         RAISE EXCEPTION 'This deliveryfoodListingKey does not exist in the DeliveryFoodListing table';
-    -- TODO: Ensure that the cancelling app user is authorized (must be the donor, receiver, or deliverer only)!
-    --       Additionally, the Donor and Receiver cannot cancel the delivery after it has been started (startTime IS NOT NULL)!
+
+    -- TODO: Ensure that the cancelling app user is authorized (must be the deliverer only)!
+    IF NOT EXISTS(SELECT 1
+                  FROM DeliveryFoodListing TABLE
+                  WHERE _cancelledByAppUserKey = deliveryAppUserKey
+                    AND _deliveryFoodListingKey = deliveryFoodListingKey)
+    THEN 
+        RAISE EXCEPTION 'This USER is not authorized to make this cancelation';   
 
     _deliveryUpdateNotification := generateDeliveryUpdateNotification(_deliveryFoodListingKey, 'unscheduled'::DeliveryState, NULL, NULL,
                                                                       TRUE, _cancelReason, _foodRejected);
