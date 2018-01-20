@@ -33,6 +33,7 @@ BEGIN
         RAISE EXCEPTION 'This deliveryfoodListingKey does not exist in the DeliveryFoodListing table';
 
     -- TODO: Ensure that the cancelling app user is authorized (must be the deliverer only)!
+    -- DONE
     IF NOT EXISTS(SELECT 1
                   FROM DeliveryFoodListing TABLE
                   WHERE _cancelledByAppUserKey = deliveryAppUserKey
