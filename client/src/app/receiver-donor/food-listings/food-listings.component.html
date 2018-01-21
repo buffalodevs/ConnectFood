@@ -20,37 +20,89 @@
         </ng-container>
         
         <div slick-list-item-body id="slick-list-item-body" class="row">
-        
-            <div class="col-lg-6" *ngIf="!isDonatedCart">
-                        
-                <div class="space-bottom">
-                    <div><b>Donor</b></div>
-                    <span>{{ foodListing.donorInfo.organizationName }}</span>
-                </div>
 
-                <div class="space-bottom">
-                    <div><b>Donor Address</b></div>
-                    <div class="inline-block">
-                        <span>{{ foodListing.donorInfo.address }}</span><br>
-                        <span>{{ foodListing.donorInfo.city }}, {{ foodListing.donorInfo.state }}</span>
+            <ng-container *ngIf="!isDonatedCart">
+        
+                <div class="col-lg-6">
+
+                    <div class="space-bottom">
+                        <div><b>Donor</b></div>
+                        <span>{{ foodListing.donorInfo.organizationName }}</span>
                     </div>
-                </div>
-        
-            </div>
-        
-            <div class="col-lg-6 hide-phone">
 
-                <div class ="space-bottom" *ngIf="foodListing.donorInfo.drivingDistance != null">
-                    <div><b>Drive Distance</b></div>
-                    <span class="inline-block">{{ foodListing.donorInfo.drivingDistance + ' miles' }}</span>
+                    <div class="space-bottom">
+                        <div><b>Donor Address</b></div>
+                        <div class="inline-block">
+                            <span>{{ foodListing.donorInfo.address }}</span><br>
+                            <span>{{ foodListing.donorInfo.city }}, {{ foodListing.donorInfo.state }}</span>
+                        </div>
+                    </div>
+
+                    <div class="space-bottom" *ngIf="isClaimedCart">
+                        <div><b>Deliverer</b></div>
+                        <span *ngIf="foodListing.claimInfo.delivererInfo != null">
+                            {{ foodListing.claimInfo.delivererInfo.firstName + ' ' + foodListing.claimInfo.delivererInfo.lastName }}
+                        </span>
+                        <span *ngIf="foodListing.claimInfo.delivererInfo == null">
+                            None
+                        </span>
+                    </div>
+
                 </div>
 
-                <div class="space-bottom">
-                    <div><b>Available Until</b></div>
-                    <span>{{ dateFormatter.dateToMonthDayYearString(foodListing.availableUntilDate) }}</span>
+                <div class="col-lg-6 hide-phone">
+
+                    <div class ="space-bottom" *ngIf="foodListing.donorInfo.drivingDistance != null">
+                        <div><b>Drive Distance</b></div>
+                        <span class="inline-block">{{ foodListing.donorInfo.drivingDistance + ' miles' }}</span>
+                    </div>
+
+                    <div class="space-bottom">
+                        <div><b>Available Until</b></div>
+                        <span>{{ dateFormatter.dateToMonthDayYearString(foodListing.availableUntilDate) }}</span>
+                    </div>
+            
                 </div>
-        
-            </div>
+
+            </ng-container>
+
+            <ng-container *ngIf="isDonatedCart">
+
+                <div class="col-lg-6">
+
+                    <div class="space-bottom">
+                        <div><b>Receiver</b></div>
+                        <span *ngIf="foodListing.claimInfo.receiverInfo != null">{{ foodListing.claimInfo.receiverInfo.organizationName }}</span>
+                        <span *ngIf="foodListing.claimInfo.receiverInfo == null">None</span>
+                    </div>
+
+                    <div class="space-bottom" *ngIf="foodListing.claimInfo.receiverInfo != null">
+                        <div><b>Receiver Address</b></div>
+                        <div class="inline-block">
+                            <span>{{ foodListing.claimInfo.receiverInfo.address }}</span><br>
+                            <span>{{ foodListing.claimInfo.receiverInfo.city }}, {{ foodListing.claimInfo.receiverInfo.state }}</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-lg-6">
+
+                    <div class="space-bottom">
+                        <div><b>Driver</b></div>
+                        <span *ngIf="foodListing.claimInfo.delivererInfo != null">
+                            {{ foodListing.claimInfo.delivererInfo.firstName + ' ' + foodListing.claimInfo.delivererInfo.lastName }}
+                        </span>
+                        <span *ngIf="foodListing.claimInfo.delivererInfo == null">
+                            None
+                        </span>
+                    </div>
+
+                </div>
+
+            </ng-container>
+
+
         
         </div>
 

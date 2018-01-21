@@ -237,54 +237,58 @@ BEGIN
                     -- App user information of all user's associated with Food Listing (Donor, Receiver(s), & Deliverer(s)).
                     'donorInfo',            ( SELECT sessionData->'appUserInfo' FROM getAppUserSessionData(DonorAppUser.appUserKey) ),
                     -- Form an array of claim information objects here.
-                    'claimInfo',           (
-                                                SELECT JSON_BUILD_OBJECT (
-                                                    'receiverInfo',         (
+                    'claimInfo',            JSON_BUILD_OBJECT (
+                                                'receiverInfo',         CASE WHEN (ReceiverAppUser.appUserKey IS NOT NULL)
+                                                                            THEN (
                                                                                 SELECT sessionData->'appUserInfo'
                                                                                 FROM getAppUserSessionData(ReceiverAppUser.appUserKey)
-                                                                            ),
-                                                    'delivererInfo',        (
+                                                                            )
+                                                                            ELSE NULL
+                                                                        END,
+                                                'delivererInfo',        CASE WHEN (DelivererAppUser.appUserKey IS NOT NULL)
+                                                                            THEN (
                                                                                 SELECT sessionData->'appUserInfo'
                                                                                 FROM getAppUserSessionData(DelivererAppUser.appUserKey)
-                                                                            ),
-                                                    'deliveryStateInfo',    JSON_BUILD_OBJECT (
-                                                                                'deliveryState',        getDeliveryState (
-                                                                                                            DeliveryFoodListing.scheduledStartTime,
-                                                                                                            DeliveryFoodListing.startTime,
-                                                                                                            DeliveryFoodListing.pickUpTime,
-                                                                                                            DeliveryFoodListing.dropOffTime
-                                                                                                        ),
-                                                                                'scheduledStartTime',   DeliveryFoodListing.scheduledStartTime,
-                                                                                'startTime',            DeliveryFoodListing.startTime,
-                                                                                'pickUpTime',           DeliveryFoodListing.pickUpTime,
-                                                                                'dropOffTime',          DeliveryFoodListing.dropOffTime
                                                                             )
-                                                )
-                                                FROM        ClaimedFoodListing
-                                                INNER JOIN  AppUser ReceiverAppUser     ON  ClaimedFoodListing.receiverAppUserKey = ReceiverAppUser.appUserKey
-                                                INNER JOIN  DeliveryFoodListing         ON  ClaimedFoodListing.claimedFoodListingKey = DeliveryFoodListing.claimedFoodListingKey
-                                                                                        -- Make sure we do not include cancelled deliveries!
-                                                                                        AND NOT EXISTS (
-                                                                                                SELECT  1
-                                                                                                FROM    CancelledDeliveryFoodListing
-                                                                                                WHERE   CancelledDeliveryFoodListing.deliveryFoodListingKey
-                                                                                                        = DeliveryFoodListing.deliveryFoodListingKey
-                                                                                            )
-                                                INNER JOIN  AppUser DelivererAppUser    ON  DeliveryFoodListing.delivererAppUserKey = DelivererAppUser.appUserKey
-                                                WHERE       ClaimedFoodListing.foodListingKey = FoodListing.foodListingKey
-                                                  AND       NOT EXISTS (
-                                                                SELECT  1
-                                                                FROM    UnclaimedFoodListing
-                                                                WHERE   UnclaimedFoodListing.claimedFoodListingKey = ClaimedFoodListing.claimedFoodListingKey
-                                                            )
+                                                                            ELSE NULL
+                                                                        END,
+                                                'deliveryStateInfo',    JSON_BUILD_OBJECT (
+                                                                            'deliveryState',        getDeliveryState (
+                                                                                                        DeliveryFoodListing.scheduledStartTime,
+                                                                                                        DeliveryFoodListing.startTime,
+                                                                                                        DeliveryFoodListing.pickUpTime,
+                                                                                                        DeliveryFoodListing.dropOffTime
+                                                                                                    ),
+                                                                            'scheduledStartTime',   DeliveryFoodListing.scheduledStartTime,
+                                                                            'startTime',            DeliveryFoodListing.startTime,
+                                                                            'pickUpTime',           DeliveryFoodListing.pickUpTime,
+                                                                            'dropOffTime',          DeliveryFoodListing.dropOffTime
+                                                                        )
                                             )
                 ) AS foodListing
     
     FROM        FiltFoodListing
-    INNER JOIN  FoodListing                                     ON  FiltFoodListing.foodListingKey = FoodListing.foodListingKey
-    INNER JOIN  AppUser                  AS DonorAppUser        ON  FoodListing.donorAppUserKey = DonorAppUser.appUserKey
-    INNER JOIN  ContactInfo              AS DonorContact        ON  DonorAppUser.appUserKey = DonorContact.appUserKey
-    INNER JOIN  Organization             AS DonorOrganization   ON  DonorAppUser.appUserKey = DonorOrganization.appUserKey    
+    INNER JOIN  FoodListing                                             ON  FiltFoodListing.foodListingKey = FoodListing.foodListingKey
+    INNER JOIN  AppUser                         AS DonorAppUser         ON  FoodListing.donorAppUserKey = DonorAppUser.appUserKey
+    INNER JOIN  ContactInfo                     AS DonorContact         ON  DonorAppUser.appUserKey = DonorContact.appUserKey
+    INNER JOIN  Organization                    AS DonorOrganization    ON  DonorAppUser.appUserKey = DonorOrganization.appUserKey
+    LEFT JOIN   ClaimedFoodListing                                      ON  FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
+                                                                        -- Make sure we do not include any unclaimed claims!
+                                                                        AND NOT EXISTS (
+                                                                                SELECT  1
+                                                                                FROM    UnclaimedFoodListing
+                                                                                WHERE   UnclaimedFoodListing.claimedFoodListingKey = ClaimedFoodListing.claimedFoodListingKey
+                                                                            )
+    LEFT JOIN   AppUser                         AS ReceiverAppUser      ON  ClaimedFoodListing.receiverAppUserKey = ReceiverAppUser.appUserKey
+    LEFT JOIN   DeliveryFoodListing                                     ON  ClaimedFoodListing.claimedFoodListingKey = DeliveryFoodListing.claimedFoodListingKey
+                                                                        -- Make sure we do not include cancelled deliveries!
+                                                                        AND NOT EXISTS (
+                                                                                SELECT  1
+                                                                                FROM    CancelledDeliveryFoodListing
+                                                                                WHERE   CancelledDeliveryFoodListing.deliveryFoodListingKey
+                                                                                        = DeliveryFoodListing.deliveryFoodListingKey
+                                                                            )
+    LEFT JOIN   AppUser                         AS DelivererAppUser     ON  DeliveryFoodListing.delivererAppUserKey = DelivererAppUser.appUserKey
     ORDER BY    FiltFoodListing.orderNumber ASC;
 
 END;

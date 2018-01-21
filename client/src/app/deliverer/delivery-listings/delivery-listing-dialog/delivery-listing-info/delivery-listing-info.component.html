@@ -14,32 +14,6 @@
         </ng-container>
 
         <div slick-list-item-body class="row">
-            
-            <slick-expansion-panel class="col-lg-6 col-md-12 desktop-space-bottom">
-                        
-                <ng-container mat-panel-title>Donor Contact</ng-container>
-                
-                <span class="inline-block">{{ delivery.donorInfo.organizationName }}</span><br>
-                <span>{{ delivery.donorInfo.address }}</span><br>
-                <span class="space-bottom">
-                    {{ delivery.donorInfo.city }}, {{ delivery.donorInfo.state }} {{ delivery.donorInfo.zip }}
-                </span><br>
-                <a href="tel:{{delivery.donorInfo.phone}}" class="link-content no-word-wrap">{{ delivery.donorInfo.phone }}</a>
-
-            </slick-expansion-panel>
-            
-            <slick-expansion-panel class="col-lg-6 col-md-12 desktop-space-bottom">
-                        
-                <ng-container mat-panel-title>Receiver Contact</ng-container>
-
-                <span class="inline-block">{{ delivery.receiverInfo.organizationName }}</span><br>
-                <span>{{ delivery.receiverInfo.address }}</span><br>
-                <span>
-                    {{ delivery.receiverInfo.city }}, {{ delivery.receiverInfo.state }} {{ delivery.receiverInfo.zip }}
-                </span><br>
-                <a href="tel:{{delivery.receiverInfo.phone}}" class="link-content no-word-wrap">{{ delivery.receiverInfo.phone }}</a>
-
-            </slick-expansion-panel>
 
             <slick-expansion-panel class="col-lg-12">
 
@@ -73,6 +47,32 @@
                     <b>Scheduled Start Time:</b>
                     <div class="inline-block">{{ getReadableScheduledStartTime() }}</div>
                 </div>
+
+            </slick-expansion-panel>
+            
+            <slick-expansion-panel class="col-xl-6 col-lg-12 desktop-space-bottom">
+                        
+                <ng-container mat-panel-title>Donor Contact</ng-container>
+                
+                <span class="inline-block">{{ delivery.donorInfo.organizationName }}</span><br>
+                <span>{{ delivery.donorInfo.address }}</span><br>
+                <span class="space-bottom">
+                    {{ delivery.donorInfo.city }}, {{ delivery.donorInfo.state }} {{ delivery.donorInfo.zip }}
+                </span><br>
+                <a href="tel:{{delivery.donorInfo.phone}}" class="link-content no-word-wrap">{{ delivery.donorInfo.phone }}</a>
+
+            </slick-expansion-panel>
+            
+            <slick-expansion-panel class="col-xl-6 col-lg-12 desktop-space-bottom">
+                        
+                <ng-container mat-panel-title>Receiver Contact</ng-container>
+
+                <span class="inline-block">{{ delivery.receiverInfo.organizationName }}</span><br>
+                <span>{{ delivery.receiverInfo.address }}</span><br>
+                <span>
+                    {{ delivery.receiverInfo.city }}, {{ delivery.receiverInfo.state }} {{ delivery.receiverInfo.zip }}
+                </span><br>
+                <a href="tel:{{delivery.receiverInfo.phone}}" class="link-content no-word-wrap">{{ delivery.receiverInfo.phone }}</a>
 
             </slick-expansion-panel>
 

@@ -1,3 +1,13 @@
 #food-types-container {
     max-width: 350px !important;
 }
+
+.row {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.col-xl-6, .col-lg-12 {
+    margin: 0px;
+    padding: 0px;
+}

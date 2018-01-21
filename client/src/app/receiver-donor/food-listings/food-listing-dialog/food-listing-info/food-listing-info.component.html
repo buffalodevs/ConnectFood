@@ -6,65 +6,26 @@
     </ng-container>
     
     <div slick-list-item-body class="row">
-    
-        <!-- Donor Description (Column 1) -->
-        <div class="col-lg-6 col-md-12 desktop-space-bottom" *ngIf="!isDonatedCart">
 
-            <slick-expansion-panel>
+        <!-- Food Description (Cell 1) -->
+        <div class="col-lg-12">
+
+            <slick-expansion-panel [collapseWidth]="null">
                     
                 <ng-container mat-panel-title>
-                    Donor Info
+                    Description
                 </ng-container>
-                
-                <div class="space-bottom">
-                    <b>Donor Organization:</b>
-                    <span class="inline-block">{{ foodListing.donorInfo.organizationName }}</span>
-                </div>
-
-                <div class="space-bottom">
-                    <b class="inline-block">Donor Administrator:</b>
-                    <span class="inline-block">{{ foodListing.donorInfo.firstName }} {{ foodListing.donorInfo.lastName }}</span>
-                </div>
-
-                <div class="space-bottom">
-                    <div class="inline-block">
-                        <b>Donor Address:</b>
-                    </div>
-                    <div class="inline-block">
-                        <span>{{ foodListing.donorInfo.address }}</span><br>
-                        <span>
-                            {{ foodListing.donorInfo.city }}, {{ foodListing.donorInfo.state }} {{ foodListing.donorInfo.zip }}
-                        </span>
-                    </div>
-                </div>
-
-                <div class="space-bottom">
-                    <b>Donor Phone:</b>
-                    <a href="tel:{{ foodListing.donorInfo.phone }}" class="no-word-wrap link-content">{{ foodListing.donorInfo.phone }}</a>
-                </div>
-
-                <div class="space-bottom">
-                    <b>Donor Email:</b>
-                    <a href="mailto:{{ foodListing.donorInfo.email }}" class="inline-block link-content">{{ foodListing.donorInfo.email }}</a>
-                </div>
-
-                <div class ="space-bottom" *ngIf="foodListing.donorInfo.drivingDistance != null">
-                    <b>Driving Distance:</b>
-                    <span class="inline-block">{{ foodListing.donorInfo.drivingDistance + ' miles' }}</span>
-                </div>
+        
+            <span class="inline-block">{{ (foodListing.foodDescription != null) ? foodListing.foodDescription : '-- No Description --' }}</span>
 
             </slick-expansion-panel>
 
-        </div> <!-- Donor Description (Column 1 Non-Donor Cart) -->
+        </div>
+        <!-- Food Description (Cell 1) -->
 
-        <div *ngIf="isDonatedCart">
 
-            <!-- TODO -->
-
-        </div> <!-- Receiver Description (Column 1 Donor Cart) -->
-
-        <!-- Misc Description (Column 2) -->
-        <div class="col-lg-6 col-md-12 desktop-space-bottom">
+        <!-- Food Info (Cell 2) -->
+        <div class="col-xl-6 col-lg-12 desktop-space-bottom">
 
             <slick-expansion-panel>
 
@@ -92,21 +53,75 @@
 
             </slick-expansion-panel>
 
-        </div> <!-- Misc Description (Column 2) -->
-
-        <div class="col-md-12">
-
-            <slick-expansion-panel [collapseWidth]="null">
-                    
-                <ng-container mat-panel-title>
-                    Description
-                </ng-container>
-        
-            <span class="inline-block">{{ (foodListing.foodDescription != null) ? foodListing.foodDescription : 'No Description' }}</span>
-
-            </slick-expansion-panel>
-
         </div>
+        <!-- Food Info (Cell 2) -->
+    
+
+        <!-- Food User(s) (Cells 3...N) -->
+        <div class="col-xl-6 col-lg-12 desktop-space-bottom">
+            
+            <ng-container *ngFor="let foodListingUserAccessor of FOOD_LISTING_USER_ACCESSORS; let i = index">
+                <ng-container *ngIf="shouldShowFoodListingUser(foodListingUserAccessor)">
+
+                    <slick-expansion-panel>
+   
+                        <ng-container mat-panel-title>
+                            {{ FOOD_LISTING_USER_TITLES[i] }} Info
+                        </ng-container>
+                        
+                        <ng-container *ngIf="foodListing[foodListingUserAccessor] != null">
+
+                            <div class="space-bottom" *ngIf="foodListing[foodListingUserAccessor].organizationName != null">
+                                <b>{{ FOOD_LISTING_USER_TITLES[i] }} Organization:</b>
+                                <span class="inline-block">{{ foodListing[foodListingUserAccessor].organizationName }}</span>
+                            </div>
+
+                            <div class="space-bottom">
+                                <b class="inline-block">{{ FOOD_LISTING_USER_TITLES[i] }} Administrator:</b>
+                                <span class="inline-block">{{ foodListing[foodListingUserAccessor].firstName }} {{ foodListing[foodListingUserAccessor].lastName }}</span>
+                            </div>
+
+                            <div class="space-bottom">
+                                <div class="inline-block">
+                                    <b>{{ FOOD_LISTING_USER_TITLES[i] }} Address:</b>
+                                </div>
+                                <div class="inline-block">
+                                    <span>{{ foodListing[foodListingUserAccessor].address }}</span><br>
+                                    <span>
+                                        {{ foodListing[foodListingUserAccessor].city }}, {{ foodListing[foodListingUserAccessor].state }} {{ foodListing[foodListingUserAccessor].zip }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="space-bottom">
+                                <b>{{ FOOD_LISTING_USER_TITLES[i] }} Phone:</b>
+                                <a href="tel:{{ foodListing[foodListingUserAccessor].phone }}" class="no-word-wrap link-content">{{ foodListing[foodListingUserAccessor].phone }}</a>
+                            </div>
+
+                            <div class="space-bottom">
+                                <b>{{ FOOD_LISTING_USER_TITLES[i] }} Email:</b>
+                                <a href="mailto:{{ foodListing[foodListingUserAccessor].email }}" class="inline-block link-content">{{ foodListing[foodListingUserAccessor].email }}</a>
+                            </div>
+
+                            <div class ="space-bottom" *ngIf="foodListing[foodListingUserAccessor].drivingDistance != null">
+                                <b>Driving Distance:</b>
+                                <span class="inline-block">{{ foodListing[foodListingUserAccessor].drivingDistance + ' miles' }}</span>
+                            </div>
+
+                        </ng-container>
+
+                        <span class="no-word-wrap" *ngIf="foodListing[foodListingUserAccessor] == null">
+                            <i class="material-icons" *ngIf="!foodListing.needsRefrigeration" style="color:red">clear</i>
+                            <span>No {{ FOOD_LISTING_USER_TITLES[i] }}</span>
+                        </span>
+
+                    </slick-expansion-panel>
+
+                </ng-container>
+            </ng-container>
+            
+        </div>
+        <!-- Food User(s) (Cells 3...N) -->
     
     </div>
 

@@ -438,16 +438,17 @@ ngb-typeahead-window .dropdown-item.active, ngb-typeahead-window .dropdown-item:
     text-align: right;
 }
 
+.cdk-overlay-pane {
+    max-width: 95vw !important;
+}
+
 @media only screen and (max-width: 776px) {
 
     .modal-button-group button {
         width: 100%;
         margin-top: 5px;
         margin-bottom: 5px;
-    }
-
-    .cdk-overlay-pane {
-        max-width: 95vw !important;
+        border-radius: 0px !important;
     }
 }
 
