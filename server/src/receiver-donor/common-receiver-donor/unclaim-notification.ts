@@ -11,9 +11,7 @@ export class UnclaimNotificationData {
 
     public constructor (
         public foodTitle: string,
-        public oldClaimedUnitsCount: number,
-        public newClaimedUnitsCount: number,
-        public unitsLabel: string,
+        public unclaimReason: string,
         public donorSessionData: SessionData,
         public receiverSessionData: SessionData,
         public delivererSessionData: SessionData
@@ -30,28 +28,19 @@ export function notifyReceiverOfUnclaim(unclaimNotificationData: UnclaimNotifica
     
     const receiverEmail: string = unclaimNotificationData.receiverSessionData.appUserInfo.email;
     const receiverOrganization: string = unclaimNotificationData.receiverSessionData.appUserInfo.organizationName;
-    const unitsLabel: string = unclaimNotificationData.unitsLabel ? unclaimNotificationData.unitsLabel
-                                                              : 'units';
-    const oldUnitsCount: number = unclaimNotificationData.oldClaimedUnitsCount;
-    const newUnitsCount: number = unclaimNotificationData.newClaimedUnitsCount;
-    const unitsUnclaimedCount: number = ( oldUnitsCount - newUnitsCount );
     const foodTitle: string = unclaimNotificationData.foodTitle;
     const donorOrganization: string = unclaimNotificationData.donorSessionData.appUserInfo.organizationName;
 
-    let unitsUnclaimedText: string = '';
-    let unitsRemainingText: string = '';
-    
-    if (newUnitsCount !== 0) {
-        unitsUnclaimedText = ( unitsUnclaimedCount + ' ' + unitsLabel + ' of ' );
-        unitsRemainingText = ( 'You have <b>' + newUnitsCount + unitsLabel + '</b> remaining ');
-    }
-
     let htmlContents: string = `
         <p>
-            We regret to inform you that ` + unitsUnclaimedText +
-            `your claimed food titled <b>` + foodTitle + `</b> has been removed by the donor <b>` + donorOrganization + `</b>.<br>` +
-            unitsRemainingText + `
+            We regret to inform you that your claimed food titled <b>` + foodTitle + `</b> has been removed by the donor <b>` + donorOrganization + `</b>.<br>
         </p>
+
+        <p>
+            ` + donorOrganization + ` gave the following reason for the removal of their donation:<br>
+        </p>
+
+        ` + genUnclaimReasonHTML(unclaimNotificationData.unclaimReason) + `
 
         <p>
             We are sorry for any inconvenience that this has caused you. Please browse and claim other available food donations
@@ -88,8 +77,14 @@ export function notifyDonorOfLostDelivery(unclaimNotificationData: UnclaimNotifi
     let htmlContents: string = `
         <p>
             We regret to inform you that the receiver <b>` + receiverOrganization + `</b>
-            has removed all claims to your donated food titled <b>` + foodTitle + `</b>.
+            has unclaimed your donated food titled <b>` + foodTitle + `</b>.
         </p>
+
+        <p>
+            ` + receiverOrganization + ` gave the following reason for the removal of their claim:<br>
+        </p>
+
+        ` + genUnclaimReasonHTML(unclaimNotificationData.unclaimReason) + `
 
         <p>
             Therefore, the corresponding delivery has been cancelled. The deliverer
@@ -137,6 +132,12 @@ export function notifyDelivererOfLostDelivery(sourceSessionData: SessionData, so
         </p>
 
         <p>
+            ` + sourceOrganization + ` gave the following reason for the removal of the delivery:<br>
+        </p>
+
+        ` + genUnclaimReasonHTML(unclaimNotificationData.unclaimReason) + `
+
+        <p>
             We are sorry for any inconvenience that this has caused you. Please browse and schedule other deliveries
             on our website at our <a href="` + process.env.HOST_ADDRESS + `/deliver">Deliver</a> tab.
         </p>
@@ -152,4 +153,19 @@ export function notifyDelivererOfLostDelivery(sourceSessionData: SessionData, so
 
     return sendEmail(mailConfig)
         .catch((err: Error) => { console.log(err); });
+}
+
+
+/**
+ * Generates blockquote HTML for the unclaim reason.
+ * @param unclaimReason The unclaim reason.
+ * @return The HTML string.
+ */
+function genUnclaimReasonHTML(unclaimReason: string): string {
+
+    return `
+        <blockquote>
+            <i><b>` + unclaimReason + `</b></i>
+        </blockquote>
+    `;
 }

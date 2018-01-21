@@ -5,7 +5,7 @@ SELECT dropFunction('updateDeliveryState');
 CREATE OR REPLACE FUNCTION updateDeliveryState
 (
      _deliveryFoodListingKey    DeliveryFoodListing.deliveryFoodListingKey%TYPE,    -- This is the key of the Delivery Food Listing element that we are updating the status of.
-     _deliveryAppUserKey        DeliveryFoodListing.deliveryAppUserKey%TYPE,        -- This is the key of the user who is delivering the Food Listing.
+     _delivererAppUserKey       DeliveryFoodListing.delivererAppUserKey%TYPE,       -- This is the key of the user who is delivering the Food Listing.
      _deliveryState             DeliveryState,
      _stateUpdateTimestamp      TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
 )
@@ -24,7 +24,7 @@ BEGIN
     --       The delivery state would be at least 2 steps (states) behind or ahead of the current one that it is on.
     --       This allows the deliverer to undo at most one state transition at a time, and progress it one state at a time!
 
-    _deliveryUpdateNotification := generateDeliveryUpdateNotification(_deliveryFoodListingKey, _deliveryState);
+    _deliveryUpdateNotification := getDeliveryUpdateNotification(_deliveryFoodListingKey, _deliveryState);
 
     UPDATE  DeliveryFoodListing
     SET     startTime   =   CASE (_deliveryState)
@@ -41,7 +41,7 @@ BEGIN
                                 WHEN 'pickedUp'     THEN    NULL -- Going back a step.
                                 ELSE                        dropOffTime
                             END
-    WHERE   deliveryFoodListingKey = _deliveryFoodListingKey;    
+    WHERE   DeliveryFoodListing.deliveryFoodListingKey = _deliveryFoodListingKey;    
 
     RETURN QUERY
     SELECT  _deliveryFoodListingKey,

@@ -1,4 +1,4 @@
-<form [formGroup]="form" class="container" *ngIf="!signupComplete" [slick-progress-spinner]="showProgressSpinner" maxWidth="200px" maxHeight="200px">
+<form [formGroup]="form" id="signup-form" class="container" *ngIf="!signupComplete" [slick-progress-spinner]="showProgressSpinner" spinnerStickyTopId="signup-form">
 
     <mat-horizontal-stepper #stepper [linear]="true">
 

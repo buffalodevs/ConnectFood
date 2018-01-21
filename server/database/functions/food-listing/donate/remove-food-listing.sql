@@ -4,117 +4,73 @@
 SELECT dropFunction('removefoodlisting');
 CREATE OR REPLACE FUNCTION removeFoodListing
 (
-    _foodListingKey         FoodListing.foodListingKey%TYPE,
-    _donatedByAppUserKey    FoodListing.donatedByAppUserKey%TYPE,
-    _deleteUnitsCount       FoodListing.availableUnitsCount%TYPE DEFAULT NULL   -- The number of units/parts that the donor wishes to remove.
-                                                                                -- NOTE: Default NULL means that all units (the whole FoodListing) shall be removed.
-                                                                                --       Also, only units that have not entered a delivery phase may be removed.
+    _foodListingKey         FoodListing.foodListingKey%TYPE,                       -- The key ID of the Food Listing that is being removed.
+    _removedByAppUserKey    AppUser.appUserKey%TYPE,                               /* The app user that is causing the removal
+                                                                                      NOTE: (should only be associated donor, receiver, or deliverer). */
+    _removalReason          RemovedFoodListing.removalReason%TYPE,                 -- The reason why the food listing was removed.
+    _foodRejected           RemovedFoodListing.foodRejected%TYPE    DEFAULT FALSE  -- Determines if the removal is due to rejection from Receiver or Deliverer.
 )
 -- Return user information of (receiver/deliverer) app users who were affected by the removal of the donation.
 RETURNS TABLE (
     claimedFoodListingKey   ClaimedFoodListing.claimedFoodListingKey%TYPE,
-    claimedByAppUserKey     ClaimedFoodListing.claimedByAppUserKey%TYPE,
     unclaimNotificationData JSON
 )
 AS $$
-    DECLARE _donorOnHandUnitsCount          FoodListing.availableUnitsCount%TYPE;
-    DECLARE _availableUnitsCount            FoodListing.availableUnitsCount%TYPE;
-    DECLARE _claimedUnitsDeleteCount        ClaimedFoodListing.claimedUnitsCount%TYPE;
+    DECLARE _claimedFoodListingKey ClaimedFoodListing.claimedFoodListingKey%TYPE;
 BEGIN
-
-    DROP TABLE IF EXISTS RemovalInfo;
-    CREATE TEMP TABLE RemovalInfo (
-        claimedFoodListingKey   INTEGER,
-        claimedByAppUserKey     INTEGER,
-        unclaimNotificationData JSON
-    );
 
     -- Make sure the food listing we are to delete exists and was donated by user issuing this command.
     IF NOT EXISTS (
-        SELECT  1
-        FROM    FoodListing
-        WHERE   FoodListing.foodListingKey = _foodListingKey
-          AND   FoodListing.donatedByAppUserKey = _donatedByAppUserKey
+        SELECT      1
+        FROM        FoodListing
+        LEFT JOIN   ClaimedFoodListing      ON  FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
+                                            AND NOT EXISTS (
+                                                SELECT  1
+                                                FROM    UnclaimedFoodListing
+                                                WHERE   UnclaimedFoodListing.claimedFoodListingKey = ClaimedFoodListing.claimedFoodListingKey
+                                            )
+        LEFT JOIN   DeliveryFoodListing     ON  ClaimedFoodListing.claimedFoodListingKey = DeliveryFoodListing.claimedFoodListingKey
+                                            AND NOT EXISTS (
+                                                SELECT  1
+                                                FROM    CancelledDeliveryFoodListing
+                                                WHERE   CancelledDeliveryFoodListing.deliveryFoodListingKey = DeliveryFoodListing.deliveryFoodListingKey
+                                            )
+        WHERE       FoodListing.foodListingKey = _foodListingKey
+          AND       (   FoodListing.donorAppUserKey = _removedByAppUserKey
+                     OR ClaimedFoodListing.receiverAppUserKey = _removedByAppUserKey
+                     OR DeliveryFoodListing.delivererAppUserKey = _removedByAppUserKey )
+
     )
     THEN
-        RAISE EXCEPTION 'Food listing does not exist, or user not authorized as Donor.';
-    END IF;
-
-    -- Get the count of units that the Donor still has control over.
-    SELECT      availableUnitsCount + COALESCE(SUM(claimedUnitsCount), 0),
-                availableUnitsCount
-    INTO        _donorOnHandUnitsCount,
-                _availableUnitsCount
-    FROM        FoodListing
-    LEFT JOIN   ClaimedFoodListing ON FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
-    WHERE       FoodListing.foodListingKey = _foodListingKey
-    -- Donor only has control over available listings and * claimed listings that have not yet entered in delivery phase *!
-      AND       NOT EXISTS (
-                    SELECT 1 FROM DeliveryFoodListing
-                    WHERE DeliveryFoodListing.claimedFoodListingKey = ClaimedFoodListing.claimedFoodListingKey
-                )
-    GROUP BY    FoodListing.foodListingKey, FoodListing.availableUnitsCount;
-
-
-
-    -- If _deleteUnitsCount is unspecified, set it to total number of deletable (donor on hand) units.
-    IF (_deleteUnitsCount IS NULL)
-    THEN
-        _deleteUnitsCount := _donorOnHandUnitsCount;
-    -- Else if _deleteUnitsCount is greater than total number of deletable units, then throw an exception!
-    ELSIF (_deleteUnitsCount > _donorOnHandUnitsCount)
-    THEN
-        RAISE EXCEPTION 'Number of specified units to delete are greater than number of units that donor has possesion of.';
+        RAISE EXCEPTION 'Food listing does not exist, or user not authorized.';
     END IF;
 
 
-    -- First get the number of claimed units that we must delete.
-    -- NOTE: We only delete claimed units if we have to delete more units than the available (unclaimed) count!
-    _claimedUnitsDeleteCount := CASE (_deleteUnitsCount > _availableUnitsCount)
-                                    WHEN TRUE THEN (_deleteUnitsCount - _availableUnitsCount)
-                                    ELSE 0
-                                END;
-
-    -- Unclaim the number of claimed units that we are to delete.
-    IF (_claimedUnitsDeleteCount > 0)
+    -- Make sure that the food listing has not already been removed (double removal should never happen although it will not cause problems).
+    IF EXISTS (
+        SELECT  1
+        FROM    RemovedFoodListing
+        WHERE   RemovedFoodListing.foodListingKey = _foodListingKey
+    )
     THEN
-        INSERT INTO     RemovalInfo
-        SELECT * FROM   unclaimFoodListing(_foodListingKey, _donatedByAppUserKey, _claimedUnitsDeleteCount);
+        RAISE EXCEPTION 'Food listing has already been removed.';
     END IF;
-
-    -- Remove all units from available units that are to be deleted.
-    UPDATE    FoodListing
-    SET       availableUnitsCount = (availableUnitsCount - _deleteUnitsCount)
-    WHERE     foodListingKey = _foodListingKey
-    RETURNING availableUnitsCount
-    INTO      _availableUnitsCount;
 
     
-    -- Check if all units under the Food Listing have been removed (meaning we should delete Food Listing).
-    IF (_availableUnitsCount = 0
-        -- No units in claimed or delivery states.
-        AND NOT EXISTS(
-            SELECT      1
-            FROM        FoodListing
-            INNER JOIN  ClaimedFoodListing  ON FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
-            LEFT JOIN   DeliveryFoodListing ON ClaimedFoodListing.claimedFoodListingKey = DeliveryFoodListing.claimedFoodListingKey
-            WHERE       FoodListing.foodListingKey = _foodListingKey
-        )
-    )
-    THEN
+    -- Finally, mark the food listing as removed by creating entry in RemovedFoodListing table.
+    INSERT INTO RemovedFoodListing (foodListingKey, removedByAppUserKey, removalReason, foodRejected)
+    VALUES      (_foodListingKey, _removedByAppUserKey, _removalReason, _foodRejected);
 
-        -- Delete type associates with Food Listing.
-        DELETE FROM FoodListingFoodTypeMap
-        WHERE       foodListingKey = _foodListingKey;
 
-        -- Delete the actual Food Listing.
-        DELETE FROM FoodListing
-        WHERE       foodListingKey = _foodListingKey;
-
-    END IF;
+    -- Make sure we return any unclaim notification data if there were claimed food listings associated with the removed food listing.
+    SELECT      ClaimedFoodListing.claimedFoodListingKey
+    INTO        _claimedFoodListingKey
+    FROM        FoodListing
+    INNER JOIN  ClaimedFoodListing ON FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
+    WHERE       FoodListing.foodListingKey = _foodListingKey;
 
     RETURN QUERY
-    SELECT * FROM RemovalInfo;
+    SELECT * FROM getUnclaimNotificationData(_claimedFoodListingKey, _removalReason);
 
 END;
 $$ LANGUAGE plpgsql;

@@ -1,6 +1,7 @@
 'use strict';
-import { connect, query, Client, QueryResult } from '../../database-util/connection-pool';
+import { query, QueryResult } from '../../database-util/connection-pool';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
+import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
 import { SessionData } from '../../common-util/session-data';
 import { UnclaimNotificationData, notifyReceiverOfUnclaim, notifyDelivererOfLostDelivery } from '../common-receiver-donor/unclaim-notification';
 
@@ -12,11 +13,12 @@ import { UnclaimNotificationData, notifyReceiverOfUnclaim, notifyDelivererOfLost
  *                        Should be pulled from server session to ensure that the requestor is authorized to perform this action!
  * @return A promise that simply resolve on success without any payload.
  */
-export function removeFoodListing(foodListingKey: number, donorSessionData: SessionData, unitsCount: number): Promise<void> {
+export function removeFoodListing(foodListingKey: number, donorSessionData: SessionData, removalReason: string): Promise<void> {
     
     // Construct prepared statement.
-    let queryString = 'SELECT * FROM removeFoodListing($1, $2, $3);';
-    let queryArgs = [ foodListingKey, donorSessionData.appUserKey, unitsCount ];
+    let queryArgs = [ foodListingKey, donorSessionData.appUserKey, removalReason ];
+    let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM removeFoodListing();', queryArgs);
+    logSqlQueryExec(queryString, queryArgs);
 
     // Execute prepared statement.
     return query(queryString, queryArgs)
@@ -40,7 +42,7 @@ function notifyAffectedAppUsers(donorSessionData: SessionData, result: QueryResu
         .then(() => {
 
             // Next, if the removal resulted in total unclaiming of food that had a scheduled delivery, then notify deliverer as well.
-            if (unclaimNotificationData.delivererSessionData != null && unclaimNotificationData.newClaimedUnitsCount === 0) {
+            if (unclaimNotificationData.delivererSessionData != null) {
                 return notifyDelivererOfLostDelivery(donorSessionData, 'donor', unclaimNotificationData)
                     .then(() => {
 

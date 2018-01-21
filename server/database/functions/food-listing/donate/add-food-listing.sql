@@ -4,51 +4,38 @@
 SELECT dropFunction('addfoodlisting');
 CREATE OR REPLACE FUNCTION addFoodListing
 (
-    _donatedByAppUserKey    FoodListing.donatedByAppUserKey%TYPE,                   -- The Donor ID.
+    _donorAppUserKey        FoodListing.donorAppUserKey%TYPE,                       -- The Donor ID.
     _foodTypes              FoodType[],                                             -- What Food Types is this?
     _foodTitle              FoodListing.foodTitle%TYPE,                             -- The title (short description) of the Food Listing.
-    _perishable             FoodListing.perishable%TYPE,                            -- Is the food perishable?
+    _needsRefrigeration     FoodListing.needsRefrigeration%TYPE,                    -- Is the food perishable?
     _availableUntilDate     TEXT,                                                   -- The date when the donated food will no longer be available.
-    _totalWeight            FoodListing.totalWeight%TYPE            DEFAULT NULL,   -- The total weight of (all parts/units of) the Food Listing (in pounds).
+    _estimatedWeight        FoodListing.estimatedWeight%TYPE        DEFAULT NULL,   -- The estimated weight of the Food Listing (in pounds).
+    _estimatedValue         FoodListing.estimatedValue%TYPE         DEFAULT NULL,   -- The estimated monetary value of the Food Listing (in $).
     _foodDescription        FoodListing.foodDescription%TYPE        DEFAULT NULL,   -- A (long) description of the Food Listing.
-    _imgURL                 FoodListing.imgUrl%TYPE                 DEFAULT NULL,   -- URL for the image being stored/uploaded.
-    _unitsCount             FoodListing.availableUnitsCount%TYPE    DEFAULT 1,      -- The total number of available parts/units that the Food Listing is split up into.
-    _unitsLabel             FoodListing.unitsLabel%TYPE             DEFAULT NULL    -- The user provided label for each unit.
+    _imgUrls                TEXT[]                                  DEFAULT NULL    -- URL(s) for the image(s) being stored/uploaded.
 )
 RETURNS FoodListing.foodListingKey%TYPE -- The food listing key of the new food listing (can be used as reference for edit).
 AS $$
-    DECLARE _availableUntilTimeStamp TIMESTAMP = to_timestamp(_availableUntilDate, 'MM/DD/YYYY');
-    DECLARE _foodListingKey FoodListing.foodListingKey%TYPE;
+    DECLARE _availableUntilTimestamp    TIMESTAMP = utcTextToTimestamp(_availableUntilDate);
+    DECLARE _foodListingKey             FoodListing.foodListingKey%TYPE;
 BEGIN
-
-    -- If NULL is explicitely passed in, then we must explicitely default to 1 for total number of units/parts!
-    IF (_unitsCount IS NULL)
-    THEN
-        _unitsCount := 1;
-    END IF;
     
     -- Insert the new food listing and get the food listing key for it.
     INSERT INTO FoodListing (
-        donatedByAppUserKey,
+        donorAppUserKey,
         foodTitle,
-        perishable,
+        needsRefrigeration,
         availableUntilDate,
-        totalWeight,
-        availableUnitsCount,
-        unitsLabel,
-        foodDescription,
-        imgUrl
+        estimatedWeight,
+        foodDescription
     )
     VALUES (
-        _donatedByAppUserKey,
+        _donorAppUserKey,
         _foodTitle,
-        _perishable,
-        _availableUntilTimeStamp,
-        _totalWeight,
-        _unitsCount,
-        _unitsLabel,
-        _foodDescription,
-        _imgURL
+        _needsRefrigeration,
+        _availableUntilTimestamp,
+        _estimatedWeight,
+        _foodDescription
     )
     RETURNING   foodListingKey
     INTO        _foodListingKey;
@@ -58,6 +45,13 @@ BEGIN
     LOOP
         INSERT INTO FoodListingFoodTypeMap (foodListingKey, foodType)
         VALUES      (_foodListingKey, _foodTypes[i]);
+    END LOOP;
+
+    -- Insert all the images that are associated with the new food listing.
+    FOR i IN array_lower(_imgUrls, 1) .. array_upper(_imgUrls, 1)
+    LOOP
+        INSERT INTO FoodListingImg (foodListingKey, imgUrl, isPrimary)
+        VALUES      (_foodListingKey, _imgUrls[i], (i = 0));
     END LOOP;
 
     RETURN _foodListingKey;

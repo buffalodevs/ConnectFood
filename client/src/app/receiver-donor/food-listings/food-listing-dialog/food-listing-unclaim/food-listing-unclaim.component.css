@@ -1,7 +1,11 @@
-#units-count {
-    max-width: 200px;
-}
-
 form {
     position: relative;
+}
+
+p {
+    font-size: 18px;
+}
+
+mat-input-container {
+    width: 100%;
 }

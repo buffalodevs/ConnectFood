@@ -21,9 +21,9 @@ export class DeliveryFilters {
          */
         public maxDistance?: number,
         /**
-         * The maximum total weight of the delivery.
+         * The maximum estimated weight of the delivery.
          */
-        public maxTotalWeight?: number,
+        public maxEstimatedWeight?: number,
         /**
          * Determines the offset used when retrieving a limited segment of food listings.
          */

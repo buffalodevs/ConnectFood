@@ -47,4 +47,4 @@ const appRoutes: Routes = [
         GetDomainValuesService        
     ]
 })
-export class AppModule { }
+export class AppModule {}

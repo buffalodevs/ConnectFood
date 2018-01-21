@@ -98,26 +98,16 @@ export class RequestService {
     /**
      * A generic response mapping to basic boolean result.
      * @param foodWebResponse The response received from the server. In the form of the JSON body of the response.
-     * @return If the related operation on the server was successful, then true.
-     *         If it was unsuccessful, and due to a resolvable error (such as required login), then false.
-     *         If it was unsuccessful, and due to a fatal error, then an Error is thrown.
+     * @return If the related operation on the server was successful, then nothing.
+     *         If it was unsuccessful, then an Error is thrown with the error message from the server as its message content.
      */
-    public genericResponseMap(foodWebResponse: FoodWebResponse): boolean {
+    public genericResponseMap(foodWebResponse: FoodWebResponse): void {
 
         console.log(foodWebResponse.message);
         
         // On failure.
         if (!foodWebResponse.success) {
-
-            // Is it a non-fatal failure?
-            if (foodWebResponse.loginRequired || foodWebResponse.signupConfirmRequired) {
-                return false;
-            }
-            // It is a fatal failure.
             throw new Error(foodWebResponse.message);
         }
-
-        // Successful.
-        return true;
     }
 }

@@ -6,22 +6,19 @@ SELECT dropFunction('updateFoodListing');
 CREATE OR REPLACE FUNCTION updateFoodListing
 (
     _foodListingKey         FoodListing.foodListingKey%TYPE,                        -- The key identifier of the Food Listing to update.
-    _donatedByAppUserKey    FoodListing.donatedByAppUserKey%TYPE,                   -- The Donor ID (used to check if user has rights to update Food Listing).
+    _donorAppUserKey        FoodListing.donorAppUserKey%TYPE,                       -- The Donor ID (used to check if user has rights to update Food Listing).
     _foodTypes              FoodType[]                              DEFAULT NULL,   -- What Food Types is this?
     _foodTitle              FoodListing.foodTitle%TYPE              DEFAULT NULL,   -- The title (short description) of the Food Listing.
-    _perishable             FoodListing.perishable%TYPE             DEFAULT NULL,   -- Is the food perishable?
+    _needsRefrigeration     FoodListing.needsRefrigeration%TYPE     DEFAULT NULL,   -- Is the food perishable?
     _availableUntilDate     TEXT                                    DEFAULT NULL,   -- The date when the donated food will no longer be available.
-    _totalWeight            FoodListing.totalWeight%TYPE            DEFAULT NULL,   -- The total weight of (all parts/units of) the Food Listing (in pounds).
+    _estimatedWeight        FoodListing.estimatedWeight%TYPE        DEFAULT NULL,   -- The total weight of the Food Listing (in pounds).
+    _estimatedValue         FoodListing.estimatedValue%TYPE         DEFAULT NULL,   -- The estimated value of the Food Listing (in $).
     _foodDescription        FoodListing.foodDescription%TYPE        DEFAULT NULL,   -- A (long) description of the Food Listing.
-    _imgURL                 FoodListing.imgUrl%TYPE                 DEFAULT NULL,   -- URL for the image being stored/uploaded.
-    _donorOnHandUnitsCount  FoodListing.availableUnitsCount%TYPE    DEFAULT 1,      /* The number of parts/units that the Food Listing is split up into which are currently
-                                                                                       in the physical possetion of the donor (both claimed and available, but not deliver state). */
-    _unitsLabel             FoodListing.unitsLabel%TYPE             DEFAULT NULL    -- The user provided label for each unit.
+    _imgUrls                TEXT[]                                  DEFAULT NULL    -- URL(s) for the image being stored/uploaded.
 )
 RETURNS VOID -- TODO: Return data pertaining to contacts of Receivers (Claimers) who are negatively effected by this update (for contacting them)!
 AS $$
-    DECLARE _deltaDonorOnHandUnitsCount     FoodListing.availableUnitsCount%TYPE;
-    DECLARE _availableUntilTimeStamp        TIMESTAMP;
+    DECLARE _availableUntilTimeStamp TIMESTAMP;
 BEGIN
 
     -- ============ Ensure user is authorized to update Food Listing ============ --
@@ -30,42 +27,10 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM   FoodListing
         WHERE           foodListingKey = _foodListingKey
-          AND           donatedByAppUserKey = _donatedByAppUserKey
+          AND           donorAppUserKey = _donorAppUserKey
     )
     THEN
         RAISE EXCEPTION 'Either the food listing does not exist, or user not authorized.';
-    END IF;
-
-
-    -- ===================== Handle number of units update ====================== --
-    -- ========================================================================== --
-
-    -- If units count is being updated, we must check if it is updated to a valid number.
-    -- An increase is not a problem, but a decrease may put data in an inconsistent state.
-    IF (_unitsCount IS NOT NULL)
-    THEN
-        
-        _deltaDonorOnHandUnitsCount := _donorOnHandUnitsCount - (SELECT getDonorOnHandUnitsCount(_foodListingKey));
-
-        -- If we have a negative change, then attempt to delete the number of units in the change.
-        IF (_deltaDonorOnHandUnitsCount < 0)
-        THEN
-
-            -- TODO: Gather a temp table result from this function call that will contain App User info of Claimers who are affected by this action.
-            -- NOTE: This function call will ensure that the units can be deleted.
-            PERFORM removeFoodListing(_foodListingKey, _donorAppUserKey, -_deltaDonorOnHandUnitsCount);
-
-        -- Else if we have a positive change, then simply add change to the available units for the associated Food Listing.
-        ELSIF (_deltaDonorOnHandUnitsCount > 0)
-        THEN
-
-            UPDATE  FoodListing
-            SET     availableUnitsCount = availableUnitsCount + _deltaDonorOnHandUnitsCount
-            WHERE   foodListingKey = _foodListingKey;
-        
-        END IF;
-        -- If the change in donor on hand units count is 0, then do nothing...
-
     END IF;
 
 
@@ -106,12 +71,11 @@ BEGIN
 
      UPDATE FoodListing
      SET    foodTitle = _foodTitle,
-            perishable = _perishable,
+            needsRefrigeration = _needsRefrigeration,
             availableUntilDate = _availableUntilDate,
-            totalWeight = _totalWeight,
-            foodDescription = _foodDescription,
-            imgUrl = _imgUrl,
-            unitsLabel = _unitsLabel
+            estimatedWeight = _estimatedWeight,
+            estimatedValue = _estimatedValue,
+            foodDescription = _foodDescription
     WHERE   FoodListing.foodListingKey = _foodListingKey;
 
 END;

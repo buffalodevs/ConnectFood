@@ -1,5 +1,9 @@
-#units-count {
-    max-width: 200px;
+p {
+    font-size: 18px;
+}
+
+.margin-bottom {
+    margin-bottom: 50px;
 }
 
 form {

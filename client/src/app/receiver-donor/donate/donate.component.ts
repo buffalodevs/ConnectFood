@@ -28,7 +28,7 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
     private image: string;
     private cropperSettings: CropperSettings;
 
-    private foodTitleMaxLength: number;
+    private titleMaxLength: number;
     private showProgressSpinner: boolean;
 
 
@@ -56,7 +56,7 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
         this.cropperSettings.noFileInput = true;
         this.cropperSettings.fileType = 'image/jpeg';
 
-        this.foodTitleMaxLength = 100;
+        this.titleMaxLength = 30;
         this.showProgressSpinner = false;
         this.form = new FormGroup({});
     }
@@ -82,19 +82,17 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
 
             if (foodListingUpload.hasOwnProperty(property)) {
 
-                // All of these members are not included in the form view-model at first!
+                // All of these members are not included in the form view-model!
                 if (    property === 'foodListingKey'
-                    ||  property === 'imageUpload'
-                    ||  property === 'availableUnitsCount'
-                    ||  property === 'unitsLabel')
+                    ||  property === 'imageUploads')
                 { continue; }
 
                 let validators: ValidatorFn[] = [ Validators.required ];
 
                 // Add additional needed validators for email and password fields.
-                switch(property) {
-                    case 'foodTitle':       validators.push(Validators.maxLength(this.foodTitleMaxLength));     break;
-                    case 'foodDescription': validators = null;                                                  break;
+                switch (property) {
+                    case 'foodTitle':       validators.push(Validators.maxLength(this.titleMaxLength)); break;
+                    case 'foodDescription': validators = null;                                          break;
                 }
 
                 this.form.addControl(property, new FormControl(null, validators));
@@ -154,31 +152,6 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
      */
     private isFormControlEmpty(formControl: AbstractControl): boolean {
         return (formControl.value == null || formControl.value.length === 0)
-    }
-
-
-    /**
-     * Toggles the display of form controls for splitting the Donation into multiple units.
-     */
-    private toggleSplitIntoUnits(): void {
-
-        if (this.isSplitIntoUnits()) {
-            this.form.removeControl('availableUnitsCount');
-            this.form.removeControl('unitsLabel');
-        }
-        else {
-            this.form.addControl('availableUnitsCount', new FormControl(null, [ Validators.required, Validators.min(1) ]));
-            this.form.addControl('unitsLabel', new FormControl(null, [ Validators.required ]));
-        }
-    }
-
-
-    /**
-     * Determines if the donation is split into multiple units.
-     * @return true if it has been split, false if not.
-     */
-    private isSplitIntoUnits(): boolean {
-        return ( this.form.contains('availableUnitsCount') && this.form.contains('unitsLabel') );
     }
 
 

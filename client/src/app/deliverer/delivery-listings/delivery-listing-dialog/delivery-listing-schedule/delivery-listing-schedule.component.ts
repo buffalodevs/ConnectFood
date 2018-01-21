@@ -25,6 +25,7 @@ export class DeliveryListingScheduleComponent {
     private showProgressSpinner: boolean;
     private schedulingComplete: boolean;
     private scheduleControl: FormControl;
+    private errMsg: string;
 
 
     public constructor (
@@ -46,16 +47,16 @@ export class DeliveryListingScheduleComponent {
         this.showProgressSpinner = true;
 
         this.scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, false, value)
-            .finally(() => { this.showProgressSpinner = false; })
-            .subscribe((success: boolean) => {
-                if (success) {
-                    this.delivery.deliveryStateInfo.deliveryState = DeliveryState.scheduled;
-                    this.removeListing.emit();
-                    this.schedulingComplete = true;
-                }
+            .finally(() => {
+                this.schedulingComplete = true;
+                this.showProgressSpinner = false;
+            })
+            .subscribe(() => {
+                this.delivery.deliveryStateInfo.deliveryState = DeliveryState.scheduled;
+                this.removeListing.emit();
             },
             (err: Error) => {
-                alert(err.message);
+                this.errMsg = err.message;
             });
     }
 }

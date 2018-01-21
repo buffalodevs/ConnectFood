@@ -9,8 +9,8 @@ export class ManageFoodListingRequest {
          */
         public foodListingKey: number,
         /**
-         * The number of units to act upon in the management function.
+         * The reason for the associated management operation (such as unclaim or removal reason).
          */
-        public unitsCount?: number
+        public reason?: string
     ) { }
 }

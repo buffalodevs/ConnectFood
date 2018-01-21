@@ -1,16 +1,22 @@
 'use strict';
-import { connect, query, Client, QueryResult } from '../../database-util/connection-pool';
+import { query, QueryResult } from '../../database-util/connection-pool';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
+import * as fs from 'fs';
+import { Storage, Bucket, File, BucketConfig, WriteStreamOptions } from '@google-cloud/storage';
 
-import { toPostgresArray } from '../../database-util/prepared-statement-util';
+import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
 
 import { FoodListingUpload } from '../../../../shared/receiver-donor/food-listing-upload';
 import { FoodListing } from '../../../../shared/receiver-donor/food-listing';
 import { DateFormatter } from '../../../../shared/common-util/date-formatter';
 
 require('dotenv');
-let fs = require('fs');
-let storageBucket = require('@google-cloud/storage') ({
+
+
+/**
+ * Storage bucket object used to communicate with Google Cloud.
+ */
+let storageBucket: Storage = require('@google-cloud/storage') ({
     projectId: process.env.GOOGLE_CLOUD_PROJECT_ID
 });
 
@@ -23,34 +29,32 @@ let storageBucket = require('@google-cloud/storage') ({
 export function addFoodListing(foodListingUpload: FoodListingUpload, donorAppUserKey: number): Promise<any> {
 
     const dateFormatter: DateFormatter = new DateFormatter();
-    let imageName: string = null;
-    let imageUrl: string = null;
+    let imageNames: string[] = [];
+    let imageUrls: string[] = [];
 
     // If we have an image form the Donor, then generate the name and URL for it before we create database entry.
-    if (foodListingUpload.imageUpload != null) {
-        imageName = 'img-' + Date.now().toString() + '.jpeg';
-        imageUrl = (process.env.DEVELOPER_MODE.toLowerCase() === 'true') ? ('/public/' + imageName)
-                                                                         : (process.env.BUCKET_URL + imageName);
+    if (foodListingUpload.imageUploads != null) {
+        genAndFillImageUrlsAndNames(imageUrls, imageNames, foodListingUpload.imageUploads); // NOTE: imageUrls and imageNames modified internally!
     }
     
     // Construct prepared statement.
-    let queryString = 'SELECT * FROM addFoodListing($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);';
     let queryArgs = [ donorAppUserKey,
-                      toPostgresArray(foodListingUpload.foodTypes),
+                      foodListingUpload.foodTypes,
                       foodListingUpload.foodTitle,
-                      foodListingUpload.perishable,
-                      dateFormatter.dateToMonthDayYearString(foodListingUpload.availableUntilDate),
-                      foodListingUpload.totalWeight,
+                      foodListingUpload.needsRefrigeration,
+                      foodListingUpload.availableUntilDate,
+                      foodListingUpload.estimatedWeight,
+                      foodListingUpload.estimatedValue,
                       foodListingUpload.foodDescription,
-                      imageUrl,
-                      foodListingUpload.availableUnitsCount,
-                      foodListingUpload.unitsLabel ];
+                      imageUrls ];
+    let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM addFoodListing();', queryArgs);
+    logSqlQueryExec(queryString, queryArgs);
 
     // Execute prepared statement.
     return query(queryString, queryArgs)
         .then((result: QueryResult) => {
             logSqlQueryResult(result.rows);
-            return writeImg(foodListingUpload.imageUpload, imageUrl, imageName);
+            return writeImgs(foodListingUpload.imageUploads, imageUrls, imageNames);
         })
         .catch((err: Error) => {
             console.log(err);
@@ -60,24 +64,47 @@ export function addFoodListing(foodListingUpload: FoodListingUpload, donorAppUse
 
 
 /**
+ * Internally fills the given imageUrls and imageNames arrays with generated URLs and names based off of given imageUploads base64 image data.
+ * @param imageUrls The image URLs array to fill (NOTE: INTERNALLY MODIFIED).
+ * @param imageNames The image names array to fill (NOTE: INTERNALLY MODIFIED).
+ * @param imageUploads The uploaded base64 image data.
+ */
+function genAndFillImageUrlsAndNames(imageUrls: string[], imageNames: string[], imageUploads: string[]): void {
+
+    for (let i: number = 0; i < imageUploads.length; i++) {
+        imageNames.push('img-' + Date.now().toString() + '.jpeg');
+        imageUrls.push((process.env.DEVELOPER_MODE.toLowerCase() === 'true') ? ('/public/' + imageNames[i])
+                                                                             : (process.env.BUCKET_URL + imageNames[i]));
+    }
+}
+
+
+/**
  * Writes a base64 image to its appropriate storage destination - either local filesystem in development mode
  * or Google Cloud storage bucket in deployment mode.
- * @param image The base64 image that is to be written to storage.
- * @param imageUrl The URL which will be used to reference the image.
- * @param imageName The name of the image.
+ * @param imageUploads The base64 image uploads that are to be written to storage.
+ * @param imageUrls The URLs which will be used to reference the images.
+ * @param imageNames The names of the images.
+ * @param index The index of the image to write (NOTE: should NOT be set by original caller).
  * @return A promise with no payload that will resolve on success.
  */
-function writeImg(image: string, imageUrl: string, imageName: string): Promise<any> {
+function writeImgs(imageUploads: string[], imageUrls: string[], imageNames: string[], index: number = 0): Promise <any> {
 
-    // If we have an image, then store it
-    if (image != null) {
-        // strip off the base64 header.
-        image = image.replace(/^data:image\/\w+;base64,/, '');
+    // TODO: Write to Google Cloud Storage in bulk.
 
-        // Write image to appropriate storage location. On failure, do nothing for now...
-        return (process.env.DEVELOPER_MODE === 'true') ? writeImgToLocalFs(image, imageUrl)
-                                                       : writeImgToBucket(image, imageName);
-    }
+    // strip off the base64 header.
+    const image: string = imageUploads[index].replace(/^data:image\/\w+;base64,/, '');
+
+    // Write image to appropriate storage location. On failure, do nothing for now...
+    let writePromise: Promise <any> = (process.env.DEVELOPER_MODE === 'true') ? writeImgToLocalFs(image, imageUrls[index])
+                                                                              : writeImgToBucket(image, imageNames[index]);
+
+    return writePromise.then(() => {
+
+        // If we have reached not reached end of images to write, then call recursively, else return empty resolved promise.
+        return (++index < imageUploads.length) ? writeImgs(imageUploads, imageUrls, imageNames, index)
+                                               : Promise.resolve();
+    });
 }
 
 
@@ -87,7 +114,7 @@ function writeImg(image: string, imageUrl: string, imageName: string): Promise<a
  * @param imageUrl The url of the image.
  * @return A promise with no payload that will resolve on success.
  */
-function writeImgToLocalFs(image: string, imageUrl: string): Promise<any> {
+function writeImgToLocalFs(image: string, imageUrl: string): Promise <any> {
 
     // Wrap result in a promise.
     return new Promise((resolve, reject) => {
@@ -114,14 +141,14 @@ function writeImgToLocalFs(image: string, imageUrl: string): Promise<any> {
  * @param imageName The name of the image.
  * @return A promise with no payload that will resolve on success.
  */
-function writeImgToBucket(image: string, imageName: string): Promise<any> {
+function writeImgToBucket(image: string, imageName: string): Promise <any> {
 
-    let bucket = storageBucket.bucket(process.env.GOOGLE_CLOUD_BUCKET_ID);
-    let file = bucket.file(imageName);
-    let imageBinary = new Buffer(image, 'base64');
+    let bucket: Bucket = storageBucket.bucket(process.env.GOOGLE_CLOUD_BUCKET_ID);
+    let file: File = bucket.file(imageName);
+    let imageBinary: Buffer = new Buffer(image, 'base64');
 
     // Save config for saving base64 image as jpeg.
-    let saveConfig = {
+    let saveConfig: WriteStreamOptions = {
         metadata: {
             contentType: 'image/jpeg',
             metadata: {

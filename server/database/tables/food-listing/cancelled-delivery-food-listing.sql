@@ -8,22 +8,21 @@ CREATE TABLE IF NOT EXISTS CancelledDeliveryFoodListing
 );
 
 -- Key of Delivery Food Listing that is to be Cancelled.
-ALTER TABLE CancelledDeliveryFoodListing ADD COLUMN IF NOT EXISTS deliveryFoodListingKey    INTEGER NOT NULL REFERENCES DeliveryFoodListing (deliveryFoodListingKey);
+ALTER TABLE CancelledDeliveryFoodListing ADD COLUMN IF NOT EXISTS deliveryFoodListingKey    INTEGER     NOT NULL REFERENCES DeliveryFoodListing (deliveryFoodListingKey);
 
--- The key identifier of the user who cancelled the delivery. Should only be the donor, claimer (receiver), or deliverer!
-ALTER TABLE CancelledDeliveryFoodListing ADD COLUMN IF NOT EXISTS cancelledByAppUserKey     INTEGER NOT NULL REFERENCES AppUser (appUserKey);
+-- Key of the App User who cancelled the Delivery.
+ALTER TABLE CancelledDeliveryFoodListing ADD COLUMN IF NOT EXISTS cancelledByAppUserKey     INTEGER     NOT NULL REFERENCES AppUser (appUserKey);
 
 -- The reason for the cancellation (should be required by front-end interface).
-ALTER TABLE CancelledDeliveryFoodListing ADD COLUMN IF NOT EXISTS cancelReason              TEXT    NOT NULL;
+ALTER TABLE CancelledDeliveryFoodListing ADD COLUMN IF NOT EXISTS cancelReason              TEXT        NOT NULL;
 
--- Flag that determines if the Food has been rejected by either the Driver or Receiver due to an unacceptable quality.
-ALTER TABLE CancelledDeliveryFoodListing ADD COLUMN IF NOT EXISTS foodRejected              BOOLEAN NOT NULL DEFAULT FALSE;
+-- Timestapm of the cancellation.
+ALTER TABLE CancelledDeliveryFoodListing ADD COLUMN IF NOT EXISTS cancelTime                TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
 
 -- Add more columns here --
 
-CREATE INDEX IF NOT EXISTS cancelledDeliveryFoodListing_DeliveryFoodListingKeyIdx     ON CancelledDeliveryFoodListing (deliveryFoodListingKey);
-
-CREATE INDEX IF NOT EXISTS cancelledDeliveryFoodListing_CancelledByAppUserKeyIdx      ON CancelledDeliveryFoodListing (cancelledByAppUserKey);
+CREATE INDEX IF NOT EXISTS cancelledDeliveryFoodListing_DeliveryFoodListingKeyIdx   ON CancelledDeliveryFoodListing (deliveryFoodListingKey);
+CREATE INDEX IF NOT EXISTS cancelledDeliveryFoodListing_CancelledByAppUserKeyIdx    ON CancelledDeliveryFoodListing (cancelledByAppUserKey);
 
 -- Create more indexes here --

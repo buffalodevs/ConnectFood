@@ -35,7 +35,7 @@
     min-width: 0px;
     padding: 0px;
     opacity: 1;
-    visibility: hidden;
+    display: none;
     z-index: 65;
     border-top-right-radius: 10%;
     border-bottom-right-radius: 10%;
@@ -133,7 +133,7 @@
     }
 
     .collapse-lg #slick-left-panel-button {
-        visibility: visible;
+        display: initial;
     }
 
     .collapse-lg #close-button {
@@ -186,7 +186,7 @@
     }
 
     .collapse-md #slick-left-panel-button {
-        visibility: visible;
+        display: initial;
     }
 
     .collapse-md #close-button {
@@ -237,7 +237,7 @@
     }
 
     .collapse-sm #slick-left-panel-button {
-        visibility: visible;
+        display: initial;
     }
 
     .collapse-sm #close-button {
@@ -288,7 +288,7 @@
     }
 
     .collapse-xs #slick-left-panel-button {
-        visibility: visible;
+        display: initial;
     }
 
     .collapse-xs #close-button {

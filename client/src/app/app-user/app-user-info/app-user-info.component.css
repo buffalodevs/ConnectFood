@@ -68,6 +68,11 @@ mat-icon {
     width: 100%;
 }
 
+:host ::ng-deep .mat-progress-spinner {
+    max-width: 200px !important;
+    max-height: 200px !important
+}
+
 #state {
     margin-bottom: 15px;
 }

@@ -3,7 +3,7 @@
  */
 export class FoodListingUpload {
 
-    constructor(
+    public constructor (
         /**
          * Primary identifier of the Food Listing if editing.
          */
@@ -19,31 +19,27 @@ export class FoodListingUpload {
         /**
          * Can the food listing spoil?
          */
-        public perishable?: boolean,
+        public needsRefrigeration?: boolean,
         /**
          * Date that the donated Food Listing will no longer be available at (of the format mm/dd/yyyy)
          */
         public availableUntilDate?: Date,
         /**
-         * Optional weight of entire Food Listing (in pounds).
+         * Optional estimated weight of Food Listing (in pounds).
          */
-        public totalWeight?: number,
+        public estimatedWeight?: number,
+        /**
+         * Optional estimated monetary value of Food Listing (in $).
+         */
+        public estimatedValue?: number,
         /**
          * Optional (long) food description.
          */
         public foodDescription?: string,
         /**
-         * The string representation of the image associated with the listing.
+         * The string representation of the image(s) associated with the listing.
          * Should only be populated for the addition or upload of a new Food Listing.
          */
-        public imageUpload?: string,
-        /**
-         * The total number of available units (parts) contained in the Food Listing.
-         */
-        public availableUnitsCount: number = 1,
-        /**
-         * The units label for the food listing.
-         */
-        public unitsLabel?: string
-    ) { }
+        public imageUploads?: string[]
+    ) {}
 }

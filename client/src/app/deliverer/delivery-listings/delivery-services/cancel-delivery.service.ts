@@ -27,7 +27,7 @@ export class CancelDeliveryService {
      * @param foodRejected Determines whether or not the food was rejected due to an inadequate quality.
      * @return An observable that resolves to true on success, false on non-fatal failure (such as when need login), and throws an error on fatal failure.
      */
-    public cancelDelivery(deliveryFoodListingKey: number, cancelReason: string, foodRejected: boolean): Observable<boolean> {
+    public cancelDelivery(deliveryFoodListingKey: number, cancelReason: string, foodRejected: boolean): Observable <void> {
 
         return this.requestService.post('/deliverer/cancelDelivery', new CancelDeliveryRequest(deliveryFoodListingKey, cancelReason, foodRejected))
                                   .map(this.requestService.genericResponseMap);

@@ -1,6 +1,6 @@
 'use strict'
 import { query, QueryResult } from './../database-util/connection-pool';
-import { fixNullQueryArgs, toPostgresArray } from './../database-util/prepared-statement-util';
+import { addArgPlaceholdersToQueryStr } from './../database-util/prepared-statement-util';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
 
 import { getDrivingDistTime, GPSCoordinate, DriveDistTime } from './../common-util/geocode';
@@ -19,14 +19,13 @@ import { DateFormatter } from "./../../../shared/common-util/date-formatter";
 export function getDeliveries(filters: DeliveryFilters, myAppUserKey: number, myGPSCoordinate: GPSCoordinate): Promise<Delivery[]> {
    
     // Build our prepared statement.
-    let queryString: string = 'SELECT * FROM getDeliveries($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);';
     let queryArgs: any[] = [ myAppUserKey, filters.retrievalOffset, filters.retrievalAmount,
                              filters.deliveryFoodListingKey, filters.claimedFoodListingKey,
-                             filters.maxDistance, filters.maxTotalWeight, filters.unscheduledDeliveries,
+                             filters.maxDistance, filters.maxEstimatedWeight, filters.unscheduledDeliveries,
                              filters.myScheduledDeliveries, filters.matchRegularAvailability, filters.deliveryState ];
 
-    // Replace any NULL query arguments with literals in query string.
-    queryString = fixNullQueryArgs(queryString, queryArgs);
+    // Insert query argument placeholders and preprocess query arguments.
+    let queryString: string = addArgPlaceholdersToQueryStr('SELECT * FROM getDeliveries();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);
 
     return query(queryString, queryArgs)

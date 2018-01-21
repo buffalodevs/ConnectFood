@@ -22,33 +22,32 @@ export class ManageFoodListingService {
     /**
      * Claims a given Food Listing.
      * @param foodListingKey The key (identifier) for the Food Listing that is to be claimed.
-     * @param unitsCount The number of units of the given Food Listing that should be claimed.
      * @return An observable that has no payload (simply resolves on success).
      */
-    public claimFoodListing(foodListingKey: number, unitsCount: number): Observable<boolean> {
-        return this.manageFoodListing(foodListingKey, unitsCount, '/receiverDonor/receiver/claimFoodListing');
+    public claimFoodListing(foodListingKey: number): Observable <void> {
+        return this.manageFoodListing(foodListingKey, '/receiverDonor/receiver/claimFoodListing');
     }
 
 
     /**
      * Unclaims a given Food Listing.
      * @param foodListingKey The key (identifier) for the Food Listing that is to be unclaimed.
-     * @param unitsCount The number of units to unclaim.
+     * @param unclaimReason The reason for the unclaim.
      * @return An observable that has no payload (simply resolves on success).
      */
-    public unclaimFoodListing(foodListingKey: number, unitsCount: number): Observable<boolean> {
-        return this.manageFoodListing(foodListingKey, unitsCount, '/receiverDonor/receiver/unclaimFoodListing');
+    public unclaimFoodListing(foodListingKey: number, unclaimReason: string): Observable <void> {
+        return this.manageFoodListing(foodListingKey, '/receiverDonor/receiver/unclaimFoodListing', unclaimReason);
     }
 
 
     /**
      * Removes (un-donates) a given Foood Listing.
      * @param foodListingKey The key (identifier) for the Food Listing that is to be removed.
-     * @param unitsCount The number of units to remove.
+     * @param removalReason The reason for the removal.
      * @return An observable that has no payload (simply resolves on success).
      */
-    public removeFoodListing(foodListingKey: number, unitsCount: number): Observable<boolean> {
-        return this.manageFoodListing(foodListingKey, unitsCount, 'receiverDonor/donor/removeFoodListing');
+    public removeFoodListing(foodListingKey: number, removalReason: string): Observable <void> {
+        return this.manageFoodListing(foodListingKey, 'receiverDonor/donor/removeFoodListing', removalReason);
     }
 
 
@@ -56,12 +55,13 @@ export class ManageFoodListingService {
      * Uniform function for sending Food Listing ID to server for specific management functions (such as claim, unclaim, & remove).
      * @param foodListingKey The key identifier of the food listing that is to be acted upon.
      * @param controllerRoute The route to the controller function that handles the operation.
-     * @return An observable that on success resolves to true. On failure, if it is non-fatal (such as required login), then false.
-     *         If fatal failure, then error is thrown.
+     * @param reason The reason for the associated management operation.
+     * @return An observable that on success resolves to nothing.
+     *         If failure, then error is thrown.
      */
-    private manageFoodListing(foodListingKey: number, unitsCount: number, controllerRoute: string): Observable<boolean> {
+    private manageFoodListing(foodListingKey: number, controllerRoute: string, reason?: string): Observable <void> {
 
-        return this.requestService.post(controllerRoute, new ManageFoodListingRequest(foodListingKey, unitsCount))
+        return this.requestService.post(controllerRoute, new ManageFoodListingRequest(foodListingKey, reason))
                                   .map(this.requestService.genericResponseMap);
     }
 }

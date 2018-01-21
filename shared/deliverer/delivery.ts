@@ -15,19 +15,18 @@ export class Delivery {
         public deliveryStateInfo?: DeliveryStateInfo,
         public foodTitle?: string,
         public foodDescription?: string,
-        public perishable?: boolean,
+        public needsRefrigeration?: boolean,
         /**
-         * The url of a saved Food Listing that will be used to display the associated image.
+         * The URLs of images associated with the Food Listing.
+         * NOTE: The first URL should be the one marked as primary. The remaining URLs should be in the order they were uploaded.
          */
-        public imgUrl?: string,
+        public imgUrls?: string[],
         /**
-         * The total weight of the delivery (in lbs).
+         * The estimated weight of the delivery (in lbs).
          */
-        public totalWeight?: number,
+        public estimatedWeight?: number,
         public donorInfo?: FoodListingUser,     // Driving distance and time here is from driver to donor!
         public receiverInfo?: FoodListingUser,  // Driving distance and time here is from donor to receiver!
-        public claimedUnitsCount?: number,
-        public unitsLabel?: string,
         public possibleDeliveryTimes?: TimeRange[]
     ) {}
 }

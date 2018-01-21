@@ -10,29 +10,27 @@ import * as _ from "lodash";
 export class SlickProgressSpinnerComponent implements OnChanges {
 
     // For follwing, see Angular Material's MatSpinner component documentation!
-    @Input() private color: string;
-    @Input() private mode: string;
-    @Input() private value: number;
-    @Input() private maxWidth: number | string;
-    @Input() private maxHeight: number | string
+    @Input() private spinnerColor: string;
+    @Input() private spinnerMode: string;
+    @Input() private spinnerValue: number;
 
     /**
      * Default is 0 ms. The delay time before the progress spinner is displayed.
      */
-    @Input() private delayMs: number;
+    @Input() private spinnerDelayMs: number;
     /**
      * Default value is 0. The minimum duration that the progress spinner must show for.
      */
-    @Input() private minDurationMs: number;
+    @Input() private spinnerMinDurationMs: number;
     /**
      * Default is true. Determines whether or not to use the backdrop.
      */
-    @Input() private showBackdrop: boolean;
+    @Input() private showSpinnerBackdrop: boolean;
     /**
      * The color of the backdrop (in css background style format).
      * Default is 'rgba(211, 211, 211, 0.5)' for semi-transparent lightgray.
      */
-    @Input() private backdropColor: string;
+    @Input() private spinnerBackdropColor: string;
     /**
      * Triggers the display of the progress spinner if set true once delayMs has elapsed. Stops display if set false after minDurationMs has elapsed.
      */
@@ -40,7 +38,7 @@ export class SlickProgressSpinnerComponent implements OnChanges {
     /**
      * An optional extra show condition.
      */
-    @Input() private showCondition: boolean;
+    @Input() private showSpinnerCondition: boolean;
     /**
      * ID of the container for a sticky top spinner. If given, then the spinner will have stick top behavior inside the given container.
      */
@@ -55,17 +53,15 @@ export class SlickProgressSpinnerComponent implements OnChanges {
 
     public constructor() {
 
-        this.color = 'accent';
-        this.mode = 'indeterminate';
-        this.maxWidth = '100%';
-        this.maxHeight = '100%';
+        this.spinnerColor = 'accent';
+        this.spinnerMode = 'indeterminate';
 
-        this.delayMs = 0;
-        this.minDurationMs = 0;
-        this.showBackdrop = true;
-        this.backdropColor = 'rgba(211, 211, 211, 0.5)';
+        this.spinnerDelayMs = 0;
+        this.spinnerMinDurationMs = 0;
+        this.showSpinnerBackdrop = true;
+        this.spinnerBackdropColor = 'rgba(211, 211, 211, 0.5)';
         this.triggerShowSpinner = false;
-        this.showCondition = true;
+        this.showSpinnerCondition = true;
         this.spinnerStickyTopId = null;
         this.spinnerTest = false;
         this.showSpinner = false;
@@ -73,20 +69,6 @@ export class SlickProgressSpinnerComponent implements OnChanges {
 
 
     public ngOnChanges(changes: SimpleChanges): void {
-
-        // Ensure width is converted to style string if it is a number.
-        if (changes.maxWidth && this.maxWidth != null) {
-
-            this.maxWidth = _.isString(this.maxWidth) ? this.maxWidth
-                                                                       : this.maxWidth + 'px';
-        }
-
-        // Ensure height is converted to style string if it is a number.
-        if (changes.maxHeight && this.maxHeight != null) {
-
-            this.maxHeight = _.isString(this.maxHeight) ? this.maxHeight
-                                                                         : this.maxHeight + 'px';
-        }
         
         // Whenever the triggerShowSpinner flag changes, we must set timeout for spinner display change.
         if (changes.triggerShowSpinner) {
@@ -103,8 +85,8 @@ export class SlickProgressSpinnerComponent implements OnChanges {
             setTimeout(() => {
                 this.showSpinner = (!this.spinnerTest || this.triggerShowSpinner) ? this.triggerShowSpinner
                                                                                   : true; // Always true if spinnerTest is set!
-            }, this.triggerShowSpinner ? this.delayMs
-                                       : this.minDurationMs);
+            }, this.triggerShowSpinner ? this.spinnerDelayMs
+                                       : this.spinnerMinDurationMs);
         }
     }
 }

@@ -81,4 +81,4 @@ AS $$
 
 $$ LANGUAGE sql;
 
---SELECT * FROM getAppUserSessionData(NULL, '{1, 2}'::int[]);
+SELECT * FROM getAppUserSessionData(1);

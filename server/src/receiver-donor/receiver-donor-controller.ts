@@ -55,7 +55,7 @@ export function handleRemoveFoodListing(request: Request, response: Response): v
     // Need so we can verify that currently logged in user must be the original Donor (have authority to remove Food Listing).
     let donorSessionData: SessionData = SessionData.loadSessionData(request);
 
-    removeFoodListing(removeFoodListingRequest.foodListingKey, donorSessionData, removeFoodListingRequest.unitsCount)
+    removeFoodListing(removeFoodListingRequest.foodListingKey, donorSessionData, removeFoodListingRequest.reason)
         .then(() => {
             response.send(new FoodWebResponse(true, 'Food listing has been successfully removed.'));
         })
@@ -72,7 +72,7 @@ export function handleClaimFoodListing(request: Request, response: Response): vo
     let claimFoodListingRequest: ManageFoodListingRequest = request.body;
     let receiverSessionData: SessionData = SessionData.loadSessionData(request);
 
-    claimFoodListing(claimFoodListingRequest.foodListingKey, receiverSessionData, claimFoodListingRequest.unitsCount)
+    claimFoodListing(claimFoodListingRequest.foodListingKey, receiverSessionData)
         .then(() => {
             response.send(new FoodWebResponse(true, 'Food listing has been successfully claimed.'));
         })
@@ -89,7 +89,7 @@ export function handleUnclaimFoodListing(request: Request, response: Response): 
     let unclaimFoodListingRequest: ManageFoodListingRequest = request.body;
     let receiverSessionData: SessionData = SessionData.loadSessionData(request);
 
-    unclaimFoodListing(unclaimFoodListingRequest.foodListingKey, receiverSessionData, unclaimFoodListingRequest.unitsCount)
+    unclaimFoodListing(unclaimFoodListingRequest.foodListingKey, receiverSessionData, unclaimFoodListingRequest.reason)
         .then(() => {
             response.send(new FoodWebResponse(true, 'Food listing has been successfully unclaimed.'));
         })

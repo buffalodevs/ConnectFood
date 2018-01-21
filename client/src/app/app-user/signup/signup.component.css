@@ -41,6 +41,12 @@ h2 {
     width: 100%;
 }
 
+:host ::ng-deep .mat-progress-spinner {
+    margin-top: 30px;
+    max-width: 500px !important;
+    max-height: 500px !important
+}
+
 slick-auto-complete-input {
     margin-bottom: 10px;
 }

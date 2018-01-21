@@ -1,8 +1,8 @@
 /**
  * Gets delivery update notification data so that status update emails may be sent to concerned users (Donors and Receivers).
  */
-SELECT dropFunction('generateDeliveryUpdateNotification');
-CREATE OR REPLACE FUNCTION generateDeliveryUpdateNotification
+SELECT dropFunction('getDeliveryUpdateNotification');
+CREATE OR REPLACE FUNCTION getDeliveryUpdateNotification
 (
      _deliveryFoodListingKey    DeliveryFoodListing.deliveryFoodListingKey%TYPE,                    -- This is the key of the Delivery Food Listing element that we are updating.
      _newDeliveryState          DeliveryState,
@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION generateDeliveryUpdateNotification
      _scheduledStartTime        DeliveryFoodListing.scheduledStartTime%TYPE         DEFAULT NULL,
      _cancelled                 BOOLEAN                                             DEFAULT FALSE,
      _cancelReason              CancelledDeliveryFoodListing.cancelReason%TYPE      DEFAULT NULL,
-     _foodRejected              CancelledDeliveryFoodListing.foodRejected%TYPE      DEFAULT FALSE
+     _foodRejected              BOOLEAN                                             DEFAULT FALSE
 )
 RETURNS JSON -- DeliveryUpdateNotification object.
 AS $$
@@ -36,9 +36,9 @@ BEGIN
                         'cancelled',            _cancelled,
                         'cancelReason',         _CancelReason,
                         'foodRejected',         _foodRejected,
-                        'receiverSessionData',  ( SELECT sessionData FROM getAppUserSessionData(ClaimedFoodListing.claimedByAppUserKey) ),
-                        'donorSessionData',     ( SELECT sessionData FROM getAppUserSessionData(FoodListing.donatedByAppUserKey) ),
-                        'delivererSessionData', ( SELECT sessionData FROM getAppUserSessionData(DeliveryFoodListing.deliveryAppUserKey) )
+                        'receiverSessionData',  ( SELECT sessionData FROM getAppUserSessionData(ClaimedFoodListing.receiverAppUserKey) ),
+                        'donorSessionData',     ( SELECT sessionData FROM getAppUserSessionData(FoodListing.donorAppUserKey) ),
+                        'delivererSessionData', ( SELECT sessionData FROM getAppUserSessionData(DeliveryFoodListing.delivererAppUserKey) )
                     )
         FROM        DeliveryFoodListing
         INNER JOIN  ClaimedFoodListing  ON  DeliveryFoodListing.claimedFoodListingKey = ClaimedFoodListing.claimedFoodListingKey
@@ -50,4 +50,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 
---SELECT * FROM generateDeliveryUpdateNotification(41, 'started');
+--SELECT * FROM getDeliveryUpdateNotification(41, 'started');

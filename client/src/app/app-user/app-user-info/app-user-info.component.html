@@ -191,7 +191,7 @@
 
     <h2>Availability</h2>
     <hr>
-    <div class="row" [slick-progress-spinner]="editData.get('availability').showProgressSpinner" [maxWidth]="200" [maxHeight]="200">
+    <div id="schedule-builder-container" class="row" [slick-progress-spinner]="editData.get('availability').showProgressSpinner" spinnerStickyTopId="schedule-builder-container">
 
         <slick-weekday-schedule-builder #availability id="availability" [displayOnly]="!editData.get('availability').editing" formControlName="availability">
         </slick-weekday-schedule-builder>

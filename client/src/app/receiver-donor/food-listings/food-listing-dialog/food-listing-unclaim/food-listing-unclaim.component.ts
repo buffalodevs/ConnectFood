@@ -14,7 +14,7 @@ import { FoodListing } from './../../../../../../../shared/receiver-donor/food-l
     templateUrl: './food-listing-unclaim.component.html',
     styleUrls: ['./food-listing-unclaim.component.css']
 })
-export class FoodListingUnclaimComponent implements OnChanges {
+export class FoodListingUnclaimComponent {
 
     @Input() private foodListing: FoodListing;
 
@@ -30,6 +30,7 @@ export class FoodListingUnclaimComponent implements OnChanges {
     private unclaimForm: FormGroup;
     private unclaimComplete: boolean;
     private showProgressSpinner: boolean;
+    private errMsg: string;
 
 
     public constructor (
@@ -39,20 +40,10 @@ export class FoodListingUnclaimComponent implements OnChanges {
         this.removeListing = new EventEmitter<void>();
         this.close = new EventEmitter<void>();
 
-        this.unclaimForm = new FormGroup({'unitsCount': new FormControl(1, [ Validators.required, Validators.min(1) ])});
+        this.unclaimForm = new FormGroup({ unclaimReason: new FormControl(null, Validators.required) });
         this.unclaimComplete = false;
         this.showProgressSpinner = false;
-    }
-
-
-    public ngOnChanges(changes: SimpleChanges): void {
-
-        // Listen for update of FoodListing input so we can set default unitsCount value and update max number validation!
-        if (changes.foodListing != null && this.foodListing != null) {
-
-            this.unclaimForm.get('unitsCount').setValue(this.foodListing.unitsInfo.myClaimedUnitsCount);
-            this.unclaimForm.setValidators([ Validators.required, Validators.min(1), Validators.max(this.foodListing.unitsInfo.myClaimedUnitsCount) ]);
-        }
+        this.errMsg = null;
     }
 
 
@@ -63,28 +54,21 @@ export class FoodListingUnclaimComponent implements OnChanges {
 
         if (!this.unclaimForm.valid) return;
         
-        const unitsCount: number = Number.parseInt(this.unclaimForm.get('unitsCount').value);
-        let observer: Observable<boolean> = this.manageFoodListingService.unclaimFoodListing(this.foodListing.foodListingKey, unitsCount);
+        const unclaimReason: string = this.unclaimForm.get('unclaimReason').value;
+        let observer: Observable <void> = this.manageFoodListingService.unclaimFoodListing(this.foodListing.foodListingKey, unclaimReason);
         this.showProgressSpinner = true;
         
         // Listen for result.
-        observer.finally(() => { this.showProgressSpinner = false; })
+        observer.finally(() => {
+                    this.unclaimComplete = true;
+                    this.showProgressSpinner = false;
+                })
                 .subscribe (
-                    (success: boolean) => {
-
-                        if (success) {
-
-                            this.foodListing.unitsInfo.myClaimedUnitsCount -= unitsCount;
-                            this.foodListing.unitsInfo.availableUnitsCount += unitsCount;
-
-                            // Remove only if all claimed units are depleted!
-                            if (this.foodListing.unitsInfo.myClaimedUnitsCount === 0)
-                                {  this.removeListing.emit();  }
-                            this.unclaimComplete = true;
-                        }
+                    () => {
+                        this.removeListing.emit();
                     },
                     (err: Error) => {
-                        alert(err.message);
+                        this.errMsg = err.message;
                     }
                 );
     }

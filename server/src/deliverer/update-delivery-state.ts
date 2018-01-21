@@ -1,6 +1,6 @@
 'use strict'
 import { query, QueryResult } from './../database-util/connection-pool';
-import { fixNullQueryArgs } from '../database-util/prepared-statement-util';
+import { addArgPlaceholdersToQueryStr } from '../database-util/prepared-statement-util';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
 import { SessionData } from '../common-util/session-data';
 import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotification } from './delivery-update-notification';
@@ -10,14 +10,12 @@ import { Delivery, DeliveryState } from '../../../shared/deliverer/delivery';
 
 export function updateDeliveryState(deliveryFoodListingKey: number, delivererSessionData: SessionData, deliveryState: DeliveryState): Promise<void> {
 
-    let queryString: string = 'SELECT * FROM updateDeliveryState($1, $2, $3)';
     let queryArgs: any[] = [
         deliveryFoodListingKey,
         delivererSessionData.appUserKey,
         deliveryState
     ];
-
-    queryString = fixNullQueryArgs(queryString, queryArgs);
+    let queryString: string = addArgPlaceholdersToQueryStr('SELECT * FROM updateDeliveryState();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);
 
     return query(queryString, queryArgs)

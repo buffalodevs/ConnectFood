@@ -20,11 +20,11 @@ i:active {
     background-color: rgb(200, 255, 200);
 }
 
-#perishable-yes {
+#needsRefrigeration-yes {
     margin-right: 20px;
 }
 
-.extra-bottom-margin {
+.field-margin-bottom {
     margin-bottom: 30px;
 }
 
@@ -76,6 +76,12 @@ button.mat-raised-button.mat-primary.file-upload-button {
     visibility: hidden;
 }
 
+:host ::ng-deep .mat-progress-spinner {
+    margin-top: 30px;
+    max-width: 500px !important;
+    max-height: 500px !important
+}
+
 /* Custom mobile formatting */
 @media screen and (max-width: 1024px) {
 
@@ -83,4 +89,13 @@ button.mat-raised-button.mat-primary.file-upload-button {
         text-align: center;
     }
 
+}
+
+@media screen and (max-width: 400px) {
+
+    .button-group button {
+        width: 100%;
+        margin-left: 0px !important;
+        margin-bottom: 4px;
+    }
 }

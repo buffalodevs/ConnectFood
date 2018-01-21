@@ -110,13 +110,11 @@ export class DeliveryListingInfoComponent implements OnChanges {
 
             this.scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, true)
                 .finally(() => { this.showMappings.set('progressSpinner', false); })
-                .subscribe((success: boolean) => {
-                    if (success) {
-                        console.log('Delivery started');
-                        this.delivery.deliveryStateInfo.deliveryState = DeliveryState.started;
-                        if (!this.isCart) this.removeListing.emit();
-                        this.startComplete = true;
-                    }
+                .subscribe(() => {
+                    console.log('Delivery started');
+                    this.delivery.deliveryStateInfo.deliveryState = DeliveryState.started;
+                    if (!this.isCart) this.removeListing.emit();
+                    this.startComplete = true;
                 },
                 (err: Error) => {
                     // If we get here, then we have encountered a fatal error...
@@ -152,11 +150,9 @@ export class DeliveryListingInfoComponent implements OnChanges {
 
         this.manageDeliveryService.updateDeliveryState(this.delivery.deliveryFoodListingKey, deliveryState)
             .finally(() => { this.showMappings.set('progressSpinner', false); })
-            .subscribe((success: boolean) => {
-                if (success) {
-                    this.delivery.deliveryStateInfo.deliveryState = deliveryState;
-                    this.stateChangeComplete = true;
-                }
+            .subscribe(() => {
+                this.delivery.deliveryStateInfo.deliveryState = deliveryState;
+                this.stateChangeComplete = true;
             },
             (err: Error) => {
                 // If we get here, then we have encountered a fatal error...

@@ -55,20 +55,20 @@ export class FoodListing {
         public foodTitle?: string,
         public foodTypes?: string[],
         public foodDescription?: string,
-        public perishable?: boolean,
+        public needsRefrigeration?: boolean,
         /**
          * The date until the Food Listing expires of the format mm/dd/yyyy
          */
         public availableUntilDate?: string,
         /**
-         * The url of a saved Food Listing that will be used to display the associated image.
+         * The URLs of images associated with the Food Listing.
+         * NOTE: The first url in the array should be the image marked as the primary one. The rest are in the order they were uploaded.
          */
-        public imgUrl?: string,
+        public imgUrls?: string[],
         public donorInfo?: FoodListingUser,
         /**
          * Information pertaining to all claims on this Food Listing.
          */
-        public claimsInfo?: ClaimInfo[],
-        public unitsInfo?: FoodListingUnits
+        public claimInfo?: ClaimInfo
     ) {}
 }

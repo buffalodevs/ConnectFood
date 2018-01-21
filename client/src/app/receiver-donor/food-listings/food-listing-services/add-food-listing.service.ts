@@ -21,12 +21,12 @@ export class AddFoodListingService {
     /**
      * Adds a food listing on the server.
      * @param foodListing The food listing to be added.
-     * @param imageUpload The image component of the food listing that is to be added.
+     * @param imageUploads The image(s) associated with the food listing that is to be added.
      * @return An observable that on success will provide the added food listings key (unique ID).
      */
     public addFoodListing(foodListingUpload: FoodListingUpload, imageUpload: string): Observable<number> {
 
-        foodListingUpload.imageUpload = imageUpload;
+        foodListingUpload.imageUploads = [ imageUpload ];
 
         let body: AddFoodListingRequest = new AddFoodListingRequest(foodListingUpload);
         let observer: Observable<AddFoodListingResponse> = this.requestService.post('/receiverDonor/donor/addFoodListing', body);

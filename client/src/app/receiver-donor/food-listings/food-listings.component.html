@@ -1,14 +1,14 @@
-<h2 id="list-header">{{ header }}</h2>
+<h2 class="slick-list-header">{{ header }}</h2>
 <hr>
 
 
-<div id="food-listings" class="slick-list" [slick-progress-spinner]="showProgressSpinner" spinnerStickyTopId="food-listings" backdropColor="white">
+<div id="food-listings" class="slick-list" [slick-progress-spinner]="showProgressSpinner" spinnerStickyTopId="food-listings" spinnerBackdropColor="white">
 
     <!-- This is the Food Listings (generated via loop) -->
     <slick-list-item *ngFor="let foodListing of listData; let i = index">
 
         <ng-container slick-list-item-img>
-            <img DefaultImg [src]="foodListing.imgUrl" alt="Image Not Available"/>
+            <img DefaultImg [src]="foodListing.imgUrls[0]" alt="Image Not Available"/>
         </ng-container>
 
         <ng-container slick-list-item-header>

@@ -8,16 +8,25 @@
 
 <ng-container *ngIf="schedulingComplete">
         
-    <p>
-        The delivery has been scheduled on
-        <b>{{ dateFormatter.dateToMonthDayYearString(scheduleControl.value) }}</b> at <b>{{ dateFormatter.dateToWallClockString(scheduleControl.value) }}</b>
-        We will send you a reminder via text and email one hour prior to the delivery.
-    </p>
+    <ng-container *ngIf="errMsg == null">
 
-    <p>
-        You can view, start, and update status information about the delivery in the
-        <a (click)="close.emit()" [routerLink]="['/deliveryCart']" class="link-content">Delivery Cart</a> tab.
-    </p>
+        <p>
+            The delivery has been scheduled on
+            <b>{{ dateFormatter.dateToMonthDayYearString(scheduleControl.value) }}</b> at <b>{{ dateFormatter.dateToWallClockString(scheduleControl.value) }}</b>.
+            We will send you a reminder via text and email one hour prior to the delivery.
+        </p>
+
+        <p>
+            You can view, start, and update status information about the delivery in the
+            <a (click)="close.emit()" [routerLink]="['/deliveryCart']" class="link-content">Delivery Cart</a> tab.
+        </p>
+
+    </ng-container>
+
+    <div *ngIf="errMsg != null">
+        <p>Schedule operation failed due to error:</p>
+        <p class="warn-foreground">{{ errMsg }}</p>
+    </div>
 
     <div class="modal-button-group">
         <button mat-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>

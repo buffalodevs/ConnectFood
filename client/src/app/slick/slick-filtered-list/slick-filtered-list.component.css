@@ -1,10 +1,5 @@
 #filters {
     border-right: 1px solid #D5D5D5;
-    padding: 10px;
-}
-
-#listings {
-    padding-top: 10px;
 }
 
 :host ::ng-deep #slick-left-panel {

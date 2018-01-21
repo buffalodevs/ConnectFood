@@ -1,7 +1,7 @@
 'use strict';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
-import { query, Client, QueryResult } from '../../database-util/connection-pool';
-import { fixNullQueryArgs } from "../../database-util/prepared-statement-util";
+import { query, QueryResult } from '../../database-util/connection-pool';
+import { addArgPlaceholdersToQueryStr } from "../../database-util/prepared-statement-util";
 
 import { SessionData, AppUserInfo } from '../../common-util/session-data';
 import { hashPassword } from '../common-app-user/password-util';
@@ -92,9 +92,8 @@ function addOrUpdateAppUserInSQL(appUserInfo: AppUserInfo, hashedPassword?: stri
     let isUpdate: boolean = (appUserUpdateKey != null);
 
     // Generate query string based off of either signing up or updating App User.
-    let queryString: string = 'SELECT * FROM ';
-    if (isUpdate)   queryString += 'updateAppUser($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)';
-    else            queryString += 'addAppUser($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)';
+    let queryString: string = isUpdate ? 'SELECT * FROM updateAppUser()'
+                                       : 'SELECT * FROM addAppUser()';
 
     // Generate query args based off of either signing up or updating App User.
     let queryArgs: Array<any> = [ appUserInfo.email,
@@ -112,11 +111,11 @@ function addOrUpdateAppUserInSQL(appUserInfo: AppUserInfo, hashedPassword?: stri
                                   appUserInfo.availability,
                                   appUserInfo.organizationName,
                                   appUserInfo.taxId ];
-    
     // If an update, then we will need additional appUserKey argument at beginning of list.
     if (isUpdate) queryArgs.unshift(appUserUpdateKey);
-                                  
-    queryString = fixNullQueryArgs(queryString, queryArgs);
+            
+    // Insert query argument placeholders in query string and preprocess query arguments.
+    queryString = addArgPlaceholdersToQueryStr(queryString, queryArgs);
     logSqlQueryExec(queryString, queryArgs);
 
     return query(queryString, queryArgs)

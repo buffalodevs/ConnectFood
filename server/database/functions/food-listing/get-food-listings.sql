@@ -11,12 +11,12 @@ CREATE OR REPLACE FUNCTION getFoodListings
     _retrievalAmount            INTEGER,                                            -- The number of records that should be retrieved starting at _retrievalOffset.
     _foodListingKey             FoodListing.foodListingKey%TYPE     DEFAULT NULL,   -- This is for when we are looking for a specific Food Listing.
     _foodTypes                  FoodType[]                          DEFAULT NULL,   -- This is when we may be filtering by one or many food types. Null is for all food types.
-    _perishable                 FoodListing.perishable%TYPE         DEFAULT NULL,   -- Are we looking for perishable food? Input true for perishable only, false for non-perishable, and null for both.
+    _needsRefrigeration         FoodListing.needsRefrigeration%TYPE DEFAULT NULL,   -- Are we looking for perishable food? Input true for perishable only, false for non-perishable, and null for both.
     _availableAfterDate         TEXT                                DEFAULT NULL,   -- Do we require food that is going to be available on or after a given date? Must be in the format MM/DD/YYYY!
     _unclaimedOnly              BOOLEAN                             DEFAULT FALSE,  -- to TRUE if only unclaimed results should come back (When browsing Receive tab for claimable Food Listings).
     _myDonatedItemsOnly         BOOLEAN                             DEFAULT FALSE,  -- Set to TRUE if only Donor Cart items should come back (this user's donated Food Listings only).
     _myClaimedItemsOnly         BOOLEAN                             DEFAULT FALSE,  -- Set to TRUE if only Receiver Cart items should come back (this user's claimed Food Listings only).
-    _matchAvailability          BOOLEAN                             DEFAULT TRUE    -- Determines if the items that are viewed were donated by a Donor whose availability overlaps this user's.
+    _matchRegularAvailability   BOOLEAN                             DEFAULT TRUE    -- Determines if the items that are viewed were donated by a Donor whose availability overlaps this user's.
 )
 RETURNS TABLE
 (
@@ -34,10 +34,10 @@ BEGIN
 -- ======================================================================================================= --
 
     -- Is the user concerned with matching Donor availability with their own?
-    _matchAvailability := (     _matchAvailability
-                            -- If either of following are TRUE, then we are in cart and don't care about availability!
-                            AND _myDonatedItemsOnly <> TRUE
-                            AND _myClaimedItemsOnly <> TRUE);
+    _matchRegularAvailability := (    _matchRegularAvailability
+                                  -- If either of following are TRUE, then we are in cart and don't care about availability!
+                                  AND _myDonatedItemsOnly <> TRUE
+                                  AND _myClaimedItemsOnly <> TRUE);
 
 
 -- ==================================== Dynamic Query Generation Phase ======================================= --
@@ -65,9 +65,16 @@ BEGIN
         WHERE ($1 IS NULL   OR FoodListing.foodListingKey = $1)
           -- We will translate the list of food type descriptions into integer keys for lookup efficiency.
           AND ($2 IS NULL   OR FoodListingFoodTypeMap.foodType = ANY($2))
-          AND ($3 IS NULL   OR FoodListing.perishable = $3)
-          AND ($4 IS NULL   OR FoodListing.availableUntilDate >= TO_TIMESTAMP($4, ''MM/DD/YYYY''))
-          AND ($5 IS NULL   OR FoodListing.donatedByAppUserKey = $5)
+          AND ($3 IS NULL   OR FoodListing.needsRefrigeration = $3)
+          AND ($4 IS NULL   OR FoodListing.availableUntilDate >= $4)
+          AND ($5 IS NULL   OR FoodListing.donorAppUserKey = $5)
+          -- Ensure that food listing has not been removed.
+          -- NOTE: Transofrming this into a left join combined with an IS NULL where clause check may be more efficient!!!
+          AND NOT EXISTS (
+              SELECT    1
+              FROM      RemovedFoodListing
+              WHERE     RemovedFoodListing.foodListingKey = FoodListing.foodListingKey
+          )
     ';
 
 
@@ -77,7 +84,16 @@ BEGIN
 
         -- If we have at least 1 member in ClaimedFoodListing for our FoodListing that we are examining, then it has been claimed.
         _queryFilters := _queryFilters || '
-            AND (FoodListing.availableUnitsCount > 0)
+            AND NOT EXISTS (
+                SELECT  1
+                FROM    ClaimedFoodListing
+                WHERE   ClaimedFoodListing.foodListingKey = FoodListing.foodListingKey
+                  AND   NOT EXISTS (
+                            SELECT  1
+                            FROM    UnclaimedFoodListing
+                            WHERE   UnclaimedFoodListing.claimedFoodListingKey = ClaimedFoodListing.claimedFoodListingKey
+                        )
+            )
         ';
 
     ELSE
@@ -85,8 +101,12 @@ BEGIN
         -- Get any delivery information so that donor and receiver can see delivery state of Food Listing.
         _queryBase := _queryBase || '
             LEFT JOIN   ClaimedFoodListing  ON  FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
-                                            -- Always exclude claimed food listings that have been completely unclaimed (0 remaining claimed units)!
-                                            AND ClaimedFoodListing.claimedUnitsCount <> 0
+                                            -- Always exclude claimed food listings that have been unclaimed!
+                                            AND NOT EXISTS (
+                                                SELECT  1
+                                                FROM    UnclaimedFoodListing
+                                                WHERE   UnclaimedFoodListing.claimedFoodListingKey = ClaimedFoodListing.claimedFoodListingKey
+                                            )
         ';
 
         -- Do we want only the invoking user's claimed food listings and have filter pertaining to specified claimer?
@@ -94,7 +114,7 @@ BEGIN
         THEN
 
             _queryFilters := _queryFilters || '
-                AND (ClaimedFoodListing.claimedByAppUserKey = $6)
+                AND (ClaimedFoodListing.receiverAppUserKey = $6)
             ';
 
         END IF;
@@ -102,8 +122,8 @@ BEGIN
     END IF;
         
 
-    -- Should we match by Donor availability (assumes this is receive tab and given _appUserKey input denoted by $7 is Receiver's)?
-    IF (_matchAvailability = TRUE)
+    -- Should we match by Donor's regular weekly availability (assumes this is receive tab and given _appUserKey input denoted by $7 is Receiver's)?
+    IF (_matchRegularAvailability = TRUE)
     THEN
 
         _currentWeekday = (SELECT EXTRACT(DOW FROM CURRENT_DATE)); -- Grab [0, 6] index of current day of week (DOW).
@@ -128,7 +148,7 @@ BEGIN
         _queryBase := _queryBase || '
             INNER JOIN  AppUserAvailability ReceiverAvailability ON ReceiverAvailability.appUserKey = $7
             INNER JOIN  RelativeAvailabilityDates ON ReceiverAvailability.appUserAvailabilityKey = RelativeAvailabilityDates.appUserAvailabilityKey
-            INNER JOIN  AppUserAvailability DonorAvailability ON FoodListing.donatedByAppUserKey = DonorAvailability.appUserKey
+            INNER JOIN  AppUserAvailability DonorAvailability ON FoodListing.donorAppUserKey = DonorAvailability.appUserKey
         ';
 
         -- TODO: We may not want to simply find an overlap in time range here!
@@ -155,7 +175,7 @@ BEGIN
             ELSE  -- Cart.
                 CASE (_myClaimedItemsOnly)
                     WHEN TRUE THEN  'MAX(ClaimedFoodListing.claimedDate) DESC'  -- For receiver cart, show most recent claims.
-                    ELSE            'FoodListing.postDate DESC'                 -- For donor cart, show most recent donations.
+                    ELSE            'FoodListing.donationDate DESC'             -- For donor cart, show most recent donations.
                 END
 
         END || '
@@ -173,8 +193,8 @@ BEGIN
     EXECUTE (_queryBase || _queryFilters || _queryGroupAndSort)
     USING _foodListingKey,
           _foodTypes,
-          _perishable,
-          _availableAfterDate,
+          _needsRefrigeration,
+          utcTextToTimestamp(_availableAfterDate),
           CASE (_myDonatedItemsOnly)
             WHEN TRUE THEN _appUserKey
             ELSE NULL 
@@ -183,7 +203,7 @@ BEGIN
             WHEN TRUE THEN _appUserKey
             ELSE NULL
           END,
-          CASE (_matchAvailability)
+          CASE (_matchRegularAvailability)
             WHEN TRUE THEN _appUserKey
             ELSE NULL
           END,
@@ -208,41 +228,40 @@ BEGIN
                                                 FROM FoodListingFoodTypeMap
                                                 WHERE FoodListingFoodTypeMap.foodListingKey = FoodListing.foodListingKey
                                             ),
-                    'perishable',           FoodListing.perishable,
+                    'needsRefrigeration',   FoodListing.needsRefrigeration,
                     'availableUntilDate',   TO_CHAR(FoodListing.availableUntilDate, 'MM/DD/YYYY'),
                     'foodDescription',      FoodListing.foodDescription,
-                    'imgUrl',               FoodListing.imgUrl,
+                    -- Grab all associated image URLs sorted by primary first, then the order that the images were added second.
+                    'imgUrls',              ( SELECT * FROM getFoodListingImgUrls(FoodListing.foodListingKey) ),
 
                     -- App user information of all user's associated with Food Listing (Donor, Receiver(s), & Deliverer(s)).
-                    'donorInfo',            (SELECT sessionData->'appUserInfo' FROM getAppUserSessionData(DonorAppUser.appUserKey)),
+                    'donorInfo',            ( SELECT sessionData->'appUserInfo' FROM getAppUserSessionData(DonorAppUser.appUserKey) ),
                     -- Form an array of claim information objects here.
-                    'claimsInfo',           (
-                                                SELECT  ARRAY_AGG (
-                                                            JSON_BUILD_OBJECT (
-                                                                'receiverInfo',         (
-                                                                                            SELECT sessionData->'appUserInfo'
-                                                                                            FROM getAppUserSessionData(ReceiverAppUser.appUserKey)
-                                                                                        ),
-                                                                'delivererInfo',        (
-                                                                                            SELECT sessionData->'appUserInfo'
-                                                                                            FROM getAppUserSessionData(DeliveryAppUser.appUserKey)
-                                                                                        ),
-                                                                'deliveryStateInfo',    JSON_BUILD_OBJECT (
-                                                                                            'deliveryState',        getDeliveryState (
-                                                                                                                        DeliveryFoodListing.scheduledStartTime,
-                                                                                                                        DeliveryFoodListing.startTime,
-                                                                                                                        DeliveryFoodListing.pickUpTime,
-                                                                                                                        DeliveryFoodListing.dropOffTime
-                                                                                                                    ),
-                                                                                            'scheduledStartTime',   DeliveryFoodListing.scheduledStartTime,
-                                                                                            'startTime',            DeliveryFoodListing.startTime,
-                                                                                            'pickUpTime',           DeliveryFoodListing.pickUpTime,
-                                                                                            'dropOffTime',          DeliveryFoodListing.dropOffTime
-                                                                                        )
-                                                            )
-                                                        )
+                    'claimInfo',           (
+                                                SELECT JSON_BUILD_OBJECT (
+                                                    'receiverInfo',         (
+                                                                                SELECT sessionData->'appUserInfo'
+                                                                                FROM getAppUserSessionData(ReceiverAppUser.appUserKey)
+                                                                            ),
+                                                    'delivererInfo',        (
+                                                                                SELECT sessionData->'appUserInfo'
+                                                                                FROM getAppUserSessionData(DelivererAppUser.appUserKey)
+                                                                            ),
+                                                    'deliveryStateInfo',    JSON_BUILD_OBJECT (
+                                                                                'deliveryState',        getDeliveryState (
+                                                                                                            DeliveryFoodListing.scheduledStartTime,
+                                                                                                            DeliveryFoodListing.startTime,
+                                                                                                            DeliveryFoodListing.pickUpTime,
+                                                                                                            DeliveryFoodListing.dropOffTime
+                                                                                                        ),
+                                                                                'scheduledStartTime',   DeliveryFoodListing.scheduledStartTime,
+                                                                                'startTime',            DeliveryFoodListing.startTime,
+                                                                                'pickUpTime',           DeliveryFoodListing.pickUpTime,
+                                                                                'dropOffTime',          DeliveryFoodListing.dropOffTime
+                                                                            )
+                                                )
                                                 FROM        ClaimedFoodListing
-                                                INNER JOIN  AppUser ReceiverAppUser     ON  ClaimedFoodListing.claimedByAppUserKey = ReceiverAppUser.appUserKey
+                                                INNER JOIN  AppUser ReceiverAppUser     ON  ClaimedFoodListing.receiverAppUserKey = ReceiverAppUser.appUserKey
                                                 INNER JOIN  DeliveryFoodListing         ON  ClaimedFoodListing.claimedFoodListingKey = DeliveryFoodListing.claimedFoodListingKey
                                                                                         -- Make sure we do not include cancelled deliveries!
                                                                                         AND NOT EXISTS (
@@ -250,25 +269,20 @@ BEGIN
                                                                                                 FROM    CancelledDeliveryFoodListing
                                                                                                 WHERE   CancelledDeliveryFoodListing.deliveryFoodListingKey
                                                                                                         = DeliveryFoodListing.deliveryFoodListingKey
-                                                                                                    )
-                                                INNER JOIN  AppUser DeliveryAppUser     ON  DeliveryFoodListing.deliveryAppUserKey = DeliveryAppUser.appUserKey
+                                                                                            )
+                                                INNER JOIN  AppUser DelivererAppUser    ON  DeliveryFoodListing.delivererAppUserKey = DelivererAppUser.appUserKey
                                                 WHERE       ClaimedFoodListing.foodListingKey = FoodListing.foodListingKey
-                                                  AND       ClaimedFoodListing.claimedUnitsCount <> 0 -- Exclude claims that have been completely unclaimed (0 units remaining)!
-                                            ),
-                    
-                    -- @ts-sql class="FoodListingUnits" file="/shared/food-listing/food-listing.ts"
-                    'unitsInfo',            JSON_BUILD_OBJECT (
-                                                'donorOnHandUnitsCount',    (SELECT getDonorOnHandUnitsCount(FoodListing.foodListingKey)),
-                                                'availableUnitsCount',      (SELECT getAvailableUnitsCount(FoodListing.foodListingKey)),
-                                                'myClaimedUnitsCount',      (SELECT getUserClaimedUnitsCount(FoodListing.foodListingKey, _appUserKey)),
-                                                'totalUnitsCount',          (SELECT getTotalUnitsCount(FoodListing.foodListingKey)),
-                                                'unitsLabel',               FoodListing.unitsLabel
+                                                  AND       NOT EXISTS (
+                                                                SELECT  1
+                                                                FROM    UnclaimedFoodListing
+                                                                WHERE   UnclaimedFoodListing.claimedFoodListingKey = ClaimedFoodListing.claimedFoodListingKey
+                                                            )
                                             )
                 ) AS foodListing
     
     FROM        FiltFoodListing
     INNER JOIN  FoodListing                                     ON  FiltFoodListing.foodListingKey = FoodListing.foodListingKey
-    INNER JOIN  AppUser                  AS DonorAppUser        ON  FoodListing.donatedByAppUserKey = DonorAppUser.appUserKey
+    INNER JOIN  AppUser                  AS DonorAppUser        ON  FoodListing.donorAppUserKey = DonorAppUser.appUserKey
     INNER JOIN  ContactInfo              AS DonorContact        ON  DonorAppUser.appUserKey = DonorContact.appUserKey
     INNER JOIN  Organization             AS DonorOrganization   ON  DonorAppUser.appUserKey = DonorOrganization.appUserKey    
     ORDER BY    FiltFoodListing.orderNumber ASC;
@@ -278,4 +292,4 @@ $$ LANGUAGE plpgsql;
 
 -- Test the Stored Procedure here --
 
---SELECT * FROM getFoodListings(1, 0, 10);
+SELECT * FROM getFoodListings(1, 0, 10, null, null, null, null, false, true, false, null);

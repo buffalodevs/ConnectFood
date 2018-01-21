@@ -1,4 +1,4 @@
-<div class="container" [slick-progress-spinner]="showProgressSpinner">
+<div id="donate-container" class="container" [slick-progress-spinner]="showProgressSpinner" spinnerStickyTopId="donate-container" spinnerBackdropColor="white">
 
     <mat-horizontal-stepper #stepper>
 
@@ -10,7 +10,7 @@
 
             <form class="row" [formGroup]="form" (ngSubmit)="ifValidProceedToReview(form.value, form.valid, stepper)">
 
-                <div class="col-md-12 col-lg-5 mobile-center">
+                <div class="col-md-12 col-lg-5 mobile-center field-margin-bottom">
 
                     <div class="crop-container" [style.max-width.px]="cropperSettings.canvasWidth">
 
@@ -40,10 +40,34 @@
                     <div class="form-group">
                         <h4 for="foodTitle">Title</h4>
                         <mat-form-field class="input-group" floatPlaceholder="never">
-                            <textarea #foodTitle matInput matTextareaAutosize id="foodTitle" placeholder="Donation Title"
-                                      formControlName="foodTitle" [maxlength]="foodTitleMaxLength" [errorStateMatcher]="this" required></textarea>
-                            <mat-hint align="end">{{ foodTitle.value.length }} / {{ foodTitleMaxLength }}</mat-hint>
+                            <textarea #title matInput matTextareaAutosize id="foodTitle" placeholder="Donation Title"
+                                      formControlName="foodTitle" [maxlength]="titleMaxLength" [errorStateMatcher]="this" required></textarea>
+                            <mat-hint align="end">{{ title.value.length }} / {{ titleMaxLength }}</mat-hint>
                         </mat-form-field>
+                    </div>
+
+                    <div class="row">
+
+                        <!-- estimatedValue -->
+                        <div class="form-group col-md-6">
+                            <h4 for="estimatedValue">Estimated Value</h4>
+                            <mat-input-container floatPlaceholder="never">
+                                <span matPrefix>$&nbsp;</span>
+                                <input matInput id="estimatedValue" placeholder="0.00" formControlName="estimatedValue"
+                                       [textMask]="validationService.MONEY_MASK_CONFIG" [errorStateMatcher]="this" required>
+                            </mat-input-container>
+                        </div>
+
+                        <!-- estimatedWeight -->
+                        <div class="form-group col-md-6">
+                            <h4 for="estimatedWeight">Estimated Weight</h4>
+                            <mat-input-container floatPlaceholder="never">
+                                <input matInput id="estimatedWeight" placeholder="weight (lbs)" formControlName="estimatedWeight"
+                                       type="number" min="0.5" step="0.5" [errorStateMatcher]="this" required>
+                                <span matSuffix>lbs</span>
+                            </mat-input-container>
+                        </div>
+
                     </div>
 
                     <div class="row">
@@ -59,73 +83,37 @@
                             </mat-input-container>
                         </div>
 
-                        <!-- totalWeight -->
-                        <div class="form-group col-md-6">
-                            <h4 for="totalWeight">Estimated Weight</h4>
-                            <mat-input-container floatPlaceholder="never">
-                                <input matInput id="totalWeight" placeholder="weight (lbs)" formControlName="totalWeight"
-                                       type="number" min="0.5" step="0.5" [errorStateMatcher]="this" required>
-                                <span matSuffix>lbs</span>
-                            </mat-input-container>
+                        <!-- needsRefrigeration -->
+                        <div class="form-group col-md-6 field-margin-bottom">
+                            <h4 [style.margin-bottom.px]="18">Needs Refrigeration</h4>
+                            <mat-radio-group #needsRefrigeration [ngClass]="{'warn-foreground': isInvalid(control('needsRefrigeration'))}"
+                                             formControlName="needsRefrigeration" required>
+                                <mat-radio-button name="needsRefrigeration" id="needsRefrigeration-yes" [value]="true">Yes</mat-radio-button>
+                                <mat-radio-button name="needsRefrigeration" [value]="false">No</mat-radio-button>
+                            </mat-radio-group>
                         </div>
 
                     </div>
 
                     <!-- foodTypes -->
-                    <div class="form-group extra-bottom-margin food-types-container">
+                    <div class="form-group food-types-container field-margin-bottom">
                         <h4>Food Types</h4>
                         <food-types formControlName="foodTypes" [initiallyChecked]="false" [required]="true" [validate]="validate"></food-types>
-                    </div>
-
-                    <!-- perishable -->
-                    <div class="form-group extra-bottom-margin">
-                        <h4>Needs Refrigeration</h4>
-                        <mat-radio-group #perishable [ngClass]="{'warn-foreground': isInvalid(control('perishable'))}" formControlName="perishable" required>
-                            <mat-radio-button name="perishable" id="perishable-yes" [value]="true">Yes</mat-radio-button>
-                            <mat-radio-button name="perishable" [value]="false">No</mat-radio-button>
-                        </mat-radio-group>
                     </div>
 
                     <!-- foodDescription -->
                     <div class="form-group">
                         <h4 for="foodDescription">Description</h4>
                         <mat-input-container class="input-group" floatPlaceholder="never">
-                            <textarea #foodDescription matInput matTextareaAutosize id="foodDescription" placeholder="Donation Description" formControlName="foodDescription">
+                            <textarea #description matInput matTextareaAutosize id="foodDescription" placeholder="Donation Description" formControlName="foodDescription">
                             </textarea>
                         </mat-input-container>
                     </div>
 
-                    <!-- units -->
-                    <!-- <div class="form-group">
-
-                        <ng-container *ngIf="isSplitIntoUnits()">
-                            <h4>Donation Units</h4>
-                            <div class="row">
-
-                                <div class="col-md-4">
-                                    <mat-input-container floatPlaceholder="never">
-                                        <input matInput placeholder="Units Count" formControlName="availableUnitsCount" type="number" min="1"
-                                               [errorStateMatcher]="this" required>
-                                    </mat-input-container>
-                                </div>
-
-                                <div class="col-md-8">
-                                    <mat-input-container floatPlaceholder="never">
-                                        <input matInput placeholder="Units Label" formControlName="unitsLabel" [errorStateMatcher]="this" required>
-                                    </mat-input-container>
-                                </div>
-                                
-                            </div>
-                        </ng-container>
-
-                        <span class="link-content">
-                            <a (click)="toggleSplitIntoUnits()">{{ isSplitIntoUnits() ? 'Combine into single unit' : 'Split into multiple units' }}</a>
-                        </span>
-
-                    </div> -->
-
                     <!-- This button does not actually submit data to the server, but rather moves to the confirmation display -->
-                    <button mat-raised-button type="submit" color="primary" class="button-md">Next</button>
+                    <div class="button-group">
+                        <button mat-raised-button type="submit" color="primary" class="button-md">Next</button>
+                    </div>
 
                 </div>
             </form>
@@ -163,7 +151,7 @@
 
                         <div class="form-group col-md-6">
                             <h4>Estimated Weight</h4>
-                            <div>{{ control('totalWeight').value }} lbs</div>
+                            <div>{{ control('estimatedWeight').value }} lbs</div>
                         </div>
 
                     </div>
@@ -175,9 +163,9 @@
 
                     <div class="form-group">
                         <h4>Needs Refrigeration</h4>
-                        <i class="material-icons" *ngIf="control('perishable').value" style="color:green">check</i>
-                        <i class="material-icons" *ngIf="!control('perishable').value" style="color:red">clear</i>
-                        <span>{{ (control('perishable').value === true) ? 'Yes' : 'No' }}</span>
+                        <i class="material-icons" *ngIf="control('needsRefrigeration').value" style="color:green">check</i>
+                        <i class="material-icons" *ngIf="!control('needsRefrigeration').value" style="color:red">clear</i>
+                        <span>{{ (control('needsRefrigeration').value === true) ? 'Yes' : 'No' }}</span>
                     </div>
             
                     <div class="form-group">
@@ -186,15 +174,11 @@
                         <div *ngIf="isFormControlEmpty(control('foodDescription'))">-- None --</div>
                     </div>
 
-                    <div class="form-group" *ngIf="isSplitIntoUnits()">
-                        <h4>Donation Units</h4>
-                        <div>{{ control('availableUnitsCount').value }} {{ control('unitsLabel').value }}</div>
+                    <div class="button-group">
+                        <button mat-raised-button color="primary" class="button-md warn-button" type="button" (click)="editDonation(stepper)">Edit Donation</button>
+                        <button mat-raised-button color="primary" class="button-md" type="button"
+                            (click)="submitDonation(form.value, form.valid, stepper)" style="margin-left:20px;">Confirm Donation</button>
                     </div>
-
-                    <br>
-                    <button mat-raised-button color="primary" class="button-md warn-button" type="button" (click)="editDonation(stepper)">Edit Donation</button>
-                    <button mat-raised-button color="primary" class="button-md" type="button"
-                        (click)="submitDonation(form.value, form.valid, stepper)" style="margin-left:20px;">Confirm Donation</button>
 
                 </div>
 
@@ -221,7 +205,9 @@
                         You can also click <a [routerLink]="['/foodListingCart']" class="link-content">here</a> to view your cart.
                     </p>
 
-                    <button mat-raised-button color="primary" class="button-md" type="button" (click)="donateAgain(stepper, cropper)">Donate Again</button>
+                    <div class="button-group">
+                        <button mat-raised-button color="primary" class="button-md" type="button" (click)="donateAgain(stepper, cropper)">Donate Again</button>
+                    </div>
 
                 </div>
  

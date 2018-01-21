@@ -1,21 +1,12 @@
 <form [formGroup]="removeForm" [slick-progress-spinner]="showProgressSpinner" *ngIf="!removeComplete">
-    
-    <ng-container *ngIf="foodListing.unitsInfo.donorOnHandUnitsCount > 1">
 
-        <h5>{{ foodListing.unitsInfo.donorOnHandUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }} Are currently donated. How many will you remove?</h5>
-        <mat-input-container id="units-count" floatPlaceholder="never">
-            <input matInput formControlName="unitsCount" InputFilter [min]="1" [max]="foodListing.unitsInfo.donorOnHandUnitsCount">
-            <span matSuffix>/ {{ foodListing.unitsInfo.donorOnHandUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }}</span>
-        </mat-input-container>
-
-    </ng-container>
-
-    <ng-container *ngIf="foodListing.unitsInfo.donorOnHandUnitsCount === 1">
-        <p>Are you sure that you wish to remove the selected food listing?</p>
-    </ng-container>
+    <h5>Please provide a detailed reason for the removal.</h5>
+    <mat-input-container id="removal-reason" floatPlaceholder="never">
+        <textarea matInput matTextareaAutosize formControlName="removalReason" required></textarea>
+    </mat-input-container>
 
     <!-- Footer -->
-    <div class="modal-button-group">    
+    <div class="modal-button-group">
         <button mat-raised-button color="primary" type="submit" class="button-md" (click)="removeSelectedFoodListing()">Confirm Remove</button>
     </div>
 
@@ -24,12 +15,15 @@
 
 <ng-container *ngIf="removeComplete">
 
-    <p>
-        Successfully removed
-        {{ (foodListing.unitsInfo.unitsLabel == null) ? ''
-                                                      : removeForm.get('unitsCount').value + ' ' + foodListing.unitsInfo.unitsLabel + ' of' }}
-        food listing titled <b>{{ foodListing.foodTitle }}</b>.
-    </p>
+    <ng-container *ngIf="errMsg == null">
+        <p>Successfully removed food listing: <b>{{ foodListing.foodTitle }}</b>.</p>
+        <p>Any associated receivers or deliverers will be automatically notified of the removal.</p>
+    </ng-container>
+
+    <div *ngIf="errMsg != null">
+        <p>Removal operation failed due to error:</p>
+        <p class="warn-foreground">{{ errMsg }}</p>
+    </div>
 
     <div class="modal-button-group">
         <button mat-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>

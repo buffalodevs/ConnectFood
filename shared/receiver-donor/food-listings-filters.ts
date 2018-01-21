@@ -22,11 +22,11 @@ export class FoodListingsFilters {
         /**
          * Determines if results should include perishable elements.
          */
-        public perishable?: boolean,
+        public needsRefrigeration?: boolean,
         /**
          * Determines if results should include non-perishable elements.
          */
-        public notPerishable?: boolean,
+        public notNeedsRefrigeration?: boolean,
         /**
          * Determines the minimum date that retrieved items must still be available by.
          */

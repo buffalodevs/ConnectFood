@@ -1,3 +1,7 @@
+#filters-header {
+    text-align: center;
+}
+
 :host ::ng-deep .mat-select {
     padding-top: 0px;
 }
@@ -9,4 +13,11 @@
 
 :host ::ng-deep .mat-form-field-infix {
     border-top: none;
+}
+
+@media only screen and (min-width: 1200px) {
+
+    #filters-container {
+        padding-left: 10px;
+    }
 }

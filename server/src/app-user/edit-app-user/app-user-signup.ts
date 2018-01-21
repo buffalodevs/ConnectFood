@@ -1,6 +1,7 @@
 'use strict';
 import { SessionData, AppUserInfo } from '../../common-util/session-data';
 import { addOrUpdateAppUser } from './app-user-add-update';
+import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
 import { logSqlQueryExec } from '../../logging/sql-logger';
 import { query } from '../../database-util/connection-pool';
 import { sendEmail, MailConfig } from '../../common-util/email';
@@ -33,9 +34,8 @@ export function signup(appUserInfo: AppUserInfo, password: string): Promise<Sess
  */
 export function signupVerify(appUserKey: number, verificationToken: String): Promise<void> {
 
-    let queryString: string = 'SELECT * FROM verifyAppUser($1, $2)';
     let queryArgs: Array<any> = [ appUserKey, verificationToken ];
-    
+    let queryString: string = addArgPlaceholdersToQueryStr('SELECT * FROM verifyAppUser();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);
 
     return query(queryString, queryArgs)

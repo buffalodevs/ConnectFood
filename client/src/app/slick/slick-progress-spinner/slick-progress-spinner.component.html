@@ -1,9 +1,9 @@
 <div class="progress-spinner-container" *ngIf="showSpinner">
 
-    <div class="progress-spinner-backdrop" [style.opacity]="showBackdrop ? 1 : 0" [style.background-color]="backdropColor"></div>
+    <div class="progress-spinner-backdrop" [style.opacity]="showSpinnerBackdrop ? 1 : 0" [style.background-color]="spinnerBackdropColor"></div>
     <mat-progress-spinner
-        [color]="color" [mode]="mode" [value]="value" [style.max-width]="maxWidth" [style.max-height]="maxHeight"
-        [SlickScrollableSticky]="{ scrollable: false, stickyClass: 'sticky-spinner', containerId: spinnerStickyTopId }" [enableSticky]="spinnerStickyTopId != null">
+        [color]="spinnerColor" [mode]="spinnerMode" [value]="spinnerValue" [enableSticky]="spinnerStickyTopId != null"
+        [SlickScrollableSticky]="{ scrollable: false, stickyClass: 'sticky-spinner', containerId: spinnerStickyTopId }">
     </mat-progress-spinner>
 
 </div>

@@ -2,7 +2,7 @@
 <slick-list-item [includeBorder]="false">
                 
     <ng-container slick-list-item-img>
-        <img DefaultImg [src]="foodListing.imgUrl" alt="Image Not Available"/>
+        <img DefaultImg [src]="foodListing.imgUrls[0]" alt="Image Not Available"/>
     </ng-container>
     
     <div slick-list-item-body class="row">
@@ -59,7 +59,7 @@
 
         <div *ngIf="isDonatedCart">
 
-            
+            <!-- TODO -->
 
         </div> <!-- Receiver Description (Column 1 Donor Cart) -->
 
@@ -79,9 +79,9 @@
                 <div class="space-bottom">
                     <b>Needs Refrigeration:</b>
                     <span class="no-word-wrap">
-                        <i class="material-icons" *ngIf="foodListing.perishable" style="color:green">check</i>
-                        <i class="material-icons" *ngIf="!foodListing.perishable" style="color:red">clear</i>
-                        <span>{{ foodListing.perishable ? 'Yes' : 'No'}}</span>
+                        <i class="material-icons" *ngIf="foodListing.needsRefrigeration" style="color:green">check</i>
+                        <i class="material-icons" *ngIf="!foodListing.needsRefrigeration" style="color:red">clear</i>
+                        <span>{{ foodListing.needsRefrigeration ? 'Yes' : 'No'}}</span>
                     </span>
                 </div>
                 
@@ -90,42 +90,11 @@
                     <food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true" [condensedDisplay]="!responsiveService.widthGreaterThan(767)"></food-types>
                 </div>
 
-                <!-- Claimed indicator -->
-                <div class="space-bottom">
-
-                    <div *ngIf="!isClaimedCart">
-                        <b>Available Count:</b>
-                        <span class="inline-block">
-                            {{ foodListing.unitsInfo.availableUnitsCount }} of
-                            {{ foodListing.unitsInfo.totalUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }}
-                        </span>
-                    </div>
-
-                    <div *ngIf="isDonatedCart">
-                        <b>Donor On-Hand Count:</b>
-                        <span class="inline-block">
-                            {{ foodListing.unitsInfo.donorOnHandUnitsCount }} of
-                            {{ foodListing.unitsInfo.totalUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }}
-                        </span>
-                    </div>
-
-                    <div *ngIf="isClaimedCart">
-                        <b>Claimed Count:</b>
-                        <span class="inline-block">
-                            {{ foodListing.unitsInfo.myClaimedUnitsCount }} of
-                            <!-- Instead of total units here, we have total units obtainable by this receiver -->
-                            {{ foodListing.unitsInfo.availableUnitsCount + foodListing.unitsInfo.myClaimedUnitsCount }}
-                            {{ foodListing.unitsInfo.unitsLabel }}
-                        </span>
-                    </div>
-
-                </div> <!-- Units Counts Container -->
-
             </slick-expansion-panel>
 
         </div> <!-- Misc Description (Column 2) -->
 
-        <div class="col-md-12" *ngIf="foodListing.foodDescription != null">
+        <div class="col-md-12">
 
             <slick-expansion-panel [collapseWidth]="null">
                     
@@ -133,7 +102,7 @@
                     Description
                 </ng-container>
         
-            <span class="inline-block">{{ foodListing.foodDescription }}</span>
+            <span class="inline-block">{{ (foodListing.foodDescription != null) ? foodListing.foodDescription : 'No Description' }}</span>
 
             </slick-expansion-panel>
 

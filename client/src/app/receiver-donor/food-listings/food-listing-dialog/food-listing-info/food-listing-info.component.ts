@@ -22,10 +22,6 @@ export class FoodListingInfoComponent {
      * Determines if this dialog is displaying Food Listing info for a Donor's Cart. Default is false.
      */
     @Input() private isDonatedCart: boolean;
-    /**
-     * Default replacement image URL if one is not provided or if the provided one does not exist.
-     */
-    @Input() private defaultImgUrl: string;
 
     /**
      * Emitted whenever a Food Listing is to be claimed.
@@ -46,7 +42,6 @@ export class FoodListingInfoComponent {
     ) {
         this.isClaimedCart = false;
         this.isDonatedCart = false;
-        this.defaultImgUrl = null;
 
         this.toClaim = new EventEmitter<void>();
         this.toUnclaim = new EventEmitter<void>();

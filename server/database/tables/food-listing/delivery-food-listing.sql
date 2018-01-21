@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS DeliveryFoodListing
 -- Key of Claimed Food Listing that is to be Delivered (or was delivered).
 ALTER TABLE DeliveryFoodListing ADD COLUMN IF NOT EXISTS claimedFoodListingKey  INTEGER         NOT NULL REFERENCES ClaimedFoodListing (claimedFoodListingKey);
 
-ALTER TABLE DeliveryFoodListing ADD COLUMN IF NOT EXISTS deliveryAppUserKey     INTEGER         NOT NULL REFERENCES AppUser (appUserKey);
+ALTER TABLE DeliveryFoodListing ADD COLUMN IF NOT EXISTS delivererAppUserKey    INTEGER         NOT NULL REFERENCES AppUser (appUserKey);
 
 -- Indacates when the deliverer has scheduled to start delivery of the Food Listing (in the future).
 ALTER TABLE DeliveryFoodListing ADD COLUMN IF NOT EXISTS scheduledStartTime     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP;
@@ -29,6 +29,6 @@ ALTER TABLE DeliveryFoodListing ADD COLUMN IF NOT EXISTS dropOffTime            
 
 CREATE INDEX IF NOT EXISTS deliveryFoodListing_ClaimedFoodListingKeyIdx     ON DeliveryFoodListing (claimedFoodListingKey);
 
-CREATE INDEX IF NOT EXISTS deliveryFoodListing_DeliveryAppUserKeyIdx        ON DeliveryFoodListing (DeliveryAppUserKey);
+CREATE INDEX IF NOT EXISTS deliveryFoodListing_DelivererAppUserKeyIdx       ON DeliveryFoodListing (delivererAppUserKey);
 
 -- Create more indexes here --

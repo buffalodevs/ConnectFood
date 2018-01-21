@@ -1,18 +1,9 @@
 <form [formGroup]="unclaimForm" [slick-progress-spinner]="showProgressSpinner" *ngIf="!unclaimComplete">
     
-    <ng-container *ngIf="foodListing.unitsInfo.myClaimedUnitsCount > 1">
-
-        <h5>{{ foodListing.unitsInfo.myClaimedUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }} Are currently claimed. How many will you unclaim?</h5>
-        <mat-input-container id="units-count" floatPlaceholder="never">
-            <input matInput formControlName="unitsCount" InputFilter [min]="1" [max]="foodListing.unitsInfo.myClaimedUnitsCount">
-            <span matSuffix>/ {{ foodListing.unitsInfo.myClaimedUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }}</span>
-        </mat-input-container>
-
-    </ng-container>
-
-    <ng-container *ngIf="foodListing.unitsInfo.myClaimedUnitsCount === 1">
-        <p>Are you sure that you wish to unclaim the selected food listing?</p>
-    </ng-container>
+    <h5>Please provide a detailed reason for the unclaim.</h5>
+    <mat-input-container id="unclaim-reason" floatPlaceholder="never">
+        <textarea matInput matTextareaAutosize formControlName="unclaimReason" required></textarea>
+    </mat-input-container>
 
     <!-- Footer -->
     <div class="modal-button-group">    
@@ -24,12 +15,15 @@
 
 <ng-container *ngIf="unclaimComplete">
 
-    <p>
-        Successfully unclaimed
-        {{ (foodListing.unitsInfo.unitsLabel == null) ? ''
-                                                      : unclaimForm.get('unitsCount').value + ' ' + foodListing.unitsInfo.unitsLabel + ' of' }}
-        food listing titled <b>{{ foodListing.foodTitle }}</b>.
-    </p>
+    <ng-container *ngIf="errMsg == null">
+        <p>Successfully unclaimed food listing: <b>{{ foodListing.foodTitle }}</b>.</p>
+        <p>Any associated donors and deliverers will automatically be notified about the unclaim.</p>
+    </ng-container>
+
+    <div *ngIf="errMsg != null">
+        <p>Unclaim operation failed due to error:</p>
+        <p class="warn-foreground">{{ errMsg }}</p>
+    </div>
 
     <div class="modal-button-group">
         <button mat-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>

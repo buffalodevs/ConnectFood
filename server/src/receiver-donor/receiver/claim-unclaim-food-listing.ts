@@ -1,36 +1,41 @@
 'use strict'
-import { connect, query, Client, QueryResult } from '../../database-util/connection-pool';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
-import { FoodListing } from '../food-listing';
+import { query, QueryResult } from '../../database-util/connection-pool';
+import { logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
+import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
 import { SessionData } from '../../common-util/session-data';
 import { UnclaimNotificationData, notifyDelivererOfLostDelivery, notifyDonorOfLostDelivery } from '../common-receiver-donor/unclaim-notification';
 
 
-export function claimFoodListing(foodListingKey: number, receiverSessionData: SessionData, unitsCount: number): Promise<void> {
-    return claimOrUnclaimFoodListing(foodListingKey, receiverSessionData, unitsCount, true);
-}
-
-
-export function unclaimFoodListing(foodListingKey: number, receiverSessionData: SessionData, unitsCount: number): Promise<void> {
-    return claimOrUnclaimFoodListing(foodListingKey, receiverSessionData, unitsCount, false);
-}
-
-
-function claimOrUnclaimFoodListing(foodListingKey: number, receiverSessionData: SessionData, unitsCount: number, isClaim: boolean): Promise<void> {
+export function claimFoodListing(foodListingKey: number, receiverSessionData: SessionData): Promise <void> {
     
-    let queryString: string = 'SELECT * FROM ' + (isClaim ? '' : 'un') + 'claimFoodListing($1, $2, $3)';
-    let queryArgs: Array<any> = [ foodListingKey, receiverSessionData.appUserKey, unitsCount ];
+    let queryArgs: Array<any> = [ foodListingKey, receiverSessionData.appUserKey ];
+    let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM claimFoodListing()', queryArgs);
+
+    return execClaimOrUnclaimQuery(true, queryString, queryArgs);
+}
+
+
+export function unclaimFoodListing(foodListingKey: number, receiverSessionData: SessionData, unclaimReason: string): Promise <void> {
+
+    let queryArgs: Array<any> = [ foodListingKey, receiverSessionData.appUserKey, unclaimReason ];
+    let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM unclaimFoodListing()', queryArgs);
+
+    return execClaimOrUnclaimQuery(false, queryString, queryArgs, receiverSessionData);
+}
+
+
+function execClaimOrUnclaimQuery(isClaim: boolean, queryString: string, queryArgs: any[], receiverSessionData?: SessionData): Promise <void> {
+
     logSqlQueryExec(queryString, queryArgs);
 
     return query(queryString, queryArgs)
-
         .then((queryResult: QueryResult) => {
-            logSqlQueryResult(queryResult.rows);
-            console.log((isClaim ? 'Claim' : 'Unclaim') + ' Food Listing Successful.');
-            return isClaim ? Promise.resolve() // If claim, then just resolve.
-                           : handleUnclaimQueryResult(receiverSessionData, queryResult);
-        })
 
+            logSqlQueryResult(queryResult.rows);
+
+            return ( isClaim ? Promise.resolve() // If claim, then just resolve.
+                             : handleUnclaimQueryResult(receiverSessionData, queryResult) );
+        })
         .catch((err: Error) => {
             console.log(err);
             return Promise.reject(new Error((isClaim ? 'Claim' : 'Unclaim') + ' Food Listing Unexpectedly Failed.'));
@@ -48,7 +53,7 @@ function handleUnclaimQueryResult(receiverSessionData: SessionData, result: Quer
     let unclaimNotificationData: UnclaimNotificationData = result.rows[0].unclaimnotificationdata;
 
     // Next, if the removal resulted in total unclaiming of food that had a scheduled delivery, then notify deliverer and donor as well.
-    if (unclaimNotificationData.delivererSessionData != null && unclaimNotificationData.newClaimedUnitsCount === 0) {
+    if (unclaimNotificationData.delivererSessionData != null) {
         
         return notifyDelivererOfLostDelivery(receiverSessionData, 'receiver', unclaimNotificationData)
             .then(() => {

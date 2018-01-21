@@ -3,7 +3,7 @@
 --DROP TABLE Organization CASCADE;
 CREATE TABLE IF NOT EXISTS Organization
 (
-    organizationKey SERIAL      PRIMARY KEY
+    organizationKey SERIAL PRIMARY KEY
 );
 
 ALTER TABLE Organization ADD COLUMN IF NOT EXISTS appUserKey    INTEGER         NOT NULL UNIQUE REFERENCES AppUser (appUserKey);

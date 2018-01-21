@@ -24,6 +24,7 @@ export class DeliveryListingCancelComponent {
     private validate: boolean;
     private cancelComplete: boolean;
     private showProgressSpinner: boolean;
+    private errMsg: string;
 
 
     public constructor (
@@ -40,6 +41,7 @@ export class DeliveryListingCancelComponent {
         this.validate = false;
         this.cancelComplete = false;
         this.showProgressSpinner = false;
+        this.errMsg = null;
     }
 
 
@@ -56,15 +58,15 @@ export class DeliveryListingCancelComponent {
         const foodRejected: boolean = this.cancelForm.get('foodRejected').value;
 
         this.cancelDeliveryService.cancelDelivery(this.delivery.deliveryFoodListingKey, cancelReason, foodRejected)
-            .finally(() => { this.showProgressSpinner = false; })
-            .subscribe((success: boolean) => {
-                if (success) {
-                    this.removeListing.emit(); // Emit signal to parent (Dialog) so it can close and remove the cancelled listing.
-                    this.cancelComplete = true;
-                }
+            .finally(() => {
+                this.cancelComplete = true;
+                this.showProgressSpinner = false;
+            })
+            .subscribe(() => {
+                this.removeListing.emit(); // Emit signal to parent (Dialog) so it can close and remove the cancelled listing.
             },
             (err: Error) => {
-                alert(err.message);
+                this.errMsg = err.message;
             });
     }
 }

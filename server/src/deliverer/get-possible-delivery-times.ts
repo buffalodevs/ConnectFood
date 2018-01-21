@@ -1,6 +1,7 @@
 'use strict'
-import { query, QueryResult } from './../database-util/connection-pool';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
+import { query, QueryResult } from '../database-util/connection-pool';
+import { addArgPlaceholdersToQueryStr } from '../database-util/prepared-statement-util';
+import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../logging/sql-logger';
 
 import { TimeRange } from '../../../shared/app-user/time-range';
 
@@ -12,8 +13,9 @@ import { TimeRange } from '../../../shared/app-user/time-range';
  */
 export function getPossibleDeliveryTimes(claimedFoodListingKey: number, myAppUserKey: number): Promise<TimeRange[]> {
 
-    let queryString: string = 'SELECT * FROM getPossibleDeliveryTimes($1, $2)';
     let queryArgs: any[] = [ claimedFoodListingKey, myAppUserKey ];
+    let queryString: string = addArgPlaceholdersToQueryStr('SELECT * FROM getPossibleDeliveryTimes();', queryArgs);
+    
     logSqlQueryExec(queryString, queryArgs);
 
     return query(queryString, queryArgs)

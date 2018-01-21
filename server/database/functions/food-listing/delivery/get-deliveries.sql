@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION getDeliveries
     _deliveryFoodListingKey DeliveryFoodListing.deliveryFoodListingKey%TYPE DEFAULT NULL,   -- The key identifier of a delivery food listing.
     _claimedFoodListingKey  ClaimedFoodListing.claimedFoodListingKey%TYPE   DEFAULT NULL,   -- The key identifier of a claimed food listing that is to be or has been delivered.
     _maxDistance            INTEGER                                         DEFAULT NULL,   -- The maximum distance (mi) of Donors and Reivers from the (potential) deliverer.
-    _maxTotalWeight         FoodListing.totalWeight%TYPE                    DEFAULT NULL,   -- The maximum total weight of the delivery.
+    _maxEstimatedWeight     FoodListing.estimatedWeight%TYPE                DEFAULT NULL,   -- The maximum estimated weight of the delivery.
     _unscheduledDeliveries  BOOLEAN                                         DEFAULT FALSE,  -- Set to TRUE if we should only pull back deliveries that have not been scheduled.
     _myScheduledDeliveries  BOOLEAN                                         DEFAULT FALSE,  -- Set to TRUE if we should only pull back deliveries that are scheduled for deliverer.
     _matchAvailability      BOOLEAN                                         DEFAULT TRUE,   -- If TRUE, matches the availability of the Driver with that of the Receiver and Donor.
@@ -88,15 +88,13 @@ BEGIN
                                             ),
                 'foodTitle',                FoodListing.foodTitle,
                 -- NOTE: We may want to remove these getAppUserSessionData() function calls for performance improvements! They create subqueries (likely inlined though).
-                'donorInfo',                (SELECT sessionData->'appUserInfo' FROM getAppUserSessionData(DonorAppUser.appUserKey)),
-                'receiverInfo',             (SELECT sessionData->'appUserInfo' FROM getAppUserSessionData(ReceiverAppUser.appUserKey)),
+                'donorInfo',                ( SELECT sessionData->'appUserInfo' FROM getAppUserSessionData(DonorAppUser.appUserKey) ),
+                'receiverInfo',             ( SELECT sessionData->'appUserInfo' FROM getAppUserSessionData(ReceiverAppUser.appUserKey) ),
                 'foodDescription',          FoodListing.foodDescription,
-                'perishable',               FoodListing.perishable,
+                'needsRefrigeration',       FoodListing.needsRefrigeration,
                 'availableUntilDate',       FoodListing.availableUntilDate,
-                'claimedUnitsCount',        ClaimedFoodListing.claimedUnitsCount,
-                'unitsLabel',               FoodListing.unitsLabel,
-                'imgUrl',                   FoodListing.imgUrl,
-                'totalWeight',              FoodListing.totalWeight,
+                'imgUrls',                  ( SELECT * FROM getFoodListingImgUrls(FoodListing.foodListingKey) ),
+                'estimatedWeight',          FoodListing.estimatedWeight,
                 -- This large subquery in getPossibleDeliveryTimes may need to be inlined for performance benefits. Although, the select portion of this query
                 -- should be evaluated last, and therefore, this should only happen a very limited number of times... so it's probably fine.
                 'possibleDeliveryTimes',    (   
@@ -106,23 +104,18 @@ BEGIN
             ) AS delivery
     FROM        FoodListing
     INNER JOIN  ClaimedFoodListing                              ON  FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
-                                                                -- Do not include claims that have been completely unclaimed (0 remaining claimed units).
-                                                                AND ClaimedFoodListing.claimedUnitsCount <> 0
-                                                                -- Do not include rejected cancelled deliveries!
+                                                                -- Do not include claims that have been unclaimed or that were unscheduled and marked as rejected.
                                                                 AND NOT EXISTS (
-                                                                    SELECT      1
-                                                                    FROM        CancelledDeliveryFoodListing
-                                                                    INNER JOIN  DeliveryFoodListing ON CancelledDeliveryFoodListing.deliveryFoodListingKey =
-                                                                                                       DeliveryFoodListing.deliveryFoodListingKey
-                                                                    WHERE       DeliveryFoodListing.claimedFoodListingKey = ClaimedFoodListing.claimedFoodListingKey
-                                                                      AND       CancelledDeliveryFoodListing.foodRejected = TRUE
+                                                                    SELECT  1
+                                                                    FROM        UnclaimedFoodListing
+                                                                    WHERE       UnclaimedFoodListing.claimedFoodListingKey = ClaimedFoodListing.claimedFoodListingKey
                                                                 )
     INNER JOIN  AppUser             AS DelivererAppUser         ON  _appUserKey = DelivererAppUser.appUserKey
     INNER JOIN  AppUserAvailability AS DelivererAvailability    ON  DelivererAppUser.appUserKey = DelivererAvailability.appUserKey
-    INNER JOIN  AppUser             AS DonorAppUser             ON  FoodListing.donatedByAppUserKey = DonorAppUser.appUserKey
+    INNER JOIN  AppUser             AS DonorAppUser             ON  FoodListing.donorAppUserKey = DonorAppUser.appUserKey
     INNER JOIN  ContactInfo         AS DonorContact             ON  DonorAppUser.appUserKey = DonorContact.appUserKey
     INNER JOIN  AppUserAvailability AS DonorAvailability        ON  DonorAppUser.appUserKey = DonorAvailability.appUserKey
-    INNER JOIN  AppUser             AS ReceiverAppUser          ON  ClaimedFoodListing.claimedByAppUserKey = ReceiverAppUser.appUserKey
+    INNER JOIN  AppUser             AS ReceiverAppUser          ON  ClaimedFoodListing.receiverAppUserKey = ReceiverAppUser.appUserKey
     INNER JOIN  ContactInfo         AS ReceiverContact          ON  ReceiverAppUser.appUserKey = ReceiverContact.appUserKey
     INNER JOIN  AppUserAvailability AS ReceiverAvailability     ON  ReceiverAppUser.appUserKey = ReceiverAvailability.appUserKey
     -- LEFT b/c we may or may not have a delivery lined up yet (deliverer may be looking for potential deliveries here).
@@ -131,13 +124,20 @@ BEGIN
                                                                 AND NOT EXISTS (
                                                                     SELECT  1
                                                                     FROM    CancelledDeliveryFoodListing
-                                                                    WHERE   DeliveryFoodListing.deliveryFoodListingKey = CancelledDeliveryFoodListing.deliveryFoodListingKey
+                                                                    WHERE   CancelledDeliveryFoodListing.deliveryFoodListingKey = DeliveryFoodListing.deliveryFoodListingKey
                                                                 )
-    WHERE       (_deliveryFoodListingKey IS NULL    OR DeliveryFoodListing.deliveryFoodListingKey = _deliveryFoodListingKey)
+                -- Ensure that the base Food Listing has not been marked as removed.
+                -- NOTE: Using a left join to RemovedFoodListing combined with IS NULL where clause check may be more efficient!
+    WHERE       NOT EXISTS (
+                    SELECT  1
+                    FROM    RemovedFoodListing
+                    WHERE   RemovedFoodListing.foodListingKey = FoodListing.foodListingKey
+                )
+      AND       (_deliveryFoodListingKey IS NULL    OR DeliveryFoodListing.deliveryFoodListingKey = _deliveryFoodListingKey)
       AND       (_claimedFoodListingKey IS NULL     OR ClaimedFoodListing.claimedFoodListingKey = _claimedFoodListingKey)
       AND       (_maxDistanceMeters IS NULL         OR ST_DWITHIN(ReceiverContact.gpsCoordinate, DonorContact.gpsCoordinate, _maxDistanceMeters))
-      AND       (_maxTotalWeight IS NULL            OR FoodListing.totalWeight <= _maxTotalWeight)
-      AND       (_myScheduledDeliveries = FALSE     OR DeliveryFoodListing.deliveryAppUserKey = _appUserKey)
+      AND       (_maxEstimatedWeight IS NULL        OR FoodListing.estimatedWeight <= _maxEstimatedWeight)
+      AND       (_myScheduledDeliveries = FALSE     OR DeliveryFoodListing.delivererAppUserKey = _appUserKey)
       AND       (_unscheduledDeliveries = FALSE     OR DeliveryFoodListing.scheduledStartTime IS NULL)
       -- When deliverer, receiver, and donor availabilities must all line up for future scheduling of delivery.
       AND       (_matchAvailability = FALSE         OR (    ReceiverAvailability.endTime > DelivererAvailability.startTime

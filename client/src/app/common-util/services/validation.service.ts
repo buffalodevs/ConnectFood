@@ -1,6 +1,7 @@
 import { Pipe } from '@angular/core';
 import { AbstractControl, ValidatorFn, FormGroup, FormArray, FormControl, ValidationErrors } from '@angular/forms';
 import createAutoCorrectedDatePipe from 'text-mask-addons/dist/createAutoCorrectedDatePipe';
+import createNumberMask from 'text-mask-addons/dist/createNumberMask.js';
 import * as _ from "lodash";
 
 import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
@@ -14,16 +15,35 @@ export class ValidationService extends Validation {
     /**
      * Configuration for a date text-mask (with auto correct functionality).
      */
-    private readonly DATE_MASK_CONFIG: { mask: Array <string | RegExp>, keepCharPositions: boolean, pipe: Pipe };
+    public readonly DATE_MASK_CONFIG: { mask: Array <string | RegExp>, keepCharPositions: boolean, pipe: Pipe, placeholder: string };
+
+    /**
+     * Configuration for a money text-mask.
+     */
+    public readonly MONEY_MASK_CONFIG: { mask: Array <string | RegExp>, placeholder: string };
 
 
     public constructor() {
+
         super();
 
         this.DATE_MASK_CONFIG = {
             mask: [ /\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/ ],
             keepCharPositions: true,
-            pipe: createAutoCorrectedDatePipe('mm/dd/yyyy')
+            pipe: createAutoCorrectedDatePipe('mm/dd/yyyy'),
+            placeholder: '\u2000'
+        };
+
+        this.MONEY_MASK_CONFIG = {
+            mask: createNumberMask({
+                prefix: '',
+                suffix: '',
+                integerLimit: 4,
+                decimalLimit: 2,
+                includeThousandsSeparator: true,
+                allowDecimal: true
+            }),
+            placeholder: '\u2000'
         };
     }
 

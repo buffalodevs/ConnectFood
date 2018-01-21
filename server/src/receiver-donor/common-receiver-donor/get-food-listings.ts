@@ -1,12 +1,12 @@
 'use strict'
 import { query, QueryResult } from '../../database-util/connection-pool';
-import { fixNullQueryArgs, toPostgresArray } from './../../database-util/prepared-statement-util';
+import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
+import * as _ from 'lodash';
 
 import { getDrivingDistTime, GPSCoordinate, DriveDistTime } from '../../common-util/geocode';
 import { FoodListingsFilters, LISTINGS_STATUS } from '../../../../shared/receiver-donor/food-listings-filters';
 import { FoodListing } from "../../../../shared/receiver-donor/food-listing";
-import { DateFormatter } from "../../../../shared/common-util/date-formatter";
 
 
 /**
@@ -18,24 +18,21 @@ import { DateFormatter } from "../../../../shared/common-util/date-formatter";
  */
 export function getFoodListings(filters: FoodListingsFilters, myAppUserKey: number, myGPSCoordinate: GPSCoordinate): Promise<FoodListing[]> {
 
-    let perishableArg: boolean = generatePerishabilityArg(filters.perishable, filters.notPerishable);
-    let foodTypesArg: string = toPostgresArray(filters.foodTypes);
-    let availableAfterDateArg: string = generateAvailableAfterArg(filters.availableAfterDate);
+    let perishableArg: boolean = generatePerishabilityArg(filters.needsRefrigeration, filters.notNeedsRefrigeration);
+    filters.foodTypes = ( _.isEmpty(filters.foodTypes) ? null
+                                                       : filters.foodTypes );
 
     // Determine if this is a donor/receiver cart or if its the receive tab (unclaimed only).
     let unclaimedListingsOnly: boolean = (filters.listingsStatus === LISTINGS_STATUS.unclaimedListings);
     let myDonatedListingsOnly: boolean = (filters.listingsStatus === LISTINGS_STATUS.myDonatedListings);
     let myClaimedListingsOnly: boolean = (filters.listingsStatus === LISTINGS_STATUS.myClaimedListings);
    
-    // Build our prepared statement.
-    let queryString: string = 'SELECT * FROM getFoodListings($1, $2, $3, null, $4, $5, $6, $7, $8, $9, $10);';
+    // Build our prepared statement.    
     let queryArgs: any[] = [ myAppUserKey, filters.retrievalOffset, filters.retrievalAmount,
-                             foodTypesArg, perishableArg, availableAfterDateArg,
+                             null, filters.foodTypes, perishableArg, filters.availableAfterDate,
                              unclaimedListingsOnly, myDonatedListingsOnly, myClaimedListingsOnly,
                              filters.matchRegularAvailability ];
-
-    // Replace any NULL query arguments with literals in query string.
-    queryString = fixNullQueryArgs(queryString, queryArgs);
+    let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM getFoodListings();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);
 
     return query(queryString, queryArgs)
@@ -64,20 +61,6 @@ function generatePerishabilityArg(perishable: boolean, notPerishable: boolean): 
         return perishable;
     }
     return null;
-}
-
-
-/**
- * Generates the available after date argument. All food must be available on or after this date.
- * @param availableAfterDate The date that food must be availalbe on or after to appear in the results.
- * @return A string in the format mm/dd/yyyy that signifies the available after date argument. If no filter, then null for don't care. 
- */
-function generateAvailableAfterArg(availableAfterDate: Date): string {
-
-    const dateFormatter: DateFormatter = new DateFormatter();
-
-    return (availableAfterDate == null) ? null
-                                        : dateFormatter.dateToMonthDayYearString(availableAfterDate);
 }
 
 

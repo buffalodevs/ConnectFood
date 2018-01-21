@@ -8,7 +8,7 @@
 
     <h5>Please provide a reason for the delivery cancellation:</h5>
     <mat-form-field floatPlaceholder="never" class="no-pad-top-input" id="cancel-reason">
-        <textarea #foodTitle matInput matTextareaAutosize placeholder="Cancellation Reason" formControlName="cancelReason"></textarea>
+        <textarea matInput matTextareaAutosize placeholder="Cancellation Reason" formControlName="cancelReason"></textarea>
     </mat-form-field>
 
     <!-- Footer -->
@@ -21,8 +21,15 @@
 
 <ng-container *ngIf="cancelComplete">
 
-    <p>The delivery cancellation succeeded.</p>
-    <p>Both the Donor and Receiver will be automatically notified about your cancellation.</p>
+    <ng-container *ngIf="errMsg == null">
+        <p>The delivery cancellation succeeded.</p>
+        <p>Both the Donor and Receiver will be automatically notified about your cancellation.</p>
+    </ng-container>
+
+    <div *ngIf="errMsg != null">
+        <p>Delivery cancellation failed due to error:</p>
+        <p class="warn-foreground">{{ errMsg }}</p>
+    </div>
 
     <div class="modal-button-group">
         <button mat-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>

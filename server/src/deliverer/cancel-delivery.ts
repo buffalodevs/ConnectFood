@@ -1,6 +1,6 @@
 'use strict'
 import { query, QueryResult } from './../database-util/connection-pool';
-import { fixNullQueryArgs } from '../database-util/prepared-statement-util';
+import { addArgPlaceholdersToQueryStr } from '../database-util/prepared-statement-util';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
 import { SessionData } from '../common-util/session-data';
 import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotification } from './delivery-update-notification';
@@ -11,10 +11,8 @@ import { Delivery } from '../../../shared/deliverer/delivery';
 
 export function cancelDelivery(deliveryFoodListingKey: number, delivererSessionData: SessionData, cancelReason: string, foodRejected: boolean): Promise<void> {
 
-    let queryString: string = 'SELECT * FROM cancelDelivery($1, $2, $3, $4)';
     let queryArgs: any[] = [ deliveryFoodListingKey, delivererSessionData.appUserKey, cancelReason, foodRejected ];
-
-    queryString = fixNullQueryArgs(queryString, queryArgs);
+    let queryString: string = addArgPlaceholdersToQueryStr('SELECT * FROM cancelDelivery();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);
 
     return query(queryString, queryArgs)

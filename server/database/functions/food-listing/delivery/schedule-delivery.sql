@@ -5,7 +5,7 @@ SELECT dropFunction('scheduleDelivery');
 CREATE OR REPLACE FUNCTION scheduleDelivery
 (
     _claimedFoodListingKey  DeliveryFoodListing.deliveryFoodListingKey%TYPE,    -- This is the key of the Claimed Food Listing that is to be delivered.
-    _deliveryAppUserKey     DeliveryFoodListing.deliveryAppUserKey%TYPE,        -- This is the key of the user who is delivering the Food Listing.
+    _delivererAppUserKey    DeliveryFoodListing.delivererAppUserKey%TYPE,       -- This is the key of the user who is delivering the Food Listing.
     _startImmediately       BOOLEAN,                                            -- TRUE if the deliverer will start delivery immediately, FALSE if scheduled for future.
     _scheduledStartTime     TEXT DEFAULT NULL                                   -- The time that the deliverer has scheduled to start the delivery.
                                                                                 -- Leave default only if _startImmediately is set TRUE. Otherwise, give explicite value!
@@ -31,13 +31,13 @@ BEGIN
     INSERT INTO DeliveryFoodListing
     (
         claimedFoodListingKey,
-        deliveryAppUserKey,
+        delivererAppUserKey,
         scheduledStartTime
     )
     VALUES
     (
         _claimedFoodListingKey,
-        _deliveryAppUserKey,
+        _delivererAppUserKey,
         _scheduledStartTimestamp
     )
     RETURNING   DeliveryFoodListing.deliveryFoodListingKey
@@ -48,12 +48,12 @@ BEGIN
 
         SELECT  deliveryUpdateNotification
         INTO    _deliveryUpdateNotification
-        FROM    updateDeliveryState(_deliveryFoodListingKey, _deliveryAppUserKey, 'started', _currentTimestamp);
+        FROM    updateDeliveryState(_deliveryFoodListingKey, _delivererAppUserKey, 'started', _currentTimestamp);
 
     -- Else, we need to set the delivery update notification for the scheduled state change here!
     ELSE
-        _deliveryUpdateNotification := generateDeliveryUpdateNotification(_deliveryFoodListingKey, 'scheduled'::DeliveryState,
-                                                                          'unscheduled'::DeliveryState, _scheduledStartTimestamp);
+        _deliveryUpdateNotification := getDeliveryUpdateNotification(_deliveryFoodListingKey, 'scheduled'::DeliveryState,
+                                                                     'unscheduled'::DeliveryState, _scheduledStartTimestamp);
     END IF;
 
     RETURN QUERY

@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
@@ -14,7 +14,7 @@ import { FoodListing } from './../../../../../../../shared/receiver-donor/food-l
     templateUrl: './food-listing-remove.component.html',
     styleUrls: ['./food-listing-remove.component.css']
 })
-export class FoodListingRemoveComponent implements OnChanges {
+export class FoodListingRemoveComponent {
 
     @Input() private foodListing: FoodListing;
 
@@ -30,6 +30,7 @@ export class FoodListingRemoveComponent implements OnChanges {
     private removeForm: FormGroup;
     private removeComplete: boolean;
     private showProgressSpinner: boolean;
+    private errMsg: string;
 
 
     public constructor (
@@ -39,20 +40,10 @@ export class FoodListingRemoveComponent implements OnChanges {
         this.removeListing = new EventEmitter<void>();
         this.close = new EventEmitter<void>();
 
-        this.removeForm = new FormGroup({'unitsCount': new FormControl(1, [ Validators.required, Validators.min(1) ])});
+        this.removeForm = new FormGroup({ removalReason: new FormControl(null, Validators.required) });
         this.removeComplete = false;
         this.showProgressSpinner = false;
-    }
-
-
-    public ngOnChanges(changes: SimpleChanges): void {
-
-        // Listen for update of FoodListing input so we can set default unitsCount value and update max number validation!
-        if (changes.foodListing != null && this.foodListing != null) {
-
-            this.removeForm.get('unitsCount').setValue(this.foodListing.unitsInfo.donorOnHandUnitsCount);
-            this.removeForm.setValidators([ Validators.required, Validators.min(1), Validators.max(this.foodListing.unitsInfo.donorOnHandUnitsCount) ]);
-        }
+        this.errMsg = null;
     }
 
 
@@ -63,31 +54,21 @@ export class FoodListingRemoveComponent implements OnChanges {
         
         if (!this.removeForm.valid) return;
         
-        const unitsCount: number = Number.parseInt(this.removeForm.get('unitsCount').value);
-        let observer: Observable<boolean> = this.manageFoodListingService.removeFoodListing(this.foodListing.foodListingKey, unitsCount);
+        const removalReason: string = this.removeForm.get('removalReason').value;
+        let observer: Observable <void> = this.manageFoodListingService.removeFoodListing(this.foodListing.foodListingKey, removalReason);
         this.showProgressSpinner = true;
         
         // Listen for result.
-        observer.finally(() => { this.showProgressSpinner = false; })
+        observer.finally(() => {
+                    this.removeComplete = true;
+                    this.showProgressSpinner = false;
+                })
                 .subscribe (
-                    (success: boolean) => {
-
-                        if (success) {
-
-                            let availableUnitsCount: number = this.foodListing.unitsInfo.availableUnitsCount;
-                            this.foodListing.unitsInfo.availableUnitsCount -= (availableUnitsCount >= unitsCount) ? unitsCount
-                                                                                                                  : availableUnitsCount;
-                            this.foodListing.unitsInfo.totalUnitsCount -= unitsCount;
-                            this.foodListing.unitsInfo.donorOnHandUnitsCount -= unitsCount;
-
-                            // Remove only if all claimed units are depleted!
-                            if (this.foodListing.unitsInfo.availableUnitsCount === 0)
-                                {  this.removeListing.emit();  }
-                            this.removeComplete = true;
-                        }
+                    () => {
+                        this.removeListing.emit();
                     },
                     (err: Error) => {
-                        alert(err.message);
+                        this.errMsg = err.message;
                     }
                 );
     }

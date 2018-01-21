@@ -15,7 +15,6 @@ import { GeocodeService } from './geocode.service';
         AgmCoreModule
     ],
     exports: [
-        AgmCoreModule,
         SlickMapComponent
     ],
     providers: [

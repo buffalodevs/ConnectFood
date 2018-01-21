@@ -1,6 +1,6 @@
 'use strict'
 import { query, QueryResult } from './../database-util/connection-pool';
-import { fixNullQueryArgs } from '../database-util/prepared-statement-util';
+import { addArgPlaceholdersToQueryStr } from '../database-util/prepared-statement-util';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
 import { SessionData } from '../common-util/session-data';
 import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotification } from './delivery-update-notification';
@@ -16,7 +16,6 @@ export function scheduleDelivery(claimedFoodListingKey: number, delivererSession
     // scheduledStartTime was likely converted to a string in the JSON request message!
     dateFormatter.ensureIsDate(scheduledStartTime);
 
-    let queryString: string = 'SELECT * FROM scheduleDelivery($1, $2, $3, $4)';
     let queryArgs: any[] = [
         claimedFoodListingKey,
         delivererSessionData.appUserKey,
@@ -24,7 +23,8 @@ export function scheduleDelivery(claimedFoodListingKey: number, delivererSession
         dateFormatter.dateToDateTimeString(scheduledStartTime)
     ];
 
-    queryString = fixNullQueryArgs(queryString, queryArgs);
+    // Insert query argument placeholders and preprocess query arguments.
+    let queryString: string = addArgPlaceholdersToQueryStr('SELECT * FROM scheduleDelivery();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);
 
     return query(queryString, queryArgs)

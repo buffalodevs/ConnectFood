@@ -1,27 +1,27 @@
-<form [formGroup]="claimForm" *ngIf="!claimComplete" [slick-progress-spinner]="showProgressSpinner">
+<div [slick-progress-spinner]="showProgressSpinner" *ngIf="!claimComplete">
     
-    <h5>{{ foodListing.unitsInfo.availableUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }} Are available. How many will you claim?</h5>
-    <mat-input-container id="units-count" floatPlaceholder="never">
-        <input matInput formControlName="unitsCount" InputFilter [min]="1" [max]="foodListing.unitsInfo.availableUnitsCount">
-        <span matSuffix>/ {{ foodListing.unitsInfo.availableUnitsCount }} {{ foodListing.unitsInfo.unitsLabel }}</span>
-    </mat-input-container>
+    <div class="margin-bottom">
+        <p>Are you sure you wish to claim the selected food?</p>
+    </div>
 
     <!-- Footer -->
     <div class="modal-button-group">    
-        <button mat-raised-button color="primary" type="submit" class="button-md" (click)="claimSelectedFoodListing()">Confirm Claim</button>
+        <button mat-raised-button color="primary" class="button-md" (click)="claimSelectedFoodListing()">Confirm Claim</button>
     </div>
-
-</form>
-
+            
+</div>
 
 <ng-container *ngIf="claimComplete">
 
-    <p>Claim of food listing titled <b>{{ foodListing.foodTitle }}</b> successful.</p>
+    <ng-container *ngIf="errMsg == null">
+        <p>Claim of food listing <b>{{ foodListing.foodTitle }}</b> successful.</p>
+        <p>You can view your newly claimed food in the <a (click)="close.emit()" [routerLink]="['/foodListingCart']" class="link-content">Food Cart</a> tab.</p>
+    </ng-container>
 
-    <p>
-        You can view your newly claimed food in the
-        <a (click)="close.emit()" [routerLink]="['/foodListingCart']" class="link-content">Food Cart</a> tab.
-    </p>
+    <div class="margin-bottom" *ngIf="errMsg != null">
+        <p>Claim operation failed due to error:</p>
+        <p class="warn-foreground">{{ errMsg }}</p>
+    </div>
 
     <div class="modal-button-group">
         <button mat-raised-button color="primary" class="button-md" (click)="close.emit()">Ok</button>

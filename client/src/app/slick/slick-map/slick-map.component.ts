@@ -1,5 +1,7 @@
 import { Component, Input, SimpleChanges, OnChanges } from '@angular/core';
 
+import { GeocodeService } from './geocode.service';
+
 import { GPSCoordinate } from '../../../../../shared/common-util/geocode';
 import { Address } from '../../../../../shared/app-user/app-user-info';
 
@@ -7,7 +9,8 @@ import { Address } from '../../../../../shared/app-user/app-user-info';
 @Component({
     selector: 'slick-map',
     templateUrl: './slick-map.component.html',
-    styleUrls: ['./slick-map.component.css']
+    styleUrls: ['./slick-map.component.css'],
+    providers: [GeocodeService]
 })
 export class SlickMapComponent implements OnChanges {
 
@@ -17,15 +20,17 @@ export class SlickMapComponent implements OnChanges {
     @Input() private addresses: Address[];
     @Input() private addressNames: string[];
 
-    private readonly BASE_GOOGLE_MAPS_HREF;
+    
     private googleMapsHref: string;
 
 
-    public constructor() {
+    public constructor (
+        private geocodeService: GeocodeService
+    ) {
         this.addresses = [];
         this.addressNames = [];
-        this.BASE_GOOGLE_MAPS_HREF = 'https://www.google.com/maps/dir';
-        this.googleMapsHref = this.BASE_GOOGLE_MAPS_HREF;
+        
+        this.googleMapsHref = this.geocodeService.BASE_GOOGLE_MAPS_HREF;
     }
 
 
@@ -33,7 +38,7 @@ export class SlickMapComponent implements OnChanges {
 
         // Whenever new addresses is entered, then regenerate the link to google maps.
         if (changes.addresses) {
-            this.googleMapsHref = this.generateGoogleMapsHref(this.addresses);            
+            this.googleMapsHref = this.geocodeService.generateGoogleMapsHref(this.addresses);            
         }
 
         if (changes.gpsCenterCoordinate || changes.addresses) {
@@ -60,30 +65,6 @@ export class SlickMapComponent implements OnChanges {
      */
     public getGoogleMapsHref(): string {
         return this.googleMapsHref;
-    }
-
-
-    /**
-     * Generates a Google Maps link href from given addresses.
-     * @param addresses The addresses form which to generate the Google Maps link href.
-     * @return The generated href.
-     */
-    private generateGoogleMapsHref(addresses: Address[]): string {
-        
-        let href: string = this.BASE_GOOGLE_MAPS_HREF;
-
-        if (addresses != null) {
-
-            for (let i: number = 0; i < this.addresses.length; i++) {
-
-                // If address is valid, then include it in link.
-                if (this.addresses[i] != null) {
-                    href += ('/' + this.addresses[i].address + '+' + this.addresses[i].city + '+' + this.addresses[i].state + '+' + this.addresses[i].zip);
-                }
-            }
-        }
-
-        return href;
     }
 
 

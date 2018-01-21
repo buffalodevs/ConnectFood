@@ -1,16 +1,52 @@
+import * as _ from "lodash";
+
+
+/**
+ * Generates and inserts placeholder arguments in between SQL function argument braces in the given queryStr.
+ * Also, combines the effects of preProcessQueryArgs. See the definition of preProcessQueryArgs() below for more details.
+ * @param queryStr The original query string that needs its placeholder function arguments generated.
+ * @param queryArgs The actual arguments to the SQL function (used to generate placeholders).
+ *                  NOTE: (INTERNALLY MODIFIED) All null/undefined entries will be removed internally.
+ * @param insertIndex An optional insert index where the placeholders will be inserted in the query string.
+ *                     By default, the placeholders are automatically placed in between SQL function argument braces: '()'.
+ * @param noPreprocessQueryArgs An optional flag that tells the function not to preprocess query argument using the preProcessQueryArgs function.
+ *                              Default value is false so that preprocessing will occur.
+ * @return The original queryStr with placeholder function arugments included.
+ */
+export function addArgPlaceholdersToQueryStr(queryStr: string, queryArgs: any[], insertIndex?: number, noPreprocessQueryArgs: boolean = false): string {
+
+    // If no insert index provided, then assume we are inserting in between braces of SQL function.
+    insertIndex = (insertIndex == null) ? ( queryStr.indexOf('()') + 1 )
+                                        : insertIndex;
+
+    // Generate the function argument placeholder string (based at $1).
+    let placeholderStr: string = '$1'; // Assume we have at least one argument to simplify string concatenation...
+    for (let i: number = 2; i <= queryArgs.length; i++) {
+        placeholderStr += ( ', $' + i );
+    }
+
+    // Insert the placeholder function arguments into the queryStr and complete any required pre-processing of query arguments.
+    const queryStrWithPlaceholders: string = ( queryStr.slice(0, insertIndex) + placeholderStr + queryStr.slice(insertIndex) );
+    return ( noPreprocessQueryArgs ? queryStrWithPlaceholders
+                                   : preProcessQueryArgs(queryStrWithPlaceholders, queryArgs) );
+}
+
+
 /**
  * Removes all null entries in an argument list to a parameterized SQL prepared statement to prevent errors.
  * @param queryStr The query string with parameters in it.
- * @param queryArgs The arguments to a parameterized SQL prepared statement. All null entries will be removed.
+ * @param queryArgs The arguments to a parameterized SQL prepared statement.
+ *                  NOTE: (INTERNALLY MODIFIED) All null/undefined entries will be removed internally.
  * @return The resulting queryStr with all paraemters corresponding to null arguments replaced with null literals.
  */
-export function fixNullQueryArgs(queryStr: string, queryArgs: Array<any>): string {
+export function preProcessQueryArgs(queryStr: string, queryArgs: any[]): string {
+
     let replaceSearch: string;
     let replaceVal: string;
 
     for (let i: number = 0; i < queryArgs.length; i++) {
 
-        // If we have a null query argument, then replace its placeholder with a null literal!
+        // If we have a null/undefined query argument, then replace its placeholder with a null literal!
         if (queryArgs[i] == null) {
 
             // Replace the argument in the query string with null
@@ -32,26 +68,4 @@ export function fixNullQueryArgs(queryStr: string, queryArgs: Array<any>): strin
     }
 
     return queryStr;
-}
-
-
-/**
- * Converts a given JavaScript array to a PGSQL array (in string format).
- * @param jsArr The JavaScript array.
- * @return The PGSQL array (in string format). Returns null if the given jsArr is null or empty.
- */
-export function toPostgresArray(jsArr: Array<any>): string {
-    let postgresArrStr: string = null;
-    
-    if (jsArr != null && jsArr.length > 0) {
-        postgresArrStr = '{ ';
-
-        for (let i: number = 0; i < jsArr.length; i++) {
-            postgresArrStr += jsArr[i] + ', ';
-        }
-
-        postgresArrStr = postgresArrStr.substr(0, postgresArrStr.length - 2) + ' }';
-    }
-    
-    return postgresArrStr;
 }

@@ -28,7 +28,7 @@ export class ScheduleDeliveryService {
      * @param scheduledStartTime The scheduled start time for the new Delivery Food Listing.
      * @return An observable that resolves to true on success, false on non-fatal failure. If a fatal error occurs, then an exception is thrown.
      */
-    public scheduleDelivery(claimedFoodListingKey: number, startImmediately: boolean, scheduledStartTime?: Date): Observable<boolean> {
+    public scheduleDelivery(claimedFoodListingKey: number, startImmediately: boolean, scheduledStartTime?: Date): Observable <void> {
         
         return this.requestService.post('/deliverer/scheduleDelivery', new ScheduleDeliveryRequest(claimedFoodListingKey, startImmediately, scheduledStartTime))
                                   .map(this.requestService.genericResponseMap);

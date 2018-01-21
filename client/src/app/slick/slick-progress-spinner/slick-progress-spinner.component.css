@@ -13,6 +13,7 @@ mat-progress-spinner {
     height: 100%;
     text-align: center;
     z-index: 50;
+    overflow: hidden;
 }
 
 :host ::ng-deep .sticky-spinner {
