@@ -20,7 +20,7 @@ export class SlickLeftPanelComponent implements OnChanges {
      */
     @Input() private buttonIcon: string;
     /**
-     * The title of the toggle button. Will be displayed as the label for the button.
+     * Will be displayed as the label for the button.
      * Also, will be placed as the button tooltip if one is not given.
      * If left undefined (null), then the button will not be given text, but rather a 3 (horizontal) line tab icon.
      */

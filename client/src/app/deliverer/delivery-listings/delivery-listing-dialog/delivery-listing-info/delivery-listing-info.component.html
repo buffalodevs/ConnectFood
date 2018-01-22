@@ -85,8 +85,8 @@
         
         <button mat-raised-button color="primary" class="button-md" (click)="toSchedule.emit()" *ngIf="!isCart">Schedule Delivery</button>
         <button mat-raised-button color="primary" class="button-md" (click)="startDelivery()" *ngIf="showMappings.get('startButton')">Start Delivery</button>
-        <button mat-raised-button color="primary" class="button-md" (click)="markPickedUp()" *ngIf="showMappings.get('markPickedUpButton')">Mark Picked Up</button>
-        <button mat-raised-button color="primary" class="button-md" (click)="markDroppedOff()" *ngIf="showMappings.get('markDroppedOffButton')">Mark Dropped Off</button>
+        <button mat-raised-button color="primary" class="button-md" (click)="markPickedUp()" *ngIf="showMappings.get('pickedUpButton')">Mark Picked Up</button>
+        <button mat-raised-button color="primary" class="button-md" (click)="markDroppedOff()" *ngIf="showMappings.get('droppedOffButton')">Mark Dropped Off</button>
         <button mat-raised-button color="primary" class="button-md warn-button" (click)="toCancelReason.emit()" *ngIf="showMappings.get('cancelButton')">Cancel Delivery</button>
 
     </div>

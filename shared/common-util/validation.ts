@@ -207,4 +207,15 @@ export class Validation {
 
         return null;
     }
+
+
+    /**
+     * Validates that retrieval offset and amount values are within correct numeric range.
+     * @param retrievalOffset The retrieval offset.
+     * @param retrievalAmount The retrieval amount.
+     * @return true if the offset and amount are valid, false if either is invalid.
+     */
+    public validateRetrievalLimts(retrievalOffset: number, retrievalAmount: number): boolean {
+        return ( retrievalOffset >= 0 && retrievalAmount > 0 );
+    }
 }

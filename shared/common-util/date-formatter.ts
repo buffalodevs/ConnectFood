@@ -253,9 +253,9 @@ export class DateFormatter {
         let retDate: Date = moment(date).add(1, 'days').startOf('isoWeek').add(weekday - 1, 'days')
                             .add(date.getHours(), 'hours').add(date.getMinutes(), 'minutes').toDate();
 
-        // If the calculated date is a weekday of this week on or before today, then push it to next week.
-        return ( retDate.getDay() <= (new Date()).getDay() ) ? moment(retDate).add(7, 'days').toDate()
-                                                             : retDate;
+        // If the calculated date is a weekday of this week before today, then push it to next week.
+        return ( retDate.getDay() < (new Date()).getDay() ) ? moment(retDate).add(7, 'days').toDate()
+                                                            : retDate;
     }
 
 

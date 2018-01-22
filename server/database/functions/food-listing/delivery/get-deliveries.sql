@@ -81,10 +81,10 @@ BEGIN
                                                                             DeliveryFoodListing.pickUpTime,
                                                                             DeliveryFoodListing.dropOffTime
                                                                         ),
-                                                'scheduledStartTime',   DeliveryFoodListing.scheduledStartTime,
-                                                'startTime',            DeliveryFoodListing.startTime,
-                                                'pickUpTime',           DeliveryFoodListing.pickUpTime,
-                                                'dropOffTime',          DeliveryFoodListing.dropOffTime
+                                                'scheduledStartTime',   timestampToUtcText(DeliveryFoodListing.scheduledStartTime),
+                                                'startTime',            timestampToUtcText(DeliveryFoodListing.startTime),
+                                                'pickUpTime',           timestampToUtcText(DeliveryFoodListing.pickUpTime),
+                                                'dropOffTime',          timestampToUtcText(DeliveryFoodListing.dropOffTime)
                                             ),
                 'foodTitle',                FoodListing.foodTitle,
                 -- NOTE: We may want to remove these getAppUserSessionData() function calls for performance improvements! They create subqueries (likely inlined though).

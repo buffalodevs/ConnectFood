@@ -30,8 +30,8 @@ BEGIN
                                                                                         ELSE    _oldDeliveryState
                                                 END,
                         'newDeliveryState',     _newDeliveryState,
-                        'scheduledStartTime',   CASE WHEN (_scheduledStartTime IS NULL) THEN DeliveryFoodListing.scheduledStartTime
-                                                                                        ELSE _scheduledStartTime
+                        'scheduledStartTime',   CASE WHEN (_scheduledStartTime IS NULL) THEN timestampToUtcText(DeliveryFoodListing.scheduledStartTime)
+                                                                                        ELSE timestampToUtcText(_scheduledStartTime)
                                                 END,
                         'cancelled',            _cancelled,
                         'cancelReason',         _CancelReason,

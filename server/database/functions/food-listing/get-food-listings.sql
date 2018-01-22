@@ -30,16 +30,6 @@ AS $$
     DECLARE _queryGroupAndSort  VARCHAR(2000);
 BEGIN
 
--- ================= Preprocessing Phase - Check input values and recalculate if needed ================== --
--- ======================================================================================================= --
-
-    -- Is the user concerned with matching Donor availability with their own?
-    _matchRegularAvailability := (    _matchRegularAvailability
-                                  -- If either of following are TRUE, then we are in cart and don't care about availability!
-                                  AND _myDonatedItemsOnly <> TRUE
-                                  AND _myClaimedItemsOnly <> TRUE);
-
-
 -- ==================================== Dynamic Query Generation Phase ======================================= --
 -- =========================================================================================================== --
 

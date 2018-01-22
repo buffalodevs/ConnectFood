@@ -91,6 +91,13 @@ button.mat-raised-button.mat-primary.file-upload-button {
 
 }
 
+@media screen and (max-width: 991px) {
+    
+    #form-title {
+        text-align: center;
+    }
+}
+
 @media screen and (max-width: 400px) {
 
     .button-group button {

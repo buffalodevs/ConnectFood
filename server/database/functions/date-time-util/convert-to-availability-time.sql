@@ -39,12 +39,10 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-/*
 DO $$
 BEGIN
 
-    RAISE NOTICE 'Old time: %', CURRENT_TIMESTAMP;
-    RAISE NOTICE 'New time: %', convertToAvailabilityTime (CURRENT_TIMESTAMP::TIMESTAMP);
+    RAISE NOTICE 'Start Time: %', convertToAvailabilityTime('2018-01-28T15:00:00.000Z');
+    RAISE NOTICE 'End Time: %', convertToAvailabilityTime('2018-01-29T03:00:00.000Z');
 
 END$$;
-*/

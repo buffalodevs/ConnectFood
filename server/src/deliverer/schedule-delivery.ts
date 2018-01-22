@@ -20,7 +20,7 @@ export function scheduleDelivery(claimedFoodListingKey: number, delivererSession
         claimedFoodListingKey,
         delivererSessionData.appUserKey,
         startImmediately,
-        dateFormatter.dateToDateTimeString(scheduledStartTime)
+        scheduledStartTime
     ];
 
     // Insert query argument placeholders and preprocess query arguments.

@@ -1,6 +1,6 @@
 <slick-filtered-list #filteredList [filters]="filters" [listings]="listings">
 
-    <slick-left-panel buttonIcon="search" filters>
+    <ng-container filters>
         <delivery-listings-filters #filters [formGroup]="filters" header="Find Deliveries" [additionalFilters]="additionalFilters">
 
             <ng-container top>
@@ -17,8 +17,7 @@
             </ng-container>
 
         </delivery-listings-filters>
-    </slick-left-panel>
-
+    </ng-container>
 
 
     <ng-container listings>

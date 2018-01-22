@@ -5,7 +5,7 @@
         <!-- Step 1: Donation -->
         <mat-step>
 
-            <h1>Donor Form</h1>
+            <h1 id="form-title">Donor Form</h1>
             <hr>
 
             <form class="row" [formGroup]="form" (ngSubmit)="ifValidProceedToReview(form.value, form.valid, stepper)">

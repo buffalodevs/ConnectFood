@@ -43,7 +43,7 @@ LEFT JOIN DeliveryFoodListing ON DeliveryFoodListing.claimedFoodListingKey = Cla
                               )
 WHERE foodTitle = 'Lots of beans';*/
 
-SELECT * FROM FoodListing
+/*SELECT * FROM FoodListing
 LEFT JOIN RemovedFoodListing ON FoodListing.foodListingKey = RemovedFoodListing.foodListingKey;
 
 SELECT * FROM ClaimedFoodListing
@@ -52,4 +52,6 @@ LEFT JOIN UnclaimedFoodListing ON ClaimedFoodListing.claimedFoodListingKey = Unc
 SELECT * FROM DeliveryFoodListing
 LEFT JOIN CancelledDeliveryFoodListing ON DeliveryFoodListing.deliveryFoodListingKey = CancelledDeliveryFoodListing.deliveryFoodListingKey;
 
-SELECT * FROM AppUserAvailability;
+SELECT * FROM AppUserAvailability;*/
+
+SELECT * FROM scheduleDelivery(5, 1, true, null);

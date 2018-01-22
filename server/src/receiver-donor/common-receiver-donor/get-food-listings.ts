@@ -7,6 +7,8 @@ import * as _ from 'lodash';
 import { getDrivingDistTime, GPSCoordinate, DriveDistTime } from '../../common-util/geocode';
 import { FoodListingsFilters, LISTINGS_STATUS } from '../../../../shared/receiver-donor/food-listings-filters';
 import { FoodListing } from "../../../../shared/receiver-donor/food-listing";
+import { Validation } from '../../../../shared/common-util/validation';
+import { DateFormatter } from '../../../../shared/common-util/date-formatter';
 
 
 /**
@@ -18,27 +20,29 @@ import { FoodListing } from "../../../../shared/receiver-donor/food-listing";
  */
 export function getFoodListings(filters: FoodListingsFilters, myAppUserKey: number, myGPSCoordinate: GPSCoordinate): Promise<FoodListing[]> {
 
-    let perishableArg: boolean = generatePerishabilityArg(filters.needsRefrigeration, filters.notNeedsRefrigeration);
-    filters.foodTypes = ( _.isEmpty(filters.foodTypes) ? null
-                                                       : filters.foodTypes );
+    sanitizeFilters(filters);
 
-    // Determine if this is a donor/receiver cart or if its the receive tab (unclaimed only).
-    let unclaimedListingsOnly: boolean = (filters.listingsStatus === LISTINGS_STATUS.unclaimedListings);
-    let myDonatedListingsOnly: boolean = (filters.listingsStatus === LISTINGS_STATUS.myDonatedListings);
-    let myClaimedListingsOnly: boolean = (filters.listingsStatus === LISTINGS_STATUS.myClaimedListings);
-   
     // Build our prepared statement.    
-    let queryArgs: any[] = [ myAppUserKey, filters.retrievalOffset, filters.retrievalAmount,
-                             null, filters.foodTypes, perishableArg, filters.availableAfterDate,
-                             unclaimedListingsOnly, myDonatedListingsOnly, myClaimedListingsOnly,
-                             filters.matchRegularAvailability ];
+    let queryArgs: any[] = [
+        myAppUserKey,
+        filters.retrievalOffset,
+        filters.retrievalAmount,
+        null,
+        filters.foodTypes,
+        filters.needsRefrigeration,
+        filters.availableAfterDate,
+        (filters.listingsStatus === LISTINGS_STATUS.unclaimedListings),
+        (filters.listingsStatus === LISTINGS_STATUS.myDonatedListings),
+        (filters.listingsStatus === LISTINGS_STATUS.myClaimedListings),
+        filters.matchRegularAvailability
+    ];
     let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM getFoodListings();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);
 
     return query(queryString, queryArgs)
         .then((queryResult: QueryResult) => {
             logSqlQueryResult(queryResult.rows);
-            return generateResultArray(queryResult.rows, myGPSCoordinate, myDonatedListingsOnly);
+            return generateResultArray(queryResult.rows, myGPSCoordinate, (filters.listingsStatus === LISTINGS_STATUS.myDonatedListings));
         })
         .catch((err: Error) => {
             console.log(err);
@@ -48,19 +52,66 @@ export function getFoodListings(filters: FoodListingsFilters, myAppUserKey: numb
 
 
 /**
+ * Sanitizes all filters values. Any values that must be auto corrected before being sent to the data access layer (SP) for data retrieval
+ * will be modified internally. If any filters have errors and cannot be corrected, then an associated Error will be thrown.
+ * @param filters The original filters values.
+ *                NOTE: Modified internally.
+ */
+function sanitizeFilters(filters: FoodListingsFilters): void {
+
+    const validation: Validation = new Validation();
+    if (!validation.validateRetrievalLimts(filters.retrievalOffset, filters.retrievalAmount)) {
+        throw new Error('Retrieval offset or amount is not within correct range.');
+    }
+
+    const dateFormatter: DateFormatter = new DateFormatter();
+    filters.availableAfterDate = dateFormatter.ensureIsDate(filters.availableAfterDate);
+    if (!_.isDate(filters.availableAfterDate)) {
+        throw new Error('Available After Date filter is not in correct date format.');
+    }
+
+    filters.foodTypes = sanitizeFoodTypes(filters.foodTypes);
+    filters.matchRegularAvailability = sanitizeMatchRegularAvailability(filters.matchRegularAvailability, filters.listingsStatus);
+    filters.needsRefrigeration = sanitizeNeedsRefrigeration(filters.needsRefrigeration, filters.needsRefrigeration);
+}
+
+
+/**
+ * Generates a refined Food Types argument.
+ * @param foodTypes The original Food Types filter.
+ * @return If the given Food Types filter is impty, then null is returned, otherwise the filter value is returned.
+ */
+function sanitizeFoodTypes(foodTypes: string[]): string[] {
+    return ( _.isEmpty(foodTypes) ? null : foodTypes );
+}
+
+
+/**
+ * Generates a refined match regular availability flag arugment.
+ * Make sure we are only matching regular availability when looking for other listings in Receive tab (not in user's personal cart).
+ * @param matchRegularAvailability The original match regular availability filter.
+ * @param listingsStatus The status of the listings to retrieve.
+ * @return true if we should match regular availability, false if not.
+ */
+function sanitizeMatchRegularAvailability(matchRegularAvailability: boolean, listingsStatus: LISTINGS_STATUS): boolean {
+    return ( matchRegularAvailability && listingsStatus === LISTINGS_STATUS.unclaimedListings );
+}
+
+
+/**
  * Generates the perishablility argument.
  * @param perishable Set true if including perishable listings.
  * @param notPerishable Set true if including non-perishable listings.
  * @return true if only perishable items should be included, false if only non-perishable should be included, and null if both (don't care).
  */
-function generatePerishabilityArg(perishable: boolean, notPerishable: boolean): boolean {
-    // If exactly one filter is only active, then we apply filter.
-    let notBoth = !(perishable && notPerishable);
-    let notNeither = (perishable || notPerishable);
-    if (notBoth && notNeither) {
-        return perishable;
-    }
-    return null;
+function sanitizeNeedsRefrigeration(needsRefrigeration: boolean, notNeedsRefrigeration: boolean): boolean {
+
+    const notBoth = !(needsRefrigeration && notNeedsRefrigeration);
+    const notNeither = (needsRefrigeration || notNeedsRefrigeration);
+
+    // If exactly one filter is only active, then we apply original filter.
+    return (notBoth && notNeither) ? needsRefrigeration
+                                   : null;
 }
 
 

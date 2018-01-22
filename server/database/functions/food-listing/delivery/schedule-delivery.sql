@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION scheduleDelivery
     _claimedFoodListingKey  DeliveryFoodListing.deliveryFoodListingKey%TYPE,    -- This is the key of the Claimed Food Listing that is to be delivered.
     _delivererAppUserKey    DeliveryFoodListing.delivererAppUserKey%TYPE,       -- This is the key of the user who is delivering the Food Listing.
     _startImmediately       BOOLEAN,                                            -- TRUE if the deliverer will start delivery immediately, FALSE if scheduled for future.
-    _scheduledStartTime     TEXT DEFAULT NULL                                   -- The time that the deliverer has scheduled to start the delivery.
+    _scheduledStartTime     TIMESTAMP DEFAULT NULL                              -- The time that the deliverer has scheduled to start the delivery.
                                                                                 -- Leave default only if _startImmediately is set TRUE. Otherwise, give explicite value!
 )
 RETURNS TABLE -- Returns the new Delivery that has been scheduled/started.
@@ -18,7 +18,6 @@ RETURNS TABLE -- Returns the new Delivery that has been scheduled/started.
 AS $$
     DECLARE _deliveryFoodListingKey     DeliveryFoodListing.deliveryFoodListingKey%TYPE;
     DECLARE _deliveryUpdateNotification JSON;
-    DECLARE _scheduledStartTimestamp    TIMESTAMP;
 BEGIN
 
     -- TODO: Check that the delivery app user and claimed food listing exist!
@@ -32,12 +31,13 @@ BEGIN
                   FROM DeliveryFoodListing TABLE
                   WHERE _claimedFoodListingKey = claimedFoodListingKey)
     THEN
-        RAISE EXCEPTION 'This claimedFoodListingKey does not exist in the DeliveryFoodListing table';
+        RAISE EXCEPTION 'This claimedFoodListingKey does not exist in the DeliveryFoodListing table';*/
 
-    _scheduledStartTimestamp := CASE (_startImmediately)
-                                    WHEN TRUE THEN  CURRENT_TIMESTAMP
-                                    ELSE            TO_TIMESTAMP(_scheduledStartTime, 'MM/DD/YYYY hh:mi AM')
-                                END;*/
+    -- If we are starting immediately, then set scheduled start time to now.
+    IF (_startImmediately = TRUE)
+    THEN
+        _scheduledStartTime = CURRENT_TIMESTAMP;
+    END IF;
 
     INSERT INTO DeliveryFoodListing
     (
@@ -49,7 +49,7 @@ BEGIN
     (
         _claimedFoodListingKey,
         _delivererAppUserKey,
-        _scheduledStartTimestamp
+        _scheduledStartTime
     )
     RETURNING   DeliveryFoodListing.deliveryFoodListingKey
     INTO        _deliveryFoodListingKey;
@@ -57,14 +57,14 @@ BEGIN
     -- If starting immediately, then update the state of the new delivery to started (and returned update notification will be for started state change, not scheduled)!
     IF (_startImmediately) THEN
 
-        SELECT  deliveryUpdateNotification
+        SELECT  updateDeliveryState.deliveryUpdateNotification
         INTO    _deliveryUpdateNotification
-        FROM    updateDeliveryState(_deliveryFoodListingKey, _delivererAppUserKey, 'started', _currentTimestamp);
+        FROM    updateDeliveryState(_deliveryFoodListingKey, _delivererAppUserKey, 'started', _scheduledStartTime);
 
     -- Else, we need to set the delivery update notification for the scheduled state change here!
     ELSE
         _deliveryUpdateNotification := getDeliveryUpdateNotification(_deliveryFoodListingKey, 'scheduled'::DeliveryState,
-                                                                     'unscheduled'::DeliveryState, _scheduledStartTimestamp);
+                                                                     'unscheduled'::DeliveryState, _scheduledStartTime);
     END IF;
 
     RETURN QUERY
