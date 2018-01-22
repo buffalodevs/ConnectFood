@@ -10,7 +10,7 @@ const DOMAIN_COL: string = 'domainCol';
  * @param domainName The name of the domain (table) from which to get values.
  * @return A promise that resolves to an array of the domain string values.
  */
-export function getDomainValues(domainName: string): Promise<string[]> {
+export async function getDomainValues(domainName: string): Promise <string[]> {
 
     // NOTE: Since we cannot put domainName in prepared statement, it is VERY IMPORTANT to SANATIZE domainName data here!!!!!
     if (/\s/.test(domainName)) {
@@ -18,16 +18,18 @@ export function getDomainValues(domainName: string): Promise<string[]> {
         throw new Error('Failed to get values in domain: ' + domainName);
     }
 
-    let queryString: string = 'SELECT unnest(enum_range(NULL::' + domainName + ')) AS "' + DOMAIN_COL + '";'
+    const queryString: string = 'SELECT unnest(enum_range(NULL::' + domainName + ')) AS "' + DOMAIN_COL + '";'
     logSqlQueryExec(queryString);
 
-    return query(queryString)
-        .then(processDomainSelectResult)
-        .catch((err: Error) => {
-            // Should never happen!
-            console.log(err);
-            throw new Error('Failed to get values in domain: ' + domainName);
-        });
+    try {
+        const queryResult: QueryResult = await query(queryString);
+        return processDomainSelectResult(queryResult);
+    }
+    catch (err) {
+        // Should never happen!
+        console.log(err);
+        throw new Error('Failed to get values in domain: ' + domainName);
+    }
 }
 
 
@@ -36,7 +38,7 @@ export function getDomainValues(domainName: string): Promise<string[]> {
  * @param queryResult The result of the domain select query.
  * @return See return type of getDomainValues.
  */
-function processDomainSelectResult(queryResult: QueryResult): Promise<string[]> {
+function processDomainSelectResult(queryResult: QueryResult): Promise <string[]> {
     let domainValues: Array<string> = [];
 
     logSqlQueryResult(queryResult.rows);

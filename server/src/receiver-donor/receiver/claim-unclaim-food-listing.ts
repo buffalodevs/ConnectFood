@@ -24,22 +24,21 @@ export function unclaimFoodListing(foodListingKey: number, receiverSessionData: 
 }
 
 
-function execClaimOrUnclaimQuery(isClaim: boolean, queryString: string, queryArgs: any[], receiverSessionData?: SessionData): Promise <void> {
+async function execClaimOrUnclaimQuery(isClaim: boolean, queryString: string, queryArgs: any[], receiverSessionData?: SessionData): Promise <void> {
 
     logSqlQueryExec(queryString, queryArgs);
 
-    return query(queryString, queryArgs)
-        .then((queryResult: QueryResult) => {
+    try {
+        const queryResult: QueryResult = await query(queryString, queryArgs);
+        logSqlQueryResult(queryResult.rows);
 
-            logSqlQueryResult(queryResult.rows);
-
-            return ( isClaim ? Promise.resolve() // If claim, then just resolve.
-                             : handleUnclaimQueryResult(receiverSessionData, queryResult) );
-        })
-        .catch((err: Error) => {
-            console.log(err);
-            return Promise.reject(new Error((isClaim ? 'Claim' : 'Unclaim') + ' Food Listing Unexpectedly Failed.'));
-        });
+        return ( isClaim ? Promise.resolve() // If claim, then just resolve.
+                         : handleUnclaimQueryResult(receiverSessionData, queryResult) );
+    }
+    catch (err) {
+        console.log(err);
+        return Promise.reject(new Error((isClaim ? 'Claim' : 'Unclaim') + ' Food Listing Unexpectedly Failed.'));
+    }
 }
 
 
@@ -48,16 +47,14 @@ function execClaimOrUnclaimQuery(isClaim: boolean, queryString: string, queryArg
  * @param receiverSessionData The sessiond data related to the receiver who unclaimed the food listing resulting in loss of scheduled delivery.
  * @param result The result of the unclaim query which holds information needed to notify a deliverer who lost their scheduled delivery due to unclaim action.
  */
-function handleUnclaimQueryResult(receiverSessionData: SessionData, result: QueryResult): Promise<void> {
+async function handleUnclaimQueryResult(receiverSessionData: SessionData, result: QueryResult): Promise <void> {
     
     let unclaimNotificationData: UnclaimNotificationData = result.rows[0].unclaimnotificationdata;
 
     // Next, if the removal resulted in total unclaiming of food that had a scheduled delivery, then notify deliverer and donor as well.
     if (unclaimNotificationData.delivererSessionData != null) {
         
-        return notifyDelivererOfLostDelivery(receiverSessionData, 'receiver', unclaimNotificationData)
-            .then(() => {
-                return notifyDonorOfLostDelivery(unclaimNotificationData);
-            });
+        await notifyDelivererOfLostDelivery(receiverSessionData, 'receiver', unclaimNotificationData)
+        return notifyDonorOfLostDelivery(unclaimNotificationData);
     }
 }

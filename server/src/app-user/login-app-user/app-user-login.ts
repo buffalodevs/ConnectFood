@@ -14,17 +14,16 @@ import { AppUserErrorMsgs} from '../../../../shared/app-user/message/app-user-er
  * @param password The (plain text) password of the user.
  * @return A promise where on success it will provide the primary AppUser information of the logged in user.
  */
-export function login(email: string, password: string): Promise<SessionData> {
+export async function login(email: string, password: string): Promise <SessionData> {
 
-    return getAppUserInfo(email)
-        .then((getAppUserInfoResult: QueryResult) => {
-            return analyzeGetAppUserInfoResult(email, password, getAppUserInfoResult);
-        })
-        .catch((err: Error) => {
-            console.log(err);
-            // Return general login error message so that we do not give away any sensitive details to potential hacker.
-            return Promise.reject(new Error(AppUserErrorMsgs.INCORRECT_LOGIN));
-        });
+    try {
+        const getAppUserInfoResult: QueryResult = await getAppUserInfo(email);
+        return analyzeGetAppUserInfoResult(email, password, getAppUserInfoResult);
+    }
+    catch (err) {
+        console.log(err);
+        throw new Error(AppUserErrorMsgs.INCORRECT_LOGIN);
+    }
 }
 
 
@@ -33,10 +32,10 @@ export function login(email: string, password: string): Promise<SessionData> {
  * @param email: The email (username) of the user to get the salt for.
  * @return A promise with the query result. The query result should simply contain one row information pertaining to the App User.
  */
-function getAppUserInfo(email: string): Promise<QueryResult> {
+function getAppUserInfo(email: string): Promise <QueryResult> {
 
     let queryString: string = `SELECT * FROM getAppUserSessionData(NULL, NULL, $1, TRUE);`;
-    let queryArgs: Array<string> = [email];
+    let queryArgs: Array <string> = [ email ];
 
     logSqlQueryExec(queryString, queryArgs);
     return query(queryString, queryArgs);
@@ -51,7 +50,7 @@ function getAppUserInfo(email: string): Promise<QueryResult> {
  * @param getAppUserInfoResult The query result that on success should contain a single row with the App User info.
  * @return A promise that on success will resolve to the app user's session data for login.
  */
-function analyzeGetAppUserInfoResult(email: string, password: string, getAppUserInfoResult: QueryResult): Promise<SessionData> {
+async function analyzeGetAppUserInfoResult(email: string, password: string, getAppUserInfoResult: QueryResult): Promise<SessionData> {
 
     logSqlQueryResult(getAppUserInfoResult.rows);
 
@@ -61,15 +60,10 @@ function analyzeGetAppUserInfoResult(email: string, password: string, getAppUser
         let firstRowResult: any = getAppUserInfoResult.rows[0];
         let hashPassword: string = firstRowResult.password;
         
-        return checkPassword(password, hashPassword)
-            .then((isMatch: boolean) => {
+        const isMatch: boolean = await checkPassword(password, hashPassword);
 
-                if (isMatch) {
-                    return <SessionData>(firstRowResult.sessiondata);
-                }
-
-                throw new Error('Password is incorrect');
-            });
+        return (isMatch) ? <SessionData>(firstRowResult.sessiondata)
+                         : Promise.reject(new Error('Password is incorrect'));
     }
 
     // Otherwise, we could not find an AppUser with username or email in database.

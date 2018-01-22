@@ -8,7 +8,7 @@ import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotification } fr
 import { Delivery, DeliveryState } from '../../../shared/deliverer/delivery';
 
 
-export function updateDeliveryState(deliveryFoodListingKey: number, delivererSessionData: SessionData, deliveryState: DeliveryState): Promise<void> {
+export async function updateDeliveryState(deliveryFoodListingKey: number, delivererSessionData: SessionData, deliveryState: DeliveryState): Promise <void> {
 
     let queryArgs: any[] = [
         deliveryFoodListingKey,
@@ -18,14 +18,14 @@ export function updateDeliveryState(deliveryFoodListingKey: number, delivererSes
     let queryString: string = addArgPlaceholdersToQueryStr('SELECT * FROM updateDeliveryState();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);
 
-    return query(queryString, queryArgs)
-        .then((queryResult: QueryResult) => {
-            return handleUpdateDeliveryStateResult(delivererSessionData, queryResult, deliveryState);
-        })
-        .catch((err: Error) => {
-            console.log(err);
-            throw new Error('Sorry, an unexpected error occured when updating the state of the delivery');
-        });
+    try {
+        const queryResult: QueryResult = await query(queryString, queryArgs);
+        return handleUpdateDeliveryStateResult(delivererSessionData, queryResult, deliveryState);
+    }
+    catch (err) {
+        console.log(err);
+        throw new Error('Sorry, an unexpected error occured when updating the state of the delivery');
+    }
 }
 
 
@@ -36,7 +36,7 @@ export function updateDeliveryState(deliveryFoodListingKey: number, delivererSes
  * @param deliveryState The delivery state that the delivery was updated to.
  * @return On success, a promise that resolves to nothing. On failure, an error is thrown.
  */
-export function handleUpdateDeliveryStateResult(delivererSessionData: SessionData, queryResult: QueryResult, deliveryState: DeliveryState): Promise<void> {
+export function handleUpdateDeliveryStateResult(delivererSessionData: SessionData, queryResult: QueryResult, deliveryState: DeliveryState): Promise <void> {
 
     logSqlQueryResult(queryResult.rows);
     

@@ -1,20 +1,10 @@
 import * as googleDistance from 'google-distance';
 import * as moment from 'moment';
 
+import { DriveDistTime } from './drive-dist-time';
 import { GPSCoordinate } from '../../../shared/common-util/geocode';
-export { GPSCoordinate };
 
-
-/**
- * Container for driving distance and time.
- */
-export class DriveDistTime {
-
-    public constructor (
-        public driveDistanceMi: number = 0,
-        public driveDurationMin: number = 0
-    ) {}
-}
+export { DriveDistTime, GPSCoordinate };
 
 
 /**
@@ -23,23 +13,21 @@ export class DriveDistTime {
  * @param travelStartTime The travel start timestamp from which to add segment driving durations to. Default is current time (now).
  * @return A promsie that will resolve to the estimated arrival times for each point after the first in routeGPSCoordinates.
  */
-export function getEstimatedArrivalTimes(routeGPSCoordinates: GPSCoordinate[], travelStartTime: Date = new Date()): Promise<Date[]> {
+export async function getEstimatedArrivalTimes(routeGPSCoordinates: GPSCoordinate[], travelStartTime: Date = new Date()): Promise <Date[]> {
 
-    return getRouteSegmentDrivingDistTimes(routeGPSCoordinates)
-        .then((segmentDriveDistTimes: DriveDistTime[]) => {
+    const segmentDriveDistTimes: DriveDistTime[] = await getRouteSegmentDrivingDistTimes(routeGPSCoordinates);
 
-            let estimatedArrivalTimes: Date[] = [];
-            let segmentStartTime: Date = travelStartTime;
-            
-            for (let i: number = 0; i < segmentDriveDistTimes.length; i++) {
+    let estimatedArrivalTimes: Date[] = [];
+    let segmentStartTime: Date = travelStartTime;
+    
+    for (let i: number = 0; i < segmentDriveDistTimes.length; i++) {
 
-                const segmentDurMin: number = segmentDriveDistTimes[i].driveDurationMin;
-                estimatedArrivalTimes.push(moment(segmentStartTime).add(segmentDurMin, 'm').toDate());
-                segmentStartTime = estimatedArrivalTimes[i];
-            }
+        const segmentDurMin: number = segmentDriveDistTimes[i].driveDurationMin;
+        estimatedArrivalTimes.push(moment(segmentStartTime).add(segmentDurMin, 'm').toDate());
+        segmentStartTime = estimatedArrivalTimes[i];
+    }
 
-            return estimatedArrivalTimes;
-        });
+    return estimatedArrivalTimes;
 }
 
 
@@ -48,7 +36,7 @@ export function getEstimatedArrivalTimes(routeGPSCoordinates: GPSCoordinate[], t
  * @param routeGPSCoordinates A set of route GPS Coordinates that shall be traversed in sequential order.
  * @return A promise that resolves to the driving distances and times of each segment of the route.
  */
-export function getRouteSegmentDrivingDistTimes(routeGPSCoordinates: GPSCoordinate[]): Promise<DriveDistTime[]> {
+export function getRouteSegmentDrivingDistTimes(routeGPSCoordinates: GPSCoordinate[]): Promise <DriveDistTime[]> {
     return _getRouteSegmentDrivingDistTimes(routeGPSCoordinates);
 }
 
@@ -60,8 +48,9 @@ export function getRouteSegmentDrivingDistTimes(routeGPSCoordinates: GPSCoordina
  * @param accumolatorDriveDistTime An accumulator that keeps track of the latest sum of driving distances and driving times.
  * @return A promise that resolves to the driving distances and times of each segment of the route.
  */
-function _getRouteSegmentDrivingDistTimes(routeGPSCoordinates: GPSCoordinate[], routeIndex: number = 0, accumulatorDriveDistTime: DriveDistTime[] = []): Promise<DriveDistTime[]> {
-
+async function _getRouteSegmentDrivingDistTimes(routeGPSCoordinates: GPSCoordinate[], routeIndex: number = 0,
+                                                accumulatorDriveDistTime: DriveDistTime[] = []): Promise <DriveDistTime[]>
+{
     // Check if we have traversed all route points.
     if (routeIndex >= routeGPSCoordinates.length - 1)   return Promise.resolve(accumulatorDriveDistTime);
 
@@ -69,12 +58,9 @@ function _getRouteSegmentDrivingDistTimes(routeGPSCoordinates: GPSCoordinate[], 
     const destinationGpsCoordinate: GPSCoordinate = routeGPSCoordinates[routeIndex + 1];
 
     // Get driving distance and time for current segment, sum them in, and make next recursive call.
-    return getDrivingDistTime(originGPSCoordinate, [destinationGpsCoordinate])
-        .then((segmentDistTimeArr: DriveDistTime[]) => {
-
-            accumulatorDriveDistTime.push(segmentDistTimeArr[0]);
-            return _getRouteSegmentDrivingDistTimes(routeGPSCoordinates, ++routeIndex, accumulatorDriveDistTime);
-        });
+    const segmentDistTimeArr: DriveDistTime[] = await getDrivingDistTime(originGPSCoordinate, [destinationGpsCoordinate]);
+    accumulatorDriveDistTime.push(segmentDistTimeArr[0]);
+    return _getRouteSegmentDrivingDistTimes(routeGPSCoordinates, ++routeIndex, accumulatorDriveDistTime);
 }
 
 
@@ -84,12 +70,12 @@ function _getRouteSegmentDrivingDistTimes(routeGPSCoordinates: GPSCoordinate[], 
  * @param destinationgpsCoordinate An array of one or more destination GPS Coordinates.
  * @return A promise that resolves to an array of the computed driving distances and times.
  */
-export function getDrivingDistTime(originGpsCoordinate: GPSCoordinate, destinationGpsCoordinate: GPSCoordinate[]): Promise<DriveDistTime[]> {
+export function getDrivingDistTime(originGpsCoordinate: GPSCoordinate, destinationGpsCoordinate: GPSCoordinate[]): Promise <DriveDistTime[]> {
 
     // Simply break out with a resolved promise if the given destinationgpsCoordinate array is empty!
     if (destinationGpsCoordinate == null || destinationGpsCoordinate.length === 0)  return Promise.resolve([]);
 
-    return new Promise<DriveDistTime[]> (
+    return new Promise <DriveDistTime[]> (
 
         (resolve: (value?: DriveDistTime[]) => void, reject: (reason?: Error) => void) => {
 

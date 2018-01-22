@@ -13,7 +13,7 @@ import { UnclaimNotificationData, notifyReceiverOfUnclaim, notifyDelivererOfLost
  *                        Should be pulled from server session to ensure that the requestor is authorized to perform this action!
  * @return A promise that simply resolve on success without any payload.
  */
-export function removeFoodListing(foodListingKey: number, donorSessionData: SessionData, removalReason: string): Promise<void> {
+export async function removeFoodListing(foodListingKey: number, donorSessionData: SessionData, removalReason: string): Promise <void> {
     
     // Construct prepared statement.
     let queryArgs = [ foodListingKey, donorSessionData.appUserKey, removalReason ];
@@ -21,37 +21,26 @@ export function removeFoodListing(foodListingKey: number, donorSessionData: Sess
     logSqlQueryExec(queryString, queryArgs);
 
     // Execute prepared statement.
-    return query(queryString, queryArgs)
-        .then((result: QueryResult) => {
-            logSqlQueryResult(result.rows);
-            return notifyAffectedAppUsers(donorSessionData, result);
-        });
+    const queryResult: QueryResult = await query(queryString, queryArgs);
+    
+    logSqlQueryResult(queryResult.rows);
+    return notifyAffectedAppUsers(donorSessionData, queryResult);
 }
 
 
 /**
  * Notifies all affected users (other than Donor causing removal) that their claims/deliveries have been removed.
  */
-function notifyAffectedAppUsers(donorSessionData: SessionData, result: QueryResult, resultRowIndex: number = 0): Promise<void> {
+async function notifyAffectedAppUsers(donorSessionData: SessionData, result: QueryResult, resultRowIndex: number = 0): Promise <void> {
 
     if (resultRowIndex === result.rowCount) return; // Terminate recursive call once we reach end of result rows!
 
     // First notify affected receiver that their food has been unclaimed as a result of removal.
     let unclaimNotificationData: UnclaimNotificationData = result.rows[resultRowIndex].unclaimnotificationdata;
-    return notifyReceiverOfUnclaim(unclaimNotificationData)
-        .then(() => {
+    await notifyReceiverOfUnclaim(unclaimNotificationData)
 
-            // Next, if the removal resulted in total unclaiming of food that had a scheduled delivery, then notify deliverer as well.
-            if (unclaimNotificationData.delivererSessionData != null) {
-                return notifyDelivererOfLostDelivery(donorSessionData, 'donor', unclaimNotificationData)
-                    .then(() => {
-
-                        // Make recursive call with index of next row as subject of next call.
-                        return notifyAffectedAppUsers(donorSessionData, result, ++resultRowIndex);
-                    })
-            }
-            else {
-                return notifyAffectedAppUsers(donorSessionData, result, ++resultRowIndex);
-            }
-        });
+    // Next, if the removal resulted in total unclaiming of food that had a scheduled delivery, then notify deliverer as well.
+    if (unclaimNotificationData.delivererSessionData != null) {
+        return notifyDelivererOfLostDelivery(donorSessionData, 'donor', unclaimNotificationData)
+    }
 }

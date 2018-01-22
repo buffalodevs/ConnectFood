@@ -9,20 +9,20 @@ import { DateFormatter } from '../../../shared/common-util/date-formatter';
 import { Delivery } from '../../../shared/deliverer/delivery';
 
 
-export function cancelDelivery(deliveryFoodListingKey: number, delivererSessionData: SessionData, cancelReason: string, foodRejected: boolean): Promise<void> {
+export async function cancelDelivery(deliveryFoodListingKey: number, delivererSessionData: SessionData, cancelReason: string, foodRejected: boolean): Promise <void> {
 
     let queryArgs: any[] = [ deliveryFoodListingKey, delivererSessionData.appUserKey, cancelReason, foodRejected ];
     let queryString: string = addArgPlaceholdersToQueryStr('SELECT * FROM cancelDelivery();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);
 
-    return query(queryString, queryArgs)
-        .then((queryResult: QueryResult) => {
-            return handleCancelDeliveryResult(delivererSessionData, queryResult);
-        })
-        .catch((err: Error) => {
-            console.log(err);
-            throw new Error('Sorry, an unexpected error occured when cancelling the delivery');
-        });
+    try {
+        const queryResult: QueryResult = await query(queryString, queryArgs);
+        return handleCancelDeliveryResult(delivererSessionData, queryResult);
+    }
+    catch (err) {
+        console.log(err);
+        throw new Error('Sorry, an unexpected error occured when cancelling the delivery');
+    }
 }
 
 

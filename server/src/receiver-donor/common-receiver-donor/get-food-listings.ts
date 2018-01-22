@@ -18,7 +18,7 @@ import { DateFormatter } from '../../../../shared/common-util/date-formatter';
  * @param myGPSCoordinate The GPS Coordinates of the organization associated with the App User this is logged in (making this call).
  * @return A Promise that resolves to an array of Food Listings that have been retrieved.
  */
-export function getFoodListings(filters: FoodListingsFilters, myAppUserKey: number, myGPSCoordinate: GPSCoordinate): Promise<FoodListing[]> {
+export async function getFoodListings(filters: FoodListingsFilters, myAppUserKey: number, myGPSCoordinate: GPSCoordinate): Promise <FoodListing[]> {
 
     sanitizeFilters(filters);
 
@@ -39,15 +39,16 @@ export function getFoodListings(filters: FoodListingsFilters, myAppUserKey: numb
     let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM getFoodListings();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);
 
-    return query(queryString, queryArgs)
-        .then((queryResult: QueryResult) => {
-            logSqlQueryResult(queryResult.rows);
-            return generateResultArray(queryResult.rows, myGPSCoordinate, (filters.listingsStatus === LISTINGS_STATUS.myDonatedListings));
-        })
-        .catch((err: Error) => {
-            console.log(err);
-            return Promise.reject(new Error('Food listing search failed'));
-        });
+    try {
+        const queryResult: QueryResult = await query(queryString, queryArgs);
+        
+        logSqlQueryResult(queryResult.rows);
+        return generateResultArray(queryResult.rows, myGPSCoordinate, (filters.listingsStatus === LISTINGS_STATUS.myDonatedListings));
+    }
+    catch (err) {
+        console.log(err);
+        return Promise.reject(new Error('Food listing search failed'));
+    }
 }
 
 
@@ -122,7 +123,7 @@ function sanitizeNeedsRefrigeration(needsRefrigeration: boolean, notNeedsRefrige
  * @param myDonatedListingsOnly A flag signifying whether or not the listings that were retrieved are the logged in App User's donated items only (donor cart).
  * @return A promise that resolves the the result Food Listing array.
  */
-function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate, myDonatedListingsOnly: boolean): Promise<FoodListing[]> {
+async function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate, myDonatedListingsOnly: boolean): Promise <FoodListing[]> {
 
     let foodListings: FoodListing[] = [];
     let donorGPSCoordinates: GPSCoordinate[] = [];
@@ -138,14 +139,13 @@ function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate, myDona
     if (myDonatedListingsOnly)  return Promise.resolve(foodListings);
 
     // In Receive tab or Receiver Cart, we do care about driving distances!
-    return getDrivingDistTime(myGPSCoordinate, donorGPSCoordinates)
-        .then((driveDistTime: DriveDistTime[]) => {
-            for (let i: number = 0; i < driveDistTime.length; i++) {
-                foodListings[i].donorInfo.drivingDistance = driveDistTime[i].driveDistanceMi;
-                foodListings[i].donorInfo.drivingTime = driveDistTime[i].driveDurationMin;
-            }
+    const driveDistTime: DriveDistTime[] = await getDrivingDistTime(myGPSCoordinate, donorGPSCoordinates);
+    
+    for (let i: number = 0; i < driveDistTime.length; i++) {
+        foodListings[i].donorInfo.drivingDistance = driveDistTime[i].driveDistanceMi;
+        foodListings[i].donorInfo.drivingTime = driveDistTime[i].driveDurationMin;
+    }
 
-            return foodListings;
-        });
-        // Friendly error message generated in getDrivingDistances()!
+    return foodListings;
+    // NOTE: No need to handle error since friendly error message generated in getDrivingDistances() and should bubble up to controller for client!
 }

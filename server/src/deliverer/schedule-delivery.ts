@@ -9,7 +9,7 @@ import { DateFormatter } from '../../../shared/common-util/date-formatter';
 import { Delivery } from '../../../shared/deliverer/delivery';
 
 
-export function scheduleDelivery(claimedFoodListingKey: number, delivererSessionData: SessionData, startImmediately: boolean, scheduledStartTime: Date): Promise<void> {
+export async function scheduleDelivery(claimedFoodListingKey: number, delivererSessionData: SessionData, startImmediately: boolean, scheduledStartTime: Date): Promise <void> {
 
     const dateFormatter: DateFormatter = new DateFormatter();
 
@@ -26,15 +26,15 @@ export function scheduleDelivery(claimedFoodListingKey: number, delivererSession
     // Insert query argument placeholders and preprocess query arguments.
     let queryString: string = addArgPlaceholdersToQueryStr('SELECT * FROM scheduleDelivery();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);
-
-    return query(queryString, queryArgs)
-        .then((queryResult: QueryResult) => {
-            return handleScheduleDeliveryResult(delivererSessionData, queryResult);
-        })
-        .catch((err: Error) => {
-            console.log(err);
-            throw new Error('Sorry, an unexpected error occured when ' + (startImmediately ? 'starting' : 'scheduling') + ' the delivery');
-        });
+    
+    try {
+        const queryResult: QueryResult = await query(queryString, queryArgs);
+        return handleScheduleDeliveryResult(delivererSessionData, queryResult);
+    }
+    catch (err) {
+        console.log(err);
+        throw new Error('Sorry, an unexpected error occured when ' + (startImmediately ? 'starting' : 'scheduling') + ' the delivery');
+    }
 }
 
 
@@ -44,7 +44,7 @@ export function scheduleDelivery(claimedFoodListingKey: number, delivererSession
  * @param queryResult The result of the scheduleDelivery() SQL query.
  * @return On success, a promise that resolves to nothing. On failure, an error is thrown.
  */
-function handleScheduleDeliveryResult(delivererSessionData: SessionData, queryResult: QueryResult): Promise<void> {
+function handleScheduleDeliveryResult(delivererSessionData: SessionData, queryResult: QueryResult): Promise <void> {
 
     logSqlQueryResult(queryResult.rows);
     

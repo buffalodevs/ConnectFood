@@ -21,57 +21,42 @@ import { TimeRange } from '../../../../shared/app-user/time-range';
  * @param appUserUpdateKey If provided, then it designates the app user to be updated. If not provided, then it signifies that this is a new app user to be added.
  * @return A promise that on success will resolve to the new or updated sessiond data for the app user.
  */
-export function addOrUpdateAppUser(appUserInfo: AppUserInfo, password?: string, appUserUpdateKey?: number): Promise<SessionData> {
+export async function addOrUpdateAppUser(appUserInfo: AppUserInfo, password?: string, appUserUpdateKey?: number): Promise <SessionData> {
 
-    let isUpdate: boolean = appUserUpdateKey != null;
+    const isUpdate: boolean = ( appUserUpdateKey != null );
 
     // First validate given App User signup info.
-    let validation: Validation = new Validation();
-    let validationErr: Error = validation.validateAppUserInfo(appUserInfo, password);
+    const validation: Validation = new Validation();
+    const validationErr: Error = validation.validateAppUserInfo(appUserInfo, password);
     if (validationErr != null)  throw validationErr;
 
-    // Determine if we must hash a password. If it is a signup then we must have a password to hash,
-    // and if it's an update we should check if we are updating password.
-    let hashPasswordPromise: Promise<string> = Promise.resolve(null);
-    if (!isUpdate || password != null) {
-        hashPasswordPromise = hashPassword(password);
-    }
+    // Determine if we must hash a password and/or generate GPS Coordinate.
+    const mustHashPass: boolean = (!isUpdate || password != null);
+    const mustGenGPSCoordinate: boolean = (!isUpdate || appUserInfo.address != null);
 
-    return hashPasswordPromise
-        // Generate GPS coordinates if initial signup (not an update).
-        .then((hashPass: string) => {
-            return (!isUpdate || appUserInfo.address != null) ? genGPSCoordsAndHashPass(appUserInfo, hashPass)
-                                                              : { hashPass: hashPass, gpsCoordinate: null};
-        })
-        // Add new user into database on signup, or update information on App User update.
-        .then(({hashPass, gpsCoordinate}) => {
-            return addOrUpdateAppUserInSQL(appUserInfo, hashPass, gpsCoordinate, appUserUpdateKey);
-        })
-        // Handle the results of the add or update (includes sending verification email).
-        .then((addOrUpdateResult: QueryResult) => {
-            return handleResult(addOrUpdateResult, isUpdate);
-        })
-        .catch((err: Error) => {
-            console.log(err);
-            throw new Error(err.message);  // We should have a user friendly error here!
-        });
+
+    const hashPass: string = await ( mustHashPass ? hashPassword(password)
+                                                  : null );
+
+    const gpsCoordinate = await ( mustGenGPSCoordinate ? genGPSCoordinate(appUserInfo)
+                                                       : null );
+
+    const addOrUpdateResult: QueryResult = await addOrUpdateAppUserInSQL(appUserInfo, hashPass, gpsCoordinate, appUserUpdateKey);
+
+    return handleResult(addOrUpdateResult, isUpdate);
 }
 
 
 /**
- * Aggregates hashed password and GPS coordinate results together for next step in promise chain.
+ * Generates a GPS Coordinate for a given address of a user.
  * @param appUserAddress The app user address information.
- * @param hashPass The previously generated hashed password.
- * @return A promise that will resolve to an object containing the hashed password and GPS coordinates.
+ * @return A promise that will resolve to the GPS coordinates.
  */
-function genGPSCoordsAndHashPass(appUserAddress: Address, hashPass: string): Promise<{ hashPass: string, gpsCoordinate: GPSCoordinate }> {
+function genGPSCoordinate(appUserAddress: Address): Promise <GPSCoordinate> {
 
     return getGPSCoordinate(appUserAddress.address, appUserAddress.city, appUserAddress.state, appUserAddress.zip)
-        // Simply map the result to an aggregate of all results so far!
-        .then((gpsCoordinate: GPSCoordinate) => {
-            return { hashPass: hashPass, gpsCoordinate: gpsCoordinate };
-        })
         .catch((err: Error) => {
+            console.log(err);
             throw new Error(AppUserErrorMsgs.INVALID_ADDRESS);
         });
 }
@@ -87,7 +72,7 @@ function genGPSCoordsAndHashPass(appUserAddress: Address, hashPass: string): Pro
  * @param appUserUpdateKey The key of the app user to update if this is an update. Will be null if this is an add.
  * @return A promise that will resolve to the add or update query result upon success.
  */
-function addOrUpdateAppUserInSQL(appUserInfo: AppUserInfo, hashedPassword?: string, gpsCoordinate?: GPSCoordinate, appUserUpdateKey?: number): Promise<QueryResult> {
+function addOrUpdateAppUserInSQL(appUserInfo: AppUserInfo, hashedPassword?: string, gpsCoordinate?: GPSCoordinate, appUserUpdateKey?: number): Promise <QueryResult> {
 
     let isUpdate: boolean = (appUserUpdateKey != null);
 

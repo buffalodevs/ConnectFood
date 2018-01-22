@@ -60,8 +60,10 @@
     "pg": "7.x",
     "postgres-array": "^1.0.2",
     "primeng": "^5.0.2",
+    "reflect-metadata": "^0.1.12",
     "rxjs": "^5.1.0",
     "text-mask-addons": "^3.7.1",
+    "typeorm": "^0.1.11",
     "typescript": "~2.5.3"
   },
   "devDependencies": {

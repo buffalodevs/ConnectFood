@@ -35,23 +35,13 @@ export class DeliveryUpdateNotification {
  * @param deliveryUpdateNotification Data required to notify all affected parties of the delivery state change operation.
  * @return A promise that resolves to nothing on success.
  */
-export function notifyReceiverAndDonorOfDeliveryUpdate(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification): Promise<void> {
-    return notifyDonorOfDeliveryUpdate(delivererSessionData, deliveryUpdateNotification)
-        .then(() => {
-            return notifyReceiverOfDeliveryUpdate(delivererSessionData, deliveryUpdateNotification);
-        });
-}
+export async function notifyReceiverAndDonorOfDeliveryUpdate(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification): Promise <void> {
 
+    // First grab estimated arrival time strings for Donor and Receiver.
+    const estimatedArrivalTimes: Map <string, string> = await getEstimatedArrivalTimeStrs(delivererSessionData, deliveryUpdateNotification);
 
-/**
- * Notifies an affected receiver of the state change of a Delivery.
- * @param delivererSessionData Data concerning the deliverer who submitted the delivery state change operation.
- * @param deliveryUpdateNotification Data required to notify all affected parties of the delivery state change operation.
- * @return A promise that resolves to nothing on success.
- */
-function notifyReceiverOfDeliveryUpdate(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification): Promise<void> {
-    return generateAndSendEmail(delivererSessionData, deliveryUpdateNotification, AppUserType.Receiver);
-    // TODO: Chain to promise and send text message.
+    await notifyDonorOfDeliveryUpdate(delivererSessionData, deliveryUpdateNotification, estimatedArrivalTimes.get('Donor'));
+    return notifyReceiverOfDeliveryUpdate(delivererSessionData, deliveryUpdateNotification, estimatedArrivalTimes.get('Receiver'));
 }
 
 
@@ -59,10 +49,25 @@ function notifyReceiverOfDeliveryUpdate(delivererSessionData: SessionData, deliv
  * Notifies an affected donor of the state change of a Delivery.
  * @param delivererSessionData Data concerning the deliverer who submitted the delivery state change operation.
  * @param deliveryUpdateNotification Data required to notify all affected parties of the delivery state change operation.
+ * @param estimatedArrivalTime The estimated time for the Deliverer to arrive at the Donor.
+ *                             NOTE: Can be null if the deliverer has already picked up the delivery at the donor.
  * @return A promise that resolves to nothing on success.
  */
-function notifyDonorOfDeliveryUpdate(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification): Promise<void> {
-    return generateAndSendEmail(delivererSessionData, deliveryUpdateNotification, AppUserType.Donor);
+function notifyDonorOfDeliveryUpdate(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification, estimatedArrivalTime: string): Promise<void> {
+    return generateAndSendEmail(delivererSessionData, deliveryUpdateNotification, AppUserType.Donor, estimatedArrivalTime);
+    // TODO: Chain to promise and send text message.
+}
+
+
+/**
+ * Notifies an affected receiver of the state change of a Delivery.
+ * @param delivererSessionData Data concerning the deliverer who submitted the delivery state change operation.
+ * @param deliveryUpdateNotification Data required to notify all affected parties of the delivery state change operation.
+ * @param estimatedArrivalTime The estimated time for the Deliverer to arrive at the Donor.
+ * @return A promise that resolves to nothing on success.
+ */
+function notifyReceiverOfDeliveryUpdate(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification, estimatedArrivalTime: string): Promise<void> {
+    return generateAndSendEmail(delivererSessionData, deliveryUpdateNotification, AppUserType.Receiver, estimatedArrivalTime);
     // TODO: Chain to promise and send text message.
 }
 
@@ -72,31 +77,32 @@ function notifyDonorOfDeliveryUpdate(delivererSessionData: SessionData, delivery
  * @param delivererSessionData The session data pertaining to the deliverer.
  * @param deliveryUpdateNotification The update notification data used to generate the message.
  * @param appUserType The type of the user (Receiver or Donor) that the message is being sent to.
+ * @param estimatedArrivalTime The estimated time for the Deliverer to arrive at the Donor or Receiver.
+ *                             NOTE: Can be null for Donor if delivery has already been picked up.
  */
-function generateAndSendEmail(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification, appUserType: AppUserType): Promise<void> {
+function generateAndSendEmail(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification,
+                              appUserType: AppUserType, estimatedArrivalTime: string): Promise <void>
+{
+    const htmlBodyMid: string = generateHTMLBodyMid(delivererSessionData, deliveryUpdateNotification, appUserType, estimatedArrivalTime);
 
-    return generateHTMLBodyMid(delivererSessionData, deliveryUpdateNotification, appUserType)
-        .then((htmlBodyMid: string) => {
+    // Are we targeting the Donor or Receiver?
+    const targetUser: AppUserInfo = (appUserType === AppUserType.Receiver) ? deliveryUpdateNotification.receiverSessionData.appUserInfo
+                                                                            : deliveryUpdateNotification.donorSessionData.appUserInfo;
 
-            // Are we targeting the Donor or Receiver?
-            const targetUser: AppUserInfo = (appUserType === AppUserType.Receiver) ? deliveryUpdateNotification.receiverSessionData.appUserInfo
-                                                                                   : deliveryUpdateNotification.donorSessionData.appUserInfo;
+    // Generate our mail configuration for sending the update notification email (includes options and payload data).
+    const mailConfig: MailConfig = new MailConfig (
+        deliveryUpdateNotification.foodTitle + ' Update Notification',
+        targetUser.organizationName,
+        targetUser.email,
+        appUserType,
+        ( generateHTMLBodyStart(delivererSessionData, deliveryUpdateNotification) + htmlBodyMid )
+    );
 
-            // Generate our mail configuration for sending the update notification email (includes options and payload data).
-            const mailConfig: MailConfig = new MailConfig (
-                deliveryUpdateNotification.foodTitle + ' Update Notification',
-                targetUser.organizationName,
-                targetUser.email,
-                appUserType,
-                ( generateHTMLBodyStart(delivererSessionData, deliveryUpdateNotification) + htmlBodyMid )
-            );
-        
-            // Send the email with our generated mail configuration.
-            return sendEmail(mailConfig)
-                .catch((err: Error) => {
-                    console.log(err);
-                    throw new Error('Failed to email notification of delivery update to concerned donor and receiver');
-                });
+    // Send the email with our generated mail configuration.
+    return sendEmail(mailConfig)
+        .catch((err: Error) => {
+            console.log(err);
+            throw new Error('Failed to email notification of delivery update to concerned donor and receiver');
         });
 } 
 
@@ -135,28 +141,29 @@ function generateHTMLBodyStart(delivererSessionData: SessionData, deliveryUpdate
  * @param appUserType The type of the user that this message is designated for (Receiver or Donor).
  * @return The mid body contents.
  */
-function generateHTMLBodyMid(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification, appUserType: AppUserType): Promise<string> {
+function generateHTMLBodyMid(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification,
+                             appUserType: AppUserType, estimatedArrivalTime: string): string
+{        
+    if (deliveryUpdateNotification.cancelled) {
+        return generateCancelledHTMLBodyMid(delivererSessionData, deliveryUpdateNotification);
+    }
 
-    return Promise.resolve().then(() => {
+    switch (deliveryUpdateNotification.newDeliveryState) {
+        case DeliveryState.scheduled:
+            return generateScheduledHTMLBodyMid(delivererSessionData, deliveryUpdateNotification, appUserType, estimatedArrivalTime);
 
-        let htmlBody: string | Promise<string>;
-        
-        if (deliveryUpdateNotification.cancelled) {
-            htmlBody = generateCancelledHTMLBodyMid(delivererSessionData, deliveryUpdateNotification);
-        }
-        else {
-    
-            switch (deliveryUpdateNotification.newDeliveryState) {
-                case DeliveryState.scheduled:   htmlBody = generateScheduledHTMLBodyMid(delivererSessionData, deliveryUpdateNotification, appUserType);   break;
-                case DeliveryState.started:     htmlBody = generateStartedHTMLBodyMid(delivererSessionData, deliveryUpdateNotification, appUserType);     break;
-                case DeliveryState.pickedUp:    htmlBody = generatePickedUpHTMLBodyMid(delivererSessionData, deliveryUpdateNotification, appUserType);    break;
-                case DeliveryState.droppedOff:  htmlBody = generateDroppedOffHTMLBodyMid(delivererSessionData, deliveryUpdateNotification, appUserType);  break;
-                default:                        throw new Error('Incorrect newDeliveryState provided in deliveryUpdateNotification object.');
-            }
-        }
-    
-        return htmlBody;
-    });
+        case DeliveryState.started:
+            return generateStartedHTMLBodyMid(delivererSessionData, deliveryUpdateNotification, appUserType, estimatedArrivalTime);
+
+        case DeliveryState.pickedUp:
+            return generatePickedUpHTMLBodyMid(delivererSessionData, deliveryUpdateNotification, appUserType, estimatedArrivalTime);
+
+        case DeliveryState.droppedOff:
+            return generateDroppedOffHTMLBodyMid(delivererSessionData, deliveryUpdateNotification, appUserType);
+
+        default:
+            throw new Error('Incorrect newDeliveryState provided in deliveryUpdateNotification object.');
+    }
 }
 
 
@@ -193,26 +200,22 @@ function generateCancelledHTMLBodyMid(delivererSessionData: SessionData, deliver
  * @param appUserType See generateHTMLBodyMid.
  * @return The mid body contents.
  */
-function generateScheduledHTMLBodyMid(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification, appUserType: AppUserType): Promise<string> {
+function generateScheduledHTMLBodyMid(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification,
+                                      appUserType: AppUserType, estimatedArrivalTime: string): string
+{        
+    // Then, generate the scheduled mid body string.
+    const scheduledStartTime: Date = deliveryUpdateNotification.scheduledStartTime;
+    const scheduledStartDateStr: string = moment(scheduledStartTime).format('MM/DD/YYYY');
+    const scheduledStartTimeStr: string = moment(scheduledStartTime).format('h:mm a');
+    const dropOffOrPickUp: string = (appUserType === AppUserType.Receiver) ? 'drop off'
+                                                                           : 'pick up';
 
-    // First, get estimated arrival times at user specified by appUserType.
-    return getEstimatedArrivalTimeStr(delivererSessionData, deliveryUpdateNotification, appUserType)
-        // Then, generate the scheduled mid body string.
-        .then((estimatedArrivalTimeStr: string) => {
-
-            const scheduledStartTime: Date = deliveryUpdateNotification.scheduledStartTime;
-            const scheduledStartDateStr: string = moment(scheduledStartTime).format('MM/DD/YYYY');
-            const scheduledStartTimeStr: string = moment(scheduledStartTime).format('h:mm a');
-            const dropOffOrPickUp: string = (appUserType === AppUserType.Receiver) ? 'drop off'
-                                                                                   : 'pick up';
-
-            return `
-                <p>
-                    The deliverer has scheduled the delivery to start on <b>` + scheduledStartDateStr + `</b> at <b>` + scheduledStartTimeStr + `</b>.
-                    You can expect the deliverer to arrive around <b>` + estimatedArrivalTimeStr + `</b> to ` + dropOffOrPickUp + ` the delivery.
-                </p>
-            `;
-        });
+    return `
+        <p>
+            The deliverer has scheduled the delivery to start on <b>` + scheduledStartDateStr + `</b> at <b>` + scheduledStartTimeStr + `</b>.
+            You can expect the deliverer to arrive around <b>` + estimatedArrivalTime + `</b> to ` + dropOffOrPickUp + ` the delivery.
+        </p>
+    `;
 }
 
 
@@ -222,23 +225,19 @@ function generateScheduledHTMLBodyMid(delivererSessionData: SessionData, deliver
  * @param deliveryUpdateNotification See generateHTMLBodyMid.
  * @return The mid body contents.
  */
-function generateStartedHTMLBodyMid(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification, appUserType: AppUserType): Promise<string> {
-    
-    // First, get estimated arrival times at user specified by appUserType.
-    return getEstimatedArrivalTimeStr(delivererSessionData, deliveryUpdateNotification, appUserType)
-        // Then, generate the started mid body string.
-        .then((estimatedArrivalTimeStr: string) => {
+function generateStartedHTMLBodyMid(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification,
+                                    appUserType: AppUserType, estimatedArrivalTime: string): string
+{    
+    // Then, generate the started mid body string.
+    const dropOffOrPickUp: string = (appUserType === AppUserType.Receiver) ? 'drop off '
+                                                                           : 'pick up ';
 
-            const dropOffOrPickUp: string = (appUserType === AppUserType.Receiver) ? 'drop off '
-                                                                                   : 'pick up ';
-
-            return `
-                <p>
-                    The deliverer has started the delivery. You can expect the deliverer to arrive around <b>
-                    ` + estimatedArrivalTimeStr + `</b> to ` + dropOffOrPickUp + `the delivery.
-                </p>
-            `;
-        });
+    return `
+        <p>
+            The deliverer has started the delivery. You can expect the deliverer to arrive around <b>
+            ` + estimatedArrivalTime + `</b> to ` + dropOffOrPickUp + `the delivery.
+        </p>
+    `;
 }
 
 
@@ -248,33 +247,21 @@ function generateStartedHTMLBodyMid(delivererSessionData: SessionData, deliveryU
  * @param deliveryUpdateNotification See generateHTMLBodyMid.
  * @return The mid body contents.
  */
-function generatePickedUpHTMLBodyMid(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification, appUserType: AppUserType): Promise<string> {
+function generatePickedUpHTMLBodyMid(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification,
+                                     appUserType: AppUserType, estimatedArrivalTime: string): string
+{
+    let receiverArrivalTimeMsg: string = '';
     
-    let estimatedArrivalTimePromise: Promise<string> = Promise.resolve(null);
-
-    // Only get estimated arrival time for the receiver since the deliverer has already been to the donor!
+    // Since deliverer has already arrived at Donor, we only want to tell Receiver of estimated arrival time!
     if (appUserType === AppUserType.Receiver) {
-        estimatedArrivalTimePromise = getEstimatedArrivalTimeStr(delivererSessionData, deliveryUpdateNotification, appUserType);
+        receiverArrivalTimeMsg = 'You can expect the deliverer to arrive around <b>' + estimatedArrivalTime + '</b> to drop off the delivery.';
     }
 
-    // First, get estimated arrival times at user specified by appUserType.
-    return estimatedArrivalTimePromise
-        // Then, generate the picked up mid body string.
-        .then((estimatedArrivalTimeStr: string) => {
-
-            let receiverArrivalTimeStr: string = '';
-
-            // Since deliverer has already arrived at Donor, we only want to tell Receiver of estimated arrival time!
-            if (appUserType === AppUserType.Receiver) {
-                receiverArrivalTimeStr = 'You can expect the deliverer to arrive around <b>' + estimatedArrivalTimeStr + '</b> to drop off the delivery.';
-            }
-
-            return `
-                <p>
-                    The deliverer has picked up the delivery from the donor and is on route to the receiver. ` + receiverArrivalTimeStr + `
-                </p>
-            `;
-        });
+    return `
+        <p>
+            The deliverer has picked up the delivery from the donor and is on route to the receiver. ` + receiverArrivalTimeMsg + `
+        </p>
+    `;
 }
 
 
@@ -295,32 +282,35 @@ function generateDroppedOffHTMLBodyMid(delivererSessionData: SessionData, delive
 
 
 /**
- * Gets the estimated arrival time string in wall clock time format for a given user type.
+ * Gets the estimated arrival time strings (in wall clock time format) for the Donor and Receiver along a delivery path.
  * @param delivererSessionData The session data for the deliverer (contains GPS Coordinate).
- * @param deliveryUpdateNotification Contains information to generate the estimated arrival time with.
- * @param appUserType The type of the user to get the estimated arrival time string for.
- * @return The estimated arrival wall clock time string.
+ * @param deliveryUpdateNotification Contains information to generate the estimated arrival time (Donor & Receiver GPS coordinates).
+ * @return A map containing the estimated arrival times for the Donor and Receiver.
+ *         NOTE: If the delivery is on or after the picked up state, then since the Donor has already been visited by the deliverer, their arrival time will be null!
  */
-function getEstimatedArrivalTimeStr(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification, appUserType: AppUserType): Promise<string> {
+async function getEstimatedArrivalTimeStrs(delivererSessionData: SessionData, deliveryUpdateNotification: DeliveryUpdateNotification): Promise <Map <string, string>> {
     
+    // If in dropped off state, then just return right away with empty map for arrival times.
+    const wasDroppedOff: boolean = ( deliveryUpdateNotification.newDeliveryState === DeliveryState.droppedOff );
+    if (wasDroppedOff)  return new Map ();
+
     const delivererGPSCoordinate: GPSCoordinate = delivererSessionData.appUserInfo.gpsCoordinate;
-    const donorGPSCoordinate: GPSCoordinate = deliveryUpdateNotification.donorSessionData.appUserInfo.gpsCoordinate;
-    const receiverGPSCoordinate: GPSCoordinate = deliveryUpdateNotification.receiverSessionData.appUserInfo.gpsCoordinate;
+    const donorGPSCoordinate: GPSCoordinate     = deliveryUpdateNotification.donorSessionData.appUserInfo.gpsCoordinate;
+    const receiverGPSCoordinate: GPSCoordinate  = deliveryUpdateNotification.receiverSessionData.appUserInfo.gpsCoordinate;
 
     // Generate travel start time based one whether or not in scheduled state.
-    const travelStartTime: Date = (deliveryUpdateNotification.newDeliveryState === DeliveryState.scheduled) ? deliveryUpdateNotification.scheduledStartTime
-                                                                                                            : new Date(); // Now
+    const inScheduledState: boolean = ( deliveryUpdateNotification.newDeliveryState === DeliveryState.scheduled );
+    const travelStartTime: Date = ( inScheduledState ? deliveryUpdateNotification.scheduledStartTime
+                                                     : new Date() ); // new Date() = now
 
-    let routeGPSCoordinates: GPSCoordinate[] = [ donorGPSCoordinate ];
     // If in picked up state, then we don't want to include route segment from deliverer to donor, since deliverer is at the donor!
-    if (deliveryUpdateNotification.newDeliveryState !== DeliveryState.pickedUp) routeGPSCoordinates.unshift(delivererGPSCoordinate);
-    // If we are only concerned about ETA for the donor, then we don't need to include the receiver in route coordinates!
-    if (appUserType === AppUserType.Receiver)                                   routeGPSCoordinates.push(receiverGPSCoordinate);
-
-    return getEstimatedArrivalTimes(routeGPSCoordinates, travelStartTime)
-        .then((estimatedArrivalTimes: Date[]) => {
-
-            const estimatedArrivalTime: Date = estimatedArrivalTimes[estimatedArrivalTimes.length - 1];
-            return moment(estimatedArrivalTime).format('h:mm a');
-        })
+    const wasPickedUp: boolean = ( deliveryUpdateNotification.newDeliveryState !== DeliveryState.pickedUp );
+    let routeGPSCoordinates: GPSCoordinate[] = ( wasPickedUp ? [ donorGPSCoordinate, receiverGPSCoordinate ]
+                                                             : [ delivererGPSCoordinate, donorGPSCoordinate, receiverGPSCoordinate ] );
+    
+    const estimatedArrivalTimes: Date[] = await getEstimatedArrivalTimes(routeGPSCoordinates, travelStartTime);
+    return new Map ([
+        [ 'Donor', ( wasPickedUp ? null : moment(estimatedArrivalTimes[0]).format('h:mm a') ) ],
+        [ 'Receiver', moment(estimatedArrivalTimes[estimatedArrivalTimes.length - 1]).format('h:mm a') ]
+    ]);
 }

@@ -15,28 +15,19 @@ import { AppUserErrorMsgs } from "../../../../shared/app-user/message/app-user-e
  * @param appUserSessionData The session data for the App User. Contains the current email and address info of the App User.
  * @return A promise without a payload. If it resolves, then the update was successful.
  */
-export function updateAppUser(appUserUpdateInfo: AppUserInfo, newPassword: string,
-                              currentPasswordCheck: string, appUserSessionData: SessionData): Promise<SessionData>
+export async function updateAppUser(appUserUpdateInfo: AppUserInfo, newPassword: string,
+                                    currentPasswordCheck: string, appUserSessionData: SessionData): Promise <SessionData>
 {   
-    // Check the current password if provided by user (when updating password).
-    let passwordCheckPromise: Promise<void> = Promise.resolve();
-    if (newPassword != null) {
-        passwordCheckPromise = checkPassword(appUserSessionData.appUserInfo.email, currentPasswordCheck);
-    }
+    // VERY IMPORTANT: Must first check if the current password is correct if user is updating to a new password.
+    await ( (newPassword != null) ? checkPassword(appUserSessionData.appUserInfo.email, currentPasswordCheck)
+                                  : null );
 
     // Check if this is an address field(s) update, and fill any null address field(s) with session data for new GPS coordinates.
     if (isAddressInfoUpdate(appUserUpdateInfo)) {
         fillAddressUpdateInfo(appUserUpdateInfo, appUserSessionData.appUserInfo);
     }
-
-    return passwordCheckPromise
-        .then(() => {
-            return performDatabaseUpdate(appUserUpdateInfo, newPassword, appUserSessionData.appUserKey);
-        })
-        .catch((err: Error) => {
-            console.log(err);
-            throw new Error(err.message);
-        });
+    
+    return addOrUpdateAppUser(appUserUpdateInfo, newPassword, appUserSessionData.appUserKey);
 }
 
 
@@ -46,16 +37,15 @@ export function updateAppUser(appUserUpdateInfo: AppUserInfo, newPassword: strin
  * @param currentPassword The current password of the App User (from client).
  * @return A promise that will resolve if the password is correct and reject if it is not.
  */
-function checkPassword(currentEmail: string, currentPassword: string): Promise<void> {
+async function checkPassword(currentEmail: string, currentPassword: string): Promise <void> {
 
-    return login(currentEmail, currentPassword)
-        .then(() => {
-            console.log('Password check successful.');
-        })
-        .catch((err: Error) => {
-            console.log(err);
-            throw new Error(AppUserErrorMsgs.INCORRECT_PASSWORD);
-        })
+    try {
+        await login(currentEmail, currentPassword);
+    }
+    catch (err) {
+        console.log(err);
+        throw new Error(AppUserErrorMsgs.INCORRECT_PASSWORD);
+    }
 }
 
 
@@ -84,25 +74,4 @@ function fillAddressUpdateInfo(appUserUpdateInfo: AppUserInfo, appUserSessionInf
     if (appUserUpdateInfo.city == null)     appUserUpdateInfo.city = appUserSessionInfo.city;
     if (appUserUpdateInfo.state == null)    appUserUpdateInfo.state = appUserSessionInfo.state;
     if (appUserUpdateInfo.zip == null)      appUserUpdateInfo.zip = appUserSessionInfo.zip;
-}
-
-
-/**
- * Performs the actual update in the database.
- * @param appUserUpdateInfo The app user update information.
- * @param newPassword The new password for the app user.
- * @param appUserUpdateKey The key identifier of the app user to be updated.
- * @return A promise resolving to the updated Session Data on success.
- */
-function performDatabaseUpdate(appUserUpdateInfo: AppUserInfo, newPassword: string, appUserUpdateKey: number): Promise<SessionData> {
-
-    return addOrUpdateAppUser(appUserUpdateInfo, newPassword, appUserUpdateKey)
-        .then((sessionData: SessionData) => {
-            console.log('App User update successful.');
-            return Promise.resolve(sessionData);
-        })
-        .catch((err: Error) => {
-            console.log(err);
-            throw err;
-        })
 }

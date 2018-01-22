@@ -1,5 +1,9 @@
 import * as _ from "lodash";
+
+import { MailConfig } from "./mail-config";
 import { AppUserType } from "../../../shared/app-user/app-user-info";
+
+export { MailConfig };
 
 let nodemailer = require("nodemailer-promise");
 let fs = require('fs');
@@ -18,72 +22,26 @@ const INJECT_VARIABLE_CLOSE_BRACE: string = _.escapeRegExp('}}');
 
 
 /**
- * Configuration object for sending an email.
- */
-export class MailConfig {
-
-    public constructor (
-        /**
-         * The subject of the email.
-         */
-        public subject?: string,
-        /**
-         * The receiving entity's name.
-         * NOTE: Will be displayed in the 'Dear' heading of the email!
-         */
-        public receiverName?: string,
-        /**
-         * The receiving entity's email address.
-         */
-        public receiverEmail?: string,
-        /**
-         * The user type of the email's receiver.
-         * NOTE: Will be used to determine which header links to include.
-         */
-        public receiverAppUserType?: AppUserType,
-        /**
-         * A string containing the HTML contents for the email.
-         * NOTE: The contents will be automatically injected into the email container HTML file contents!
-         * NOTE: This is ignored if contentHTMLPath is non-null!
-         */
-        public contentHTMLStr?: string,
-        /**
-         * A string containing the path to the HTML contents file for the email.
-         * NOTE: The contents will be automatically injected into the email container HTML file contents!
-         * NOTE: The path is relative to the client email directory!
-         * NOTE: contentHTMLStr is ignored if this is non-null!
-         */
-        public contentHTMLPath?: string,
-        /**
-         * Mappings of variable name value pairs.
-         * NOTE: These variable values will be injected into the HTML document where ever they appear in between two nestings of curly braces (e.g.: {{ variableName }})!
-         * NOTE: Do NOT surround variable names in curly braces, because this is implicitly taken care of!
-         */
-        public injectionVariables: Map<string, any> = new Map<string, any>()
-    ) {}
-}
-
-
-/**
  * Sends an email based off of a given mail configuration.
  * @param mailConfig The mail configuration for the email.
  * @return A promise that resolves to nothing on success.
  */
-export function sendEmail(mailConfig: MailConfig): Promise<void> {
+export async function sendEmail(mailConfig: MailConfig): Promise <void> {
 
-    // First, get the string form of the HTML template (with inlined CSS) that will serve as the content of the email.
-    return genEmailHTMLStr(mailConfig)
-        .then((emailHTMLStr: string) => {
+    try {
 
-            // Finally, send the email with the content set as the pre-processed HTML string.
-            return _sendEmail({
-                subject: mailConfig.subject,
-                senderName: 'Food Web',
-                receiver: mailConfig.receiverEmail,
-                html: emailHTMLStr
-            })
-            .catch((err: Error) => { console.log(err); });
-        });
+        // First, get the string form of the HTML template (with inlined CSS) that will serve as the content of the email.
+        const emailHTMLStr: string = await genEmailHTMLStr(mailConfig);
+
+        // Finally, send the email with the content set as the pre-processed HTML string.
+        _sendEmail({
+            subject: mailConfig.subject,
+            senderName: 'Food Web',
+            receiver: mailConfig.receiverEmail,
+            html: emailHTMLStr
+        })
+    }
+    catch (err) { console.log(err); }
 }
 
 
@@ -106,7 +64,7 @@ function genEmailHTMLStr(mailConfig: MailConfig): Promise<string> {
  * @param mailConfig The email configuration which contains the path of the HTML file.
  * @return See genEmailHTMLStr for details.
  */
-function genEmailHTMLStrFromHTMLFile(mailConfig: MailConfig): Promise<string> {
+function genEmailHTMLStrFromHTMLFile(mailConfig: MailConfig): Promise <string> {
 
     return new Promise((resolve: (string: Promise<string> | string) => void, reject: (err: Error) => void) => {
 

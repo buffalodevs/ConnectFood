@@ -1,22 +1,10 @@
 import { SessionData } from "../../common-util/session-data";
+import { UnclaimNotificationData } from './unclaim-notification-data';
 import { sendEmail, MailConfig } from "../../common-util/email";
 
 import { AppUserType, AppUserInfo } from "../../../../shared/app-user/app-user-info";
 
-
-/**
- * Container for data needed for an unclaim notification whenever a Food Listing is unclaimed (or removed causing an unclaim).
- */
-export class UnclaimNotificationData {
-
-    public constructor (
-        public foodTitle: string,
-        public unclaimReason: string,
-        public donorSessionData: SessionData,
-        public receiverSessionData: SessionData,
-        public delivererSessionData: SessionData
-    ) {}
-}
+export { UnclaimNotificationData };
 
 
 /**
@@ -24,7 +12,7 @@ export class UnclaimNotificationData {
  * @param donorSessionData Data concerning the donor who submitted the remove/unclaim operation.
  * @param unclaimNotificationData Data required to notify all affected parties of the remove/unclaim operation.
  */
-export function notifyReceiverOfUnclaim(unclaimNotificationData: UnclaimNotificationData): Promise<void> {
+export function notifyReceiverOfUnclaim(unclaimNotificationData: UnclaimNotificationData): Promise <void> {
     
     const receiverEmail: string = unclaimNotificationData.receiverSessionData.appUserInfo.email;
     const receiverOrganization: string = unclaimNotificationData.receiverSessionData.appUserInfo.organizationName;
@@ -65,7 +53,7 @@ export function notifyReceiverOfUnclaim(unclaimNotificationData: UnclaimNotifica
  * Notifies an affected donor of a lost delivery due to the unclaiming of the related Food Listing.
  * @param unclaimNotificationData Data required to notify all affected parties of the lost delivery as a result of an unclaim operation.
  */
-export function notifyDonorOfLostDelivery(unclaimNotificationData: UnclaimNotificationData): Promise<void> {
+export function notifyDonorOfLostDelivery(unclaimNotificationData: UnclaimNotificationData): Promise <void> {
 
     const donorEmail: string = unclaimNotificationData.donorSessionData.appUserInfo.email;
     const donorOrganization: string = unclaimNotificationData.donorSessionData.appUserInfo.organizationName;
@@ -116,7 +104,7 @@ export function notifyDonorOfLostDelivery(unclaimNotificationData: UnclaimNotifi
  * @param sourceAppUserType The type of the user (receiver or donor) who submitted the remove/unclaim operation.
  * @param unclaimNotificationData Data required to notify all affected parties of the remove/unclaim operation.
  */
-export function notifyDelivererOfLostDelivery(sourceSessionData: SessionData, sourceAppUserType: string, unclaimNotificationData: UnclaimNotificationData): Promise<void> {
+export function notifyDelivererOfLostDelivery(sourceSessionData: SessionData, sourceAppUserType: string, unclaimNotificationData: UnclaimNotificationData): Promise <void> {
     
     const delivererEmail: string = unclaimNotificationData.delivererSessionData.appUserInfo.email;
     const delivererName: string = ( unclaimNotificationData.delivererSessionData.appUserInfo.firstName + ' ' +

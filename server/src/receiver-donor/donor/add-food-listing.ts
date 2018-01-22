@@ -26,7 +26,7 @@ let storageBucket: Storage = require('@google-cloud/storage') ({
  * @param foodListingUpload The food listing that will be added.
  * @param donorAppUserKey The key identifier of the App User that donated the food listing.
  */
-export function addFoodListing(foodListingUpload: FoodListingUpload, donorAppUserKey: number): Promise<any> {
+export async function addFoodListing(foodListingUpload: FoodListingUpload, donorAppUserKey: number): Promise <any> {
 
     const dateFormatter: DateFormatter = new DateFormatter();
     let imageNames: string[] = [];
@@ -50,16 +50,17 @@ export function addFoodListing(foodListingUpload: FoodListingUpload, donorAppUse
     let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM addFoodListing();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);
 
-    // Execute prepared statement.
-    return query(queryString, queryArgs)
-        .then((result: QueryResult) => {
-            logSqlQueryResult(result.rows);
-            return writeImgs(foodListingUpload.imageUploads, imageUrls, imageNames);
-        })
-        .catch((err: Error) => {
-            console.log(err);
-            throw new Error('Donor submission failed.');
-        });
+    try {
+        // Execute prepared statement.
+        const result: QueryResult = await query(queryString, queryArgs);
+
+        logSqlQueryResult(result.rows);
+        return writeImgs(foodListingUpload.imageUploads, imageUrls, imageNames);
+    }
+    catch (err) {
+        console.log(err);
+        throw new Error('Donor submission failed.');
+    }
 }
 
 
@@ -88,7 +89,7 @@ function genAndFillImageUrlsAndNames(imageUrls: string[], imageNames: string[], 
  * @param index The index of the image to write (NOTE: should NOT be set by original caller).
  * @return A promise with no payload that will resolve on success.
  */
-function writeImgs(imageUploads: string[], imageUrls: string[], imageNames: string[], index: number = 0): Promise <any> {
+async function writeImgs(imageUploads: string[], imageUrls: string[], imageNames: string[], index: number = 0): Promise <any> {
 
     // TODO: Write to Google Cloud Storage in bulk.
 
@@ -96,15 +97,12 @@ function writeImgs(imageUploads: string[], imageUrls: string[], imageNames: stri
     const image: string = imageUploads[index].replace(/^data:image\/\w+;base64,/, '');
 
     // Write image to appropriate storage location. On failure, do nothing for now...
-    let writePromise: Promise <any> = (process.env.DEVELOPER_MODE === 'true') ? writeImgToLocalFs(image, imageUrls[index])
-                                                                              : writeImgToBucket(image, imageNames[index]);
+    await (process.env.DEVELOPER_MODE === 'true') ? writeImgToLocalFs(image, imageUrls[index])
+                                                  : writeImgToBucket(image, imageNames[index]);
 
-    return writePromise.then(() => {
-
-        // If we have reached not reached end of images to write, then call recursively, else return empty resolved promise.
-        return (++index < imageUploads.length) ? writeImgs(imageUploads, imageUrls, imageNames, index)
-                                               : Promise.resolve();
-    });
+    // If we have reached not reached end of images to write, then call recursively, else return empty resolved promise.
+    return (++index < imageUploads.length) ? writeImgs(imageUploads, imageUrls, imageNames, index)
+                                           : Promise.resolve();
 }
 
 
@@ -141,7 +139,7 @@ function writeImgToLocalFs(image: string, imageUrl: string): Promise <any> {
  * @param imageName The name of the image.
  * @return A promise with no payload that will resolve on success.
  */
-function writeImgToBucket(image: string, imageName: string): Promise <any> {
+async function writeImgToBucket(image: string, imageName: string): Promise <any> {
 
     let bucket: Bucket = storageBucket.bucket(process.env.GOOGLE_CLOUD_BUCKET_ID);
     let file: File = bucket.file(imageName);
@@ -159,12 +157,11 @@ function writeImgToBucket(image: string, imageName: string): Promise <any> {
         resumable: false
     };
 
-    return file.save(imageBinary, saveConfig)
-        .then(() => {
-            console.log('Successfully saved image in Google Cloud storage bucket.');
-        })
-        .catch((err: Error) => {
-            console.log(err);
-            throw new Error('Failed to save image in Google Cloud storage bucket.');
-        }); 
+    try {
+        return await file.save(imageBinary, saveConfig);
+    }
+    catch (err) {
+        console.log(err);
+        throw new Error('Failed to save image in Google Cloud storage bucket.');
+    } 
 }
