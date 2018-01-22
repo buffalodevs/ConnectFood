@@ -36,11 +36,13 @@ async function notifyAffectedAppUsers(donorSessionData: SessionData, result: Que
     if (resultRowIndex === result.rowCount) return; // Terminate recursive call once we reach end of result rows!
 
     // First notify affected receiver that their food has been unclaimed as a result of removal.
-    let unclaimNotificationData: UnclaimNotificationData = result.rows[resultRowIndex].unclaimnotificationdata;
-    await notifyReceiverOfUnclaim(unclaimNotificationData)
+    const unclaimNotificationData: UnclaimNotificationData = result.rows[resultRowIndex].unclaimnotificationdata;
 
-    // Next, if the removal resulted in total unclaiming of food that had a scheduled delivery, then notify deliverer as well.
-    if (unclaimNotificationData.delivererSessionData != null) {
-        return notifyDelivererOfLostDelivery(donorSessionData, 'donor', unclaimNotificationData)
-    }
+    // Notify receiver and deliverer at the same time (don't wait for one to finish before notifying the other).
+    await Promise.all([
+        notifyReceiverOfUnclaim(unclaimNotificationData),
+        // If the removal resulted in total unclaiming of food that had a scheduled delivery, then notify deliverer as well.
+        (unclaimNotificationData.delivererSessionData != null) ? notifyDelivererOfLostDelivery(donorSessionData, 'donor', unclaimNotificationData)
+                                                               : Promise.resolve()
+    ]);
 }

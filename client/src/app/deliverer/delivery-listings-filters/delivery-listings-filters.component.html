@@ -9,7 +9,7 @@
     <h5>Max Distance:</h5>
     <mat-form-field floatPlaceholder="never">
         <mat-select formControlName="maxDistance" [value]="controls.maxDistance.value" panelClass="select-panel"
-         title="Max distance radius (in miles) from driver's start location to donor and receiver">
+         title="Max distance radius (in miles) from deliverer's start location to donor and receiver">
             <mat-option *ngFor="let distance of maxDistances" [value]="distance">
                 {{ distance }} Mi
             </mat-option>

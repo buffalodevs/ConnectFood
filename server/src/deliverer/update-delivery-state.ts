@@ -3,7 +3,7 @@ import { query, QueryResult } from './../database-util/connection-pool';
 import { addArgPlaceholdersToQueryStr } from '../database-util/prepared-statement-util';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
 import { SessionData } from '../common-util/session-data';
-import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotification } from './delivery-update-notification';
+import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotificationData } from './delivery-update-notification';
 
 import { Delivery, DeliveryState } from '../../../shared/deliverer/delivery';
 
@@ -42,8 +42,8 @@ export function handleUpdateDeliveryStateResult(delivererSessionData: SessionDat
     
     if (queryResult.rowCount === 1) {
         console.log('Successfully updated the delivery state to: ' + deliveryState);
-        const deliveryUpdateNotification: DeliveryUpdateNotification = queryResult.rows[0].deliveryupdatenotification;
-        return notifyReceiverAndDonorOfDeliveryUpdate(delivererSessionData, deliveryUpdateNotification);
+        const deliveryUpdateNotificationData: DeliveryUpdateNotificationData = queryResult.rows[0].deliveryupdatenotification;
+        return notifyReceiverAndDonorOfDeliveryUpdate(delivererSessionData, deliveryUpdateNotificationData);
     }
 
     throw new Error('An incorrect number of rows have returned from the updateDeliveryState() SQL function call');

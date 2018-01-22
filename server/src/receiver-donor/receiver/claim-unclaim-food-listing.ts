@@ -8,7 +8,7 @@ import { UnclaimNotificationData, notifyDelivererOfLostDelivery, notifyDonorOfLo
 
 export function claimFoodListing(foodListingKey: number, receiverSessionData: SessionData): Promise <void> {
     
-    let queryArgs: Array<any> = [ foodListingKey, receiverSessionData.appUserKey ];
+    let queryArgs: any[] = [ foodListingKey, receiverSessionData.appUserKey ];
     let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM claimFoodListing()', queryArgs);
 
     return execClaimOrUnclaimQuery(true, queryString, queryArgs);
@@ -17,7 +17,7 @@ export function claimFoodListing(foodListingKey: number, receiverSessionData: Se
 
 export function unclaimFoodListing(foodListingKey: number, receiverSessionData: SessionData, unclaimReason: string): Promise <void> {
 
-    let queryArgs: Array<any> = [ foodListingKey, receiverSessionData.appUserKey, unclaimReason ];
+    let queryArgs: any[] = [ foodListingKey, receiverSessionData.appUserKey, unclaimReason ];
     let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM unclaimFoodListing()', queryArgs);
 
     return execClaimOrUnclaimQuery(false, queryString, queryArgs, receiverSessionData);
@@ -54,7 +54,9 @@ async function handleUnclaimQueryResult(receiverSessionData: SessionData, result
     // Next, if the removal resulted in total unclaiming of food that had a scheduled delivery, then notify deliverer and donor as well.
     if (unclaimNotificationData.delivererSessionData != null) {
         
-        await notifyDelivererOfLostDelivery(receiverSessionData, 'receiver', unclaimNotificationData)
-        return notifyDonorOfLostDelivery(unclaimNotificationData);
+        await Promise.all([
+            notifyDelivererOfLostDelivery(receiverSessionData, 'receiver', unclaimNotificationData),
+            notifyDonorOfLostDelivery(unclaimNotificationData),
+        ]);
     }
 }
