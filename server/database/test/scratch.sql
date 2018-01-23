@@ -54,4 +54,4 @@ LEFT JOIN CancelledDeliveryFoodListing ON DeliveryFoodListing.deliveryFoodListin
 
 SELECT * FROM AppUserAvailability;*/
 
-SELECT * FROM scheduleDelivery(5, 1, true, null);
+--SELECT * FROM scheduleDelivery(5, 1, true, null);

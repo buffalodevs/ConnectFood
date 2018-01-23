@@ -1,10 +1,11 @@
 'use strict';
-import { query, QueryResult } from '../../database-util/connection-pool';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
-import * as fs from 'fs';
 import { Storage, Bucket, File, BucketConfig, WriteStreamOptions } from '@google-cloud/storage';
+import * as fs from 'fs';
+import * as _ from 'lodash';
 
+import { query, QueryResult } from '../../database-util/connection-pool';
 import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
+import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 
 import { FoodListingUpload } from '../../../../shared/receiver-donor/food-listing-upload';
 import { FoodListing } from '../../../../shared/receiver-donor/food-listing';
@@ -26,7 +27,7 @@ let storageBucket: Storage = require('@google-cloud/storage') ({
  * @param foodListingUpload The food listing that will be added.
  * @param donorAppUserKey The key identifier of the App User that donated the food listing.
  */
-export async function addFoodListing(foodListingUpload: FoodListingUpload, donorAppUserKey: number): Promise <any> {
+export async function addFoodListing(foodListingUpload: FoodListingUpload, donorAppUserKey: number): Promise <number> {
 
     const dateFormatter: DateFormatter = new DateFormatter();
     let imageNames: string[] = [];
@@ -34,6 +35,7 @@ export async function addFoodListing(foodListingUpload: FoodListingUpload, donor
 
     // If we have an image form the Donor, then generate the name and URL for it before we create database entry.
     if (foodListingUpload.imageUploads != null) {
+        foodListingUpload.imageUploads = _.compact(foodListingUpload.imageUploads);
         genAndFillImageUrlsAndNames(imageUrls, imageNames, foodListingUpload.imageUploads); // NOTE: imageUrls and imageNames modified internally!
     }
     
@@ -53,9 +55,15 @@ export async function addFoodListing(foodListingUpload: FoodListingUpload, donor
     try {
         // Execute prepared statement.
         const result: QueryResult = await query(queryString, queryArgs);
-
+        const foodListingKey: number = result.rows[0].addfoodlisting;
         logSqlQueryResult(result.rows);
-        return writeImgs(foodListingUpload.imageUploads, imageUrls, imageNames);
+
+        // Save any image(s) to storage bucket / disk.
+        if (foodListingUpload.imageUploads != null) {
+            await writeImgs(foodListingUpload.imageUploads, imageUrls, imageNames);
+        }
+
+        return foodListingKey;
     }
     catch (err) {
         console.log(err);
@@ -73,6 +81,7 @@ export async function addFoodListing(foodListingUpload: FoodListingUpload, donor
 function genAndFillImageUrlsAndNames(imageUrls: string[], imageNames: string[], imageUploads: string[]): void {
 
     for (let i: number = 0; i < imageUploads.length; i++) {
+
         imageNames.push('img-' + Date.now().toString() + '.jpeg');
         imageUrls.push((process.env.DEVELOPER_MODE.toLowerCase() === 'true') ? ('/public/' + imageNames[i])
                                                                              : (process.env.BUCKET_URL + imageNames[i]));
@@ -86,23 +95,24 @@ function genAndFillImageUrlsAndNames(imageUrls: string[], imageNames: string[], 
  * @param imageUploads The base64 image uploads that are to be written to storage.
  * @param imageUrls The URLs which will be used to reference the images.
  * @param imageNames The names of the images.
- * @param index The index of the image to write (NOTE: should NOT be set by original caller).
  * @return A promise with no payload that will resolve on success.
  */
-async function writeImgs(imageUploads: string[], imageUrls: string[], imageNames: string[], index: number = 0): Promise <any> {
+async function writeImgs(imageUploads: string[], imageUrls: string[], imageNames: string[]): Promise <void> {
 
-    // TODO: Write to Google Cloud Storage in bulk.
+    let imageUploadPromises: Promise <void>[] = [];
 
-    // strip off the base64 header.
-    const image: string = imageUploads[index].replace(/^data:image\/\w+;base64,/, '');
+    for (let i: number = 0; i < imageUploads.length; i++) {
 
-    // Write image to appropriate storage location. On failure, do nothing for now...
-    await (process.env.DEVELOPER_MODE === 'true') ? writeImgToLocalFs(image, imageUrls[index])
-                                                  : writeImgToBucket(image, imageNames[index]);
+        // strip off the base64 header.
+        const image: string = imageUploads[i].replace(/^data:image\/\w+;base64,/, '');
 
-    // If we have reached not reached end of images to write, then call recursively, else return empty resolved promise.
-    return (++index < imageUploads.length) ? writeImgs(imageUploads, imageUrls, imageNames, index)
-                                           : Promise.resolve();
+        // Write image to appropriate storage location.
+        imageUploadPromises.push( (process.env.DEVELOPER_MODE === 'true') ? writeImgToLocalFs(image, imageUrls[i])
+                                                                          : writeImgToBucket(image, imageNames[i]) );
+    }
+
+    // Execute image upload promises in parallel and return when all are finished.
+    await Promise.all(imageUploadPromises);
 }
 
 
@@ -112,7 +122,7 @@ async function writeImgs(imageUploads: string[], imageUrls: string[], imageNames
  * @param imageUrl The url of the image.
  * @return A promise with no payload that will resolve on success.
  */
-function writeImgToLocalFs(image: string, imageUrl: string): Promise <any> {
+function writeImgToLocalFs(image: string, imageUrl: string): Promise <void> {
 
     // Wrap result in a promise.
     return new Promise((resolve, reject) => {
@@ -139,7 +149,7 @@ function writeImgToLocalFs(image: string, imageUrl: string): Promise <any> {
  * @param imageName The name of the image.
  * @return A promise with no payload that will resolve on success.
  */
-async function writeImgToBucket(image: string, imageName: string): Promise <any> {
+async function writeImgToBucket(image: string, imageName: string): Promise <void> {
 
     let bucket: Bucket = storageBucket.bucket(process.env.GOOGLE_CLOUD_BUCKET_ID);
     let file: File = bucket.file(imageName);

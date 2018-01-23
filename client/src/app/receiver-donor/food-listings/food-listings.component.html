@@ -8,7 +8,7 @@
     <slick-list-item *ngFor="let foodListing of listData; let i = index">
 
         <ng-container slick-list-item-img>
-            <img DefaultImg [src]="foodListing.imgUrls[0]" alt="Image Not Available"/>
+            <img DefaultImg [src]="( foodListing.imgUrls ? foodListing.imgUrls[0] : null )" alt="Image Not Available"/>
         </ng-container>
 
         <ng-container slick-list-item-header>

@@ -16,6 +16,8 @@ CREATE OR REPLACE FUNCTION addFoodListing
 )
 RETURNS FoodListing.foodListingKey%TYPE -- The food listing key of the new food listing (can be used as reference for edit).
 AS $$
+    DECLARE _foodType                   FoodType;
+    DECLARE _imgUrl                     TEXT;
     DECLARE _availableUntilTimestamp    TIMESTAMP = utcTextToTimestamp(_availableUntilDate);
     DECLARE _foodListingKey             FoodListing.foodListingKey%TYPE;
 BEGIN
@@ -41,17 +43,17 @@ BEGIN
     INTO        _foodListingKey;
 
     -- Insert all the food types that are associated with the new food listing.
-    FOR i IN array_lower(_foodTypes, 1) .. array_upper(_foodTypes, 1)
+    FOREACH _foodType IN ARRAY _foodTypes
     LOOP
         INSERT INTO FoodListingFoodTypeMap (foodListingKey, foodType)
-        VALUES      (_foodListingKey, _foodTypes[i]);
+        VALUES      (_foodListingKey, _foodType);
     END LOOP;
 
     -- Insert all the images that are associated with the new food listing.
-    FOR i IN array_lower(_imgUrls, 1) .. array_upper(_imgUrls, 1)
+    FOREACH _imgUrl IN ARRAY _imgUrls
     LOOP
         INSERT INTO FoodListingImg (foodListingKey, imgUrl, isPrimary)
-        VALUES      (_foodListingKey, _imgUrls[i], (i = 0));
+        VALUES      (_foodListingKey, _imgUrl, (i = 0));
     END LOOP;
 
     RETURN _foodListingKey;

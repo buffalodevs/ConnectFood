@@ -2,7 +2,7 @@
 <slick-list-item [includeBorder]="false">
                 
     <ng-container slick-list-item-img>
-        <img DefaultImg [src]="foodListing.imgUrls[0]" alt="Image Not Available"/>
+        <img DefaultImg [src]="( foodListing.imgUrls ? foodListing.imgUrls[0] : null )" alt="Image Not Available"/>
     </ng-container>
     
     <div slick-list-item-body class="row">
