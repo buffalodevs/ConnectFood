@@ -74,7 +74,7 @@ export class SlickLeftPanelComponent implements OnChanges {
         this.buttonIcon = 'keyboard_arrow_right';
         this.buttonLabel = null;
         this.buttonLabelAllowLowercase = false;
-        this.buttonLabelFontSizePx = 20;
+        this.buttonLabelFontSizePx = 15;
         this.buttonTitle = 'Open';
         this.useBackDrop = true;
         this.stickyContainerId = null;

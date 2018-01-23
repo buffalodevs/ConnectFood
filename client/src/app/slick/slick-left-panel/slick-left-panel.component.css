@@ -47,7 +47,7 @@
 }
 
 #slick-left-panel-button, #slick-left-panel-button i {
-    font-size: 20px;
+    font-size: 15px;
     width: 20px;
     transition: right 0.25s, width 0.25s, font-size 0.25s;
     -webkit-transition: right 0.25s, width 0.25s, font-size 0.25s;

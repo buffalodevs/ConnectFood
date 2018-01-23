@@ -4,6 +4,8 @@ import { Observable } from 'rxjs/Observable';
 import { ResponsiveService } from '../../../../common-util/services/responsive.service';
 
 import { FoodListing } from './../../../../../../../shared/receiver-donor/food-listing';
+import { FoodListingUser } from '../../../../../../../shared/common-receiver-donor-deliverer/shared-food-listing-delivery';
+import * as _ from 'lodash';
 
 
 @Component({
@@ -65,5 +67,15 @@ export class FoodListingInfoComponent {
         return (    (foodListingUserAccessor != 'donorInfo' || !this.isDonatedCart)
                 &&  (foodListingUserAccessor != 'claimInfo.receiverInfo' || this.isDonatedCart)
                 &&  (foodListingUserAccessor != 'claimInfo.delivererInfo' || this.isDonatedCart || this.isClaimedCart) );
+    }
+
+
+    /**
+     * Gets the Food Listing User associated with a given accessor string.
+     * @param foodListingUserAccessor The accessor string associated with the user.
+     * @return The Food Listing User.
+     */
+    private getFoodListingUser(foodListingUserAccessor: string): FoodListingUser {
+        return _.get(this.foodListing, foodListingUserAccessor);
     }
 }

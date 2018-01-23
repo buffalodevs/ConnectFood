@@ -1,137 +1,148 @@
-<!-- The body of the dialog is in the format of a slick list item! -->
-<slick-list-item [includeBorder]="false">
-                
-    <ng-container slick-list-item-img>
-        <img DefaultImg [src]="( foodListing.imgUrls ? foodListing.imgUrls[0] : null )" alt="Image Not Available"/>
-    </ng-container>
-    
-    <div slick-list-item-body class="row">
+<div id="food-listing-info-container">
 
-        <!-- Food Description (Cell 1) -->
-        <div class="col-lg-12">
-
-            <slick-expansion-panel [collapseWidth]="null">
+    <!-- The body of the dialog is in the format of a slick list item! -->
+    <slick-list-item [includeBorder]="false">
                     
-                <ng-container mat-panel-title>
-                    Description
-                </ng-container>
+        <ng-container slick-list-item-img>
+            <img DefaultImg [src]="( foodListing.imgUrls ? foodListing.imgUrls[0] : null )" alt="Image Not Available"/>
+        </ng-container>
         
-            <span class="inline-block">{{ (foodListing.foodDescription != null) ? foodListing.foodDescription : '-- No Description --' }}</span>
+        <div slick-list-item-body class="row">
 
-            </slick-expansion-panel>
+            <!-- Food Description (Cell 1) -->
+            <div class="col-lg-12">
 
-        </div>
-        <!-- Food Description (Cell 1) -->
-
-
-        <!-- Food Info (Cell 2) -->
-        <div class="col-xl-6 col-lg-12 desktop-space-bottom">
-
-            <slick-expansion-panel>
-
-                <ng-container mat-panel-title>
-                    Food Info
-                </ng-container>
-
-                <div class="space-bottom">
-                    <b>Available Until:</b> {{ foodListing.availableUntilDate }}
-                </div>
-
-                <div class="space-bottom">
-                    <b>Needs Refrigeration:</b>
-                    <span class="no-word-wrap">
-                        <i class="material-icons" *ngIf="foodListing.needsRefrigeration" style="color:green">check</i>
-                        <i class="material-icons" *ngIf="!foodListing.needsRefrigeration" style="color:red">clear</i>
-                        <span>{{ foodListing.needsRefrigeration ? 'Yes' : 'No'}}</span>
-                    </span>
-                </div>
-                
-                <div id="food-types-container" class="space-bottom">
-                    <b>Present Food Types:</b><br>
-                    <food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true" [condensedDisplay]="!responsiveService.widthGreaterThan(767)"></food-types>
-                </div>
-
-            </slick-expansion-panel>
-
-        </div>
-        <!-- Food Info (Cell 2) -->
-    
-
-        <!-- Food User(s) (Cells 3...N) -->
-        <div class="col-xl-6 col-lg-12 desktop-space-bottom">
-            
-            <ng-container *ngFor="let foodListingUserAccessor of FOOD_LISTING_USER_ACCESSORS; let i = index">
-                <ng-container *ngIf="shouldShowFoodListingUser(foodListingUserAccessor)">
-
-                    <slick-expansion-panel>
-   
-                        <ng-container mat-panel-title>
-                            {{ FOOD_LISTING_USER_TITLES[i] }} Info
-                        </ng-container>
+                <slick-expansion-panel [collapseWidth]="null">
                         
-                        <ng-container *ngIf="foodListing[foodListingUserAccessor] != null">
+                    <ng-container mat-panel-title>
+                        Description
+                    </ng-container>
+            
+                <span class="inline-block">{{ (foodListing.foodDescription != null) ? foodListing.foodDescription : '-- No Description --' }}</span>
 
-                            <div class="space-bottom" *ngIf="foodListing[foodListingUserAccessor].organizationName != null">
-                                <b>{{ FOOD_LISTING_USER_TITLES[i] }} Organization:</b>
-                                <span class="inline-block">{{ foodListing[foodListingUserAccessor].organizationName }}</span>
-                            </div>
+                </slick-expansion-panel>
 
-                            <div class="space-bottom">
-                                <b class="inline-block">{{ FOOD_LISTING_USER_TITLES[i] }} Administrator:</b>
-                                <span class="inline-block">{{ foodListing[foodListingUserAccessor].firstName }} {{ foodListing[foodListingUserAccessor].lastName }}</span>
-                            </div>
+            </div>
+            <!-- Food Description (Cell 1) -->
 
-                            <div class="space-bottom">
-                                <div class="inline-block">
-                                    <b>{{ FOOD_LISTING_USER_TITLES[i] }} Address:</b>
+
+            <!-- Food Info (Cell 2) -->
+            <div class="col-xl-6 col-lg-12 desktop-space-bottom">
+
+                <slick-expansion-panel [expanded]="false">
+
+                    <ng-container mat-panel-title>
+                        Food Info
+                    </ng-container>
+
+                    <div class="space-bottom">
+                        <b>Available Until:</b> {{ foodListing.availableUntilDate }}
+                    </div>
+
+                    <div class="space-bottom">
+                        <b>Needs Refrigeration:</b>
+                        <span class="no-word-wrap">
+                            <i class="material-icons" *ngIf="foodListing.needsRefrigeration" style="color:green">check</i>
+                            <i class="material-icons" *ngIf="!foodListing.needsRefrigeration" style="color:red">clear</i>
+                            <span>{{ foodListing.needsRefrigeration ? 'Yes' : 'No'}}</span>
+                        </span>
+                    </div>
+                    
+                    <div id="food-types-container" class="space-bottom">
+                        <b>Present Food Types:</b><br>
+                        <food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true" [condensedDisplay]="!responsiveService.widthGreaterThan(767)"></food-types>
+                    </div>
+
+                </slick-expansion-panel>
+
+            </div>
+            <!-- Food Info (Cell 2) -->
+        
+
+            <!-- Food User(s) (Cells 3...N) -->
+            <div class="col-xl-6 col-lg-12 desktop-space-bottom">
+                
+                <ng-container *ngFor="let foodListingUserAccessor of FOOD_LISTING_USER_ACCESSORS; let i = index">
+                    <ng-container *ngIf="shouldShowFoodListingUser(foodListingUserAccessor)">
+
+                        <slick-expansion-panel [ngClass]="{ 'full-panel-min-height': ( getFoodListingUser(foodListingUserAccessor) != null ) }" [expanded]="false">
+    
+                            <ng-container mat-panel-title>
+                                {{ FOOD_LISTING_USER_TITLES[i] }} Info
+                            </ng-container>
+                            
+                            <ng-container *ngIf="getFoodListingUser(foodListingUserAccessor) != null">
+
+                                <div class="space-bottom" *ngIf="getFoodListingUser(foodListingUserAccessor).organizationName != null">
+                                    <b>{{ FOOD_LISTING_USER_TITLES[i] }} Organization:</b>
+                                    <span class="inline-block">{{ getFoodListingUser(foodListingUserAccessor).organizationName }}</span>
                                 </div>
-                                <div class="inline-block">
-                                    <span>{{ foodListing[foodListingUserAccessor].address }}</span><br>
-                                    <span>
-                                        {{ foodListing[foodListingUserAccessor].city }}, {{ foodListing[foodListingUserAccessor].state }} {{ foodListing[foodListingUserAccessor].zip }}
+
+                                <div class="space-bottom">
+                                    <b class="inline-block">{{ FOOD_LISTING_USER_TITLES[i] }} Administrator:</b>
+                                    <span class="inline-block">
+                                        {{ getFoodListingUser(foodListingUserAccessor).firstName }} {{ getFoodListingUser(foodListingUserAccessor).lastName }}
                                     </span>
                                 </div>
-                            </div>
 
-                            <div class="space-bottom">
-                                <b>{{ FOOD_LISTING_USER_TITLES[i] }} Phone:</b>
-                                <a href="tel:{{ foodListing[foodListingUserAccessor].phone }}" class="no-word-wrap link-content">{{ foodListing[foodListingUserAccessor].phone }}</a>
-                            </div>
+                                <div class="space-bottom">
+                                    <div class="inline-block">
+                                        <b>{{ FOOD_LISTING_USER_TITLES[i] }} Address:</b>
+                                    </div>
+                                    <div class="inline-block">
+                                        <span>{{ getFoodListingUser(foodListingUserAccessor).address }}</span><br>
+                                        <span>
+                                            {{ getFoodListingUser(foodListingUserAccessor).city }}, {{ getFoodListingUser(foodListingUserAccessor).state }}
+                                            {{ getFoodListingUser(foodListingUserAccessor).zip }}
+                                        </span>
+                                    </div>
+                                </div>
 
-                            <div class="space-bottom">
-                                <b>{{ FOOD_LISTING_USER_TITLES[i] }} Email:</b>
-                                <a href="mailto:{{ foodListing[foodListingUserAccessor].email }}" class="inline-block link-content">{{ foodListing[foodListingUserAccessor].email }}</a>
-                            </div>
+                                <div class="space-bottom">
+                                    <b>{{ FOOD_LISTING_USER_TITLES[i] }} Phone:</b>
+                                    <a href="tel:{{ getFoodListingUser(foodListingUserAccessor).phone }}" class="no-word-wrap link-content">
+                                        {{ getFoodListingUser(foodListingUserAccessor).phone }}
+                                    </a>
+                                </div>
 
-                            <div class ="space-bottom" *ngIf="foodListing[foodListingUserAccessor].drivingDistance != null">
-                                <b>Driving Distance:</b>
-                                <span class="inline-block">{{ foodListing[foodListingUserAccessor].drivingDistance + ' miles' }}</span>
-                            </div>
+                                <div class="space-bottom">
+                                    <b>{{ FOOD_LISTING_USER_TITLES[i] }} Email:</b>
+                                    <a href="mailto:{{ getFoodListingUser(foodListingUserAccessor).email }}" class="inline-block link-content">
+                                        {{ getFoodListingUser(foodListingUserAccessor).email }}
+                                    </a>
+                                </div>
 
-                        </ng-container>
+                                <div class ="space-bottom" *ngIf="getFoodListingUser(foodListingUserAccessor).drivingDistance != null">
+                                    <b>Driving Distance:</b>
+                                    <span class="inline-block">{{ getFoodListingUser(foodListingUserAccessor).drivingDistance + ' miles' }}</span>
+                                </div>
 
-                        <span class="no-word-wrap" *ngIf="foodListing[foodListingUserAccessor] == null">
-                            <i class="material-icons" *ngIf="!foodListing.needsRefrigeration" style="color:red">clear</i>
-                            <span>No {{ FOOD_LISTING_USER_TITLES[i] }}</span>
-                        </span>
+                            </ng-container>
 
-                    </slick-expansion-panel>
+                            <span class="no-word-wrap" *ngIf="getFoodListingUser(foodListingUserAccessor) == null">
+                                <i class="material-icons" *ngIf="!foodListing.needsRefrigeration" style="color:red">clear</i>
+                                <span>No {{ FOOD_LISTING_USER_TITLES[i] }}</span>
+                            </span>
 
+                        </slick-expansion-panel>
+
+                    </ng-container>
                 </ng-container>
-            </ng-container>
-            
+                
+            </div>
+            <!-- Food User(s) (Cells 3...N) -->
+        
         </div>
-        <!-- Food User(s) (Cells 3...N) -->
-    
+
+    </slick-list-item>
+
+
+    <div class="modal-button-group">
+        
+        <button mat-raised-button color="primary" class="button-md" (click)="toClaim.emit()" *ngIf="!isClaimedCart && !isDonatedCart">Claim</button>
+        <button mat-raised-button color="primary" class="button-md warn-button" (click)="toUnclaim.emit()" *ngIf="isClaimedCart">Unclaim</button>
+        <button mat-raised-button color="primary" class="button-md warn-button" (click)="toRemove.emit()" *ngIf="isDonatedCart">Remove</button>
+
     </div>
-
-</slick-list-item>
-
-
-<div class="modal-button-group">
-    
-    <button mat-raised-button color="primary" class="button-md" (click)="toClaim.emit()" *ngIf="!isClaimedCart && !isDonatedCart">Claim</button>
-    <button mat-raised-button color="primary" class="button-md warn-button" (click)="toUnclaim.emit()" *ngIf="isClaimedCart">Unclaim</button>
-    <button mat-raised-button color="primary" class="button-md warn-button" (click)="toRemove.emit()" *ngIf="isDonatedCart">Remove</button>
 
 </div>

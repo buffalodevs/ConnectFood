@@ -1,3 +1,8 @@
+#food-listing-info-container {
+    width: 100%;
+    min-width: 80vw;
+}
+
 #food-types-container {
     max-width: 350px !important;
 }
@@ -10,4 +15,8 @@
 .col-xl-6, .col-lg-12 {
     margin: 0px;
     padding: 0px;
+}
+
+:host ::ng-deep .full-panel-min-height .mat-expansion-panel-body {
+    min-height: 232px;
 }

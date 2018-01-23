@@ -13,7 +13,6 @@ export class SlickExpansionPanelComponent {
 
     @Input() private expanded: boolean;
     @Input() private collapseWidth: number;
-    @Input() private minHeightStyle: string;
 
     @ViewChild('panel') private panel: MatExpansionPanel;
 
@@ -23,7 +22,6 @@ export class SlickExpansionPanelComponent {
     ) {
         this.expanded = true;
         this.collapseWidth = 767;
-        this.minHeightStyle = '100%';
     }
 
 
@@ -50,16 +48,5 @@ export class SlickExpansionPanelComponent {
         if (panelHeader != null && panelHeader.classList.contains('green-glow')) {
             panelHeader.classList.remove('green-glow');
         }
-    }
-
-
-    /**
-     * Gets the minimum height for the expansion panel.
-     * @param panel The expansion panel component.
-     * @return The minimum height (style) for the expansion panel.
-     */
-    private getMinHeight(panel: MatExpansionPanel): string {
-        return (panel.expanded) ? this.minHeightStyle
-                                : null;
     }
 }

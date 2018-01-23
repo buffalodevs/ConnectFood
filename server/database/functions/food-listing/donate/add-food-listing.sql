@@ -18,6 +18,7 @@ RETURNS FoodListing.foodListingKey%TYPE -- The food listing key of the new food 
 AS $$
     DECLARE _foodType                   FoodType;
     DECLARE _imgUrl                     TEXT;
+    DECLARE _defaultPrimaryImg          BOOLEAN DEFAULT TRUE;
     DECLARE _availableUntilTimestamp    TIMESTAMP = utcTextToTimestamp(_availableUntilDate);
     DECLARE _foodListingKey             FoodListing.foodListingKey%TYPE;
 BEGIN
@@ -53,7 +54,9 @@ BEGIN
     FOREACH _imgUrl IN ARRAY _imgUrls
     LOOP
         INSERT INTO FoodListingImg (foodListingKey, imgUrl, isPrimary)
-        VALUES      (_foodListingKey, _imgUrl, (i = 0));
+        VALUES      (_foodListingKey, _imgUrl, _defaultPrimaryImg);
+
+        _defaultPrimaryImg := FALSE;
     END LOOP;
 
     RETURN _foodListingKey;

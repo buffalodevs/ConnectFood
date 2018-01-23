@@ -50,7 +50,7 @@
 
             </slick-expansion-panel>
             
-            <slick-expansion-panel class="col-xl-6 col-lg-12 desktop-space-bottom">
+            <slick-expansion-panel class="col-xl-6 col-lg-12 desktop-space-bottom" [expanded]="false">
                         
                 <ng-container mat-panel-title>Donor Contact</ng-container>
                 
@@ -58,12 +58,13 @@
                 <span>{{ delivery.donorInfo.address }}</span><br>
                 <span class="space-bottom">
                     {{ delivery.donorInfo.city }}, {{ delivery.donorInfo.state }} {{ delivery.donorInfo.zip }}
-                </span><br>
-                <a href="tel:{{delivery.donorInfo.phone}}" class="link-content no-word-wrap">{{ delivery.donorInfo.phone }}</a>
+                </span><br><br>
+                <a href="tel:{{delivery.donorInfo.phone}}" class="link-content no-word-wrap">{{ delivery.donorInfo.phone }}</a><br>
+                <a href="mailto:{{ delivery.donorInfo.email }}" class="inline-block link-content">{{ delivery.donorInfo.email }}</a>
 
             </slick-expansion-panel>
             
-            <slick-expansion-panel class="col-xl-6 col-lg-12 desktop-space-bottom">
+            <slick-expansion-panel class="col-xl-6 col-lg-12 desktop-space-bottom" [expanded]="false">
                         
                 <ng-container mat-panel-title>Receiver Contact</ng-container>
 
@@ -71,8 +72,9 @@
                 <span>{{ delivery.receiverInfo.address }}</span><br>
                 <span>
                     {{ delivery.receiverInfo.city }}, {{ delivery.receiverInfo.state }} {{ delivery.receiverInfo.zip }}
-                </span><br>
-                <a href="tel:{{delivery.receiverInfo.phone}}" class="link-content no-word-wrap">{{ delivery.receiverInfo.phone }}</a>
+                </span><br><br>
+                <a href="tel:{{delivery.receiverInfo.phone}}" class="link-content no-word-wrap">{{ delivery.receiverInfo.phone }}</a><br>
+                <a href="mailto:{{ delivery.receiverInfo.email }}" class="inline-block link-content">{{ delivery.receiverInfo.email }}</a>
 
             </slick-expansion-panel>
 
