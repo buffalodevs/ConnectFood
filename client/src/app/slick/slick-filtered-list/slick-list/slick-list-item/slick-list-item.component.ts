@@ -53,7 +53,7 @@ export class SlickListItemComponent implements OnInit {
         // If our header placement is fixed, then we will not update its position!
         if (this.fixHeaderPlacement)    return;
 
-        this.headerPlacement = this._responsiveService.widthGreaterThan(1199) ? 'body'
-                                                                              : 'top';
+        this.headerPlacement = this._responsiveService.widthGreaterThan(991) ? 'body'
+                                                                             : 'top';
     }
 }

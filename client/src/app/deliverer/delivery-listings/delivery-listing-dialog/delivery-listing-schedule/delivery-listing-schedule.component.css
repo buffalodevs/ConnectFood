@@ -1,3 +1,7 @@
 p {
     font-size: 18px;
 }
+
+#scheduler-container {
+    margin-bottom: 30px;
+}

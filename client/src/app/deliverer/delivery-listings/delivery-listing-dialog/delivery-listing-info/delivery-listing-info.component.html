@@ -15,74 +15,80 @@
 
         <div slick-list-item-body class="row">
 
-            <mat-expansion-panel SlickExpansionPanel class="col-lg-12" [expanded]="true">
+            <div class="col-lg-12">
+                <mat-expansion-panel SlickExpansionPanel class="col-lg-12" [expanded]="true">
 
-                <mat-expansion-panel-header>
-                    <mat-panel-title>Delivery Info</mat-panel-title>
-                </mat-expansion-panel-header>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>Delivery Info</mat-panel-title>
+                    </mat-expansion-panel-header>
 
-                <div>
-                    <b>Total Drive Distance:</b>
-                    <div class="inline-block">{{ deliveryUtilService.calcTotalDrivingDistance(delivery) }} miles</div>
-                </div>
-        
-                <div>
-                    <b>Total Drive Time:</b>
-                    <div class="inline-block">{{ deliveryUtilService.calcTotalDrivingTime(delivery) }} minutes</div>
-                </div>
-        
-                <div class="space-bottom">
-                    <a [href]="SlickMapComponent.googleMapsHref" target="_blank" class="link-content">Get Directions</a>
-                </div>
-
-                <div>
-                    <b>Estimated Weight:</b>
-                    <div class="inline-block">{{ delivery.estimatedWeight }} lbs</div>
-                </div>
-
-                <div>
-                    <b>Delivery State:</b>
-                    <div class="inline-block">{{ deliveryUtilService.getReadableDeliveryState(delivery.deliveryStateInfo.deliveryState) }}</div>
-                </div>
-
-                <div *ngIf="delivery.deliveryStateInfo.scheduledStartTime != null">
-                    <b>Scheduled Start Time:</b>
-                    <div class="inline-block">{{ getReadableScheduledStartTime() }}</div>
-                </div>
-
-            </mat-expansion-panel>
+                    <div>
+                        <b>Total Drive Distance:</b>
+                        <div class="inline-block">{{ deliveryUtilService.calcTotalDrivingDistance(delivery) }} miles</div>
+                    </div>
             
-            <mat-expansion-panel SlickExpansionPanel class="col-xl-6 col-lg-12 desktop-space-bottom" [collapseWidth]="1199" [expanded]="true">
-                        
-                <mat-expansion-panel-header>
-                    <mat-panel-title>Donor Contact</mat-panel-title>
-                </mat-expansion-panel-header>
-                
-                <span class="inline-block">{{ delivery.donorInfo.organizationName }}</span><br>
-                <span>{{ delivery.donorInfo.address }}</span><br>
-                <span class="space-bottom">
-                    {{ delivery.donorInfo.city }}, {{ delivery.donorInfo.state }} {{ delivery.donorInfo.zip }}
-                </span><br><br>
-                <a href="tel:{{delivery.donorInfo.phone}}" class="link-content no-word-wrap">{{ delivery.donorInfo.phone }}</a><br>
-                <a href="mailto:{{ delivery.donorInfo.email }}" class="inline-block link-content">{{ delivery.donorInfo.email }}</a>
-
-            </mat-expansion-panel>
+                    <div>
+                        <b>Total Drive Time:</b>
+                        <div class="inline-block">{{ deliveryUtilService.calcTotalDrivingTime(delivery) }} minutes</div>
+                    </div>
             
-            <mat-expansion-panel SlickExpansionPanel class="col-xl-6 col-lg-12 desktop-space-bottom" [collapseWidth]="1199" [expanded]="true">
-                        
-                <mat-expansion-panel-header>
-                    <mat-panel-title>Receiver Contact</mat-panel-title>
-                </mat-expansion-panel-header>
+                    <div class="space-bottom">
+                        <a [href]="SlickMapComponent.googleMapsHref" target="_blank" class="link-content">Get Directions</a>
+                    </div>
 
-                <span class="inline-block">{{ delivery.receiverInfo.organizationName }}</span><br>
-                <span>{{ delivery.receiverInfo.address }}</span><br>
-                <span>
-                    {{ delivery.receiverInfo.city }}, {{ delivery.receiverInfo.state }} {{ delivery.receiverInfo.zip }}
-                </span><br><br>
-                <a href="tel:{{delivery.receiverInfo.phone}}" class="link-content no-word-wrap">{{ delivery.receiverInfo.phone }}</a><br>
-                <a href="mailto:{{ delivery.receiverInfo.email }}" class="inline-block link-content">{{ delivery.receiverInfo.email }}</a>
+                    <div>
+                        <b>Estimated Weight:</b>
+                        <div class="inline-block">{{ delivery.estimatedWeight }} lbs</div>
+                    </div>
 
-            </mat-expansion-panel>
+                    <div>
+                        <b>Delivery State:</b>
+                        <div class="inline-block">{{ deliveryUtilService.getReadableDeliveryState(delivery.deliveryStateInfo.deliveryState) }}</div>
+                    </div>
+
+                    <div *ngIf="delivery.deliveryStateInfo.scheduledStartTime != null">
+                        <b>Scheduled Start Time:</b>
+                        <div class="inline-block">{{ getReadableScheduledStartTime() }}</div>
+                    </div>
+
+                </mat-expansion-panel>
+            </div>
+
+            <div class="col-xl-6 col-lg-12">
+                <mat-expansion-panel SlickExpansionPanel [collapseWidth]="1199" [expanded]="true">
+                            
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>Donor Contact</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    
+                    <span class="inline-block">{{ delivery.donorInfo.organizationName }}</span><br>
+                    <span>{{ delivery.donorInfo.address }}</span><br>
+                    <span class="space-bottom">
+                        {{ delivery.donorInfo.city }}, {{ delivery.donorInfo.state }} {{ delivery.donorInfo.zip }}
+                    </span><br><br>
+                    <a href="tel:{{delivery.donorInfo.phone}}" class="link-content no-word-wrap">{{ delivery.donorInfo.phone }}</a><br>
+                    <a href="mailto:{{ delivery.donorInfo.email }}" class="inline-block link-content">{{ delivery.donorInfo.email }}</a>
+
+                </mat-expansion-panel>
+            </div>
+            
+            <div class="col-xl-6 col-lg-12">
+                <mat-expansion-panel SlickExpansionPanel [collapseWidth]="1199" [expanded]="true">
+                            
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>Receiver Contact</mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <span class="inline-block">{{ delivery.receiverInfo.organizationName }}</span><br>
+                    <span>{{ delivery.receiverInfo.address }}</span><br>
+                    <span>
+                        {{ delivery.receiverInfo.city }}, {{ delivery.receiverInfo.state }} {{ delivery.receiverInfo.zip }}
+                    </span><br><br>
+                    <a href="tel:{{delivery.receiverInfo.phone}}" class="link-content no-word-wrap">{{ delivery.receiverInfo.phone }}</a><br>
+                    <a href="mailto:{{ delivery.receiverInfo.email }}" class="inline-block link-content">{{ delivery.receiverInfo.email }}</a>
+
+                </mat-expansion-panel>
+            </div>
 
         </div>
         

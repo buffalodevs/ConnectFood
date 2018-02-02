@@ -1,26 +1,26 @@
 <form [formGroup]="form">
-    <mat-radio-group formControlName="scheduledDate" class="row">
+    <mat-radio-group formControlName="scheduledDate">
+        <mat-accordion>
     
-        <mat-expansion-panel SlickExpansionPanel [expanded]="false" *ngFor="let dateStr of scheduleTimeManagement.getPossibleScheduleDateStrs()" class="col-sm-12">
-                    
-            <mat-expansion-panel-header>
-                <mat-panel-title>{{ dateStr }}</mat-panel-title>
-            </mat-expansion-panel-header>
-            
+            <mat-expansion-panel SlickExpansionPanel [expanded]="false" *ngFor="let dateStr of scheduleTimeManagement.getPossibleScheduleDateStrs()">
+                        
+                <mat-expansion-panel-header>
+                    <mat-panel-title>{{ dateStr }}</mat-panel-title>
+                </mat-expansion-panel-header>
+                
 
-            <div class="row radio-container">
+                <div class="row radio-container">
 
-                <div class="col-xs-6 col-sm-3 col-md-2" *ngFor="let availabilityTime of scheduleTimeManagement.getPossibleScheduleTimes(dateStr); let i = index">
+                    <div class="col-xs-6 col-sm-3 col-md-2" *ngFor="let availabilityTime of scheduleTimeManagement.getPossibleScheduleTimes(dateStr); let i = index">
 
-                    <mat-radio-button [value]="availabilityTime">{{ scheduleTimeManagement.getDisplayPossibleScheduleTimeAt(dateStr, i) }}</mat-radio-button>
+                        <mat-radio-button [value]="availabilityTime">{{ scheduleTimeManagement.getDisplayPossibleScheduleTimeAt(dateStr, i) }}</mat-radio-button>
+
+                    </div>
 
                 </div>
+                
+            </mat-expansion-panel>
 
-            </div>
-            
-        </mat-expansion-panel>
-
+        </mat-accordion>
     </mat-radio-group>
 </form>
-
-<br>

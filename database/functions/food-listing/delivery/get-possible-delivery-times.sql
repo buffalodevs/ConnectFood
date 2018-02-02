@@ -16,14 +16,14 @@ BEGIN
     RETURN QUERY
                 -- @ts-sql class="TimeRange" file="/shared/app-user/time-range.ts"
     SELECT      JSON_BUILD_OBJECT (
-                    'startDate',    timestampToUtcText (
+                    '_startTime',   timestampToUtcText (
                                         GREATEST (
                                             ReceiverAvailability.startTime,
                                             DonorAvailability.startTime,
                                             DelivererAvailability.startTime
                                         )
                                     ),
-                    'endDate',      timestampToUtcText (
+                    '_endTime',     timestampToUtcText (
                                         LEAST (
                                             ReceiverAvailability.endTime,
                                             DonorAvailability.endTime,

@@ -1,6 +1,6 @@
-<div *ngIf="!schedulingComplete" [slick-progress-spinner]="showProgressSpinner">
+<div *ngIf="!schedulingComplete" id="scheduler-container" [slick-progress-spinner]="showProgressSpinner">
 
-    <h4>Please select a time that you will start the delivery:</h4>
+    <h4>Please select a time that you will start the delivery:</h4><br>
     <slick-date-time-scheduler [possibleScheduleTimeRanges]="delivery.possibleDeliveryTimes" [formControl]="scheduleControl"></slick-date-time-scheduler>
 
 </div>

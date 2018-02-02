@@ -82,8 +82,8 @@ function checkForAndFixAvailabilityWeekOverflow(availabilityDateRange: DateRange
 
 
 /**
- * Converts (relative) availability date ranges to absolutely positioned date ranges that all contain the current time
- * or fall on the closest aligned time after the current time.
+ * Converts (relative) availability date ranges to absolutely positioned date ranges whose start and end time members fall on the same weekdays as the availaiblity date range
+ * start and end time members. Also, the resulting time ranges will either contain the current time or fall on the closest aligned time after the current time.
  * @param availabilityDateRanges The (relative) availability date ranges that are to be converted.
  * @return The absolute date ranges.
  */

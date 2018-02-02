@@ -1,4 +1,4 @@
-import { AppUserInfo, AppUserType, WeekdayTimeRange } from '../app-user/app-user-info';
+import { AppUserInfo, AppUserType, DateRange } from '../app-user/app-user-info';
 import { GPSCoordinate } from "../geocode/gps-coordinate";
 
 
@@ -20,7 +20,7 @@ export class FoodListingUser extends AppUserInfo {
         gpsCoordinate: GPSCoordinate = new GPSCoordinate(),
         utcOffsetMins: number = null,
         phone: string = null,
-        availability: WeekdayTimeRange[] = null,
+        availability: DateRange[] = null,
         public drivingDistance: number = null,
         public drivingTime: number = null
     ) {

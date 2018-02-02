@@ -8,6 +8,8 @@ import { ResponsiveService } from '../../common-util/services/responsive.service
 })
 export class SlickExpansionPanelDirective implements OnInit {
 
+    private readonly _ORIG_HEIGHT_STYLE: string;
+
     /**
      * The max-width (px) of the viewport where the panel will be initialized as collapsed.
      * Default is 767 (px).
@@ -28,6 +30,11 @@ export class SlickExpansionPanelDirective implements OnInit {
      * Default is 'green-glow'.
      */
     @Input() public glowClass: string;
+    /**
+     * CSS height style to apply when the expansion panel is open.
+     * Default is '100%'.
+     */
+    @Input() public heightStyleWhenOpen: string;
 
 
     public constructor (
@@ -35,10 +42,13 @@ export class SlickExpansionPanelDirective implements OnInit {
         private _hostExpansionPanel: MatExpansionPanel,
         private _responsiveService: ResponsiveService
     ) {
+        this._ORIG_HEIGHT_STYLE = _elementRef.nativeElement.style.height;
+
         this.collapseWidth = 767;
         this.alwaysGlowWhenClosed = false;
         this.glowOnInitializedClosed = true;
         this.glowClass = 'green-glow';
+        this.heightStyleWhenOpen = '100%';
 
         this._hostExpansionPanel.opened.subscribe(this.handlePanelOpen.bind(this));
         this._hostExpansionPanel.closed.subscribe(this.handlePanelClose.bind(this));
@@ -61,18 +71,29 @@ export class SlickExpansionPanelDirective implements OnInit {
 
     private handlePanelOpen(): void {
 
-        let elemClassList: DOMTokenList = (<HTMLElement>this._elementRef.nativeElement).classList;
+        const nativeElement: HTMLElement = this._elementRef.nativeElement;
+        const elemClassList: DOMTokenList = nativeElement.classList;
 
         if (elemClassList.contains(this.glowClass)) {
             elemClassList.remove(this.glowClass);
+        }
+
+        if (this.heightStyleWhenOpen != null) {
+            nativeElement.style.height = this.heightStyleWhenOpen;
         }
     }
 
 
     private handlePanelClose(): void {
 
+        const nativeElement: HTMLElement = this._elementRef.nativeElement;
+
         if (this.alwaysGlowWhenClosed) {
-            (<HTMLElement>this._elementRef.nativeElement).classList.add(this.glowClass);            
+            nativeElement.classList.add(this.glowClass);            
+        }
+
+        if (this.heightStyleWhenOpen != null) {
+            nativeElement.style.height = this._ORIG_HEIGHT_STYLE;
         }
     }
 }

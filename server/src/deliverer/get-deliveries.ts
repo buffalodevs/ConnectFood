@@ -4,7 +4,8 @@ import { addArgPlaceholdersToQueryStr } from './../database-util/prepared-statem
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
 
 import { getDrivingDistTime, GPSCoordinate, DriveDistTime } from './../geocode/geocode';
-import { fillFullTripDrivingDistances } from './delivery-util/delivery-geocode-util'
+import { fillFullTripDrivingDistances } from './delivery-util/delivery-geocode-util';
+import { availabilityToAbsDateRanges } from '../common-util/date-time-util';
 
 import { DeliveryFilters } from './../../../shared/src/deliverer/delivery-filters';
 import { Delivery } from "./../../../shared/src/deliverer/delivery";
@@ -69,6 +70,7 @@ function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate): Promi
 
         // Insert deserialized returned data into result arrays.
         let delivery: Delivery = DESERIALIZER.deserialize(rows[i].delivery, Delivery);
+        delivery.possibleDeliveryTimes = availabilityToAbsDateRanges(delivery.possibleDeliveryTimes);
         deliveries.push(delivery);
     }
 

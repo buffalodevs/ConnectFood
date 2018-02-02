@@ -86,7 +86,7 @@ export class ScheduleTimeManagementService {
             if (possibleScheduleDateTime > new Date()) {
 
                 // If the previous possible schedule date-time that was analyzed had a different date, then we must generate date string for this new one.
-                if (prevPossibleScheduleDateTime != null && possibleScheduleDateTime.getDay() !== prevPossibleScheduleDateTime.getDay()) {
+                if (prevPossibleScheduleDateTime == null || possibleScheduleDateTime.getDay() !== prevPossibleScheduleDateTime.getDay()) {
                 
                     possibleScheduleDateStr = this.genPossibleScheduleDateStr(possibleScheduleDateTime);
                     this.insertScheduleDateIfNotExists(possibleScheduleDateStr);
@@ -122,6 +122,7 @@ export class ScheduleTimeManagementService {
 
         if (!this._possibleScheduleTimes.has(possibleScheduleDateStr)) {
 
+            this._possibleScheduleTimes.set(possibleScheduleDateStr, []);
             this._possibleDisplayScheduleTimes.set(possibleScheduleDateStr, []);
             this._possibleScheduleDateStrs.push(possibleScheduleDateStr);
         }
