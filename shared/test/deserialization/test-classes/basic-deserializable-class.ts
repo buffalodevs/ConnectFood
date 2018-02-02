@@ -1,4 +1,4 @@
-import { deserializable } from '../../deserializer';
+import { deserializable } from '../../../src/deserialization/deserializer';
 
 
 /**

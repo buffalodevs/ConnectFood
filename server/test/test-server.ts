@@ -1,5 +1,5 @@
 import * as chai from 'chai';
-import * as server from '../server';
+import * as server from '../src/server';
 
 chai.use(require('chai-http'));
 let should: Chai.Should = chai.should();

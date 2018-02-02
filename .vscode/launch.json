@@ -44,7 +44,7 @@
                 "${workspaceRoot}\\server\\dist\\**\\*.js"
             ],
             "stopOnEntry": false,
-            "args": ["--no-timeouts", "--colors", "--debug-brk", "${workspaceRoot}/server/dist/server/src/**/test-*.js"],
+            "args": ["--no-timeouts", "--colors", "--debug-brk", "${workspaceRoot}/server/dist/server/test/**/test-*.js"],
             "cwd": "${workspaceRoot}",
             "runtimeExecutable": null,
             "env": {
@@ -61,7 +61,7 @@
                 "${workspaceRoot}\\shared\\dist\\**\\*.js"
             ],
             "stopOnEntry": false,
-            "args": ["--no-timeouts", "--colors", "--debug-brk", "${workspaceRoot}/shared/dist/**/test-*.js"],
+            "args": ["--no-timeouts", "--colors", "--debug-brk", "${workspaceRoot}/shared/dist/test/**/test-*.js"],
             "cwd": "${workspaceRoot}",
             "runtimeExecutable": null,
             "env": {

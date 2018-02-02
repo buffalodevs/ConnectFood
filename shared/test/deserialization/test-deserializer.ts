@@ -1,5 +1,5 @@
 import { chai, should, expect } from '../../test/test-shared';
-import { Deserializer } from '../deserializer';
+import { Deserializer } from '../../src/deserialization/deserializer';
 import { BasicDeserializableClass } from './test-classes/basic-deserializable-class';
 import { DeepDeserializableClass } from './test-classes/deep-deserializable-class';
 import { DeepDeserializableClassWithInheritance } from './test-classes/deep-deserializable-class-with-inheritance';

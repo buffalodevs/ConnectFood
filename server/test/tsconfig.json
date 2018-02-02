@@ -8,13 +8,13 @@
             "dom"
         ],
         "typeRoots": [
-            "../node_modules/@types"
+            "../../node_modules/@types"
         ],
         "module": "commonjs",
         "moduleResolution": "node",
         "target": "es5",
-        "rootDir": "./src/",
-        "outDir": "./dist/",
+        "rootDirs": [ "./", "../src", "../../shared/src" ],
+        "outDir": "../dist",
         "sourceMap": true
     }
 }

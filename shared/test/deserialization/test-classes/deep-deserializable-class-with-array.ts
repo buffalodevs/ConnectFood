@@ -1,4 +1,4 @@
-import { deserializable, deepDeserializable } from '../../deserializer';
+import { deserializable, deepDeserializable } from '../../../src/deserialization/deserializer';
 import { BasicDeserializableClass } from './basic-deserializable-class';
 
 

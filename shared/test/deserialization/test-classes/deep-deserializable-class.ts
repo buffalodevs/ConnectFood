@@ -1,13 +1,13 @@
-import { deserializable, deepDeserializable } from '../../deserializer';
+import { deserializable, deepDeserializable } from '../../../src/deserialization/deserializer';
 import { BasicDeserializableClass } from './basic-deserializable-class';
 
 
 /**
- * Deserializable class for testing deserialization class with deep deserialization properties and class inheritance.
+ * Deserializable class for testing most basic form of (shallow) deserialization.
  * Contains property, method, and accessor that all should be present and work propertly after deserialization.
  */
-@deserializable('DeepDeserializableClassWithInheritance')
-export class DeepDeserializableClassWithInheritance extends BasicDeserializableClass {
+@deserializable('DeepDeserializableClass')
+export class DeepDeserializableClass {
 
     @deepDeserializable(Date)
     private _date: Date;
@@ -16,9 +16,6 @@ export class DeepDeserializableClassWithInheritance extends BasicDeserializableC
     private _basicDeserializableClass: BasicDeserializableClass;
 
     public constructor() {
-
-        super();
-
         this._date = new Date();
         this._basicDeserializableClass = new BasicDeserializableClass();
     }

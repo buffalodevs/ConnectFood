@@ -1,7 +1,7 @@
 import { chai, should, expect } from '../../test/test-shared';
-import { deserializable, requireDeserializable, deepDeserializable, skipDeserializable, Deserializer } from '../deserializer';
-import { DeserializableRegistry } from '../deserializable-registration/deserializable-registry';
-import { Deserializable } from '../deserializable-registration/deserializable';
+import { deserializable, requireDeserializable, deepDeserializable, skipDeserializable, Deserializer } from '../../src/deserialization/deserializer';
+import { DeserializableRegistry } from '../../src/deserialization/deserializable-registration/deserializable-registry';
+import { Deserializable } from '../../src/deserialization/deserializable-registration/deserializable';
 import { ManualRegistrationClass } from './test-classes/manual-registration-class';
 import { BasicDeserializableClass } from './test-classes/basic-deserializable-class';
 
@@ -39,7 +39,7 @@ function testDeserializableRegistration(done: MochaDone): void {
 
 function testRecordRequiredMembers(done: MochaDone): void {
 
-    requireDeserializable(ManualRegistrationClass.prototype, '_requiredProperty');
+    requireDeserializable()(ManualRegistrationClass.prototype, '_requiredProperty');
 
     // Ensure that all required deserialization members have been recorded.
     const manualRegistrationDeserializable: Deserializable =  DeserializableRegistry.getDeserializable(new ManualRegistrationClass());
@@ -72,8 +72,8 @@ function testRecordDeepDeserializableMembers(done: MochaDone): void {4
 
 function testRecordSkippedMembers(done: MochaDone): void {
 
-    skipDeserializable(ManualRegistrationClass.prototype, '_skippedProperty');
-    skipDeserializable(ManualRegistrationClass.prototype, '_skippedMethod');
+    skipDeserializable()(ManualRegistrationClass.prototype, '_skippedProperty');
+    skipDeserializable()(ManualRegistrationClass.prototype, '_skippedMethod');
 
     // Ensure that all skipped members have been recorded.
     const manualRegistrationDeserializable: Deserializable =  DeserializableRegistry.getDeserializable(new ManualRegistrationClass());
