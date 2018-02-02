@@ -1,5 +1,5 @@
-import { chai, server, should, expect, logResponse } from './test-server';
-import { LoginRequest, LoginResponse } from '../../shared/src/app-user/message/login-message';
+import { chai, server, should, expect, logResponse } from '../test-server';
+import { LoginRequest, LoginResponse } from '../../../shared/src/app-user/message/login-message';
 
 
 const ROUTE: string = '/appUser/login';

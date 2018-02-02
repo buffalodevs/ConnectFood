@@ -16,5 +16,10 @@
         "rootDirs": [ "./src/", "../shared/src/" ],
         "outDir": "./dist/",
         "sourceMap": true
-    }
+    },
+    "exclude": [
+        "./test/",
+        "./type-orm-sandbox",
+        "./database-orm"
+    ]
 }
