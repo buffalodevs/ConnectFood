@@ -29,7 +29,7 @@
             <!-- Food Info (Cell 2) -->
             <div class="col-xl-6 col-lg-12 desktop-space-bottom">
 
-                <mat-expansion-panel SlickExpansionPanel [collapseWidth]="1199" [expanded]="true">
+                <mat-expansion-panel SlickExpansionPanel [collapseWidth]="1199" [expanded]="true" heightStyleWhenOpen="100%">
 
                     <mat-expansion-panel-header>
                         <mat-panel-title>Food Info</mat-panel-title>
@@ -65,7 +65,7 @@
                 <ng-container *ngFor="let foodListingUserAccessor of FOOD_LISTING_USER_ACCESSORS; let i = index">
                     <ng-container *ngIf="shouldShowFoodListingUser(foodListingUserAccessor)">
 
-                        <mat-expansion-panel SlickExpansionPanel [collapseWidth]="1199" [expanded]="true">
+                        <mat-expansion-panel SlickExpansionPanel [collapseWidth]="1199" [expanded]="true" heightStyleWhenOpen="100%">
     
                             <mat-expansion-panel-header>
                                 <mat-panel-title>{{ FOOD_LISTING_USER_TITLES[i] }} Info</mat-panel-title>

@@ -32,7 +32,7 @@ export class SlickExpansionPanelDirective implements OnInit {
     @Input() public glowClass: string;
     /**
      * CSS height style to apply when the expansion panel is open.
-     * Default is '100%'.
+     * Default is null.
      */
     @Input() public heightStyleWhenOpen: string;
 
@@ -48,7 +48,7 @@ export class SlickExpansionPanelDirective implements OnInit {
         this.alwaysGlowWhenClosed = false;
         this.glowOnInitializedClosed = true;
         this.glowClass = 'green-glow';
-        this.heightStyleWhenOpen = '100%';
+        this.heightStyleWhenOpen = null;
 
         this._hostExpansionPanel.opened.subscribe(this.handlePanelOpen.bind(this));
         this._hostExpansionPanel.closed.subscribe(this.handlePanelClose.bind(this));
@@ -62,10 +62,9 @@ export class SlickExpansionPanelDirective implements OnInit {
             this._hostExpansionPanel.expanded = false;
         }
 
-        // If the panel has been initialized as collapsed.
-        if (this.glowOnInitializedClosed && this._hostExpansionPanel.expanded === false) {
-            (<HTMLElement>this._elementRef.nativeElement).classList.add(this.glowClass);
-        }
+        // If the panel has been initialized as opened.
+        this._hostExpansionPanel.expanded ? this.handlePanelOpen()
+                                          : this.handlePanelClose(true); // Else, the panel has been initialized as collapsed.
     }
 
 
@@ -84,12 +83,12 @@ export class SlickExpansionPanelDirective implements OnInit {
     }
 
 
-    private handlePanelClose(): void {
+    private handlePanelClose(initialClose: boolean): void {
 
         const nativeElement: HTMLElement = this._elementRef.nativeElement;
 
-        if (this.alwaysGlowWhenClosed) {
-            nativeElement.classList.add(this.glowClass);            
+        if (this.alwaysGlowWhenClosed || (initialClose && this.glowOnInitializedClosed)) {
+            nativeElement.classList.add(this.glowClass);
         }
 
         if (this.heightStyleWhenOpen != null) {
