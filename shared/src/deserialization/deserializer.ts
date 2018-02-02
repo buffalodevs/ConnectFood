@@ -84,7 +84,14 @@ export class Deserializer {
                 }
             }
 
-            TargetConstructor = DeserializableRegistry.getDeserializable(target).ClassConstructor;
+            const deserializable: Deserializable = DeserializableRegistry.getDeserializable(target);
+
+            if (deserializable == null) {
+                throw new Error(`Deserializable with id '` + target.deserializableId + `' could not be found in Deserializable Registry.
+                                 NOTE: The following deserializable IDs were used for registration: ` + DeserializableRegistry.getAllRegisteredDesrializableIdsStr());
+            }
+
+            TargetConstructor = deserializable.ClassConstructor;
 
             if (TargetConstructor == null) {
                 throw new Error('Could not find a registered deserializable with deserializable ID: ' + target.deserializableId + `

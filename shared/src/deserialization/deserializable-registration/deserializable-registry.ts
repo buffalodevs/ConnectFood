@@ -62,6 +62,19 @@ export class DeserializableRegistry {
     }
 
 
+    public static getAllRegisteredDesrializableIdsStr(): string {
+
+        const deserializableIds: string[] = Array.from(DeserializableRegistry._deserializables.keys());
+        let deserializableIdsStr: string = '';
+
+        for (let i: number = 0; i < deserializableIds.length; i++) {
+            deserializableIdsStr += ( deserializableIds[i] + (i === deserializableIds.length - 1 ? '' : ', ') );
+        }
+
+        return deserializableIdsStr;
+    }
+
+
     /**
      * Gets a registered deserializable associated with a deserializable class.
      * @param instanceOrPrototype The instance or prototype of the deserlializable class.
@@ -72,7 +85,7 @@ export class DeserializableRegistry {
         
         // Grab the deserializable class wrapper so we can add deserializable properties to it.
         const deserializableId: string = instanceOrPrototype.deserializableId;
-        return this._deserializables.get(deserializableId);
+        return DeserializableRegistry._deserializables.get(deserializableId);
     }
 
 
@@ -104,7 +117,7 @@ export class DeserializableRegistry {
     private static registerDeserializable(ClassConstructor: Function, deserializableId: string): Deserializable {
 
         // Ensure we are given a unique ID for the Deserializable.
-        if (this._deserializables.has(deserializableId)) {
+        if (DeserializableRegistry._deserializables.has(deserializableId)) {
             throw new Error('Attempting to register a Deserializable with a repeat Deserializable ID.');
         }
 
@@ -112,7 +125,10 @@ export class DeserializableRegistry {
         // IMPORTANT: We must include the deserializableId in JSON object via toJSON overload for automatic (non-explicit type) desrialization to work!
         ClassConstructor.prototype.toJSON = DeserializableRegistry.genDeserializableToJSONOverlaod(ClassConstructor.prototype.toJSON);
 
+        console.log('Adding deserializable with ID \'' + deserializableId + '\' to the Deserializable Registry');
         DeserializableRegistry._deserializables.set(deserializableId, new Deserializable(ClassConstructor));
+        //console.log('All deserializable IDs thus far: [ ' + DeserializableRegistry.getAllRegisteredDesrializableIdsStr() + ' ]');
+
         return DeserializableRegistry.getDeserializable(ClassConstructor.prototype);
     }
 
@@ -159,7 +175,7 @@ export class DeserializableRegistry {
      */
     private static updateDeserializableRegistrationId(ClassConstructor: Function, newDeserializableId: string): void {
 
-        if (this._deserializables.has(newDeserializableId)) {
+        if (DeserializableRegistry._deserializables.has(newDeserializableId)) {
             throw new Error('Attempting to update Deserializable ID to one that already exists.');
         }
 
@@ -168,8 +184,10 @@ export class DeserializableRegistry {
         ClassConstructor.prototype.deserializableId = newDeserializableId;
 
         // Change the registration mapping to use the new ID.
-        this._deserializables.set(newDeserializableId, this._deserializables.get(oldDeserializableId));
-        this._deserializables.delete(oldDeserializableId);
+        console.log('Updating deserializable with ID \'' + oldDeserializableId + '\' to have new ID: \`' + newDeserializableId + '\'');
+        DeserializableRegistry._deserializables.set(newDeserializableId, DeserializableRegistry._deserializables.get(oldDeserializableId));
+        DeserializableRegistry._deserializables.delete(oldDeserializableId);
+        //console.log('All deserializable IDs thus far: [ ' + DeserializableRegistry.getAllRegisteredDesrializableIdsStr() + ' ]');
     }
 
 
