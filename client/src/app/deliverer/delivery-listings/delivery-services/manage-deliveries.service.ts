@@ -5,9 +5,9 @@ import 'rxjs/add/operator/map';
 
 import { RequestService } from "../../../common-util/services/request.service";
 
-import { ManageDeliveryRequest } from "./../../../../../../shared/deliverer/message/manage-delivery-message";
-import { FoodWebResponse } from "./../../../../../../shared/message-protocol/food-web-response";
-import { DeliveryState } from '../../../../../../shared/deliverer/delivery';
+import { ManageDeliveryRequest } from "./../../../../../../shared/src/deliverer/message/manage-delivery-message";
+import { FoodWebResponse } from "./../../../../../../shared/src/message-protocol/food-web-response";
+import { DeliveryState } from '../../../../../../shared/src/deliverer/delivery';
 
 
 /**
@@ -17,7 +17,7 @@ import { DeliveryState } from '../../../../../../shared/deliverer/delivery';
 export class ManageDeliveryService {
     
     public constructor (
-        private requestService: RequestService
+        private _requestService: RequestService
     ) {}
 
 
@@ -29,7 +29,7 @@ export class ManageDeliveryService {
      */
     public updateDeliveryState(deliveryFoodListingKey: number, deliveryState: DeliveryState): Observable <void> {
         
-        return this.requestService.post('/deliverer/updateDeliveryState', new ManageDeliveryRequest(deliveryFoodListingKey, deliveryState))
-                                  .map(this.requestService.genericResponseMap);
+        return this._requestService.post('/deliverer/updateDeliveryState', new ManageDeliveryRequest(deliveryFoodListingKey, deliveryState))
+                                   .map(this._requestService.genericResponseMap);
     }
 }

@@ -12,11 +12,11 @@ export class HomeComponent implements OnInit {
 
 
     public constructor(
-        private bannerService: BannerService
+        private _bannerService: BannerService
     ) {}
 
 
     public ngOnInit(): void {
-        this.bannerService.setSrcImgUrl('../assets/BannerImg.jpg');
+        this._bannerService.imgUrl = '../assets/BannerImg.jpg';
     }
 }

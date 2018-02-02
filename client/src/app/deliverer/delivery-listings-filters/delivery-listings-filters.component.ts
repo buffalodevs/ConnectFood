@@ -11,15 +11,15 @@ import { VehicleTypesService } from '../../domain/vehicle-types/vehicle-types.se
 })
 export class DeliveryListingsFiltersComponent extends FormGroup implements OnInit {
 
-    @Input() private header: string;
+    @Input() public header: string;
     /**
      * Additional filter controls and associated names.
      */
-    @Input() private additionalFilters: Map<string, AbstractControl>;
+    @Input() public additionalFilters: Map <string, AbstractControl>;
 
-    private readonly maxDistances: number[];
-    private readonly maxTotalWeights: number[];
-    private vehicleTypes: string[];
+    public readonly maxDistances: number[];
+    public readonly maxTotalWeights: number[];
+    public vehicleTypes: string[];
 
 
     public constructor (

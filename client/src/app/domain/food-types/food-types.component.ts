@@ -22,42 +22,42 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
     /**
      * If set to true, then this component will be used to merely display a list of Food Types.
      */
-    @Input() private displayOnly: boolean;
+    @Input() public displayOnly: boolean;
     /**
      * Set to true if the display only Food Types should be a condensed list.
      * The condensed list only includes Food Types that have been selected.
      */
-    @Input() private condensedDisplay: boolean;
+    @Input() public condensedDisplay: boolean;
     /**
      * Determines if the Food Type checkboxes should initially be checked. Default is true.
      */
-    @Input() private initiallyChecked: boolean;
+    @Input() public initiallyChecked: boolean;
     /**
      * The maximum number of elements per column (if reached, will generate another column). Default is 6.
      * NOTE: Will not generate more than 4 columns, so if no more columns can be made, then this is ignored!
      */
-    @Input() private maxElementsPerColumn: number;
+    @Input() public maxElementsPerColumn: number;
     /**
      * The maximum number of columns that the Food Types checkboxes will be displayed in. Default is 2.
      */
-    @Input() private maxNumColumns: number;
+    @Input() public maxNumColumns: number;
     /**
      * Determines if at least one selection is required. Default is false.
      */
-    @Input() private required: boolean;
+    @Input() public required: boolean;
     /**
      * Triggers validation of the form by marking all as touched.
      */
-    @Input() private validate: boolean;
+    @Input() public validate: boolean;
     /**
      * Any extra required validation constraint. Ignored on default.
      */
-    @Input() private extraValidation: boolean;
+    @Input() public extraValidation: boolean;
 
-    private foodTypes: string[];
-    private selectedFoodTypes: string[];
-    private foodTypesForm: FormGroup;
-    private foodTypeIndsColumns: number[][];
+    public foodTypes: string[];
+    public foodTypesForm: FormGroup;
+    public foodTypeIndsColumns: number[][];
+    private _selectedFoodTypes: string[];
 
     /**
      * A callback function provided by a parent component (via directive such as ngModel).
@@ -68,7 +68,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
     
     public constructor (
         // private routerSnapshot: ActivatedRoute,
-        private foodTypesService: FoodTypesService
+        private _foodTypesService: FoodTypesService
     ) {
         this.displayOnly = false;
         this.condensedDisplay = false;
@@ -79,7 +79,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
         this.validate = false;
         this.extraValidation = true;
 
-        this.selectedFoodTypes = [];
+        this._selectedFoodTypes = [];
         // Simply initialize empty form here. We will fill it with Food Types from server (or client cache) in ngOnInit()!
         this.foodTypesForm = new FormGroup({});
         this.foodTypeIndsColumns = [];
@@ -93,7 +93,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
         /*  Ideally, this should resolve immediately because of a resolver used in route to parent component! The Food Types should have
             already been fetched and cached from the server before this component was initialized and rendered, but just in case we will
             call getFoodTypes instead of directly getting results form router snapshop (like shown above in commment). */
-        this.foodTypesService.getFoodTypes().subscribe((foodTypes: string[]) => {
+        this._foodTypesService.getFoodTypes().subscribe((foodTypes: string[]) => {
 
             // Set all base food types and their initial checked states.
             this.foodTypes = foodTypes;
@@ -136,7 +136,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
     private valueChangesListener(): void {
 
         // On every change, updated array of selected Food Types irregardless of existence of onChange listener.
-        this.selectedFoodTypes = this.foodTypesService.getFoodTypesAssocWithTrue(this.foodTypesForm.value);
+        this._selectedFoodTypes = this._foodTypesService.getFoodTypesAssocWithTrue(this.foodTypesForm.value);
 
         // Update display columns whenever the value changes if only displaying selected Food Types.
         if (this.isCondesnedDisplayOnlyMode()) {
@@ -144,7 +144,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
         }
 
         // Push changes to parent if it has registered an onChange listener (via ngModel or formControl).
-        this.onChange(this.selectedFoodTypes);
+        this.onChange(this._selectedFoodTypes);
     }
 
 
@@ -244,7 +244,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
      * @return A list of the currently selected Food Types.
      */
     public getSelectedFoodTypes(): string[] {
-        return this.selectedFoodTypes;
+        return this._selectedFoodTypes;
     }
 
 
@@ -253,7 +253,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
      * @return true if an error exists, false if not.
      */
     private hasError(): boolean {
-        return ( (this.foodTypesForm.touched || this.validate) && this.required && this.selectedFoodTypes.length === 0 && this.extraValidation );
+        return ( (this.foodTypesForm.touched || this.validate) && this.required && this._selectedFoodTypes.length === 0 && this.extraValidation );
     }
 
 
@@ -284,7 +284,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
      */
     private calcNumColumns(): number {
 
-        const numDisplayFoodTypes: number = this.isCondesnedDisplayOnlyMode() ? this.selectedFoodTypes.length
+        const numDisplayFoodTypes: number = this.isCondesnedDisplayOnlyMode() ? this._selectedFoodTypes.length
                                                                               : this.foodTypes.length;
         const numDivisions: number = Math.ceil(numDisplayFoodTypes / this.maxElementsPerColumn);
 
@@ -307,7 +307,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
         if (this.foodTypes != null) {
 
             // The Food Types that are to be displayed depend on the displayOnly and condensedDisplay settings.
-            let displayFoodTypes: string[] = this.isCondesnedDisplayOnlyMode() ? this.selectedFoodTypes
+            let displayFoodTypes: string[] = this.isCondesnedDisplayOnlyMode() ? this._selectedFoodTypes
                                                                                : this.foodTypes;
 
             /*  Calculate the number of extra Food Types that must be added to the first column if the total number of Food TYpes is not

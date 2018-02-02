@@ -2,17 +2,16 @@ import { Request, Response, Errback } from 'express';
 
 import { SessionData } from "../common-util/session-data";
 import { getDeliveries } from './get-deliveries';
-import { getPossibleDeliveryTimes } from './get-possible-delivery-times';
 import { scheduleDelivery } from './schedule-delivery';
 import { cancelDelivery } from './cancel-delivery';
 
-import { GetDeliveriesRequest, GetDeliveriesResponse, Delivery } from '../../../shared/deliverer/message/get-deliveries-message';
-import { ScheduleDeliveryRequest } from '../../../shared/deliverer/message/schedule-delivery-message';
-import { ManageDeliveryRequest } from '../../../shared/deliverer/message/manage-delivery-message';
-import { CancelDeliveryRequest } from '../../../shared/deliverer/message/cancel-delivery-message';
-import { TimeRange } from '../../../shared/app-user/time-range';
-import { GetPossibleDeliveryTimesResponse } from '../../../shared/deliverer/message/get-possible-delivery-times-message';
-import { FoodWebResponse } from '../../../shared/message-protocol/food-web-response';
+import { GetDeliveriesRequest, GetDeliveriesResponse, Delivery } from '../../../shared/src/deliverer/message/get-deliveries-message';
+import { ScheduleDeliveryRequest } from '../../../shared/src/deliverer/message/schedule-delivery-message';
+import { ManageDeliveryRequest } from '../../../shared/src/deliverer/message/manage-delivery-message';
+import { CancelDeliveryRequest } from '../../../shared/src/deliverer/message/cancel-delivery-message';
+import { DateRange } from '../../../shared/src/date-time-util/date-range';
+import { GetPossibleDeliveryTimesResponse } from '../../../shared/src/deliverer/message/get-possible-delivery-times-message';
+import { FoodWebResponse } from '../../../shared/src/message-protocol/food-web-response';
 import { updateDeliveryState } from './update-delivery-state';
 
 
@@ -95,21 +94,4 @@ export function handleUpdateDeliveryState(request: Request, response: Response):
     .catch((err: Error) => {
         response.send(new FoodWebResponse(false, err.message));
     });
-}
-
-
-export function handleGetPossibleDeliveryTimes(request: Request, response: Response): void {
-
-    response.setHeader('Content-Type', 'application/json');
-
-    const getPossibleDeliveryTimesRequest: ManageDeliveryRequest = request.body;
-    const sessionData: SessionData = SessionData.loadSessionData(request);
-
-    getPossibleDeliveryTimes(getPossibleDeliveryTimesRequest.deliveryFoodListingKey, sessionData.appUserKey)
-        .then((possibleDeliveryTimes: TimeRange[]) => {
-            response.send(new GetPossibleDeliveryTimesResponse(possibleDeliveryTimes, true, 'Successfully retrieved possible delivery times.'));
-        })
-        .catch((err: Error) => {
-            response.send(new GetPossibleDeliveryTimesResponse(null, false, err.message));
-        });
 }

@@ -1,5 +1,4 @@
-<slick-input-group #timeForm [formGroup]="timeForm" [validate]="validate" *ngIf="!displayOnly"
-                   concatPattern="`hh`:`mm` `am`" [validators]="groupValidators" [formControl]="timeControl">
+<slick-input-group #timeForm [formGroup]="timeForm" [validate]="validate" concatPattern="`hh`:`mm` `am`" [validators]="GROUP_VALIDATORS" [formControl]="timeControl">
 
     <span id="time-form">
 
@@ -11,7 +10,7 @@
 
         <mat-input-container floatPlaceholder="never">
             <input matInput placeholder="mm" formControlName="mm" [InputFilter]="validationService.DYNAMIC_MM_REG_EXP"
-                   (blur)="validationService.ensureMinutes2Digits(timeForm.controls.mm)">
+                   (blur)="validationService.ensureMinutes2Digits(timeForm.get('mm'))">
         </mat-input-container>
 
         <mat-input-container id="am-pm" floatPlaceholder="never">

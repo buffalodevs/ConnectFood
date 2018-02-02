@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 
-import { LISTINGS_STATUS } from "../../../../../shared/receiver-donor/food-listings-filters";
-import { FoodListing } from '../../../../../shared/receiver-donor/food-listing';
+import { LISTINGS_STATUS } from "../../../../../shared/src/receiver-donor/food-listings-filters";
 
 
 @Component({
@@ -12,15 +11,14 @@ import { FoodListing } from '../../../../../shared/receiver-donor/food-listing';
 })
 export class ReceiveComponent {
 
-    private additionalFilters: Map<string, AbstractControl>;
-    private foodListings: FoodListing[];
+    public additionalFilters: Map<string, AbstractControl>;
 
     
     public constructor() {
-        this.foodListings = [];
         this.additionalFilters = new Map<string, AbstractControl>([
             ['listingsStatus', new FormControl(LISTINGS_STATUS.unclaimedListings)],
-            ['matchRegularAvailability', new FormControl(true)]
+            ['matchRegularAvailability', new FormControl(true)],
+            ['matchSpecifiedAvailability', new FormControl(false)]
         ]);
     }
 }

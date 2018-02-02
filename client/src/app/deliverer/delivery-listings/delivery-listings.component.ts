@@ -9,8 +9,8 @@ import { GetListingsService } from '../../slick/slick-filtered-list/slick-list/s
 import { ConsumableListingCacheService } from '../../slick/slick-filtered-list/slick-list/services/consumable-listing-cache.service';
 import { DeliveryListingDialogData, DeliveryListingDialogComponent } from './delivery-listing-dialog/delivery-listing-dialog.component';
 
-import { Delivery } from '../../../../../shared/deliverer/delivery';
-import { DeliveryFilters } from '../../../../../shared/deliverer/delivery-filters';
+import { Delivery } from '../../../../../shared/src/deliverer/delivery';
+import { DeliveryFilters } from '../../../../../shared/src/deliverer/delivery-filters';
 
 
 @Component({
@@ -20,8 +20,8 @@ import { DeliveryFilters } from '../../../../../shared/deliverer/delivery-filter
 })
 export class DeliveryListingsComponent extends SlickListComponent <Delivery, DeliveryFilters> {
 
-    @Input() private header: string;
-    @Input() private isCart: boolean;
+    @Input() public header: string;
+    @Input() public isCart: boolean;
 
 
     public constructor (
@@ -30,8 +30,8 @@ export class DeliveryListingsComponent extends SlickListComponent <Delivery, Del
         consumableListingCacheService: ConsumableListingCacheService <Delivery>,
         router: Router,
         dialogService: MatDialog,
-        private sessionDataService: SessionDataService, // Referenced in HTML template
-        private deliveryUtilService: DeliveryUtilService
+        public sessionDataService: SessionDataService, // Referenced in HTML template
+        public deliveryUtilService: DeliveryUtilService
     ) {
         super('/deliverer/getDeliveries', elementRef, getListingsService, consumableListingCacheService, router, dialogService);
 
@@ -51,15 +51,5 @@ export class DeliveryListingsComponent extends SlickListComponent <Delivery, Del
         dialogConfig.data = new DeliveryListingDialogData(this.listData[selectedListIndex].foodTitle, this.isCart);
 
         super.selectListing(selectedListIndex, DeliveryListingDialogComponent, dialogConfig);
-    }
-
-
-    /**
-     * Filter applied to any new list data that has been received (on all append, refresh, or update operations).
-     * @param newListData The new list data that will be filtered.
-     */
-    protected filterNewListings(newListData: Array <Delivery>): void {
-        // Must ensure that all date fields are not JSON ISO strings (wraps them back into Date objects).
-        this.deliveryUtilService.deserializeDeliveryData(newListData);
     }
 }

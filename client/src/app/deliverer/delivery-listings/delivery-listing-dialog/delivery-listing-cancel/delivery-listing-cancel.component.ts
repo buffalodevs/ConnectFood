@@ -4,8 +4,9 @@ import 'rxjs/add/operator/finally';
 
 import { CancelDeliveryService } from '../../delivery-services/cancel-delivery.service';
 
-import { Delivery } from '../../../../../../../shared/deliverer/delivery';
-import { DeliveryState } from '../../../../../../../shared/deliverer/message/get-deliveries-message';
+import { Delivery } from '../../../../../../../shared/src/deliverer/delivery';
+import { DeliveryState } from '../../../../../../../shared/src/deliverer/message/get-deliveries-message';
+import { runInThisContext } from 'vm';
 
 
 @Component({
@@ -16,32 +17,52 @@ import { DeliveryState } from '../../../../../../../shared/deliverer/message/get
 })
 export class DeliveryListingCancelComponent {
 
-    @Input() private delivery: Delivery;
-    @Output() private removeListing: EventEmitter<void>;
-    @Output() private close: EventEmitter<void>;
+    @Input() public delivery: Delivery;
 
-    private cancelForm: FormGroup;
-    private validate: boolean;
-    private cancelComplete: boolean;
-    private showProgressSpinner: boolean;
-    private errMsg: string;
+    @Output() public removeListing: EventEmitter <void>;
+    @Output() public close: EventEmitter <void>;
+
+    private _form: FormGroup;
+    get form(): FormGroup {
+        return this._form
+    }
+
+    private _validate: boolean;
+    get validate(): boolean {
+        return this._validate;
+    }
+
+    private _cancelComplete: boolean;
+    get cancelComplete(): boolean {
+        return this._cancelComplete;
+    }
+
+    private _showProgressSpinner: boolean;
+    get showProgressSpinner(): boolean {
+        return this._showProgressSpinner;
+    }
+
+    private _errMsg: string;
+    get errMsg(): string {
+        return this._errMsg;
+    }
 
 
     public constructor (
         private cancelDeliveryService: CancelDeliveryService
     ) {
-        this.removeListing = new EventEmitter<void>();
-        this.close = new EventEmitter<void>();
+        this.removeListing = new EventEmitter <void>();
+        this.close = new EventEmitter <void>();
 
-        this.cancelForm = new FormGroup({
+        this._form = new FormGroup({
             'cancelReason': new FormControl('', [Validators.required]),
             'foodRejected': new FormControl('', [Validators.required])
         });
 
-        this.validate = false;
-        this.cancelComplete = false;
-        this.showProgressSpinner = false;
-        this.errMsg = null;
+        this._validate = false;
+        this._cancelComplete = false;
+        this._showProgressSpinner = false;
+        this._errMsg = null;
     }
 
 
@@ -50,23 +71,23 @@ export class DeliveryListingCancelComponent {
      */
     private cancelDelivery(): void {
 
-        this.validate = true;
-        if (!this.cancelForm.valid)  return;
-        this.showProgressSpinner = true;
+        this._validate = true;
+        if (!this.form.valid)  return;
+        this._showProgressSpinner = true;
 
-        const cancelReason: string = this.cancelForm.get('cancelReason').value;
-        const foodRejected: boolean = this.cancelForm.get('foodRejected').value;
+        const cancelReason: string = this.form.get('cancelReason').value;
+        const foodRejected: boolean = this.form.get('foodRejected').value;
 
         this.cancelDeliveryService.cancelDelivery(this.delivery.deliveryFoodListingKey, cancelReason, foodRejected)
             .finally(() => {
-                this.cancelComplete = true;
-                this.showProgressSpinner = false;
+                this._cancelComplete = true;
+                this._showProgressSpinner = false;
             })
             .subscribe(() => {
                 this.removeListing.emit(); // Emit signal to parent (Dialog) so it can close and remove the cancelled listing.
             },
             (err: Error) => {
-                this.errMsg = err.message;
+                this._errMsg = err.message;
             });
     }
 }

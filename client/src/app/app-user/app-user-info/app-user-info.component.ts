@@ -10,11 +10,11 @@ import { SlickTypeaheadService } from '../../slick/slick-type-ahead/slick-type-a
 import { AppUserUpdateService } from "./app-user-update.service";
 import { SessionDataService } from "../../common-util/services/session-data.service";
  
-import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
-import { Validation } from "../../../../../shared/common-util/validation";
-import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
-import { AppUserErrorMsgs } from '../../../../../shared/app-user/message/app-user-error-msgs';
-import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
+import { AppUserInfo } from "../../../../../shared/src/app-user/app-user-info";
+import { Validation } from "../../../../../shared/src/common-util/validation";
+import { FoodWebResponse } from "../../../../../shared/src/message-protocol/food-web-response";
+import { AppUserErrorMsgs } from '../../../../../shared/src/app-user/message/app-user-error-msgs';
+import { ObjectManipulation } from '../../../../../shared/src/common-util/object-manipulation';
 
 
 /**
@@ -37,29 +37,34 @@ class EditData {
 })
 export class AppUserInfoComponent extends AbstractModelDrivenComponent {
     
-    private isOrganization: boolean;
-    private editData: Map<string, EditData>;
+    public readonly IS_ORGANIZATION: boolean;
+    private _editData: Map <string, EditData>;
 
 
     public constructor (
-        private appUserValidationService: AppUserValidationService,
-        private appUserConstants: AppUserConstantsService,
-        private typeaheadService: SlickTypeaheadService,
-        private appUserUpdateService: AppUserUpdateService,
-        private sessionDataService: SessionDataService
+        public validationService: AppUserValidationService,
+        public appUserConstants: AppUserConstantsService,
+        public typeaheadService: SlickTypeaheadService,
+        private _appUserUpdateService: AppUserUpdateService,
+        private _sessionDataService: SessionDataService
     ) {
-        super(appUserValidationService);
+        super(validationService);
 
-        let appUserInfo: AppUserInfo = sessionDataService.getAppUserSessionData();
+        let appUserInfo: AppUserInfo = _sessionDataService.getAppUserSessionData();
 
         // Set some form labels based off of whether or not user is an organization.
-        this.isOrganization = (appUserInfo.organizationName != null);
+        this.IS_ORGANIZATION = (appUserInfo.organizationName != null);
 
         this.form = new FormGroup({});
-        this.editData = new Map<string, EditData>();
+        this._editData = new Map <string, EditData>();
 
         this.initAppUserInfoFormElements(appUserInfo);
         this.initNonAppUserInfoFormElements();
+    }
+
+
+    public getEditDataFor(fieldName: string): EditData {
+        return this._editData.get(fieldName);
     }
 
 
@@ -78,13 +83,13 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
 
                 // Add additional needed validators for email and password fields.
                 switch (property) {
-                    case 'email':       validators.push(Validators.pattern(this.appUserValidationService.EMAIL_REGEX));    break;
-                    case 'zip':         validators.push(Validators.pattern(this.appUserValidationService.ZIP_REGEX));      break;
+                    case 'email':       validators.push(Validators.pattern(this.validationService.EMAIL_REGEX));    break;
+                    case 'zip':         validators.push(Validators.pattern(this.validationService.ZIP_REGEX));      break;
                 }
 
                 let initValue: any = (appUserInfo[property] == null) ? '' : appUserInfo[property];
                 this.form.addControl(property, new FormControl(initValue, validators));
-                this.editData.set(property, new EditData());
+                this._editData.set(property, new EditData());
             }
         }
     }
@@ -99,11 +104,11 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
 
         // Initialize password, currentPassword, and confirmPassword form elements.
         for (let i: number = 0; i < passControlNames.length; i++) {
-            this.form.addControl(passControlNames[i], new FormControl('', [ Validators.required, Validators.pattern(this.appUserValidationService.PASSWORD_REGEX) ]));
-            this.editData.set(passControlNames[i], new EditData());
+            this.form.addControl(passControlNames[i], new FormControl('', [ Validators.required, Validators.pattern(this.validationService.PASSWORD_REGEX) ]));
+            this._editData.set(passControlNames[i], new EditData());
         }
 
-        this.form.setValidators(this.appUserValidationService.confirmPasswordEqual());
+        this.form.setValidators(this.validationService.confirmPasswordEqual());
     }
 
 
@@ -130,9 +135,9 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
             this.control(editFormControlIds[i]).markAsUntouched();                
 
             // Set the form control value to the session data value for consistency.
-            this.control(editFormControlIds[i]).setValue(this.sessionDataService.getAppUserSessionData()[editFormControlIds[i]]);
+            this.control(editFormControlIds[i]).setValue(this._sessionDataService.getAppUserSessionData()[editFormControlIds[i]]);
 
-            this.editData.get(editFormControlIds[i]).editing = editing;
+            this._editData.get(editFormControlIds[i]).editing = editing;
         }
 
         // Force processing of form input element after it is shown (via *ngIf) by inserting into end of event queue (via setTimeout).
@@ -182,29 +187,31 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
         let appUserInfoUpdate: AppUserInfo = new AppUserInfo();
 
         // Go through each form control checking valid state and adding value to update object (password form members packaged separately).
-        for (let i: number = 0; i < saveFormControlNames.length && newPassword === null; i++) {
+        if (newPassword === null) {
+            for (let i: number = 0; i < saveFormControlNames.length; i++) {
 
-            let saveFormControl: AbstractControl = this.control(saveFormControlNames[i]);
+                let saveFormControl: AbstractControl = this.control(saveFormControlNames[i]);
 
-            if (!saveFormControl.valid) {
-                return; // Invalid control, force out now!
+                if (!saveFormControl.valid) {
+                    return; // Invalid control, force out now!
+                }
+                
+                // Handle all non-password updates by writing to appUserInfoUpdate container. Password handled separately from shared
+                // object (AppUserInfo) due to possible security concerns (don't want to make it easy to accidentally send password to client).
+                appUserInfoUpdate[saveFormControlNames[i]] = saveFormControl.value;
             }
-            
-            // Handle all non-password updates by writing to appUserInfoUpdate container. Password handled separately from shared
-            // object (AppUserInfo) due to possible security concerns (don't want to make it easy to accidentally send password to client).
-            appUserInfoUpdate[saveFormControlNames[i]] = saveFormControl.value;
         }
 
         // Send save field update to server and listen for response.
-        let observable: Observable<FoodWebResponse> = this.appUserUpdateService.updateAppUserInfo(appUserInfoUpdate, newPassword, currentPassword);
+        let observable: Observable<FoodWebResponse> = this._appUserUpdateService.updateAppUserInfo(appUserInfoUpdate, newPassword, currentPassword);
         
         for (let i: number = 0; i < saveFormControlNames.length; i++) {
-            this.editData.get(saveFormControlNames[i]).showProgressSpinner = true;
+            this._editData.get(saveFormControlNames[i]).showProgressSpinner = true;
         }
 
         observable.finally(() => {
             for (let i: number = 0; i < saveFormControlNames.length; i++)
-            { this.editData.get(saveFormControlNames[i]).showProgressSpinner = false; }
+            { this._editData.get(saveFormControlNames[i]).showProgressSpinner = false; }
         })
         .subscribe(this.handleSaveManyResponse.bind(this, saveFormControlNames));
     }
@@ -225,13 +232,13 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
             }
         }
         else if (response.message === AppUserErrorMsgs.DUPLICATE_EMAIL) {
-            this.appUserValidationService.addError(this.control(saveFormControlNames[0]), 'duplicateEmail', response.message);
+            this.validationService.addError(this.control(saveFormControlNames[0]), 'duplicateEmail', response.message);
         }
         else if (response.message === AppUserErrorMsgs.INVALID_ADDRESS) {
-            this.appUserValidationService.addError(this.control(saveFormControlNames[0]), 'invalidAddress', response.message);
+            this.validationService.addError(this.control(saveFormControlNames[0]), 'invalidAddress', response.message);
         }
         else if (response.message === AppUserErrorMsgs.INCORRECT_PASSWORD) {
-            this.appUserValidationService.addError(this.control(saveFormControlNames[0]), 'incorrectPassword', response.message);
+            this.validationService.addError(this.control(saveFormControlNames[0]), 'incorrectPassword', response.message);
         }
     }
 }

@@ -3,9 +3,9 @@ import { query, QueryResult } from './../database-util/connection-pool';
 import { addArgPlaceholdersToQueryStr } from '../database-util/prepared-statement-util';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
 import { SessionData } from '../common-util/session-data';
-import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotificationData } from './delivery-update-notification';
+import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotificationData } from './delivery-util/delivery-update-notification';
 
-import { Delivery, DeliveryState } from '../../../shared/deliverer/delivery';
+import { Delivery, DeliveryState } from '../../../shared/src/deliverer/delivery';
 
 
 export async function updateDeliveryState(deliveryFoodListingKey: number, delivererSessionData: SessionData, deliveryState: DeliveryState): Promise <void> {

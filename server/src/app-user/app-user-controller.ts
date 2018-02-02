@@ -2,14 +2,14 @@
 import { Request, Response } from "express";
 
 import { login } from "./login-app-user/app-user-login";
-import { signup, signupVerify } from './edit-app-user/app-user-signup';
-import { updateAppUser } from './edit-app-user/app-user-update';
+import { signup, signupVerify } from './add-update-app-user/app-user-signup';
+import { updateAppUser } from './add-update-app-user/app-user-update';
 import { SessionData, AppUserInfo } from "../common-util/session-data";
 
-import { FoodWebResponse } from "../../../shared/message-protocol/food-web-response";
-import { LoginRequest, LoginResponse } from '../../../shared/app-user/message/login-message';
-import { SignupRequest } from '../../../shared/app-user/message/signup-message';
-import { UpdateAppUserRequest, UpdateAppUserResponse } from '../../../shared/app-user/message/update-app-user-message';
+import { FoodWebResponse } from "../../../shared/src/message-protocol/food-web-response";
+import { LoginRequest, LoginResponse } from '../../../shared/src/app-user/message/login-message';
+import { SignupRequest } from '../../../shared/src/app-user/message/signup-message';
+import { UpdateAppUserRequest, UpdateAppUserResponse } from '../../../shared/src/app-user/message/update-app-user-message';
 
 
 /**

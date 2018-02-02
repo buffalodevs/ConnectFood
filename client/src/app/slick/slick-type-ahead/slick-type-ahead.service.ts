@@ -9,7 +9,7 @@ import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import { Subscriber } from 'rxjs/Subscriber';
 
-import { StringManipulation } from '../../../../../shared/common-util/string-manipulation';
+import { StringManipulation } from '../../../../../shared/src/common-util/string-manipulation';
 
 
 @Injectable()

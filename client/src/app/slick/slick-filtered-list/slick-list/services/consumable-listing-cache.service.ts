@@ -5,17 +5,19 @@ import 'rxjs/add/operator/map';
 
 import { ConsumableListingCache } from './consumable-listing-cache';
 import { RequestService } from '../../../../common-util/services/request.service';
-import { GetListingResponse } from '../slick-list-message/slick-list-response';
+
+import { GetListingResponse } from '../../../../../../../shared/src/slick-list/message/slick-list-response';
+import { FoodWebResponse } from '../../../../../../../shared/src/message-protocol/food-web-response';
 
 
 @Injectable()
 export class ConsumableListingCacheService <LIST_T> {
 
-    private consumableListingCache: ConsumableListingCache <LIST_T>
+    private _consumableListingCache: ConsumableListingCache <LIST_T>
 
 
     public constructor (
-        private requestService: RequestService
+        private _requestService: RequestService
     ) {}
 
 
@@ -25,7 +27,7 @@ export class ConsumableListingCacheService <LIST_T> {
      * @param listingId The ID of the listing to set.
      */
     public setCachedListing(listing: LIST_T, listingId: number | string): void {
-        this.consumableListingCache.setListing(listing, listingId);
+        this._consumableListingCache.setListing(listing, listingId);
     }
 
     
@@ -40,7 +42,7 @@ export class ConsumableListingCacheService <LIST_T> {
     private getListing(url: string, listingId: number | string): Observable <LIST_T> {
 
         // Consume last set cached listing (if empty or ID does not match, then null is set here). 
-        const consumedListing: LIST_T = this.consumableListingCache.consumeListing(listingId);
+        const consumedListing: LIST_T = this._consumableListingCache.consumeListing(listingId);
 
         // If cache was a hit, then return. Else, must query server for the listing on cache miss.
         return (consumedListing != null) ? Observable.of(consumedListing)
@@ -55,8 +57,8 @@ export class ConsumableListingCacheService <LIST_T> {
      */
     private getListingFromServer(url: string): Observable <LIST_T> {
 
-        return this.requestService.post(url, null)
-            .map((response: GetListingResponse <LIST_T>) => {
+        return this._requestService.post(url, null)
+            .map((response: FoodWebResponse) => {
                 
                 console.log(response.message);
 
@@ -64,7 +66,7 @@ export class ConsumableListingCacheService <LIST_T> {
                     alert('An unexpected error occured with message: ' + response.message);
                 }
 
-                return response.listing;
+                return (<any>response).listing;
             });
     }
 }

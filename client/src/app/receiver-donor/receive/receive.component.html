@@ -1,7 +1,7 @@
 <slick-filtered-list #filteredList [filters]="filters" [listings]="listings">
 
     <ng-container filters>
-        <food-listings-filters #filters [formGroup]="filters" header="Find Food" [additionalFilters]="additionalFilters">
+        <food-listings-filters #filters [formGroup]="filters" header="Search" [additionalFilters]="additionalFilters">
 
             <ng-container bottom>
                 
@@ -10,6 +10,9 @@
                 <div class="form-group">
                     <mat-checkbox formControlName="matchRegularAvailability" title="Check this to match your regular weekly availability with the donor's availability.">
                         Regular Availability
+                    </mat-checkbox>
+                    <mat-checkbox formControlName="matchSpecifiedAvailability" title="Check this to specify availability tiles that each donor must align with.">
+                        Specify Availability
                     </mat-checkbox>
                 </div>
 

@@ -3,10 +3,15 @@ import { query, QueryResult } from './../database-util/connection-pool';
 import { addArgPlaceholdersToQueryStr } from './../database-util/prepared-statement-util';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
 
-import { getDrivingDistTime, GPSCoordinate, DriveDistTime } from './../common-util/geocode';
-import { DeliveryFilters } from './../../../shared/deliverer/delivery-filters';
-import { Delivery } from "./../../../shared/deliverer/delivery";
-import { DateFormatter } from "./../../../shared/common-util/date-formatter";
+import { getDrivingDistTime, GPSCoordinate, DriveDistTime } from './../geocode/geocode';
+import { fillFullTripDrivingDistances } from './delivery-util/delivery-geocode-util'
+
+import { DeliveryFilters } from './../../../shared/src/deliverer/delivery-filters';
+import { Delivery } from "./../../../shared/src/deliverer/delivery";
+import { Deserializer } from "./../../../shared/src/deserialization/deserializer";
+
+
+const DESERIALIZER: Deserializer = new Deserializer();
 
 
 /**
@@ -62,83 +67,10 @@ function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate): Promi
     // Go through each row of the database output (each row corresponds to a Food Listing).
     for (let i: number = 0; i < rows.length; i++) {
 
-        // Insert returned data into result arrays.
-        deliveries.push(rows[i].delivery);
+        // Insert deserialized returned data into result arrays.
+        let delivery: Delivery = DESERIALIZER.deserialize(rows[i].delivery, Delivery);
+        deliveries.push(delivery);
     }
 
-    return getFullTripDrivingDistances(deliveries, myGPSCoordinate);
-}
-
-
-/**
- * Gets the full delivery trip's driving distances and times  for segments from Deliverer origin to Donor and from Donor to Receiver.
- * Fills in the distance and time information in each Delivery Food Listing provided to this function.
- * @param deliveries The deliveries that have been retreived but have not yet had distance information filled in yet.
- * @param myGPSCoordinate The GPS Coordinate of the logged in user (deliverer).
- * @param donorGPSCoordinates The GPS Coordinates of the donors.
- * @param receivergpscoordinates The GPS Coordinates of the receivers.
- * @return A promise that resolves to the Delivery Food Listings array that was passed in with filled in distance data.
- */
-async function getFullTripDrivingDistances(deliveries: Delivery[], myGPSCoordinate: GPSCoordinate): Promise <Delivery[]>
-{
-    const donorGPSCoordinates: Array<GPSCoordinate> = new Array<GPSCoordinate>();
-    const receiverGPSCoordinates: Array<GPSCoordinate> = new Array<GPSCoordinate>();
-
-    // First, extract a list of Donor & Receiver GPS Coordinates from deliveryFoodListings results.
-    for (let i: number = 0; i < deliveries.length; i++) {
-        donorGPSCoordinates.push(deliveries[i].donorInfo.gpsCoordinate);
-        receiverGPSCoordinates.push(deliveries[i].receiverInfo.gpsCoordinate);
-    }
-
-    // Next calculate and store Deliverer to Donor and Donor to Receiver driving distances & times.
-    deliveries = await getDrivingDistTimeToDonors(deliveries, myGPSCoordinate, donorGPSCoordinates);
-    return getDrivingDistTimeFromReceiversToDonors(deliveries, donorGPSCoordinates, receiverGPSCoordinates);
-}
-
-
-/**
- * Gets the driving distances from the Deliverer origin to each Donor.
- * Fills in the distance information in each Delivery Food Listing provided to this function.
- * @param deliveries The Deliveries that have been retreived but have not yet had distance information filled in yet.
- * @param myGPSCoordinate The GPS Coordinate of the logged in user (deliverer).
- * @param donorGPSCoordinates The GPS Coordinates of the donors.
- * @return A promise that resolves to the Delivery Food Listings array that was passed in, but with added filled in to-donor distance data.
- */
-async function getDrivingDistTimeToDonors(deliveries: Delivery[], myGPSCoordinate: GPSCoordinate, donorGPSCoordinates: GPSCoordinate[]): Promise <Delivery[]> {
-
-    const driveDistTime: DriveDistTime[] = await getDrivingDistTime(myGPSCoordinate, donorGPSCoordinates);
-
-    for (let i: number = 0; i < driveDistTime.length; i++) {
-        deliveries[i].donorInfo.drivingDistance = driveDistTime[i].driveDistanceMi;
-        deliveries[i].donorInfo.drivingTime = driveDistTime[i].driveDurationMin;
-    }
-
-    return deliveries;
-}
-
-
-/**
- * Gets the driving distances and times from the Donors to corresponding Receivers (Donor-Receiver pairs).
- * Fills in the distance and time information in each Delivery Food Listing provided to this function.
- * @param deliveries The Deliveries that have been retreived but have not yet had donor to receiver distance information filled in yet.
- * @param donorGPSCoordinates The GPS Coordinates of the donors.
- * @param receiverGPSCoordinates The GPS Coordinates of the receivers.
- * @param index Should not be provided by external call to this function!!! Used to keep track of index in recursvie function calls (internally ONLY)!
- * @return A promise that resolves to the Delivery Food Listings array that was passed in, but with added filled in donor-to-receiver distance data.
- */
-async function getDrivingDistTimeFromReceiversToDonors(deliveries: Delivery[], donorGPSCoordinates: GPSCoordinate[],
-                                                       receiverGPSCoordinates: GPSCoordinate[], index: number = 0): Promise <Delivery[]>
-{
-    // Ensure that we do not have an empty list.
-    if (deliveries.length === 0)  return Promise.resolve(deliveries);
-
-    // TODO: Look for a way to do this in batch (multiple separate network requests are inefficient). 
-    const driveDistTime: DriveDistTime[] = await getDrivingDistTime(donorGPSCoordinates[index], [receiverGPSCoordinates[index]]);
-            
-    deliveries[index].receiverInfo.drivingDistance = driveDistTime[0].driveDistanceMi;
-    deliveries[index].receiverInfo.drivingTime = driveDistTime[0].driveDurationMin;
-
-    // If we have not recursively gone through the whole list.
-    return ( (++index !== deliveries.length) ? getDrivingDistTimeFromReceiversToDonors(deliveries, donorGPSCoordinates, receiverGPSCoordinates, index)
-                                             : deliveries ); // Else, we've gone through the whole list.
+    return fillFullTripDrivingDistances(deliveries, myGPSCoordinate);
 }

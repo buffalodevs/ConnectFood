@@ -3,10 +3,8 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
-import { ResponsiveService } from '../../../../common-util/services/responsive.service';
 import { ManageFoodListingService } from '../../food-listing-services/manage-food-listing.service';
-
-import { FoodListing } from './../../../../../../../shared/receiver-donor/food-listing';
+import { FoodListing } from './../../../../../../../shared/src/receiver-donor/food-listing';
 
 
 @Component({
@@ -16,25 +14,24 @@ import { FoodListing } from './../../../../../../../shared/receiver-donor/food-l
 })
 export class FoodListingClaimComponent {
 
-    @Input() private foodListing: FoodListing;
+    @Input() public foodListing: FoodListing;
 
-    /**
-     * Emitted whenever a Food Listing has been completely claimed and it should be removed from parent comonents listings (Receive).
-     */
-    @Output() private removeListing: EventEmitter<void>;
     /**
      * Emitted whenever the dialog should close.
      */
-    @Output() private close: EventEmitter<void>;
+    @Output() public close: EventEmitter<void>;
+    /**
+     * Emitted whenever a Food Listing has been completely claimed and it should be removed from parent comonents listings (Receive).
+     */
+    @Output() public removeListing: EventEmitter<void>;
 
-    private claimComplete: boolean;
-    private showProgressSpinner: boolean;
-    private errMsg: string;
+    public claimComplete: boolean;
+    public showProgressSpinner: boolean;
+    public errMsg: string;
 
 
     public constructor (
-        private responsiveService: ResponsiveService,
-        private manageFoodListingService: ManageFoodListingService
+        private _manageFoodListingService: ManageFoodListingService
     ) {
         this.removeListing = new EventEmitter<void>();
         this.close = new EventEmitter<void>();
@@ -50,7 +47,7 @@ export class FoodListingClaimComponent {
      */
     private claimSelectedFoodListing(): void {
         
-        let observer: Observable <void> = this.manageFoodListingService.claimFoodListing(this.foodListing.foodListingKey);
+        let observer: Observable <void> = this._manageFoodListingService.claimFoodListing(this.foodListing.foodListingKey);
         this.showProgressSpinner = true;
         
         // Listen for result.

@@ -7,9 +7,9 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
 
-    private readonly FOOTER_HEIGHT: number;
-    private readonly BODY_MARGIN: number;
-    private bodyHeight: number;
+    public readonly FOOTER_HEIGHT: number;
+    public readonly BODY_MARGIN: number;
+    public bodyHeight: number;
 
 
     public constructor() {

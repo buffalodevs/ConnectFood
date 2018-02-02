@@ -17,6 +17,7 @@ import { GetDomainValuesService } from '../domain/get-domain-values.service';
 import { ResponsiveService } from './services/responsive.service';
 import { ValidationService } from './services/validation.service';
 import { DateFormatterService } from './services/date-formatter.service';
+import { DeserializerService } from './services/deserializer.service';
 
 
 @NgModule({
@@ -49,7 +50,8 @@ import { DateFormatterService } from './services/date-formatter.service';
         SessionDataService,
         ResponsiveService,
         ValidationService,
-        DateFormatterService
+        DateFormatterService,
+        DeserializerService
     ]
 })
 export class CommonUtilModule {}

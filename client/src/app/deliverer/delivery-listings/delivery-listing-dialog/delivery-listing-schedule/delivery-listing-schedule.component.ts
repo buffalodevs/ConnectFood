@@ -5,9 +5,8 @@ import 'rxjs/add/operator/finally';
 import { ScheduleDeliveryService } from '../../delivery-services/schedule-delivery.service';
 import { DateFormatterService } from '../../../../common-util/services/date-formatter.service';
 
-import { Delivery } from '../../../../../../../shared/deliverer/delivery';
-import { DeliveryState } from '../../../../../../../shared/deliverer/message/get-deliveries-message';
-import { TimeRange } from '../../../../../../../shared/app-user/app-user-info';
+import { Delivery } from '../../../../../../../shared/src/deliverer/delivery';
+import { DeliveryState } from '../../../../../../../shared/src/deliverer/message/get-deliveries-message';
 
 
 @Component({
@@ -17,46 +16,61 @@ import { TimeRange } from '../../../../../../../shared/app-user/app-user-info';
 })
 export class DeliveryListingScheduleComponent {
 
-    @Input() private delivery: Delivery;
+    @Input() public delivery: Delivery;
     
-    @Output() private removeListing: EventEmitter<void>;
-    @Output() private close: EventEmitter<void>;
+    @Output() public removeListing: EventEmitter <void>;
+    @Output() public close: EventEmitter <void>;
 
-    private showProgressSpinner: boolean;
-    private schedulingComplete: boolean;
-    private scheduleControl: FormControl;
-    private errMsg: string;
+    private _showProgressSpinner: boolean;
+    get showProgressSpinner(): boolean {
+        return this._showProgressSpinner;
+    }
+
+    private _schedulingComplete: boolean;
+    get schedulingComplete(): boolean {
+        return this._schedulingComplete;
+    }
+
+    private _scheduleControl: FormControl;
+    public get scheduleControl(): FormControl {
+        return this._scheduleControl;
+    }
+    
+    private _errMsg: string;
+    public get errMsg(): string {
+        return this._errMsg;
+    }
 
 
     public constructor (
-        private scheduleDeliveryService: ScheduleDeliveryService,
-        private dateFormatter: DateFormatterService
+        public dateFormatter: DateFormatterService,
+        private _scheduleDeliveryService: ScheduleDeliveryService
     ) {
-        this.removeListing = new EventEmitter<void>();
-        this.close = new EventEmitter<void>();
+        this.removeListing = new EventEmitter <void>();
+        this.close = new EventEmitter <void>();
 
-        this.showProgressSpinner = false;
-        this.schedulingComplete = false;
-        this.scheduleControl = new FormControl(null);
+        this._showProgressSpinner = false;
+        this._schedulingComplete = false;
+        this._scheduleControl = new FormControl(null);
         this.scheduleControl.valueChanges.subscribe(this.scheduleDelivery.bind(this));
     }
 
 
     private scheduleDelivery(value: Date): void {
 
-        this.showProgressSpinner = true;
+        this._showProgressSpinner = true;
 
-        this.scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, false, value)
+        this._scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, false, value)
             .finally(() => {
-                this.schedulingComplete = true;
-                this.showProgressSpinner = false;
+                this._schedulingComplete = true;
+                this._showProgressSpinner = false;
             })
             .subscribe(() => {
                 this.delivery.deliveryStateInfo.deliveryState = DeliveryState.scheduled;
                 this.removeListing.emit();
             },
             (err: Error) => {
-                this.errMsg = err.message;
+                this._errMsg = err.message;
             });
     }
 }

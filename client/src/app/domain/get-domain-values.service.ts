@@ -4,7 +4,7 @@ import 'rxjs/add/operator/map';
 
 import { RequestService } from "../common-util/services/request.service";
 
-import { GetDomainValuesResponse, GetDomainValuesRequest } from '../../../../shared/domain/get-domain-values-message';
+import { GetDomainValuesResponse, GetDomainValuesRequest } from '../../../../shared/src/domain/get-domain-values-message';
 
 
 @Injectable()
@@ -37,7 +37,7 @@ export class GetDomainValuesService {
         }
         
         // Else we do not have cached Domain Values, or we should not use the cache, then we will contact the server.
-        let observer: Observable<GetDomainValuesResponse> = this.requestService.post('/domain/getDomainValues', new GetDomainValuesRequest(domainName));
+        let observer = <Observable <GetDomainValuesResponse>>this.requestService.post('/domain/getDomainValues', new GetDomainValuesRequest(domainName));
         
         return observer.map((getDomainValuesResponse: GetDomainValuesResponse) => {
             return this.extractDomainsFromResponse(getDomainValuesResponse, domainName);

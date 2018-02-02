@@ -8,8 +8,8 @@ import { GetListingsService } from '../../slick/slick-filtered-list/slick-list/s
 import { ConsumableListingCacheService } from '../../slick/slick-filtered-list/slick-list/services/consumable-listing-cache.service';
 import { DateFormatterService } from '../../common-util/services/date-formatter.service';
 
-import { FoodListing } from '../../../../../shared/receiver-donor/food-listing';
-import { FoodListingsFilters } from "../../../../../shared/receiver-donor/food-listings-filters";
+import { FoodListing } from '../../../../../shared/src/receiver-donor/food-listing';
+import { FoodListingsFilters } from "../../../../../shared/src/receiver-donor/food-listings-filters";
 
 
 @Component({
@@ -19,18 +19,18 @@ import { FoodListingsFilters } from "../../../../../shared/receiver-donor/food-l
 })
 export class FoodListingsComponent extends SlickListComponent <FoodListing, FoodListingsFilters> {
 
-    @Input() private header: string;
-    @Input() private isClaimedCart: boolean;
-    @Input() private isDonatedCart: boolean;
+    @Input() public header: string;
+    @Input() public isClaimedCart: boolean;
+    @Input() public isDonatedCart: boolean;
 
 
     public constructor (
+        public dateFormatter: DateFormatterService,
         elementRef: ElementRef,
         getListingsService: GetListingsService <FoodListing, FoodListingsFilters>,
         consumableListingCacheService: ConsumableListingCacheService <FoodListing>,
         router: Router,
-        dialogService: MatDialog,
-        private dateFormatter: DateFormatterService
+        dialogService: MatDialog
     ) {
         super('/receiverDonor/getFoodListings', elementRef, getListingsService, consumableListingCacheService, router, dialogService);
 

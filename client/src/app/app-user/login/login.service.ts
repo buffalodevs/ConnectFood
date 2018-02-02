@@ -4,17 +4,19 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
 import { SessionDataService } from '../../common-util/services/session-data.service';
+import { DeserializerService } from '../../common-util/services/deserializer.service';
 
-import { LoginRequest, LoginResponse } from '../../../../../shared/app-user/message/login-message';
-import { FoodWebResponse } from '../../../../../shared/message-protocol/food-web-response';
+import { LoginRequest, LoginResponse } from '../../../../../shared/src/app-user/message/login-message';
+import { FoodWebResponse } from '../../../../../shared/src/message-protocol/food-web-response';
 
 
 @Injectable()
 export class LoginService {
 
     public constructor (
-        private http: HttpClient,
-        private sessionDataService: SessionDataService
+        private _http: HttpClient,
+        private _sessionDataService: SessionDataService,
+        private _deserializer: DeserializerService
     ) {}
 
 
@@ -34,14 +36,16 @@ export class LoginService {
         };
 
         // NOTE: Should user raw http request here instead of RequestService wrapper since RequestService depends on this LoginService (prevent circular dependency)!
-        const observer: Observable<LoginResponse> = this.http.post<LoginResponse>('/appUser/login', new LoginRequest(email, password), requestOptions);
+        const observer: Observable<LoginResponse> = this._http.post<LoginResponse>('/appUser/login', new LoginRequest(email, password), requestOptions);
 
         return observer.map((loginResponse: LoginResponse): any /* AppUserInfo */ => {
 
             console.log(loginResponse.message);
 
             if (loginResponse.success) {
-                this.sessionDataService.updateAppUserSessionData(loginResponse.appUserInfo);
+                
+                loginResponse = this._deserializer.deserialize(loginResponse);
+                this._sessionDataService.updateAppUserSessionData(loginResponse.appUserInfo);
             }
 
             return (loginResponse as FoodWebResponse);

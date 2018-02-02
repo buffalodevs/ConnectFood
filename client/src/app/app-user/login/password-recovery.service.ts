@@ -3,15 +3,15 @@ import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
-import { RecoverPasswordRequest } from '../../../../../shared/app-user/message/password-recovery-message';
-import { FoodWebResponse } from '../../../../../shared/message-protocol/food-web-response';
+import { RecoverPasswordRequest } from '../../../../../shared/src/app-user/message/password-recovery-message';
+import { FoodWebResponse } from '../../../../../shared/src/message-protocol/food-web-response';
 
 
 @Injectable()
 export class PasswordRecoveryService {
 
     public constructor (
-        private http: HttpClient
+        private _http: HttpClient
     ) {}
 
 
@@ -28,7 +28,7 @@ export class PasswordRecoveryService {
             })
         };
         
-        let observer: Observable<FoodWebResponse> = this.http.post<FoodWebResponse>('/appUser/recoverPassword', new RecoverPasswordRequest(email), requestOptions);
+        let observer: Observable<FoodWebResponse> = this._http.post<FoodWebResponse>('/appUser/recoverPassword', new RecoverPasswordRequest(email), requestOptions);
 
         return observer.map((recoverPasswordResponse: FoodWebResponse): any => {
             

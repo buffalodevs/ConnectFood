@@ -8,7 +8,7 @@ import { DateFormatterService } from '../services/date-formatter.service';
 export class DateFormatterPipe implements PipeTransform {
 
     public constructor (
-        private dateFormatter: DateFormatterService
+        private _dateFormatter: DateFormatterService
     ) {}
 
 
@@ -18,6 +18,6 @@ export class DateFormatterPipe implements PipeTransform {
      * @return The string.
      */
     public transform(value: Date): string {
-        return this.dateFormatter.dateToMonthDayYearString(value);
+        return this._dateFormatter.dateToMonthDayYearString(value);
     }
 }

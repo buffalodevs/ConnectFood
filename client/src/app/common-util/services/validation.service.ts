@@ -4,8 +4,8 @@ import createAutoCorrectedDatePipe from 'text-mask-addons/dist/createAutoCorrect
 import createNumberMask from 'text-mask-addons/dist/createNumberMask.js';
 import * as _ from "lodash";
 
-import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
-import { Validation } from '../../../../../shared/common-util/validation';
+import { ObjectManipulation } from '../../../../../shared/src/common-util/object-manipulation';
+import { Validation } from '../../../../../shared/src/common-util/validation';
 
 export { Validation };
 

@@ -19,14 +19,14 @@ export class SlickScrollableStickyConfig {
         /**
          * A ratio of the body height over the sticky element height (e.g. 1.5 is provided, so body must be 1.5x height of element to activate sticky effects).
          */
-        public bodyToElementHeightRatio?: number,
+        public bodyToElementHeightRatio: number = null,
         /**
          * A name of a css class to apply to the sticky element when it enters sticky mode. It will also be removed when it exits sticky mode.
          */
-        public stickyClass?: string,
+        public stickyClass: string = null,
         /**
          * The ID of a container element. If this is set, then the sticky element cannot move beyond the bottom of the container element.
          */
-        public containerId?: string
+        public containerId: string = null
     ) {}
 }

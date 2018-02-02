@@ -8,16 +8,16 @@ import { SessionDataService } from '../../common-util/services/session-data.serv
 @Injectable()
 export class LogoutService {
 
-    constructor(
-        private router: Router,
-        private requestService: RequestService,
-        private sessionDataService: SessionDataService,
-    ) { }
+    public constructor (
+        private _router: Router,
+        private _requestService: RequestService,
+        private _sessionDataService: SessionDataService,
+    ) {}
 
     public logout(): void {
-        this.requestService.get('/appUser/logout').subscribe(() => {
-            this.sessionDataService.clearSessionData();
-            this.router.navigate(['/home']);
+        this._requestService.get('/appUser/logout').subscribe(() => {
+            this._sessionDataService.clearSessionData();
+            this._router.navigate(['/home']);
         });
         // Not interested in the response...
     }

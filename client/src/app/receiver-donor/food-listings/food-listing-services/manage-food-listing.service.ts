@@ -5,7 +5,7 @@ import 'rxjs/add/operator/map';
 
 import { RequestService } from "../../../common-util/services/request.service";
 
-import { ManageFoodListingRequest } from "./../../../../../../shared/receiver-donor/message/manage-food-listing-message";
+import { ManageFoodListingRequest } from "./../../../../../../shared/src/receiver-donor/message/manage-food-listing-message";
 
 
 /**

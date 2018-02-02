@@ -8,14 +8,14 @@ export abstract class AbstractModelDrivenComponent {
     /**
      * The base or primary form for the component.
      */
-    protected form: FormGroup;
+    public form: FormGroup;
 
 
     protected constructor (
         /**
          * The validation service for this component.
          */
-        protected validationService: ValidationService
+        public validationService: ValidationService
     ) {}
 
 
@@ -24,7 +24,7 @@ export abstract class AbstractModelDrivenComponent {
      * @param controlPath The path to the control relative to the base form object.
      * @return The control.
      */
-    protected control(controlPath: string): AbstractControl {
+    public control(controlPath: string): AbstractControl {
         return this.form.get(controlPath);
     }
 
@@ -35,7 +35,7 @@ export abstract class AbstractModelDrivenComponent {
      * @param errorCode An optional error code to check for if a specific error is being examined. Default is null for any error.
      * true if an error(s) exist, false if not.
      */
-    protected hasError(controlPath: string, errorCode?: string): boolean {
+    public hasError(controlPath: string, errorCode?: string): boolean {
 
         let control: AbstractControl = (controlPath === '.') ? this.form
                                                              : this.control(controlPath);
@@ -49,7 +49,7 @@ export abstract class AbstractModelDrivenComponent {
      * @param controlPath The path of the control relative to the base form.
      * @return The error message for the given control.
      */
-    protected errorMsgFor(controlPath: string): string {
+    public errorMsgFor(controlPath: string): string {
 
         let control: AbstractControl = (controlPath === '.') ? this.form
                                                              : this.control(controlPath);

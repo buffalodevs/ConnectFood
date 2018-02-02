@@ -8,7 +8,7 @@ import { Component, Input } from '@angular/core';
 })
 export class FooterComponent {
 
-    @Input() private height: number;
+    @Input() public height: number;
 
 
     public constructor() {}

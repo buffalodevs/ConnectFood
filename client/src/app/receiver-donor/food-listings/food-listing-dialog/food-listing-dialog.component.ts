@@ -1,9 +1,11 @@
 import { Component, Input, Output, EventEmitter, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
+import { FoodListingDialogData } from './food-listing-dialog-data';
 import { SlickListDialogData, SlickListDialog } from '../../../slick/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog';
+import { FoodListing } from './../../../../../../shared/src/receiver-donor/food-listing';
 
-import { FoodListing } from './../../../../../../shared/receiver-donor/food-listing';
+export { FoodListingDialogData };
 
 
 /**
@@ -17,23 +19,6 @@ enum FoodListingDialogState {
 }
 
 
-/**
- * Expected input data for this dialog.
- * NOTE: Needed because this dialog will be globally generated and opened, and it cannot use traditional Input() slots.
- */
-export class FoodListingDialogData extends SlickListDialogData <FoodListing> {
-
-    public constructor (
-        public header: string,
-        public isClaimedCart: boolean,
-        public isDonatedCart: boolean,
-        selectedListing?: FoodListing
-    ) {
-        super(selectedListing);
-    }
-}
-
-
 @Component({
     selector: 'food-listing-dialog',
     templateUrl: './food-listing-dialog.component.html',
@@ -41,15 +26,16 @@ export class FoodListingDialogData extends SlickListDialogData <FoodListing> {
 })
 export class FoodListingDialogComponent extends SlickListDialog {
 
-    private foodListingDialogState: FoodListingDialogState;
+    private _foodListingDialogState: FoodListingDialogState;
 
 
     public constructor (
-        private dialogRef: MatDialogRef <FoodListingDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) private dialogData: FoodListingDialogData
+        public dialogRef: MatDialogRef <FoodListingDialogComponent>,
+        @Inject(MAT_DIALOG_DATA)
+        public dialogData: FoodListingDialogData
     ) {
         super();
-        this.foodListingDialogState = FoodListingDialogState.FoodListingInfo;
+        this._foodListingDialogState = FoodListingDialogState.FoodListingInfo;
     }
 
 
@@ -58,31 +44,31 @@ export class FoodListingDialogComponent extends SlickListDialog {
      * @param state The state string to match.
      * @return true if it is in the given state, false if not.
      */
-    private isDialogState(state: string): boolean {
-        return ( this.foodListingDialogState === FoodListingDialogState[state] );
+    public isDialogState(state: string): boolean {
+        return ( this._foodListingDialogState === FoodListingDialogState[state] );
     }
 
 
     /**
      * Transitions dialog state to Claim.
      */
-    private toClaim(): void {
-        this.foodListingDialogState = FoodListingDialogState.Claim;
+    public toClaim(): void {
+        this._foodListingDialogState = FoodListingDialogState.Claim;
     }
 
 
     /**
      * Transitions dialog state to Unclaim.
      */
-    private toUnclaim(): void {
-        this.foodListingDialogState = FoodListingDialogState.Unclaim;
+    public toUnclaim(): void {
+        this._foodListingDialogState = FoodListingDialogState.Unclaim;
     }
 
 
     /**
      * Transitions dialog state to Remove.
      */
-    private toRemove(): void {
-        this.foodListingDialogState = FoodListingDialogState.Remove;
+    public toRemove(): void {
+        this._foodListingDialogState = FoodListingDialogState.Remove;
     }
 }

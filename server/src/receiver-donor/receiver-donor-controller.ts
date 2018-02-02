@@ -3,14 +3,15 @@ import { Request, Response } from 'express';
 import { SessionData } from "../common-util/session-data";
 import { addFoodListing } from './donor/add-food-listing';
 import { removeFoodListing } from "./donor/remove-food-listing";
-import { getFoodListings } from './common-receiver-donor/get-food-listings';
+import { getFoodListings } from './get-food-listings';
 import { claimFoodListing, unclaimFoodListing } from './receiver/claim-unclaim-food-listing';
 
-import { AddFoodListingRequest, AddFoodListingResponse, FoodListingUpload } from '../../../shared/receiver-donor/message/add-food-listing-message'
-import { GetFoodListingsRequest, GetFoodListingsResponse, FoodListing } from '../../../shared/receiver-donor/message/get-food-listings-message';
-import { ManageFoodListingRequest } from '../../../shared/receiver-donor/message/manage-food-listing-message';
-import { LISTINGS_STATUS } from "../../../shared/receiver-donor/food-listings-filters";
-import { FoodWebResponse } from "../../../shared/message-protocol/food-web-response";
+import { AddFoodListingRequest, AddFoodListingResponse, FoodListingUpload } from '../../../shared/src/receiver-donor/message/add-food-listing-message'
+import { GetFoodListingsRequest, GetFoodListingsResponse, FoodListing } from '../../../shared/src/receiver-donor/message/get-food-listings-message';
+import { ManageFoodListingRequest } from '../../../shared/src/receiver-donor/message/manage-food-listing-message';
+import { LISTINGS_STATUS } from "../../../shared/src/receiver-donor/food-listings-filters";
+import { FoodWebResponse } from "../../../shared/src/message-protocol/food-web-response";
+import { Deserializer } from '../../../shared/src/deserialization/deserializer';
 
 
 export function handleGetFoodListings(request: Request, response: Response): void {

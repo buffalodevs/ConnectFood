@@ -1,11 +1,7 @@
 "use strict";
 import { Injectable } from '@angular/core';
-
 import { DateFormatterService } from '../../../common-util/services/date-formatter.service';
-
-import { Delivery, DeliveryState, DeliveryUtil } from '../../../../../../shared/deliverer/delivery-util';
-import { TimeRange } from '../../../../../../shared/app-user/time-range';
-import { DateFormatter } from '../../../../../../shared/common-util/date-formatter';
+import { Delivery, DeliveryState, DeliveryUtil } from '../../../../../../shared/src/deliverer/delivery-util';
 
 export { Delivery, DeliveryState };
 
@@ -14,9 +10,7 @@ export { Delivery, DeliveryState };
 export class DeliveryUtilService {
 
 
-    public constructor (
-        private dateFormatter: DateFormatterService
-    ) {}
+    public constructor() {}
 
 
     /**
@@ -61,23 +55,16 @@ export class DeliveryUtilService {
 
         // Get the current date-time and its milliseconds since epoch for easy comparison with other dates.
         const currentDateTime: Date = new Date();
-        const currentTimeMs: number = currentDateTime.getTime();
+        const currentTimeMs: number = currentDateTime.valueOf();
 
+        // See if the current time falls in between any of the possible delivery time ranges.
         for (let i: number = 0; i < delivery.possibleDeliveryTimes.length; i++) {
 
-            // First, see if our current day of week matches the time range's day of week.
-            if (currentDateTime.getDay() === delivery.possibleDeliveryTimes[i].startTime.getDay()) {
+            const startTimeMs: number = delivery.possibleDeliveryTimes[i].startTime.valueOf();
+            const endTimeMs: number = delivery.possibleDeliveryTimes[i].endTime.valueOf();
 
-                const startWallClockTimeStr: string = this.dateFormatter.dateToWallClockString(delivery.possibleDeliveryTimes[i].startTime);
-                const endWallClockTimeStr: string = this.dateFormatter.dateToWallClockString(delivery.possibleDeliveryTimes[i].endTime);
-
-                // Convert times into a date (based on today), and get milliseconds since epoch for easy comparison with current date-time.
-                const startTimeMs: number = this.dateFormatter.setWallClockTimeForDate(new Date(), startWallClockTimeStr).getTime();
-                const endTimeMs: number = this.dateFormatter.setWallClockTimeForDate(new Date(), endWallClockTimeStr).getTime();
-
-                if (currentTimeMs >= startTimeMs && currentTimeMs <= (endTimeMs - totalDeliveryTimeMs))
-                {  return true;  }
-            }
+            if (currentTimeMs >= startTimeMs && currentTimeMs <= (endTimeMs - totalDeliveryTimeMs))
+            {  return true;  }
         }
 
         return false;
@@ -121,15 +108,5 @@ export class DeliveryUtilService {
      */
     public getReadableDeliveryState(deliveryState: DeliveryState): string {
         return DeliveryUtil.getReadableDeliveryState(deliveryState);
-    }
-
-
-    /**
-     * Custom deserializes any received delivery data before it is displayed/used.
-     * Here, we ensure that all JSON ISO string format dates are converted to Date objects.
-     * @param deliveryData The received delivery data.
-     */
-    public deserializeDeliveryData(deliveryData: Delivery[]): void {
-        DeliveryUtil.deserializeDeliveryData(deliveryData);
     }
 }

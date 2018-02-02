@@ -14,6 +14,7 @@ require('dotenv').config({ path: global['rootDir'] + '.env' });
 // Our session middleware and controllers that will handle requests after this router hands off the data to them.
 import { Application } from 'express';
 import { SessionData } from "./common-util/session-data";
+import { deserialize } from './deserialization/deserialization';
 import { handleLoginRequest,
          handleLogoutRequest,
          handleReAuthenticateRequest,
@@ -29,8 +30,7 @@ import { handleAddFoodListing,
 import { handleGetDeliveries,
          handleScheduleDelivery, 
          handleCancelDelivery,
-         handleUpdateDeliveryState, 
-         handleGetPossibleDeliveryTimes } from './deliverer/deliverer-controller';
+         handleUpdateDeliveryState } from './deliverer/deliverer-controller';
 import { handleGetDomainValues } from './domain/domain-controller';
 
 
@@ -52,33 +52,32 @@ module.exports = app; // Make available for mocha testing suites.
 
 
 // app-user Controller Routes.
-app.post('/appUser/login',                              handleLoginRequest);
-app.get( '/appUser/logout',                             handleLogoutRequest);
-app.get( '/appUser/reAuthenticate',                     handleReAuthenticateRequest);
-app.post('/appUser/signup',                             handleSignupRequest);
-app.get( '/appUser/verify',                             handleSignupVerification);
-app.post('/appUser/recoverPassword',                    handlePasswordRecovery);
-app.post('/appUser/updateAppUser',                      SessionData.ensureSessionActive, handleUpdateAppUserRequest);
+app.post('/appUser/login',                              deserialize, handleLoginRequest);
+app.get( '/appUser/logout',                             deserialize, handleLogoutRequest);
+app.get( '/appUser/reAuthenticate',                     deserialize, handleReAuthenticateRequest);
+app.post('/appUser/signup',                             deserialize, handleSignupRequest);
+app.get( '/appUser/verify',                             deserialize, handleSignupVerification);
+app.post('/appUser/recoverPassword',                    deserialize, handlePasswordRecovery);
+app.post('/appUser/updateAppUser',                      SessionData.ensureSessionActive, deserialize, handleUpdateAppUserRequest);
 
 
 // Receiver-Donor Controller Routes.
-app.post('/receiverDonor/getFoodListings',              SessionData.ensureSessionActive, handleGetFoodListings);
-app.post('/receiverDonor/donor/addFoodListing',         SessionData.ensureSessionActive, handleAddFoodListing);
-app.post('/receiverDonor/donor/removeFoodListing',      SessionData.ensureSessionActive, handleRemoveFoodListing);
-app.post('/receiverDonor/receiver/claimFoodListing',    SessionData.ensureSessionActive, handleClaimFoodListing);
-app.post('/receiverDonor/receiver/unclaimFoodListing',  SessionData.ensureSessionActive, handleUnclaimFoodListing);
+app.post('/receiverDonor/getFoodListings',              SessionData.ensureSessionActive, deserialize, handleGetFoodListings);
+app.post('/receiverDonor/donor/addFoodListing',         SessionData.ensureSessionActive, deserialize, handleAddFoodListing);
+app.post('/receiverDonor/donor/removeFoodListing',      SessionData.ensureSessionActive, deserialize, handleRemoveFoodListing);
+app.post('/receiverDonor/receiver/claimFoodListing',    SessionData.ensureSessionActive, deserialize, handleClaimFoodListing);
+app.post('/receiverDonor/receiver/unclaimFoodListing',  SessionData.ensureSessionActive, deserialize, handleUnclaimFoodListing);
 
 
 // Deliverer Controller Routes.
-app.post('/deliverer/getDeliveries',                    SessionData.ensureSessionActive, handleGetDeliveries);
-app.post('/deliverer/scheduleDelivery',                 SessionData.ensureSessionActive, handleScheduleDelivery);
-app.post('/deliverer/cancelDelivery',                   SessionData.ensureSessionActive, handleCancelDelivery);
-app.post('/deliverer/updateDeliveryState',              SessionData.ensureSessionActive, handleUpdateDeliveryState);
-app.post('/deliverer/getPossibleDeliveryTimes',         SessionData.ensureSessionActive, handleGetPossibleDeliveryTimes)
+app.post('/deliverer/getDeliveries',                    SessionData.ensureSessionActive, deserialize, handleGetDeliveries);
+app.post('/deliverer/scheduleDelivery',                 SessionData.ensureSessionActive, deserialize, handleScheduleDelivery);
+app.post('/deliverer/cancelDelivery',                   SessionData.ensureSessionActive, deserialize, handleCancelDelivery);
+app.post('/deliverer/updateDeliveryState',              SessionData.ensureSessionActive, deserialize, handleUpdateDeliveryState);
 
 
 // Domain Controller.
-app.post('/domain/getDomainValues',                     handleGetDomainValues);
+app.post('/domain/getDomainValues',                     deserialize, handleGetDomainValues);
 
 
 // Public Resource Route Handler (for local image hosting).

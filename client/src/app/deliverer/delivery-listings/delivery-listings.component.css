@@ -1,15 +1,4 @@
-img {
-    max-width: 100%;
-}
-
-
-@media only screen and (max-width: 991px) {
-
-    #slick-list-item-body > div {
-        display: inline-block;
-        width: auto;
-        text-align: left;
-    }
+@media only screen and (max-width: 767px) {
 
     .hide-mobile {
         display: none !important;

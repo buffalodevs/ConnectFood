@@ -8,7 +8,7 @@ import { Delivery, DeliveryState, DeliveryUtilService } from '../../delivery-ser
 import { ManageDeliveryService } from '../../delivery-services/manage-deliveries.service';
 import { DateFormatterService } from '../../../../common-util/services/date-formatter.service';
 
-import { FoodWebResponse } from '../../../../../../../shared/message-protocol/food-web-response';
+import { FoodWebResponse } from '../../../../../../../shared/src/message-protocol/food-web-response';
 
 
 @Component({
@@ -21,45 +21,57 @@ export class DeliveryListingInfoComponent implements OnChanges {
     /**
      * Set to true if the Delivery Listings are for a Delivery Cart. Default is false.
      */
-    @Input() private isCart: boolean;
-    @Input() private delivery: Delivery;
+    @Input() public isCart: boolean;
+    @Input() public delivery: Delivery;
 
     /**
      * Emitted whenever the 'Schedule Delivery' button is selected.
      */
-    @Output() private toSchedule: EventEmitter<void>; // Referenced in HTML template
+    @Output() public toSchedule: EventEmitter<void>; // Referenced in HTML template
     /**
      * Emitted whenever the 'Cancel Delivery' button is selected.
      */
-    @Output() private toCancelReason: EventEmitter<void>; // Referenced in HTML template
-    @Output() private removeListing: EventEmitter<void>;
-    @Output() private close: EventEmitter<void>;
+    @Output() public toCancelReason: EventEmitter<void>; // Referenced in HTML template
+    @Output() public removeListing: EventEmitter<void>;
+    @Output() public close: EventEmitter<void>;
 
-    private startComplete: boolean;
-    private stateChangeComplete: boolean;
-    private showMappings: Map<string, boolean>;
+    private _startComplete: boolean;
+    get startComplete(): boolean {
+        return this._startComplete;
+    }
+
+    private _stateChangeComplete: boolean;
+    get stateChangeComplete(): boolean {
+        return this._stateChangeComplete;
+    }
+
+    private _showProgressSpinner: boolean;
+    get showProgressSpinner(): boolean {
+        return this._showProgressSpinner;
+    }
+
+    private _showButtonFlags: Map <string, boolean>;
 
 
     public constructor (
-        private sessionDataService: SessionDataService,
-        private deliveryUtilService: DeliveryUtilService, // Referenced in HTML template
-        private manageDeliveryService: ManageDeliveryService,
-        private scheduleDeliveryService: ScheduleDeliveryService,
-        private dateFormatter: DateFormatterService
+        public sessionDataService: SessionDataService,
+        public deliveryUtilService: DeliveryUtilService, // Referenced in HTML template
+        private _manageDeliveryService: ManageDeliveryService,
+        private _scheduleDeliveryService: ScheduleDeliveryService,
+        private _dateFormatter: DateFormatterService
     ) {
         this.toSchedule = new EventEmitter<void>();
         this.toCancelReason = new EventEmitter<void>();
         this.removeListing = new EventEmitter<void>();
-        this.close = new EventEmitter<void>();
+        this.close = new EventEmitter <void>();
 
-        this.startComplete = false;
-        this.stateChangeComplete = false;
-        this.showMappings = new Map<string, boolean> ([
+        this._startComplete = false;
+        this._stateChangeComplete = false;
+        this._showButtonFlags = new Map <string, boolean> ([
             ['startButton', false],
             ['pickedUpButton', false],
             ['droppedOffButton', false],
-            ['cancelButton', false],
-            ['progressSpinner', false]
+            ['cancelButton', false]
         ]);
 
     }
@@ -73,10 +85,10 @@ export class DeliveryListingInfoComponent implements OnChanges {
             const delivery: Delivery = changes.delivery.currentValue;
             const deliveryState: DeliveryState = delivery.deliveryStateInfo.deliveryState;
 
-            this.showMappings.set('startButton', this.shouldShowStartButton(delivery));
-            this.showMappings.set('pickedUpButton', ( deliveryState === DeliveryState.started ));
-            this.showMappings.set('droppedOffButton', ( deliveryState === DeliveryState.pickedUp ));
-            this.showMappings.set('cancelButton', ( this.isCart && this.deliveryUtilService.compareDeliveryStates(deliveryState, DeliveryState.droppedOff) < 0 ));
+            this._showButtonFlags.set('startButton', this.shouldShowStartButton(delivery));
+            this._showButtonFlags.set('pickedUpButton', ( deliveryState === DeliveryState.started ));
+            this._showButtonFlags.set('droppedOffButton', ( deliveryState === DeliveryState.pickedUp ));
+            this._showButtonFlags.set('cancelButton', ( this.isCart && this.deliveryUtilService.compareDeliveryStates(deliveryState, DeliveryState.droppedOff) < 0 ));
         }
     }
 
@@ -96,6 +108,16 @@ export class DeliveryListingInfoComponent implements OnChanges {
 
 
     /**
+     * Determines whether or not to show a given button.
+     * @param buttonName The name of the button.
+     * @return true if it should be shown, false if not.
+     */
+    public shouldShowButton(buttonName: string): boolean {
+        return this._showButtonFlags.get(buttonName);
+    }
+
+
+    /**
      * Starts a delivery by updating its state to onRouteToDonor or scheduling the delivery with startImmediately flag set true.
      */
     private startDelivery(): void {
@@ -106,15 +128,15 @@ export class DeliveryListingInfoComponent implements OnChanges {
         }
         else {
 
-            this.showMappings.set('progressSpinner', true);
+            this._showProgressSpinner = true;
 
-            this.scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, true)
-                .finally(() => { this.showMappings.set('progressSpinner', false); })
+            this._scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, true)
+                .finally(() => { this._showProgressSpinner = false; })
                 .subscribe(() => {
                     console.log('Delivery started');
                     this.delivery.deliveryStateInfo.deliveryState = DeliveryState.started;
                     if (!this.isCart) this.removeListing.emit();
-                    this.startComplete = true;
+                    this._startComplete = true;
                 },
                 (err: Error) => {
                     // If we get here, then we have encountered a fatal error...
@@ -146,13 +168,13 @@ export class DeliveryListingInfoComponent implements OnChanges {
      */
     private updateDeliveryState(deliveryState: DeliveryState): void {
 
-        this.showMappings.set('progressSpinner', true);
+        this._showButtonFlags.set('progressSpinner', true);
 
-        this.manageDeliveryService.updateDeliveryState(this.delivery.deliveryFoodListingKey, deliveryState)
-            .finally(() => { this.showMappings.set('progressSpinner', false); })
+        this._manageDeliveryService.updateDeliveryState(this.delivery.deliveryFoodListingKey, deliveryState)
+            .finally(() => { this._showButtonFlags.set('progressSpinner', false); })
             .subscribe(() => {
                 this.delivery.deliveryStateInfo.deliveryState = deliveryState;
-                this.stateChangeComplete = true;
+                this._stateChangeComplete = true;
             },
             (err: Error) => {
                 // If we get here, then we have encountered a fatal error...
@@ -169,8 +191,8 @@ export class DeliveryListingInfoComponent implements OnChanges {
 
         const scheduledStartTime: Date = this.delivery.deliveryStateInfo.scheduledStartTime;
 
-        return (scheduledStartTime != null) ? ( this.dateFormatter.dateToMonthDayYearString(scheduledStartTime) + ' at ' +
-                                                this.dateFormatter.dateToWallClockString(scheduledStartTime) )
+        return (scheduledStartTime != null) ? ( this._dateFormatter.dateToMonthDayYearString(scheduledStartTime) + ' at ' +
+                                                this._dateFormatter.dateToWallClockString(scheduledStartTime) )
                                             : '';
     }
 }

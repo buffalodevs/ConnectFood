@@ -1,9 +1,8 @@
 import { Component, Input, SimpleChanges, OnChanges } from '@angular/core';
 
-import { GeocodeService } from './geocode.service';
+import { GeocodeService, GPSCoordinate } from './geocode.service';
 
-import { GPSCoordinate } from '../../../../../shared/common-util/geocode';
-import { Address } from '../../../../../shared/app-user/app-user-info';
+import { Address } from '../../../../../shared/src/app-user/app-user-info';
 
 
 @Component({
@@ -14,23 +13,23 @@ import { Address } from '../../../../../shared/app-user/app-user-info';
 })
 export class SlickMapComponent implements OnChanges {
 
-    @Input() private gpsCenterCoordinate: GPSCoordinate;
-    @Input() private zoom: number;
-    @Input() private diameterMi: number;
-    @Input() private addresses: Address[];
-    @Input() private addressNames: string[];
+    @Input() public gpsCenterCoordinate: GPSCoordinate;
+    @Input() public zoom: number;
+    @Input() public diameterMi: number;
+    @Input() public addresses: Address[];
+    @Input() public addressNames: string[];
 
     
-    private googleMapsHref: string;
+    private _googleMapsHref: string;
 
 
     public constructor (
-        private geocodeService: GeocodeService
+        private _geocodeService: GeocodeService
     ) {
         this.addresses = [];
         this.addressNames = [];
         
-        this.googleMapsHref = this.geocodeService.BASE_GOOGLE_MAPS_HREF;
+        this._googleMapsHref = this._geocodeService.BASE_GOOGLE_MAPS_HREF;
     }
 
 
@@ -38,7 +37,7 @@ export class SlickMapComponent implements OnChanges {
 
         // Whenever new addresses is entered, then regenerate the link to google maps.
         if (changes.addresses) {
-            this.googleMapsHref = this.geocodeService.generateGoogleMapsHref(this.addresses);            
+            this._googleMapsHref = this._geocodeService.generateGoogleMapsHref(this.addresses);            
         }
 
         if (changes.gpsCenterCoordinate || changes.addresses) {
@@ -60,11 +59,10 @@ export class SlickMapComponent implements OnChanges {
 
 
     /**
-     * Gets a Google Maps directions web page link based on a contained set of addresses (provided originally as input to component).
-     * @return The Google Maps directions web page link.
+     * The link to the Google Maps direction page using the points present on this map istance.
      */
-    public getGoogleMapsHref(): string {
-        return this.googleMapsHref;
+    get googleMapsHref(): string {
+        return this._googleMapsHref;
     }
 
 

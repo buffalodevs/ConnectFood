@@ -7,9 +7,9 @@ import { query, QueryResult } from '../../database-util/connection-pool';
 import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
 import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 
-import { FoodListingUpload } from '../../../../shared/receiver-donor/food-listing-upload';
-import { FoodListing } from '../../../../shared/receiver-donor/food-listing';
-import { DateFormatter } from '../../../../shared/common-util/date-formatter';
+import { FoodListingUpload } from '../../../../shared/src/receiver-donor/food-listing-upload';
+import { FoodListing } from '../../../../shared/src/receiver-donor/food-listing';
+import { DateFormatter } from '../../../../shared/src/date-time-util/date-formatter';
 
 require('dotenv');
 
@@ -44,7 +44,7 @@ export async function addFoodListing(foodListingUpload: FoodListingUpload, donor
                       foodListingUpload.foodTypes,
                       foodListingUpload.foodTitle,
                       foodListingUpload.needsRefrigeration,
-                      foodListingUpload.availableUntilDate,
+                      foodListingUpload.availableUntilDate.toISOString(),
                       foodListingUpload.estimatedWeight,
                       foodListingUpload.estimatedValue,
                       foodListingUpload.foodDescription,

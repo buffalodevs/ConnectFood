@@ -3,7 +3,7 @@ import { query, QueryResult } from '../../database-util/connection-pool';
 import { logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
 import { SessionData } from '../../common-util/session-data';
-import { UnclaimNotificationData, notifyDelivererOfLostDelivery, notifyDonorOfLostDelivery } from '../common-receiver-donor/unclaim-notification';
+import { UnclaimNotificationData, notifyDelivererOfLostDelivery, notifyDonorOfLostDelivery } from '../receiver-donor-util/unclaim-notification';
 
 
 export function claimFoodListing(foodListingKey: number, receiverSessionData: SessionData): Promise <void> {

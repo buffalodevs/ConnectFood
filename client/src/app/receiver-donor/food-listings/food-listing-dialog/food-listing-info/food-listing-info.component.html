@@ -12,15 +12,15 @@
             <!-- Food Description (Cell 1) -->
             <div class="col-lg-12">
 
-                <slick-expansion-panel [collapseWidth]="null">
+                <mat-expansion-panel [expanded]="true">
                         
-                    <ng-container mat-panel-title>
-                        Description
-                    </ng-container>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>Description</mat-panel-title>
+                    </mat-expansion-panel-header>
             
-                <span class="inline-block">{{ (foodListing.foodDescription != null) ? foodListing.foodDescription : '-- No Description --' }}</span>
+                    <span class="inline-block">{{ (foodListing.foodDescription != null) ? foodListing.foodDescription : '-- No Description --' }}</span>
 
-                </slick-expansion-panel>
+                </mat-expansion-panel>
 
             </div>
             <!-- Food Description (Cell 1) -->
@@ -29,14 +29,14 @@
             <!-- Food Info (Cell 2) -->
             <div class="col-xl-6 col-lg-12 desktop-space-bottom">
 
-                <slick-expansion-panel [expanded]="false">
+                <mat-expansion-panel SlickExpansionPanel [collapseWidth]="1199" [expanded]="true">
 
-                    <ng-container mat-panel-title>
-                        Food Info
-                    </ng-container>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>Food Info</mat-panel-title>
+                    </mat-expansion-panel-header>
 
                     <div class="space-bottom">
-                        <b>Available Until:</b> {{ foodListing.availableUntilDate }}
+                        <b>Available Until:</b> {{ dateFormatter.dateToMonthDayYearString(foodListing.availableUntilDate) }}
                     </div>
 
                     <div class="space-bottom">
@@ -53,7 +53,7 @@
                         <food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true" [condensedDisplay]="!responsiveService.widthGreaterThan(767)"></food-types>
                     </div>
 
-                </slick-expansion-panel>
+                </mat-expansion-panel>
 
             </div>
             <!-- Food Info (Cell 2) -->
@@ -65,11 +65,11 @@
                 <ng-container *ngFor="let foodListingUserAccessor of FOOD_LISTING_USER_ACCESSORS; let i = index">
                     <ng-container *ngIf="shouldShowFoodListingUser(foodListingUserAccessor)">
 
-                        <slick-expansion-panel [ngClass]="{ 'full-panel-min-height': ( getFoodListingUser(foodListingUserAccessor) != null ) }" [expanded]="false">
+                        <mat-expansion-panel SlickExpansionPanel [collapseWidth]="1199" [expanded]="true">
     
-                            <ng-container mat-panel-title>
-                                {{ FOOD_LISTING_USER_TITLES[i] }} Info
-                            </ng-container>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>{{ FOOD_LISTING_USER_TITLES[i] }} Info</mat-panel-title>
+                            </mat-expansion-panel-header>
                             
                             <ng-container *ngIf="getFoodListingUser(foodListingUserAccessor) != null">
 
@@ -124,7 +124,7 @@
                                 <span>No {{ FOOD_LISTING_USER_TITLES[i] }}</span>
                             </span>
 
-                        </slick-expansion-panel>
+                        </mat-expansion-panel>
 
                     </ng-container>
                 </ng-container>

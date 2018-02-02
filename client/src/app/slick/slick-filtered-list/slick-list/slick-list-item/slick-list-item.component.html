@@ -1,5 +1,5 @@
 <!-- Container for each list item -->
-<div id="slick-list-item-container" [ngClass]="{ 'list-div': includeBorder }">
+<div class="slick-list-item" [ngClass]="{ 'list-div': includeBorder }">
 
     <!-- Header -->
     <h3 #header class="slick-list-item-header link-content space-bottom" [hidden]="header.children.length === 0 || headerPlacement === 'body'">
@@ -7,12 +7,12 @@
     </h3>
     
     <!-- Max-width image and associated content floating on left -->
-    <div id="slick-list-item-img">
+    <div class="slick-list-item-img">
         <ng-content select="[slick-list-item-img]"></ng-content>
     </div>
 
     <!-- Right content extending remaining width after left -->
-    <div id="slick-list-item-body-container">
+    <div class="slick-list-item-body-container">
         
         <!-- Header -->
         <h3 #bodyHeader class="slick-list-item-header link-content space-bottom" [hidden]="bodyHeader.children.length === 0 || headerPlacement === 'top'">
@@ -20,14 +20,14 @@
         </h3>
     
         <!-- Body -->
-        <div id="slick-list-item-body">
+        <div class="slick-list-item-body">
             <ng-content select="[slick-list-item-body]"></ng-content>
         </div>
     
     </div>
 
     <!-- Bottom full width content -->
-    <div id="slick-list-item-footer">
+    <div class="slick-list-item-footer">
         <ng-content select="[slick-list-item-footer]"></ng-content>
     </div>
 

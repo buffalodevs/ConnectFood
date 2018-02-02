@@ -4,13 +4,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AgmCoreModule } from '@agm/core';
 
-import { MatInputModule, MatButtonModule, MatSelectModule, MatRadioModule } from '@angular/material';
+import { MatInputModule, MatButtonModule, MatSelectModule, MatRadioModule, MatExpansionModule } from '@angular/material';
 
 import { CommonUtilModule } from '../common-util/common-util.module';
 import { SlickExpansionPanelModule } from '../slick/slick-expansion-panel/slick-expansion-panel.module';
 import { SlickFilteredListModule } from '../slick/slick-filtered-list/slick-filtered-list.module';
 import { SlickMapModule } from '../slick/slick-map/slick-map.module';
-import { SlickWeekdaySchedulerModule } from '../slick/slick-scheduler/slick-weekday-scheduler/slick-weekday-scheduler.module';
+import { SlickDateTimeSchedulerModule } from '../slick/slick-scheduler/slick-date-time-scheduler/slick-date-time-scheduler.module';
 
 import { DeliveryListingsComponent } from './delivery-listings/delivery-listings.component';
 import { DeliveryListingsFiltersComponent } from './delivery-listings-filters/delivery-listings-filters.component';
@@ -70,12 +70,13 @@ const delivererRoutes: Routes = [
         MatButtonModule,
         MatSelectModule,
         MatRadioModule,
+        MatExpansionModule,
         AgmCoreModule,
         CommonUtilModule,
         SlickExpansionPanelModule,
         SlickFilteredListModule,
         SlickMapModule,
-        SlickWeekdaySchedulerModule
+        SlickDateTimeSchedulerModule
     ],
     providers: [
         DeliveryUtilService,

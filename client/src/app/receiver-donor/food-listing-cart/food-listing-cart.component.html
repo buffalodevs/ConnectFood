@@ -1,7 +1,7 @@
 <slick-filtered-list [filters]="filters" [listings]="listings">
         
     <ng-container filters>
-        <food-listings-filters #filters [formGroup]="filters" [header]="getFiltersTitle(filters)" [additionalFilters]="additionalFilters" [defaultAvailableAfterDateNow]="false">
+        <food-listings-filters #filters [formGroup]="filters" header="Search" [additionalFilters]="additionalFilters" [defaultAvailableAfterDateNow]="false">
 
             <ng-container top>
 

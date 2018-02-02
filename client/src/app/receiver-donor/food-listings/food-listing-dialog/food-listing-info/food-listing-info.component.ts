@@ -3,9 +3,10 @@ import { Observable } from 'rxjs/Observable';
 
 import { ResponsiveService } from '../../../../common-util/services/responsive.service';
 
-import { FoodListing } from './../../../../../../../shared/receiver-donor/food-listing';
-import { FoodListingUser } from '../../../../../../../shared/common-receiver-donor-deliverer/shared-food-listing-delivery';
+import { FoodListing } from './../../../../../../../shared/src/receiver-donor/food-listing';
+import { FoodListingUser } from '../../../../../../../shared/src/common-receiver-donor-deliverer/food-listing-user';
 import * as _ from 'lodash';
+import { DateFormatterService } from '../../../../common-util/services/date-formatter.service';
 
 
 @Component({
@@ -15,35 +16,36 @@ import * as _ from 'lodash';
 })
 export class FoodListingInfoComponent {
 
-    private readonly FOOD_LISTING_USER_ACCESSORS: string[];
-    private readonly FOOD_LISTING_USER_TITLES: string[];
+    public readonly FOOD_LISTING_USER_ACCESSORS: string[];
+    public readonly FOOD_LISTING_USER_TITLES: string[];
 
-    @Input() private foodListing: FoodListing;
+    @Input() public foodListing: FoodListing;
     /**
      * Determines if this dialog is displaying Food Listing info for a Receiver's Cart. Default is false.
      */
-    @Input() private isClaimedCart: boolean;
+    @Input() public isClaimedCart: boolean;
     /**
      * Determines if this dialog is displaying Food Listing info for a Donor's Cart. Default is false.
      */
-    @Input() private isDonatedCart: boolean;
+    @Input() public isDonatedCart: boolean;
 
     /**
      * Emitted whenever a Food Listing is to be claimed.
      */
-    @Output() private toClaim: EventEmitter<void>;
+    @Output() public toClaim: EventEmitter<void>;
     /**
      * Emitted whenever a Food Listing is to be unclaimed.
      */
-    @Output() private toUnclaim: EventEmitter<void>;
+    @Output() public toUnclaim: EventEmitter<void>;
     /**
      * Emitted whenever a Food Listing is to be removed (un-donated).
      */
-    @Output() private toRemove: EventEmitter<void>;
+    @Output() public toRemove: EventEmitter<void>;
 
 
     public constructor (
-        private responsiveService: ResponsiveService
+        public responsiveService: ResponsiveService,
+        public dateFormatter: DateFormatterService
     ) {
         this.FOOD_LISTING_USER_ACCESSORS = [ 'donorInfo', 'claimInfo.receiverInfo', 'claimInfo.delivererInfo' ];
         this.FOOD_LISTING_USER_TITLES = [ 'Donor', 'Receiver', 'Deliverer' ];

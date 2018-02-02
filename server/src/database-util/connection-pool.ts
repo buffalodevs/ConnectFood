@@ -6,7 +6,8 @@ require('dotenv');
 
 /**
  * The process.env object contains the global environmental variables set in the root directory's .env file.
- * For deployment on Heroku, we will explicitly set the environmental variables using 'heroku config:set ENVIRONEMNTAL_VAR_NAME = value' via the heroku cli.
+ * For deployment on Heroku (test-bed), we will explicitly set the environmental variables using 'heroku config:set ENVIRONEMNTAL_VAR_NAME = value' via the heroku cli.
+ * For deployment on Google Cloud (production), we will use a private configuration file containing environmental variables.
  */
 const config : PoolConfig = {
     user:       process.env.DATABASE_USERNAME,
@@ -31,7 +32,7 @@ const pool : Pool = new Pool(config);
  * @param values (OPTIONAL) The arguments to the prepared query statement.
  * @return A JavaScript Promise that will contain the result of the query upon success and error information upon failure.
  */
-export function query(text: string, values: Array<any> = null) : Promise<QueryResult> {
+export function query(text: string, values: Array<any> = null) : Promise <QueryResult> {
     return (values != null) ? pool.query(text, values)
                             : pool.query(text);
 }
@@ -43,6 +44,6 @@ export function query(text: string, values: Array<any> = null) : Promise<QueryRe
  * To do this, call release() on the connection object returned by this method.
  * @return A Promise that will provide a client or connection object on success that can have queries executed on it.
  */ 
-export function connect() : Promise<Client> {
+export function connect() : Promise <Client> {
     return pool.connect();
 }

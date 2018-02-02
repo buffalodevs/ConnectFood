@@ -2,10 +2,10 @@ import { Observable } from "rxjs/Observable";
 import { Observer } from "rxjs/Observer";
 import { Subscription } from "rxjs/Subscription";
 
-import { GetListingsRequest } from "../slick-list-message/slick-list-request";
-import { SlickListFilters } from "../../slick-list-filters/slick-list-filters";
+import { GetListingsRequest } from "../../../../../../../shared/src/slick-list/message/slick-list-request";
+import { SlickListFilters } from "../../../../../../../shared/src/slick-list/slick-list-filters/slick-list-filters";
 import { RequestService } from "../../../../common-util/services/request.service";
-import { GetListingsResponse } from "../slick-list-message/slick-list-response";
+import { GetListingsResponse } from "../../../../../../../shared/src/slick-list/message/slick-list-response";
 
 
 /**
@@ -15,18 +15,18 @@ import { GetListingsResponse } from "../slick-list-message/slick-list-response";
  */
 export class ListingsBuffer <LIST_T, FILTERS_T extends SlickListFilters> {
 
-    private buffer: LIST_T[];
-    private bufferStartOffset: number;
-    private endOfListingsOnServer: boolean;
-    private currentServerQuerySubscription: Subscription;
+    private _buffer: LIST_T[];
+    private _bufferStartOffset: number;
+    private _endOfListingsOnServer: boolean;
+    private _currentServerQuerySubscription: Subscription;
 
 
     public constructor (
-        private requestService: RequestService,
+        private _requestService: RequestService,
         /**
          * The size of the buffer. The buffer will always attempt to fill itself to this capacity with listings from the server. Default is 5.
          */
-        private bufferCapacity: number = 5
+        private _bufferCapacity: number = 5
     ) {
         this.clearBuffer();
     }
@@ -37,14 +37,14 @@ export class ListingsBuffer <LIST_T, FILTERS_T extends SlickListFilters> {
      */
     public clearBuffer(): void {
 
-        this.buffer = [];
-        this.bufferStartOffset = 0;
-        this.endOfListingsOnServer = false;
+        this._buffer = [];
+        this._bufferStartOffset = 0;
+        this._endOfListingsOnServer = false;
 
         // Make sure we dispose of any current subscription (so we don't fill buffer with old subscription after refresh)!
-        if (this.currentServerQuerySubscription != null) {
-            this.currentServerQuerySubscription.unsubscribe();
-            this.currentServerQuerySubscription = null;
+        if (this._currentServerQuerySubscription != null) {
+            this._currentServerQuerySubscription.unsubscribe();
+            this._currentServerQuerySubscription = null;
         }
     }
 
@@ -54,7 +54,7 @@ export class ListingsBuffer <LIST_T, FILTERS_T extends SlickListFilters> {
      * @return the buffer start offset.
      */
     public getBufferStartOffset(): number {
-        return this.bufferStartOffset;
+        return this._bufferStartOffset;
     }
 
 
@@ -63,7 +63,7 @@ export class ListingsBuffer <LIST_T, FILTERS_T extends SlickListFilters> {
      * @return true if more listings are available, false if not.
      */
     public hasMoreListings(): boolean {
-        return ( this.buffer.length > 0 || !this.endOfListingsOnServer );
+        return ( this._buffer.length > 0 || !this._endOfListingsOnServer );
     }
 
 
@@ -80,14 +80,14 @@ export class ListingsBuffer <LIST_T, FILTERS_T extends SlickListFilters> {
 
         return Observable.create((observer: Observer <LIST_T[]>) => {
 
-            const haveEnoughInBuffer: boolean = ( returnAvailableImmedialtey && this.buffer.length !== 0 ) || this.buffer.length === retrievalAmount;
+            const haveEnoughInBuffer: boolean = ( returnAvailableImmedialtey && this._buffer.length !== 0 ) || this._buffer.length === retrievalAmount;
 
             // If we have listings in the buffer, then we can immediately pull from buffer and query server in background to refill buffer.
             if (haveEnoughInBuffer) {
                 this.getListingsFromBuffer(observer, retrievalAmount, route, filters);
             }
             // If we do not have (enough) listings in the buffer, but we have more on the server.
-            else if (!this.endOfListingsOnServer) {
+            else if (!this._endOfListingsOnServer) {
                 this.getListingsFromServer(observer, retrievalAmount, route, filters);
             }
             // There are no more buffered listings or listings on the server, so return empty list in observable.
@@ -110,16 +110,16 @@ export class ListingsBuffer <LIST_T, FILTERS_T extends SlickListFilters> {
     private getListingsFromServer(observer: Observer <LIST_T[]>, retrievalAmount: number, route: string, filters: FILTERS_T): void {
 
         // If we are not currently querying the server for data to load into the buffer, then start server query.
-        if (this.currentServerQuerySubscription == null) {
-            const totalRefillRetrievalAmount: number = ( retrievalAmount + this.bufferCapacity - this.buffer.length );
-            this.currentServerQuerySubscription = this.sendMessageToServerForBufferRefill(this.bufferStartOffset, totalRefillRetrievalAmount, route, filters);
+        if (this._currentServerQuerySubscription == null) {
+            const totalRefillRetrievalAmount: number = ( retrievalAmount + this._bufferCapacity - this._buffer.length );
+            this._currentServerQuerySubscription = this.sendMessageToServerForBufferRefill(this._bufferStartOffset, totalRefillRetrievalAmount, route, filters);
         }
 
         // Wait for the current server query to complete to grab retrieved listings from the cache.
-        this.currentServerQuerySubscription.add(() => {
+        this._currentServerQuerySubscription.add(() => {
 
             // If we could not pull back any more lisings, then return empty list
-            if (this.buffer.length === 0) {
+            if (this._buffer.length === 0) {
                 
                 observer.next([]);
                 observer.complete();
@@ -142,8 +142,8 @@ export class ListingsBuffer <LIST_T, FILTERS_T extends SlickListFilters> {
     private getListingsFromBuffer(observer: Observer <LIST_T[]>, retrievalAmount: number, route: string, filters: FILTERS_T): void {
 
         // Take data from contained listings buffer and push it out to subscriber.
-        observer.next(this.buffer.splice(0, retrievalAmount));
-        this.bufferStartOffset += retrievalAmount;
+        observer.next(this._buffer.splice(0, retrievalAmount));
+        this._bufferStartOffset += retrievalAmount;
         observer.complete();
 
         // (Re)fill buffer to full capacity if necessary and listings remain on server.
@@ -158,7 +158,7 @@ export class ListingsBuffer <LIST_T, FILTERS_T extends SlickListFilters> {
      * @return true if it should, false if not.
      */
     private shouldRefillBuffer(): boolean {
-        return ( this.buffer.length < this.bufferCapacity && !this.endOfListingsOnServer && this.currentServerQuerySubscription == null );
+        return ( this._buffer.length < this._bufferCapacity && !this._endOfListingsOnServer && this._currentServerQuerySubscription == null );
     }
 
 
@@ -170,10 +170,10 @@ export class ListingsBuffer <LIST_T, FILTERS_T extends SlickListFilters> {
     private refillRemainingBufferCapacity(route: string, filters: FILTERS_T): void {
 
         // Set segment offset and amount (size) information for the refill.
-        const bufferRefillOffset: number = ( this.bufferStartOffset + this.buffer.length );
-        const bufferRefillAmount: number = ( this.bufferCapacity - this.buffer.length );
+        const _bufferRefillOffset: number = ( this._bufferStartOffset + this._buffer.length );
+        const _bufferRefillAmount: number = ( this._bufferCapacity - this._buffer.length );
 
-        this.currentServerQuerySubscription = this.sendMessageToServerForBufferRefill(bufferRefillOffset, bufferRefillAmount, route, filters);
+        this._currentServerQuerySubscription = this.sendMessageToServerForBufferRefill(_bufferRefillOffset, _bufferRefillAmount, route, filters);
     }
 
 
@@ -187,13 +187,13 @@ export class ListingsBuffer <LIST_T, FILTERS_T extends SlickListFilters> {
      */
     private sendMessageToServerForBufferRefill(retrievalOffset: number, retrievalAmount: number, route: string, filters: FILTERS_T): Subscription {
 
-        const request: GetListingsRequest <FILTERS_T> = new GetListingsRequest <FILTERS_T>(filters);
+        const request: GetListingsRequest <FILTERS_T> = { filters: filters };
 
         // Set our retrieval range information for the server to filter by.
         filters.retrievalOffset = retrievalOffset;
         filters.retrievalAmount = retrievalAmount;
 
-        return this.requestService.post(route, request).subscribe(this.fillBufferFromServerResponse.bind(this, retrievalAmount, route, filters));
+        return this._requestService.post(route, request).subscribe(this.fillBufferFromServerResponse.bind(this, retrievalAmount, route, filters));
     }
 
 
@@ -210,14 +210,14 @@ export class ListingsBuffer <LIST_T, FILTERS_T extends SlickListFilters> {
         console.log('Got ' + getListingsResponse.listData.length + ' listings out of retrieval amount: ' + retrievalAmount);
 
         // Record if we have reached end of listings on server with given set of filters (didn't get all requested listings from server).
-        this.endOfListingsOnServer = ( getListingsResponse.listData.length < retrievalAmount );
+        this._endOfListingsOnServer = ( getListingsResponse.listData.length < retrievalAmount );
 
         // Append refill listings to buffer.
-        this.buffer = this.buffer.concat(getListingsResponse.listData);
+        this._buffer = this._buffer.concat(getListingsResponse.listData);
 
         // Dispose of and reset the subscrition so server can be contacted again.
-        this.currentServerQuerySubscription.unsubscribe();
-        this.currentServerQuerySubscription = null;
+        this._currentServerQuerySubscription.unsubscribe();
+        this._currentServerQuerySubscription = null;
 
         // If buffer is still not full (due to buffer being emptied while server is being queried for refill), then attempt to fill it.
         if (this.shouldRefillBuffer()) {

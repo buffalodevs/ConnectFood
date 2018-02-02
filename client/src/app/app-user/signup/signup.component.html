@@ -80,7 +80,7 @@
             </div>
 
             <button mat-raised-button color="primary" class="button-md warn-button" type="button" matStepperPrevious>Back</button>
-            <button mat-raised-button color="primary" class="button-md" (click)="validate.set('primary', true)" matStepperNext>Next</button>
+            <button mat-raised-button color="primary" class="button-md" (click)="validateField('primary')" matStepperNext>Next</button>
 
         </mat-step>
 
@@ -127,7 +127,7 @@
             </div>
 
             <button mat-raised-button color="primary" class="button-md warn-button" type="button" matStepperPrevious>Back</button>
-            <button mat-raised-button color="primary" class="button-md" (click)="validate.set('addressPhone', true)" matStepperNext>Next</button>
+            <button mat-raised-button color="primary" class="button-md" (click)="validateField('addressPhone')" matStepperNext>Next</button>
 
         </mat-step>
 
@@ -137,7 +137,7 @@
             <h3 class="center-text">Weekly Availability</h3>
             <hr>
 
-            <slick-weekday-schedule-builder [validate]="validate.get('availability')" formControlName="availability"></slick-weekday-schedule-builder>
+            <slick-weekday-schedule-builder [validate]="shouldValidateField('availability')" formControlName="availability"></slick-weekday-schedule-builder>
 
             <button mat-raised-button color="primary" class="button-md warn-button" type="button" matStepperPrevious>Back</button>
             <button mat-raised-button color="primary" class="button-md" type="submit" (click)="signupUser(form.value, form.valid)">Submit</button>

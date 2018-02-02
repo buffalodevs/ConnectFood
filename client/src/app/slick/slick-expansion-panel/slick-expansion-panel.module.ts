@@ -2,19 +2,19 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material';
 
-import { SlickExpansionPanelComponent } from './slick-expansion-panel.component';
+import { SlickExpansionPanelDirective } from './slick-expansion-panel.directive';
 
 
 @NgModule({
     declarations: [
-        SlickExpansionPanelComponent
+        SlickExpansionPanelDirective
     ],
     imports: [
         CommonModule,
         MatExpansionModule
     ],
     exports: [
-        SlickExpansionPanelComponent
+        SlickExpansionPanelDirective
     ]
 })
 export class SlickExpansionPanelModule {}

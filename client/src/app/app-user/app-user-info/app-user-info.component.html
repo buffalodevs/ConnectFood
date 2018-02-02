@@ -10,11 +10,11 @@
 
                 <h4>Email Address:</h4>
 
-                <span *ngIf="!editData.get('email').editing" class="link-content" (click)="setEditable('email')" title="edit">
+                <span *ngIf="!getEditDataFor('email').editing" class="link-content" (click)="setEditable('email')" title="edit">
                     {{ control('email').value }}<i class="material-icons">&#xe254;</i>
                 </span>
 
-                <form [formGroup]="form" (ngSubmit)="save('email')" [slick-progress-spinner]="editData.get('email').showProgressSpinner" *ngIf="editData.get('email').editing">
+                <form [formGroup]="form" (ngSubmit)="save('email')" [slick-progress-spinner]="getEditDataFor('email').showProgressSpinner" *ngIf="getEditDataFor('email').editing">
 
                     <mat-input-container floatPlaceholder="never">
                         <input matInput type="email" id="email" formControlName="email" placeholder="Email">
@@ -28,16 +28,16 @@
 
             </div>
 
-            <div class="form-group" *ngIf="isOrganization">
+            <div class="form-group" *ngIf="IS_ORGANIZATION">
 
                 <h4>Organization Name:</h4>
 
-                <span *ngIf="!editData.get('organizationName').editing" class="link-content" (click)="setEditable('organizationName')" title="edit">
+                <span *ngIf="!getEditDataFor('organizationName').editing" class="link-content" (click)="setEditable('organizationName')" title="edit">
                     {{ control('organizationName').value}}<i class="material-icons">&#xe254;</i>
                 </span>
 
                 <form [formGroup]="form" (ngSubmit)="save('organizationName')"
-                [slick-progress-spinner]="editData.get('organizationName').showProgressSpinner" *ngIf="editData.get('organizationName').editing">
+                [slick-progress-spinner]="getEditDataFor('organizationName').showProgressSpinner" *ngIf="getEditDataFor('organizationName').editing">
 
                     <mat-input-container floatPlaceholder="never">
                         <input matInput id="organizationName" formControlName="organizationName" placeholder="Organization Name">
@@ -56,14 +56,14 @@
 
             <div class="form-group">
 
-                <h4>{{ isOrganization ? 'Admin Name' : 'Name' }}:</h4>
+                <h4>{{ IS_ORGANIZATION ? 'Admin Name' : 'Name' }}:</h4>
 
-                <span *ngIf="!editData.get('firstName').editing" class="link-content" (click)="setManyEditable(['firstName', 'lastName'])" title="edit">
+                <span *ngIf="!getEditDataFor('firstName').editing" class="link-content" (click)="setManyEditable(['firstName', 'lastName'])" title="edit">
                     {{ control('firstName').value }} {{ control('lastName').value }}<i class="material-icons">&#xe254;</i>
                 </span>
 
                 <form [formGroup]="form" (ngSubmit)="saveMany(['firstName', 'lastName'])"
-                 [slick-progress-spinner]="editData.get('firstName').showProgressSpinner" *ngIf="editData.get('firstName').editing">
+                 [slick-progress-spinner]="getEditDataFor('firstName').showProgressSpinner" *ngIf="getEditDataFor('firstName').editing">
 
                     <div class="row">
 
@@ -84,17 +84,17 @@
 
             </div>
 
-            <div class="form-group" *ngIf="isOrganization">
+            <div class="form-group" *ngIf="IS_ORGANIZATION">
 
                 <h4>Organization Tax Id:</h4>
 
-                <div class="form-group" *ngIf="!editData.get('taxId').editing">
+                <div class="form-group" *ngIf="!getEditDataFor('taxId').editing">
                     <span class="link-content" (click)="setEditable('taxId')" title="edit">
                         {{ control('taxId').value }}<i class="material-icons">&#xe254;</i>
                     </span>
                 </div>
 
-                <form [formGroup]="form" (ngSubmit)="save('taxId')" [slick-progress-spinner]="editData.get('taxId').showProgressSpinner" *ngIf="editData.get('taxId').editing">
+                <form [formGroup]="form" (ngSubmit)="save('taxId')" [slick-progress-spinner]="getEditDataFor('taxId').showProgressSpinner" *ngIf="getEditDataFor('taxId').editing">
 
                     <mat-input-container floatPlaceholder="never">
                         <input matInput placeholder="Organization Tax ID" [textMask]="{ mask: appUserConstants.TAX_ID_MASK, placeholderChar: '\u2000' }"
@@ -120,7 +120,7 @@
 
             <h4>Address:</h4>
 
-            <div class="form-group" *ngIf="!editData.get('address').editing">
+            <div class="form-group" *ngIf="!getEditDataFor('address').editing">
                 <span class="link-content" (click)="setManyEditable(['address', 'city', 'state', 'zip'])" title="edit">
                     {{ control('address').value }}<br>
                     {{ control('city').value }}, {{ control('state').value }} {{ control('zip').value }}<i class="material-icons">&#xe254;</i>
@@ -128,7 +128,7 @@
             </div>
 
             <form [formGroup]="form" (ngSubmit)="saveMany(['address', 'city', 'state', 'zip'])" class="form-group"
-             [slick-progress-spinner]="editData.get('address').showProgressSpinner" *ngIf="editData.get('address').editing">
+             [slick-progress-spinner]="getEditDataFor('address').showProgressSpinner" *ngIf="getEditDataFor('address').editing">
 
                 <mat-input-container floatPlaceholder="never" class="form-group">
                     <input matInput id="address" placeholder="Street Address" name="address" formControlName="address">
@@ -167,13 +167,13 @@
 
                 <h4>Phone Number:</h4>
 
-                <div class="form-group" *ngIf="!editData.get('phone').editing">
+                <div class="form-group" *ngIf="!getEditDataFor('phone').editing">
                     <span class="link-content" (click)="setEditable('phone')" title="edit">
                         {{ control('phone').value }}<i class="material-icons">&#xe254;</i>
                     </span>
                 </div>
 
-                <form [formGroup]="form" (ngSubmit)="save('phone')" [slick-progress-spinner]="editData.get('phone').showProgressSpinner" *ngIf="editData.get('phone').editing">
+                <form [formGroup]="form" (ngSubmit)="save('phone')" [slick-progress-spinner]="getEditDataFor('phone').showProgressSpinner" *ngIf="getEditDataFor('phone').editing">
 
                     <mat-input-container floatPlaceholder="never">
                         <input matInput placeholder="phone number" [textMask]="{ mask: appUserConstants.PHONE_MASK, placeholderChar: '\u2000' }" formControlName="phone">
@@ -191,18 +191,18 @@
 
     <h2>Availability</h2>
     <hr>
-    <div id="schedule-builder-container" class="row" [slick-progress-spinner]="editData.get('availability').showProgressSpinner" spinnerStickyTopId="schedule-builder-container">
+    <div id="schedule-builder-container" class="row" [slick-progress-spinner]="getEditDataFor('availability').showProgressSpinner" spinnerStickyTopId="schedule-builder-container">
 
-        <slick-weekday-schedule-builder #availability id="availability" [displayOnly]="!editData.get('availability').editing" formControlName="availability">
+        <slick-weekday-schedule-builder #availability id="availability" [displayOnly]="!getEditDataFor('availability').editing" formControlName="availability">
         </slick-weekday-schedule-builder>
 
         <div class="col-md-6">
 
-            <button mat-raised-button color="primary" class="button-sm" *ngIf="!editData.get('availability').editing" (click)="setEditable('availability')">
+            <button mat-raised-button color="primary" class="button-sm" *ngIf="!getEditDataFor('availability').editing" (click)="setEditable('availability')">
                 Update Availability
             </button>
 
-            <form [formGroup]="form" (ngSubmit)="save('availability')" *ngIf="editData.get('availability').editing">
+            <form [formGroup]="form" (ngSubmit)="save('availability')" *ngIf="getEditDataFor('availability').editing">
                 <button mat-raised-button color="primary" class="button-sm" type="submit">Save</button>
                 <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('availability', false)">Cancel</button>
             </form>
@@ -216,13 +216,13 @@
     <div class="row">
             
         <div class="col-md-6">
-            <button mat-raised-button color="primary" class="button-sm" *ngIf="!editData.get('password').editing"
+            <button mat-raised-button color="primary" class="button-sm" *ngIf="!getEditDataFor('password').editing"
              (click)="setManyEditable(['currentPassword', 'password', 'confirmPassword'])">
                 Update Password
             </button>
 
             <form [formGroup]="form" (ngSubmit)="savePassword('currentPassword', 'password', 'confirmPassword')"
-             [slick-progress-spinner]="editData.get('password').showProgressSpinner" *ngIf="editData.get('password').editing">
+             [slick-progress-spinner]="getEditDataFor('password').showProgressSpinner" *ngIf="getEditDataFor('password').editing">
 
                 <div class="form-group">
                     <mat-input-container class="full-width">

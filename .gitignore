@@ -3,6 +3,7 @@
 # compiled output
 /server/dist
 /client/dist
+/shared/dist
 /tmp
 
 # resources

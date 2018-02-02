@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 
 import { getDomainValues } from "./get-domain-values";
 
-import { GetDomainValuesResponse, GetDomainValuesRequest } from '../../../shared/domain/get-domain-values-message';
+import { GetDomainValuesResponse, GetDomainValuesRequest } from '../../../shared/src/domain/get-domain-values-message';
 
 
 export function handleGetDomainValues(request: Request, response: Response): void {

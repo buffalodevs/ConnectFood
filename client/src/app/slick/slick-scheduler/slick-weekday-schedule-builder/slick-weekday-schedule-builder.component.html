@@ -3,34 +3,33 @@
     <form [formGroup]="form" class="row">
 
         <div class="col-md-6" *ngFor="let weekdaySplit of weekdaySplitService.weekdaySplits">
-
-            <div class="row">
         
-                <slick-expansion-panel class="col-md-12" *ngFor="let weekday of weekdaySplit" [formArrayName]="weekday">
-                            
-                    <ng-container mat-panel-title>{{ weekday }}</ng-container>
+            <mat-expansion-panel SlickExpansionPanel [expanded]="true" *ngFor="let weekday of weekdaySplit" [formArrayName]="weekday">
+                
+                <mat-expansion-panel-header>
+                    <mat-panel-title>{{ weekday }}</mat-panel-title>
+                </mat-expansion-panel-header>
 
-                    <div *ngFor="let timeRange of control(weekday).controls; let i = index"
-                     class="time-range-container" [ngClass]="{  'display-time-range-container': displayOnly,
-                                                                'edit-time-range-container': !displayOnly }">
 
-                        <slick-time-range [weekday]="getWeekdayInd(weekday)" [validate]="validate" [displayOnly]="displayOnly" [formControlName]="i"></slick-time-range>
-                        <button (click)="removeTimeRange(weekday, i)" type="button" class="remove-button" *ngIf="allowRemove && !displayOnly">&times;</button>
+                <div *ngFor="let timeRange of control(weekday)['controls']; let i = index"
+                    class="time-range-container" [ngClass]="{  'display-time-range-container': displayOnly,
+                                                            'edit-time-range-container': !displayOnly }">
 
-                    </div>
+                    <slick-time-range [validate]="validate" [displayOnly]="displayOnly" [formControlName]="i"></slick-time-range>
+                    <button (click)="removeAvailabilityRange(weekday, i)" type="button" class="remove-button" *ngIf="allowRemove && !displayOnly">&times;</button>
 
-                    <div class="link-content add-container" *ngIf="canAddNewTimeRange(weekday)">
+                </div>
 
-                        <a (click)="addTimeRange(weekday)">
-                            <button type="button" class="add-button accent-background-darker">+</button>
-                            <span class="add-span">Add Availability</span>
-                        </a>
+                <div class="link-content add-container" *ngIf="canAddNewAvailabilityRange(weekday)">
 
-                    </div>
+                    <a (click)="addAvailabilityRange(weekday)">
+                        <button type="button" class="add-button accent-background-darker">+</button>
+                        <span class="add-span">Add Availability</span>
+                    </a>
 
-                </slick-expansion-panel>
+                </div>
 
-            </div>
+            </mat-expansion-panel>
 
         </div>
 

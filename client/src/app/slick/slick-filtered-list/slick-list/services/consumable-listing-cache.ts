@@ -5,8 +5,8 @@
 export class ConsumableListingCache <LIST_T> {
 
     public constructor (
-        private listing?: LIST_T,
-        private listingId?: number | string
+        private _listing: LIST_T = null,
+        private _listingId: number | string = null
     ) {}
 
 
@@ -16,8 +16,8 @@ export class ConsumableListingCache <LIST_T> {
      * @param listingId The ID of the new listing to set.
      */
     public setListing(listing: LIST_T, listingId: number | string): void {
-        this.listing = listing;
-        this.listingId = listingId;
+        this._listing = listing;
+        this._listingId = listingId;
     }
 
 
@@ -32,12 +32,12 @@ export class ConsumableListingCache <LIST_T> {
     public consumeListing(listingId: number | string): LIST_T {
 
         // Grab the listing if its ID matches the given ID, else grab null for return.
-        const listing: LIST_T = (this.listingId === listingId) ? this.listing
-                                                               : null;
+        const listing: LIST_T = (this._listingId === listingId) ? this._listing
+                                                                : null;
         
         // Clear out the cached value.
-        this.listing = null;
-        this.listingId = null;
+        this._listing = null;
+        this._listingId = null;
 
         return listing;
     }

@@ -15,17 +15,29 @@
             </ul>
 
             <ul class="navbar-nav navbar-right">
-                <button mat-button *ngIf="!sessionDataAvailable() && router.url != '/login'" class='nav-link' (click)="showLogin()"><li class="nav-item">Login</li></button>
-                <button mat-button *ngIf="!sessionDataAvailable()" class='nav-link' [routerLink]="['/signup']"><li class="nav-item">Signup</li></button>
-                <button mat-button *ngIf="sessionDataAvailable()" class='nav-link' [routerLink]="['/deliveryCart']"><li class="nav-item">Delivery Cart</li></button>
-                <button mat-button *ngIf="sessionDataAvailable()" class='nav-link' [routerLink]="['/foodListingCart']"><li class="nav-item">Food Cart</li></button>
-                <button mat-button *ngIf="sessionDataAvailable()" class='nav-link' [routerLink]="['/appUserInfo']"><li class="nav-item">Account</li></button>
-                <button mat-button *ngIf="sessionDataAvailable()" class='nav-link' (click)="logout()"><li class="nav-item">Logout</li></button>
+                <button mat-button *ngIf="!sessionDataService.sessionDataAvailable() && router.url != '/login'" class='nav-link' (click)="showLogin()"><li class="nav-item">
+                    Login
+                </li></button>
+                <button mat-button *ngIf="!sessionDataService.sessionDataAvailable()" class='nav-link' [routerLink]="['/signup']"><li class="nav-item">
+                    Signup
+                </li></button>
+                <button mat-button *ngIf="sessionDataService.sessionDataAvailable()" class='nav-link' [routerLink]="['/deliveryCart']"><li class="nav-item">
+                    Delivery Cart
+                </li></button>
+                <button mat-button *ngIf="sessionDataService.sessionDataAvailable()" class='nav-link' [routerLink]="['/foodListingCart']"><li class="nav-item">
+                    Food Cart
+                </li></button>
+                <button mat-button *ngIf="sessionDataService.sessionDataAvailable()" class='nav-link' [routerLink]="['/appUserInfo']"><li class="nav-item">
+                    Account
+                </li></button>
+                <button mat-button *ngIf="sessionDataService.sessionDataAvailable()" class='nav-link' (click)="logoutService.logout()"><li class="nav-item">
+                    Logout
+                </li></button>
             </ul>
         </div>
     </nav>
 </div>
 
-<img id="banner" *ngIf="bannerService.getSrcImgUrl() != null" [src]="bannerService.getSrcImgUrl()" [style.height.px]="bannerService.getHeightPx()">
+<img id="banner" *ngIf="bannerService.imgUrl != null" [src]="bannerService.imgUrl" [style.height.px]="bannerService.heightPx">
 
 <div id="header-bottom-pad"></div>

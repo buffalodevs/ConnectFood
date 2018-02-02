@@ -1,7 +1,7 @@
 import { Directive, OnInit, OnDestroy, ElementRef, Input } from '@angular/core';
 import { SlickStickyElement } from './slick-sticky-element';
 import { SlickScrollableStickyConfig } from './slick-scrollable-sticky-config';
-import { ObjectManipulation } from '../../../../../shared/common-util/object-manipulation';
+import { ObjectManipulation } from '../../../../../shared/src/common-util/object-manipulation';
 
 
 @Directive({
@@ -13,25 +13,26 @@ export class SlickScrollableStickyDirective implements OnInit, OnDestroy {
     /**
      * Configuration for the sticky behavior. See SlickScrollableStickyConfig definition for more details.
      */
-    @Input('SlickScrollableSticky') private stickyConfig: SlickScrollableStickyConfig;
+    @Input('SlickScrollableSticky') public stickyConfig: SlickScrollableStickyConfig;
     /**
      * Determines if the sticky behavior (scrollable and non-scrollable) should be enabled.
      * Default is true. If set false, then the element will return to (and remain in) its original positioning style.
      */
-    @Input() private enableSticky: boolean;
+    @Input() public enableSticky: boolean;
 
+    private _stickyElement: SlickStickyElement;
+    private _lastViewportTopScrollPos: number;
     private windowScrollEventListener: () => void;
-    private stickyElement: SlickStickyElement;
-    private lastViewportTopScrollPos: number;
 
 
     public constructor (
-        private elementRef: ElementRef
+        private _elementRef: ElementRef
     ) {
         this.stickyConfig = new SlickScrollableStickyConfig();
         this.enableSticky = true;
+
+        this._lastViewportTopScrollPos = 0;
         this.windowScrollEventListener = this.listenForScroll.bind(this);
-        this.lastViewportTopScrollPos = 0;
     }
 
 
@@ -39,8 +40,8 @@ export class SlickScrollableStickyDirective implements OnInit, OnDestroy {
 
         this.sanitizeStickyConfigInput();
         
-        const element: HTMLElement = this.elementRef.nativeElement;
-        this.stickyElement = new SlickStickyElement(element, this.stickyConfig);
+        const element: HTMLElement = this._elementRef.nativeElement;
+        this._stickyElement = new SlickStickyElement(element, this.stickyConfig);
         window.addEventListener('scroll', this.windowScrollEventListener);
         this.listenForScroll(); // Trigger scroll listener to begin with since element can appear suddenly in sticky state.
     }
@@ -81,44 +82,44 @@ export class SlickScrollableStickyDirective implements OnInit, OnDestroy {
         // Calculate scroll (offset) position of viewport, and the amount just scrolled (positive if scrolled down, negative if scrolled up).
         const viewportTopScrollPos: number = this.getYScrollPosPx();
         const viewportBottomScrollPos: number = ( viewportTopScrollPos + this.getWindowClientHeight() );
-        const scrollAmount: number = ( viewportTopScrollPos - this.lastViewportTopScrollPos );
-        this.lastViewportTopScrollPos = viewportTopScrollPos;
+        const scrollAmount: number = ( viewportTopScrollPos - this._lastViewportTopScrollPos );
+        this._lastViewportTopScrollPos = viewportTopScrollPos;
 
         
         // NOTE: Must round... firefox does floating point which messes up comparisons.
-        const elementTopPos: number = this.stickyElement.getTopPos(viewportTopScrollPos);
-        const elementBottomPos: number = this.stickyElement.getBottomPos(viewportTopScrollPos);
+        const elementTopPos: number = this._stickyElement.getTopPos(viewportTopScrollPos);
+        const elementBottomPos: number = this._stickyElement.getBottomPos(viewportTopScrollPos);
         const didElementHitContainerBottom: boolean = this.didElementHitContainerBottom(elementBottomPos, viewportTopScrollPos, scrollAmount);
         
 
-        if (!this.stickyElement.isPositionFixed()) {
+        if (!this._stickyElement.isPositionFixed()) {
 
             // If (when scrolling) we match top of element with top of viewport, and element fits inside viewport.
             if (this.shouldFixElementTop(elementTopPos, viewportTopScrollPos, scrollAmount, didElementHitContainerBottom)) {
-                this.stickyElement.fixTop(viewportTopScrollPos); // Internally marks as sticky if not already.
+                this._stickyElement.fixTop(viewportTopScrollPos); // Internally marks as sticky if not already.
             }
             // Else if (when scrolling) we match bottom of viewport with bottom of element, and element doesn't fit inside viewport.
             else if (this.shouldFixElementBottom(elementBottomPos, viewportBottomScrollPos, scrollAmount, didElementHitContainerBottom)) {
-                this.stickyElement.fixBottom(viewportTopScrollPos); // Internally marks as sticky if not already.
+                this._stickyElement.fixBottom(viewportTopScrollPos); // Internally marks as sticky if not already.
             }
         }
 
-        if (this.stickyElement.isPositionFixed()) {
+        if (this._stickyElement.isPositionFixed()) {
 
             // If containerId specified in stickyConfig and we have hit the bottom of the contianer.
             if (didElementHitContainerBottom) {
-                this.stickyElement.stickToContainerBottom(viewportTopScrollPos);
+                this._stickyElement.stickToContainerBottom(viewportTopScrollPos);
             }
             // If scrolling down with sticky top and bottom of element is not in view (element cannot fit in viewport).
             else if (( this.canElementScrollDown(elementBottomPos, viewportBottomScrollPos) && scrollAmount > 0 ) ||
                      // Or, if scrolling up with sticky bottom and top of sticky element is not in view (we can scroll its contents up).
                      ( this.canElementScrollUp(elementTopPos, viewportTopScrollPos) && scrollAmount < 0))
             {
-                this.stickyElement.allowStickyScroll(viewportTopScrollPos);
+                this._stickyElement.allowStickyScroll(viewportTopScrollPos);
             }
             else if (this.shouldRevertToUnsticky(elementTopPos, viewportTopScrollPos, scrollAmount)) {
                 // Revert back to original state (and styles).
-                this.stickyElement.markUnsticky();
+                this._stickyElement.markUnsticky();
             }
         }
     }
@@ -134,11 +135,11 @@ export class SlickScrollableStickyDirective implements OnInit, OnDestroy {
         const canAllowSticky: boolean = ( this.enableSticky &&
                                           // Is our body height to element height ratio satisfied
                                           (this.stickyConfig.bodyToElementHeightRatio == null ||
-                                           document.body.scrollHeight >= this.stickyElement.scrollHeight * this.stickyConfig.bodyToElementHeightRatio) );
+                                           document.body.scrollHeight >= this._stickyElement.scrollHeight * this.stickyConfig.bodyToElementHeightRatio) );
 
         // If sticky is not allowed and our element is in sticky state, remove sticky state.
-        if (!canAllowSticky && this.stickyElement.isSticky) {
-            this.stickyElement.markUnsticky();
+        if (!canAllowSticky && this._stickyElement.isSticky) {
+            this._stickyElement.markUnsticky();
         }
 
         return canAllowSticky;
@@ -173,9 +174,9 @@ export class SlickScrollableStickyDirective implements OnInit, OnDestroy {
 
         // If the element top has been scrolled to/past (is above viewport) and the element can completely fit inside the viewport.
         const scrolledDownPast: boolean = ( viewportTopScrollPos >= elementTopPos && scrollAmount > 0
-                                       && (!this.stickyConfig.scrollable || this.stickyElement.scrollHeight <= this.getWindowClientHeight()) );
+                                       && (!this.stickyConfig.scrollable || this._stickyElement.scrollHeight <= this.getWindowClientHeight()) );
         // If the element is sticky (in absolute pos scroll state), its contents are scrolling up, and we scroll past top, then it should be fixed to top.
-        const scrolledUpPast: boolean = ( this.stickyElement.isSticky && scrollAmount < 0 && viewportTopScrollPos <= elementTopPos );
+        const scrolledUpPast: boolean = ( this._stickyElement.isSticky && scrollAmount < 0 && viewportTopScrollPos <= elementTopPos );
 
         return ( (scrolledDownPast && !didElementHitContainerBottom) || scrolledUpPast );
     }
@@ -192,7 +193,7 @@ export class SlickScrollableStickyDirective implements OnInit, OnDestroy {
     private shouldFixElementBottom(elementBottomPos: number, viewportBottomScrollPos: number, scrollAmount: number, didElementHitContainerBottom: boolean): boolean {
 
         // If the element bottom has been scrolled to (is in viewport) and the element cannot completely fit inside the viewport.
-        const scrolledDownPast: boolean = ( viewportBottomScrollPos >= elementBottomPos && this.stickyElement.scrollHeight > this.getWindowClientHeight() && scrollAmount > 0 );
+        const scrolledDownPast: boolean = ( viewportBottomScrollPos >= elementBottomPos && this._stickyElement.scrollHeight > this.getWindowClientHeight() && scrollAmount > 0 );
 
         return ( this.stickyConfig.scrollable && scrolledDownPast && !didElementHitContainerBottom );
     }
@@ -205,7 +206,7 @@ export class SlickScrollableStickyDirective implements OnInit, OnDestroy {
      * @return true if it can, false if not.
      */
     private canElementScrollUp(elementTopPos: number, viewportTopScrollPos: number): boolean {
-        return ( this.stickyConfig.scrollable && this.stickyElement.scrollHeight > this.getWindowClientHeight() && elementTopPos < viewportTopScrollPos );
+        return ( this.stickyConfig.scrollable && this._stickyElement.scrollHeight > this.getWindowClientHeight() && elementTopPos < viewportTopScrollPos );
     }
 
 
@@ -216,7 +217,7 @@ export class SlickScrollableStickyDirective implements OnInit, OnDestroy {
      * @return true if it can, false if not.
      */
     private canElementScrollDown(elementBottomPos: number, viewportBottomScrollPos: number): boolean {
-        return ( this.stickyConfig.scrollable && this.stickyElement.scrollHeight > this.getWindowClientHeight() && elementBottomPos > viewportBottomScrollPos );
+        return ( this.stickyConfig.scrollable && this._stickyElement.scrollHeight > this.getWindowClientHeight() && elementBottomPos > viewportBottomScrollPos );
     }
 
 
@@ -232,7 +233,7 @@ export class SlickScrollableStickyDirective implements OnInit, OnDestroy {
         // If we don't have a container element set.
         if (this.stickyConfig.containerId == null) {
             // Did our sticky element move back up to its original top position before it entered into the sticky state
-            return ( this.stickyElement.getOriginalTopPos() > elementTopPos || this.stickyElement.origTopPos >= viewportTopScrollPos );
+            return ( this._stickyElement.getOriginalTopPos() > elementTopPos || this._stickyElement.origTopPos >= viewportTopScrollPos );
         }
         // Else we do have a container element set.
         else {

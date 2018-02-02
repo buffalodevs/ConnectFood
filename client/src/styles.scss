@@ -364,6 +364,17 @@ $inputGroupTextColor: #2779aa;
 
 
 
+/* Mat Expansion Panel styles */
+/* -------------------------- */
+.mat-expansion-panel-header-title {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+
+
+
+
 /* NGB Typeahead styles using theme color */
 /* -------------------------------------- */
 ngb-typeahead-window {
@@ -433,7 +444,6 @@ ngb-typeahead-window .dropdown-item.active, ngb-typeahead-window .dropdown-item:
 }
 
 .modal-button-group {
-    border-top: 1px solid lightgray;
     padding: 10px;
     text-align: right;
 }

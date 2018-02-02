@@ -4,40 +4,40 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/map';
 
-import { RequestService } from "../../../../common-util/services/request.service";
-import { SlickListFilters } from '../../slick-list-filters/slick-list-filters';
-import { GetListingsRequest } from '../slick-list-message/slick-list-request';
-import { GetListingsResponse } from '../slick-list-message/slick-list-response';
 import { ListingsBuffer } from './listings-buffer';
+import { RequestService } from "../../../../common-util/services/request.service";
+
+import { SlickListFilters } from '../../../../../../../shared/src/slick-list/slick-list-filters/slick-list-filters';
+import { GetListingsRequest } from '../../../../../../../shared/src/slick-list/message/slick-list-request';
+import { GetListingsResponse } from '../../../../../../../shared/src/slick-list/message/slick-list-response';
 
 
 @Injectable()
 export class GetListingsService <LIST_T, FILTERS_T extends SlickListFilters> {
     
-    private noMoreListingsToRetrieve: boolean;
-    private listingsBuffer: ListingsBuffer <LIST_T, FILTERS_T>;
+    private _retrievalAmount: number;
+    private _noMoreListingsToRetrieve: boolean;
+    private _listingsBuffer: ListingsBuffer <LIST_T, FILTERS_T>;
 
-    private previousRoute: string;
-    private previousFilters: FILTERS_T;
+    private _previousRoute: string;
+    private _previousFilters: FILTERS_T;
 
     private onBeforeGetMoreListingsCallback: () => void;
     private onReceivedMoreListingsCallback: (moreListings: LIST_T[]) => void;
 
     
     /**
-     * @param requestService The Food Web App wrapper around http requests.
-     * @param retrievalAmount Optional amount of items to be retrieved at a time. Default is 5.
+     * @param _requestService The Food Web App wrapper around http requests.
      */
     public constructor (
-        private requestService: RequestService,
-        @Optional() private retrievalAmount: number
+        private _requestService: RequestService
     ) {
-        if (this.retrievalAmount == null)  this.retrievalAmount = 5;
-        this.noMoreListingsToRetrieve = false;
-        this.listingsBuffer = new ListingsBuffer(requestService);
+        this._retrievalAmount = 5;
+        this._noMoreListingsToRetrieve = false;
+        this._listingsBuffer = new ListingsBuffer(_requestService);
 
-        this.previousRoute = null;
-        this.previousFilters = null;
+        this._previousRoute = null;
+        this._previousFilters = null;
 
         // Swallow changes here if no callbacks assigned later.
         this.onBeforeGetMoreListingsCallback = () => {};
@@ -53,7 +53,7 @@ export class GetListingsService <LIST_T, FILTERS_T extends SlickListFilters> {
      * @param retrievalAmount The new retrieval amount.
      */
     public setRetrievalAmount(retrievalAmount: number): void {
-        this.retrievalAmount = retrievalAmount;
+        this._retrievalAmount = retrievalAmount;
     }
 
 
@@ -90,10 +90,10 @@ export class GetListingsService <LIST_T, FILTERS_T extends SlickListFilters> {
         const loadThresholdPosition: number = ( documentHeight - 100 );
 
         // If we are near the bottom of the page, then load more listings!
-        if (this.previousFilters != null && (currentScrollPosition >= loadThresholdPosition)) {
+        if (this._previousFilters != null && (currentScrollPosition >= loadThresholdPosition)) {
 
             this.onBeforeGetMoreListingsCallback();
-            let observer: Observable<LIST_T[]> = this.getListings(this.previousFilters, this.previousRoute, true);
+            let observer: Observable<LIST_T[]> = this.getListings(this._previousFilters, this._previousRoute, true);
             
             // Notify listening component that more listings have been received (should be concatenated to held ones)!
             observer.subscribe((listData: LIST_T[]) => {
@@ -115,18 +115,18 @@ export class GetListingsService <LIST_T, FILTERS_T extends SlickListFilters> {
 
         // Break out immediately if we are attempting to get more listings but have reached end!
         if (getMoreListings && !this.canGetMoreListings())  return;
-        this.noMoreListingsToRetrieve = true; // We should not retrieve more listings until current request finished!
+        this._noMoreListingsToRetrieve = true; // We should not retrieve more listings until current request finished!
 
         // If we are refreshing (not getting more / appending), then clear the buffer (implicitly sets retrieval offset back to 0).
         if (!getMoreListings) {
-            this.listingsBuffer.clearBuffer();
+            this._listingsBuffer.clearBuffer();
         }
 
         // Record the last route and filters used so we can make same call to get more listings with current criteria.
-        this.previousRoute = route;
-        this.previousFilters = filters;
+        this._previousRoute = route;
+        this._previousFilters = filters;
 
-        return this.listingsBuffer.getListings(this.retrievalAmount, route, filters, true)
+        return this._listingsBuffer.getListings(this._retrievalAmount, route, filters, true)
                    .map(this.handleReceivedListings.bind(this));
     }
 
@@ -136,7 +136,7 @@ export class GetListingsService <LIST_T, FILTERS_T extends SlickListFilters> {
      * @return true if more listings are available for retrieval, false if not.
      */
     private canGetMoreListings(): boolean {
-        return (!this.noMoreListingsToRetrieve && this.previousFilters != null && this.previousRoute != null);
+        return (!this._noMoreListingsToRetrieve && this._previousFilters != null && this._previousRoute != null);
     }
     
     
@@ -146,7 +146,7 @@ export class GetListingsService <LIST_T, FILTERS_T extends SlickListFilters> {
      * @return The received listings.
      */
     private handleReceivedListings(listData: LIST_T[]): LIST_T[] {
-        this.noMoreListingsToRetrieve = ( listData.length === 0 );
+        this._noMoreListingsToRetrieve = ( listData.length === 0 );
         return listData;
     }
 
@@ -156,6 +156,6 @@ export class GetListingsService <LIST_T, FILTERS_T extends SlickListFilters> {
      * @return The previous filters.
      */
     public getPreviousFilters(): FILTERS_T {
-        return this.previousFilters;
+        return this._previousFilters;
     }
 }

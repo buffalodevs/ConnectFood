@@ -8,7 +8,9 @@ import 'rxjs/add/operator/finally';
 import { LoginService } from './login.service';
 import { PasswordRecoveryService } from './password-recovery.service';
 
-import { FoodWebResponse } from '../../../../../shared/message-protocol/food-web-response';
+import { FoodWebResponse } from '../../../../../shared/src/message-protocol/food-web-response';
+import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
+import { ValidationService } from '../../common-util/services/validation.service';
 
 
 @Component({
@@ -17,35 +19,61 @@ import { FoodWebResponse } from '../../../../../shared/message-protocol/food-web
     styleUrls: ['./login.component.css'],
     providers: [LoginService, PasswordRecoveryService]
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent extends AbstractModelDrivenComponent implements OnInit {
 
-    private forgotPassword: boolean;
-    private displayRecoveryResponseMessage: boolean;
-    private loginForm: FormGroup;
-    private loginError: string;
-    private showCloseButton: boolean;
-    private showProgressSpinner: boolean;
+    private _forgotPassword: boolean;
+    get forgotPassword(): boolean {
+        return this._forgotPassword;
+    }
+
+    private _displayRecoveryResponseMessage: boolean;
+    get displayRecoveryResponseMessage(): boolean {
+        return this._displayRecoveryResponseMessage;
+    }
+
+    private _loginError: string;
+    get loginError(): string {
+        return this._loginError;
+    }
+
+    private _showCloseButton: boolean;
+    get showCloseButton(): boolean {
+        return this._showCloseButton;
+    }
+
+    private _showProgressSpinner: boolean;
+    get showProgressSpinner(): boolean {
+        return this._showProgressSpinner;
+    }
+
+
+    get dialogRef(): MatDialogRef <LoginComponent> {
+        return this._dialogRef;
+    }
 
 
     public constructor (
-        private router: Router,
-        private formBuilder: FormBuilder,
-        private loginService: LoginService,
-        private passwordRecoveryService: PasswordRecoveryService,
-        @Optional() private dialogRef?: MatDialogRef <LoginComponent>
+        validationService: ValidationService,
+        private _router: Router,
+        private _formBuilder: FormBuilder,
+        private _loginService: LoginService,
+        private _passwordRecoveryService: PasswordRecoveryService,
+        @Optional() private _dialogRef?: MatDialogRef <LoginComponent>
     ) {
-        this.forgotPassword = false;
-        this.displayRecoveryResponseMessage = false;
-        this.showCloseButton = false;
-        this.showProgressSpinner = false;
+        super(validationService)
+
+        this._forgotPassword = false;
+        this._displayRecoveryResponseMessage = false;
+        this._showCloseButton = false;
+        this._showProgressSpinner = false;
     }
 
 
     public ngOnInit(): void {
 
-        this.showCloseButton = ( this.router.url !== '/login' );
+        this._showCloseButton = ( this._router.url !== '/login' );
 
-        this.loginForm = this.formBuilder.group({
+        this.form = this._formBuilder.group({
             email: [null, Validators.required],
             password: null
         });
@@ -78,13 +106,13 @@ export class LoginComponent implements OnInit {
 
         event.preventDefault();
 
-        let email: string = this.loginForm.value.email;
-        let password: string = this.loginForm.value.password;
-        let observer: Observable<FoodWebResponse> = (this.forgotPassword ? this.passwordRecoveryService.recoverPassword(email)
-                                                                         : this.loginService.login(email, password));
-        this.showProgressSpinner = true;
+        let email: string = this.form.value.email;
+        let password: string = this.form.value.password;
+        let observer: Observable<FoodWebResponse> = (this._forgotPassword ? this._passwordRecoveryService.recoverPassword(email)
+                                                                          : this._loginService.login(email, password));
+        this._showProgressSpinner = true;
 
-        observer.finally(() => { this.showProgressSpinner = false; })
+        observer.finally(() => { this._showProgressSpinner = false; })
                 .subscribe (
                     (response: FoodWebResponse) => {
 
@@ -92,17 +120,17 @@ export class LoginComponent implements OnInit {
 
                         if (response.success) {
                             
-                            this.loginError = null;
-                            this.forgotPassword ? this.displayRecoveryResponseMessage = true
-                                                : (this.dialogRef != null) ? this.dialogRef.close() : undefined;
+                            this._loginError = null;
+                            this._forgotPassword ? this._displayRecoveryResponseMessage = true
+                                                 : (this.dialogRef != null) ? this.dialogRef.close() : undefined;
 
                             // If we are on login, login required, or signup page, then navigate to home on successful sign in.
-                            if (this.router.url === '/login' || this.router.url === '/signup' || this.router.url === '/loginRequired') {
-                                this.router.navigate(['/home']);
+                            if (this._router.url === '/login' || this._router.url === '/signup' || this._router.url === '/loginRequired') {
+                                this._router.navigate(['/home']);
                             }
                         }
                         // Otherwise, failure occured.
-                        else { this.loginError = response.message; }
+                        else { this._loginError = response.message; }
                     },
 
                     (err: Error) => {
@@ -116,6 +144,6 @@ export class LoginComponent implements OnInit {
      * Toggles between the login and forgot password form.
      */
     private toggleForgotPassword(): void {
-        this.forgotPassword = !this.forgotPassword;
+        this._forgotPassword = !this._forgotPassword;
     }
 }

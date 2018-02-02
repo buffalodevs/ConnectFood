@@ -18,32 +18,25 @@ import { LogoutService } from '../../app-user/logout/logout.service';
 })
 export class HeaderComponent {
 
+    public isExpanded: boolean;
+    
+
     public constructor (
-        private router: Router,
-        private dialog: MatDialog,
-        private sessionDataService: SessionDataService,
-        private logoutService: LogoutService,
-        private bannerService: BannerService
+        public router: Router,
+        public bannerService: BannerService,
+        public logoutService: LogoutService,
+        public sessionDataService: SessionDataService,
+        private _dialog: MatDialog
     ) {   
-        this.router.events.filter(event => (event instanceof NavigationStart))
+        router.events.filter(event => (event instanceof NavigationStart))
             .subscribe((routeData: any) => {
                 // Reset banner on each re-route!
-                bannerService.setSrcImgUrl(null);
+                bannerService.reset();
             });
     }
 
 
     private showLogin(): void {
-        LoginComponent.display(this.dialog); 
-    }
-
-
-    private logout(): void {
-        this.logoutService.logout();
-    }
-
-
-    private sessionDataAvailable(): boolean {
-        return this.sessionDataService.sessionDataAvailable();
+        LoginComponent.display(this._dialog); 
     }
 }

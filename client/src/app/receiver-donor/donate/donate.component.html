@@ -41,8 +41,8 @@
                         <h4 for="foodTitle">Title</h4>
                         <mat-form-field class="input-group" floatPlaceholder="never">
                             <textarea #title matInput matTextareaAutosize id="foodTitle" placeholder="Donation Title"
-                                      formControlName="foodTitle" [maxlength]="titleMaxLength" [errorStateMatcher]="this" required></textarea>
-                            <mat-hint align="end">{{ title.value.length }} / {{ titleMaxLength }}</mat-hint>
+                                      formControlName="foodTitle" [maxlength]="TITLE_MAX_LENGTH" [errorStateMatcher]="this" required></textarea>
+                            <mat-hint align="end">{{ title.value.length }} / {{ TITLE_MAX_LENGTH }}</mat-hint>
                         </mat-form-field>
                     </div>
 

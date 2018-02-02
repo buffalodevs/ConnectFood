@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { AppUserType } from "../../../shared/app-user/app-user-info";
+import { AppUserType } from "../../../shared/src/app-user/app-user-info";
 
 
 @Entity()

@@ -13,20 +13,21 @@ export class SlickListItemComponent implements OnInit {
     /**
      * Flag signifying whether or not to include divider (hr) elements in list.
      */
-    @Input() private includeBorder;
+    @Input() public includeBorder;
     /**
      * Determines if the header should be placed on the top (above left and right panels) or right.
      * Default placement is right.
      */
-    @Input() private headerPlacement; // 'body' or 'top'
+    @Input() public headerPlacement; // 'body' or 'top'
     /**
      * Determines if the header placement should be fixed regardless of screen size.
      * Default is not fixed (it will adjust based on screen size).
      */
-    @Input() private fixHeaderPlacement;
+    @Input() public fixHeaderPlacement;
 
+    
     public constructor (
-        private responsiveService: ResponsiveService
+        private _responsiveService: ResponsiveService
     ) {
         this.includeBorder = true;
         this.headerPlacement = 'top'
@@ -52,7 +53,7 @@ export class SlickListItemComponent implements OnInit {
         // If our header placement is fixed, then we will not update its position!
         if (this.fixHeaderPlacement)    return;
 
-        this.headerPlacement = this.responsiveService.widthGreaterThan(1199) ? 'body'
-                                                                             : 'top';
+        this.headerPlacement = this._responsiveService.widthGreaterThan(1199) ? 'body'
+                                                                              : 'top';
     }
 }

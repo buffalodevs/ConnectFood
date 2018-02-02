@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormControl } from '@angular/forms';
 
-import { FoodListingsFilters } from "../../../../../shared/receiver-donor/food-listings-filters";
+import { FoodListingsFilters } from "../../../../../shared/src/receiver-donor/food-listings-filters";
 
 
 @Component({
@@ -11,7 +11,7 @@ import { FoodListingsFilters } from "../../../../../shared/receiver-donor/food-l
 })
 export class FoodListingsFiltersComponent extends FormGroup implements OnInit {
 
-    @Input() private header: string;
+    @Input() public header: string;
     @Input() private defaultAvailableAfterDateNow: boolean;
     /**
      * Additional filter controls and associated names.

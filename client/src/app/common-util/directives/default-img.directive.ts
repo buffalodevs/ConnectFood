@@ -13,7 +13,7 @@ import { Directive, Input } from '@angular/core';
 })
 export class DefaultImgDirective { 
 
-    private readonly DEFAULT_IMG_URL: string = './../assets/IconImg.png';
+    private readonly _DEFAULT_IMG_URL: string = './../assets/IconImg.png';
 
     @Input() src: string;
 
@@ -22,7 +22,7 @@ export class DefaultImgDirective {
      * Activated whenever an error occurs, and assigns the default image in response.
      */
     public onError(): void {
-        this.src = this.DEFAULT_IMG_URL;
+        this.src = this._DEFAULT_IMG_URL;
     }
 
 
@@ -32,6 +32,6 @@ export class DefaultImgDirective {
      * @return The url of the image to be displayed. If src input is null, then the default is displayed. Otherwise, src is simply displayed.
      */
     public checkPath(src): string {
-        return (src != null) ? src : this.DEFAULT_IMG_URL;
+        return (src != null) ? src : this._DEFAULT_IMG_URL;
     }
 }

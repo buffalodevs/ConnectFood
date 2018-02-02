@@ -5,17 +5,17 @@ import 'rxjs/add/operator/map';
 import { RequestService } from '../../common-util/services/request.service';
 import { SessionDataService } from '../../common-util/services/session-data.service';
 
-import { UpdateAppUserRequest, UpdateAppUserResponse } from '../../../../../shared/app-user/message/update-app-user-message';
-import { AppUserInfo } from "../../../../../shared/app-user/app-user-info";
-import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
+import { UpdateAppUserRequest, UpdateAppUserResponse } from '../../../../../shared/src/app-user/message/update-app-user-message';
+import { AppUserInfo } from "../../../../../shared/src/app-user/app-user-info";
+import { FoodWebResponse } from "../../../../../shared/src/message-protocol/food-web-response";
 
 
 @Injectable()
 export class AppUserUpdateService {
 
     public constructor (
-        private requestService: RequestService,
-        private sessionDataService: SessionDataService
+        private _requestService: RequestService,
+        private _sessionDataService: SessionDataService
     ) { }
 
 
@@ -25,10 +25,15 @@ export class AppUserUpdateService {
      * @param newPassword The password update.
      * @param currentPassword Only required when the password is being updated. Should contain the current password of the user.
      */
-    public updateAppUserInfo(appUserInfoUpdate: AppUserInfo, newPassword?: string, currentPassword?: string): Observable<FoodWebResponse> {
+    public updateAppUserInfo(appUserInfoUpdate: AppUserInfo, newPassword?: string, currentPassword?: string): Observable <FoodWebResponse> {
 
         let body: UpdateAppUserRequest = new UpdateAppUserRequest(appUserInfoUpdate, newPassword, currentPassword);
-        let observer: Observable<UpdateAppUserResponse> = this.requestService.post('/appUser/updateAppUser', body);
+        let observer: Observable <UpdateAppUserResponse> = <Observable <UpdateAppUserResponse>>this._requestService.post('/appUser/updateAppUser', body);
+
+        // If we are updating the address of the user, then we must also update their timezone offset (since when moving they can move across timezones).
+        if (appUserInfoUpdate.address != null) {
+            appUserInfoUpdate.utcOffsetMins = (new Date()).getTimezoneOffset();
+        }
 
         return observer.map((appUserUpdateResponse: UpdateAppUserResponse): FoodWebResponse => {
 
@@ -36,7 +41,7 @@ export class AppUserUpdateService {
 
             // Immediately update client session data on success!
             if (appUserUpdateResponse.success) {
-                this.sessionDataService.updateAppUserSessionData(appUserUpdateResponse.appUserInfo);
+                this._sessionDataService.updateAppUserSessionData(appUserUpdateResponse.appUserInfo);
             }
 
             return appUserUpdateResponse;

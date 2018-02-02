@@ -6,25 +6,25 @@ import { SlickScrollableStickyConfig } from "./slick-scrollable-sticky-config";
  */
 export class SlickStickyElement {
 
-    private isStickyState: boolean;
+    private _isStickyState: boolean;
     /**
      * When transitioning into fixed (sticky) position from original (unchanged) state, this will be the Y coordinate that will be used to determine
      * at what scroll position the element should return to its orignal state. Should be null if the elemnt is in its original state.
      * NOTE: Will not be used if a containerId is specified for a container element in the slick scrollable sticky config.
      */
-    private originalTopPos: number;
-    private originalStylePosition: string;
-    private originalStyleTop: string;
-    private originalStyleBottom: string;
-    private originalParentStyleMinHeight: string;
+    private _originalTopPos: number;
+    private _originalStylePosition: string;
+    private _originalStyleTop: string;
+    private _originalStyleBottom: string;
+    private _originalParentStyleMinHeight: string;
 
 
     public constructor (
-        private element: HTMLElement,
-        private stickyConfig: SlickScrollableStickyConfig
+        private _element: HTMLElement,
+        private _stickyConfig: SlickScrollableStickyConfig
     ) {
-        this.isStickyState = false;
-        this.originalTopPos = null;
+        this._isStickyState = false;
+        this._originalTopPos = null;
     }
 
 
@@ -34,7 +34,7 @@ export class SlickStickyElement {
      * @return true if the element is in a sticky state, false if not.
      */
     get isSticky(): boolean {
-        return this.isStickyState;
+        return this._isStickyState;
     }
 
 
@@ -43,7 +43,7 @@ export class SlickStickyElement {
      * @return The original top position (px).
      */
     get origTopPos(): number {
-        return this.originalTopPos;
+        return this._originalTopPos;
     }
 
 
@@ -53,27 +53,27 @@ export class SlickStickyElement {
      */
     public markSticky(viewportTopScrollPos: number): void {
 
-        this.isStickyState = true;
+        this._isStickyState = true;
 
         // Record original style data for sticky element so we can revert back when marking unsticky.
-        this.originalStylePosition = this.element.style.position;
-        this.originalStyleTop = this.element.style.top;
-        this.originalStyleBottom = this.element.style.bottom;
+        this._originalStylePosition = this._element.style.position;
+        this._originalStyleTop = this._element.style.top;
+        this._originalStyleBottom = this._element.style.bottom;
 
         // Record position at which we will revert back to unsticky state if no container element specified (otherwise use container element clientTop).
-        if (this.stickyConfig.containerId == null) {
-            this.originalTopPos = this.getTopPos(viewportTopScrollPos);
+        if (this._stickyConfig.containerId == null) {
+            this._originalTopPos = this.getTopPos(viewportTopScrollPos);
         }
         
         // Add any specified sticky class.
-        if (this.stickyConfig.stickyClass != null) {
-            this.element.classList.add(this.stickyConfig.stickyClass);
+        if (this._stickyConfig.stickyClass != null) {
+            this._element.classList.add(this._stickyConfig.stickyClass);
         }
 
         // Make sure that the parent keeps enough room for sticky element (even when it is removed from parent's layout).
-        if (this.stickyConfig.preserveHeightInParent) {
-            this.originalParentStyleMinHeight = this.element.parentElement.style.minHeight;
-            this.element.parentElement.style.minHeight = this.element.scrollHeight + 'px';
+        if (this._stickyConfig.preserveHeightInParent) {
+            this._originalParentStyleMinHeight = this._element.parentElement.style.minHeight;
+            this._element.parentElement.style.minHeight = this._element.scrollHeight + 'px';
         }
     }
 
@@ -87,9 +87,9 @@ export class SlickStickyElement {
         if (!this.isSticky) this.markSticky(viewportTopScrollPos); // NOTE: Ok if already marked as sticky here!
 
         // Align fixed element to viewport top.
-        this.element.style.position = 'fixed';
-        this.element.style.top = '0px';
-        this.element.style.bottom = 'auto';
+        this._element.style.position = 'fixed';
+        this._element.style.top = '0px';
+        this._element.style.bottom = 'auto';
     }
 
 
@@ -102,9 +102,9 @@ export class SlickStickyElement {
         if (!this.isSticky) this.markSticky(viewportTopScrollPos); // NOTE: Ok if already marked as sticky here!
 
         // Align fixed element to viewport bottom.
-        this.element.style.position = 'fixed';
-        this.element.style.top = 'auto';
-        this.element.style.bottom = '0px';
+        this._element.style.position = 'fixed';
+        this._element.style.top = 'auto';
+        this._element.style.bottom = '0px';
     }
 
 
@@ -126,7 +126,7 @@ export class SlickStickyElement {
      * @return The absolute offset from the top of this element's parent.
      */
     private calcOffsetFromParentTop(positionInBody: number, viewportTopScrollPos): number {
-        const parentElementTopPosition: number = ( viewportTopScrollPos + this.element.parentElement.parentElement.getBoundingClientRect().top );
+        const parentElementTopPosition: number = ( viewportTopScrollPos + this._element.parentElement.parentElement.getBoundingClientRect().top );
         return ( positionInBody - parentElementTopPosition );
     }
 
@@ -137,9 +137,9 @@ export class SlickStickyElement {
      */
     private setElementAbsoluteYPos(absoluteYPos): void {
 
-        this.element.style.position = 'absolute';
-        this.element.style.top = ( absoluteYPos + 'px' );
-        this.element.style.bottom = 'auto';
+        this._element.style.position = 'absolute';
+        this._element.style.top = ( absoluteYPos + 'px' );
+        this._element.style.bottom = 'auto';
     }
 
 
@@ -150,8 +150,8 @@ export class SlickStickyElement {
     public stickToContainerBottom(viewportTopScrollPos: number): void {
 
         // Get the container element from ID and check if it exists.
-        const containerElement: HTMLElement = document.getElementById(this.stickyConfig.containerId);
-        if (containerElement == null)   throw new Error('Container element does not exist with ID: ' + this.stickyConfig.containerId);
+        const containerElement: HTMLElement = document.getElementById(this._stickyConfig.containerId);
+        if (containerElement == null)   throw new Error('Container element does not exist with ID: ' + this._stickyConfig.containerId);
 
         // Calculate absolute top position for the sticky element based on container's height and sticky element's height.
         const stickyElementAbsoluteTopPos: number = ( containerElement.scrollHeight - this.scrollHeight );
@@ -167,22 +167,22 @@ export class SlickStickyElement {
     public markUnsticky(): void {
 
         // Get rid of placeholder min-height for element in parent.
-        if (this.stickyConfig.preserveHeightInParent) {
-            this.element.parentElement.style.minHeight = this.originalParentStyleMinHeight;
+        if (this._stickyConfig.preserveHeightInParent) {
+            this._element.parentElement.style.minHeight = this._originalParentStyleMinHeight;
         }
 
         // Remove any specified sticky class.
-        if (this.stickyConfig.stickyClass != null) {
-            this.element.classList.remove(this.stickyConfig.stickyClass);
+        if (this._stickyConfig.stickyClass != null) {
+            this._element.classList.remove(this._stickyConfig.stickyClass);
         }
 
         // Return positioning styles back to original.
-        this.element.style.position = this.originalStylePosition;
-        this.element.style.top = this.originalStyleTop;
-        this.element.style.bottom = this.originalStyleBottom;
-        this.originalTopPos = null;
+        this._element.style.position = this._originalStylePosition;
+        this._element.style.top = this._originalStyleTop;
+        this._element.style.bottom = this._originalStyleBottom;
+        this._originalTopPos = null;
 
-        this.isStickyState = false;
+        this._isStickyState = false;
     }
 
 
@@ -191,7 +191,7 @@ export class SlickStickyElement {
      * @return The original top position (px).
      */
     public getOriginalTopPos(): number {
-        return this.originalTopPos;
+        return this._originalTopPos;
     }
 
 
@@ -201,7 +201,7 @@ export class SlickStickyElement {
      * @return The top position of the sticky element.
      */
     public getTopPos(viewportTopScrollPos: number): number {
-        return ( Math.round(this.element.getBoundingClientRect().top) + viewportTopScrollPos );
+        return ( Math.round(this._element.getBoundingClientRect().top) + viewportTopScrollPos );
     }
 
 
@@ -211,7 +211,7 @@ export class SlickStickyElement {
      * @return The bottom position of the sticky element.
      */
     public getBottomPos(viewportTopScrollPos: number): number {
-        return ( Math.round(this.element.getBoundingClientRect().bottom) + viewportTopScrollPos );
+        return ( Math.round(this._element.getBoundingClientRect().bottom) + viewportTopScrollPos );
     }
 
 
@@ -220,7 +220,7 @@ export class SlickStickyElement {
      * NOTE: This is the total height of the element (including portions outside of visible viewport).
      */
     get scrollHeight(): number {
-        return this.element.scrollHeight;
+        return this._element.scrollHeight;
     }
 
 
@@ -229,7 +229,7 @@ export class SlickStickyElement {
      * @return true if position is fixed, false if not.
      */
     public isPositionFixed(): boolean {
-        return ( this.element.style.position === 'fixed' );
+        return ( this._element.style.position === 'fixed' );
     }
 
 
@@ -238,7 +238,7 @@ export class SlickStickyElement {
      * @return true if position is fixed top, false if not.
      */
     public isPositionFixedTop(): boolean {
-        return ( this.element.style.position === 'fixed' && this.element.style.top === '0px' );
+        return ( this._element.style.position === 'fixed' && this._element.style.top === '0px' );
     }
 
 
@@ -247,6 +247,6 @@ export class SlickStickyElement {
      * @return true if position is fixed bottom, false if not.
      */
     public isPositionFixedBottom(): boolean {
-        return ( this.element.style.position === 'fixed' && this.element.style.bottom === '0px' );
+        return ( this._element.style.position === 'fixed' && this._element.style.bottom === '0px' );
     }
 }

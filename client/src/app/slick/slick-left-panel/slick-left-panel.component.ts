@@ -13,59 +13,59 @@ export class SlickLeftPanelComponent implements OnChanges {
     /**
      * The offset for the button top (Y) position.
      */
-    @Input() private buttonTopOffsetPx: number;
+    @Input() public buttonTopOffsetPx: number;
     /**
      * The material design icon that will be displayed in the toggle button (given that buttonLabel is not set).
      * The default icon is 'keyboard_arrow_right'.
      */
-    @Input() private buttonIcon: string;
+    @Input() public buttonIcon: string;
     /**
      * Will be displayed as the label for the button.
      * Also, will be placed as the button tooltip if one is not given.
      * If left undefined (null), then the button will not be given text, but rather a 3 (horizontal) line tab icon.
      */
-    @Input() private buttonLabel: string;
+    @Input() public buttonLabel: string;
     /**
      * Set to true if lowercase letters will be allowed to display for the button title/label.
      * Otherwise, will default to false, and all letters will be capitalized.
      */
-    @Input() private buttonLabelAllowLowercase: boolean;
+    @Input() public buttonLabelAllowLowercase: boolean;
     /**
      * The font size of the button title. Ignored if buttonLabel is not provided.
      * Default is 25px;
      */
-    @Input() private buttonLabelFontSizePx: number;
+    @Input() public buttonLabelFontSizePx: number;
     /**
      * The tooltip that will be displayed for the button. If buttonLabel is given and this is null, then defaults to buttonLabel.
      * If neither this or buttonLabel is provided, then defaults to Toggle.
      */
-    @Input() private buttonTitle: string;
+    @Input() public buttonTitle: string;
     /**
      * Determines whether or not a back drop will be used when the panel is toggled to visible in mobile mode. Default is true.
      */
-    @Input() private useBackDrop: boolean;
+    @Input() public useBackDrop: boolean;
     /**
      * A CSS ID of the container for the slick left panel. This is used to prevent the panel from moving beyond the bottom of a parent contianer
      * when it is in a sticky state.
      */
-    @Input() private stickyContainerId: string;
+    @Input() public stickyContainerId: string;
     /**
      * When the screen is below this size, the left panel will collapse.
      * Based off of Bootstrap col- sizes (e.g. xs: 575px, sm: 767px, md: 911px, lg: 1199px).
      * Default is sm (767px).
      */
-    @Input() private collapseScreenSize: string;
+    @Input() public collapseScreenSize: string;
 
 
-    @ViewChild('slickLeftPanel') private slickLeftPanel: ElementRef;a
-    @ViewChild('slickLeftPanelButton') private slickLeftPanelButton: MatButton;
-    @ViewChild('slickLeftPanelBackdrop') private slickLeftPanelBackdrop: ElementRef;
+    @ViewChild('slickLeftPanel') public slickLeftPanel: ElementRef;
+    @ViewChild('slickLeftPanelButton') public slickLeftPanelButton: MatButton;
+    @ViewChild('slickLeftPanelBackdrop') public slickLeftPanelBackdrop: ElementRef;
 
 
-    private readonly ICON_BUTTON_HEIGHT_PX: number;
-    private buttonLabelChars: string[];
-    private buttonHeightPx: number;
-    private slickScrollableStickyConfig: SlickScrollableStickyConfig;
+    private readonly _ICON_BUTTON_HEIGHT_PX: number;
+    public buttonLabelChars: string[];
+    public buttonHeightPx: number;
+    public slickScrollableStickyConfig: SlickScrollableStickyConfig;
 
 
     public constructor() {
@@ -80,7 +80,7 @@ export class SlickLeftPanelComponent implements OnChanges {
         this.stickyContainerId = null;
         this.collapseScreenSize = 'sm';
 
-        this.ICON_BUTTON_HEIGHT_PX = 65;
+        this._ICON_BUTTON_HEIGHT_PX = 65;
         this.updateButtonLabelChars(this.buttonLabel);
     }
 
@@ -118,7 +118,7 @@ export class SlickLeftPanelComponent implements OnChanges {
         }
         // Title is empty, so leave iterable button title char array empty and use icon button.
         else {
-            this.buttonHeightPx = this.ICON_BUTTON_HEIGHT_PX;
+            this.buttonHeightPx = this._ICON_BUTTON_HEIGHT_PX;
         }
     }
 

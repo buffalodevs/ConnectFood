@@ -1,11 +1,12 @@
 import { Component, OnInit, Input, Output, EventEmitter, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-
-import { DeliveryUtilService } from '../delivery-services/delivery-util.service';
-
-import { Delivery, DeliveryState } from '../../../../../../shared/deliverer/delivery';
-import { SlickListDialogData, SlickListDialog } from '../../../slick/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+
+import { DeliveryListingDialogData } from './delivery-listing-dialog-data';
+import { Delivery, DeliveryState } from '../../../../../../shared/src/deliverer/delivery';
+import { SlickListDialogData, SlickListDialog } from '../../../slick/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog';
+
+export { DeliveryListingDialogData };
 
 
 /**
@@ -19,22 +20,6 @@ enum DeliveryDialogState {
 }
 
 
-/**
- * Expected input data for this dialog.
- * NOTE: Needed because this dialog will be globally generated and opened, and it cannot use traditional Input() slots.
- */
-export class DeliveryListingDialogData extends SlickListDialogData<Delivery> {
-
-    public constructor (
-        public header: string,
-        public isCart: boolean,
-        selectedListing?: Delivery
-    ) {
-        super(selectedListing);
-    }
-}
-
-
 @Component({
     selector: 'delivery-listing-dialog',
     templateUrl: './delivery-listing-dialog.component.html',
@@ -42,16 +27,28 @@ export class DeliveryListingDialogData extends SlickListDialogData<Delivery> {
 })
 export class DeliveryListingDialogComponent extends SlickListDialog {
 
-    private deliveryDialogState: DeliveryDialogState;
+    private _dialogRef: MatDialogRef <DeliveryListingDialogComponent>;
+    get dialogRef(): MatDialogRef <DeliveryListingDialogComponent> {
+        return this._dialogRef;
+    }
+
+    private _dialogData: DeliveryListingDialogData;
+    get dialogData(): DeliveryListingDialogData {
+        return this._dialogData;
+    }
+
+    private _deliveryDialogState: DeliveryDialogState;
 
 
     public constructor (
-        private dialogRef: MatDialogRef<DeliveryListingDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) private dialogData: DeliveryListingDialogData,
-        private deliveryUtilService: DeliveryUtilService // Referenced in HTML template
+        dialogRef: MatDialogRef <DeliveryListingDialogComponent>,
+        @Inject(MAT_DIALOG_DATA) dialogData: DeliveryListingDialogData
     ) {
         super();
-        this.deliveryDialogState = DeliveryDialogState.DeliveryInfo;
+
+        this._dialogRef = dialogRef;
+        this._dialogData = dialogData;
+        this._deliveryDialogState = DeliveryDialogState.DeliveryInfo;
     }
 
 
@@ -60,23 +57,23 @@ export class DeliveryListingDialogComponent extends SlickListDialog {
      * @param state The state string to match.
      * @return true if it is in the given state, false if not.
      */
-    private isDialogState(state: string): boolean {
-        return ( this.deliveryDialogState === DeliveryDialogState[state] );
+    public isDialogState(state: string): boolean {
+        return ( this._deliveryDialogState === DeliveryDialogState[state] );
     }
 
 
     /**
      * Transitions the delivery dialog to the Schedule state.
      */
-    private toSchedule(): void {
-        this.deliveryDialogState = DeliveryDialogState.Schedule;
+    public toSchedule(): void {
+        this._deliveryDialogState = DeliveryDialogState.Schedule;
     }
 
 
     /**
      * Transitions the delivery dialog to the Cancel Reason state.
      */
-    private toCancelReason(): void {
-        this.deliveryDialogState = DeliveryDialogState.CancelReason;
+    public toCancelReason(): void {
+        this._deliveryDialogState = DeliveryDialogState.CancelReason;
     }
 }

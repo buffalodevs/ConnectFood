@@ -39,20 +39,20 @@ export class SlickInputGroupComponent extends FormGroup implements OnInit, OnCha
      *       set of all formControlNames as their keys. In other words, the object shape/members must align with the contained form's shape/members!
      *       This allows parent to directly set and get an object through model binding without any extra work/code!
      */
-    @Input() private concatPattern: string;
+    @Input() public concatPattern: string;
     /**
      * Each member of the input list cotains a list of validators corresponding to each control listed in concatPattern in order.
      * 
      * For example, let's say that concatPattern is `hh`:`mm` `amOrPm`, and validators is [[Validator.required], [Validator.required]].
      * Then, the hh and mm controls will be required, but no validation will be associated with the amOrPm control.
      */
-    @Input() private validators: ValidatorFn[][];
+    @Input() public validators: ValidatorFn[][];
     /**
      * When this value is set or changes to true, then the contained form will be forced to validate its controls and show any related errors.
      */
-    @Input() private validate: boolean;
+    @Input() public validate: boolean;
 
-    private formValueSet: boolean;
+    private _formValueSet: boolean;
     private onChange: (value: any) => void;
 
 
@@ -61,7 +61,8 @@ export class SlickInputGroupComponent extends FormGroup implements OnInit, OnCha
         private concatPatternParser: ConcatPatternParserService
     ) {
         super({});
-        this.formValueSet = false;
+        
+        this._formValueSet = false;
         this.onChange = (value: any) => {}; // If model not bound to from parent, simply swallow all changes here.
     }
 
@@ -90,7 +91,7 @@ export class SlickInputGroupComponent extends FormGroup implements OnInit, OnCha
      */
     private addFormControlsIfNotExist(writeObj?: any): void {
 
-        if (this.formValueSet)  return;        
+        if (this._formValueSet)  return;        
 
         // If the form control names are in the concatPattern string.
         if (this.concatPattern != null) {
@@ -115,7 +116,7 @@ export class SlickInputGroupComponent extends FormGroup implements OnInit, OnCha
                                                                                                  : undefined));
         }
 
-        this.formValueSet = true;
+        this._formValueSet = true;
     }
 
 
@@ -133,7 +134,7 @@ export class SlickInputGroupComponent extends FormGroup implements OnInit, OnCha
             }
         }
 
-        this.formValueSet = true;
+        this._formValueSet = true;
     }
 
 

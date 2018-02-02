@@ -5,9 +5,9 @@ import 'rxjs/add/operator/map';
 
 import { RequestService } from "../../../common-util/services/request.service";
 
-import { ScheduleDeliveryRequest } from '../../../../../../shared/deliverer/message/schedule-delivery-message';
-import { FoodWebResponse } from "./../../../../../../shared/message-protocol/food-web-response";
-import { DeliveryState } from '../../../../../../shared/deliverer/delivery';
+import { ScheduleDeliveryRequest } from '../../../../../../shared/src/deliverer/message/schedule-delivery-message';
+import { FoodWebResponse } from "./../../../../../../shared/src/message-protocol/food-web-response";
+import { DeliveryState } from '../../../../../../shared/src/deliverer/delivery';
 
 
 /**
@@ -17,7 +17,7 @@ import { DeliveryState } from '../../../../../../shared/deliverer/delivery';
 export class ScheduleDeliveryService {
     
     public constructor (
-        private requestService: RequestService
+        private _requestService: RequestService
     ) {}
 
 
@@ -30,7 +30,7 @@ export class ScheduleDeliveryService {
      */
     public scheduleDelivery(claimedFoodListingKey: number, startImmediately: boolean, scheduledStartTime?: Date): Observable <void> {
         
-        return this.requestService.post('/deliverer/scheduleDelivery', new ScheduleDeliveryRequest(claimedFoodListingKey, startImmediately, scheduledStartTime))
-                                  .map(this.requestService.genericResponseMap);
+        return this._requestService.post('/deliverer/scheduleDelivery', new ScheduleDeliveryRequest(claimedFoodListingKey, startImmediately, scheduledStartTime))
+                                   .map(this._requestService.genericResponseMap);
     }
 }

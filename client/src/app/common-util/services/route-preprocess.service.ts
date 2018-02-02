@@ -8,7 +8,7 @@ import { RequestService } from './request.service';
 import { SessionDataService } from './session-data.service';
 import { LoginComponent } from '../../app-user/login/login.component'
 
-import { LoginResponse } from './../../../../../shared/app-user/message/login-message';
+import { LoginResponse } from './../../../../../shared/src/app-user/message/login-message';
 
 
 /**
@@ -22,14 +22,14 @@ export class RoutePreprocessService implements CanActivate {
     /**
      * List of login restricted routes. User must be logged in to visit these pages!
      */
-    private static readonly LOGIN_RESTRICTED_ROUTES: string[] = ['/donate', '/receive', '/deliver', '/foodListingCart', 'deliveryCart', '/appUserInfo'];
+    private static readonly _LOGIN_RESTRICTED_ROUTES: string[] = ['/donate', '/receive', '/deliver', '/foodListingCart', 'deliveryCart', '/appUserInfo'];
 
 
     public constructor (
-        private requestService: RequestService,
-        private router: Router,
-        private authSessionService: SessionDataService,
-        private dialog: MatDialog
+        private _requestService: RequestService,
+        private _router: Router,
+        private _authSessionService: SessionDataService,
+        private _dialog: MatDialog
     ) { }
 
 
@@ -40,10 +40,10 @@ export class RoutePreprocessService implements CanActivate {
      * @param state The state of the router.
      * @return An observable that will resolve to true if the route can be activated, and false if it cannot.
      */
-    public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+    public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable <boolean> {
 
         // Check with server to check if we are logged in!
-        let observer: Observable<LoginResponse> = this.requestService.get('/appUser/reAuthenticate')
+        let observer: Observable <LoginResponse> = <Observable <LoginResponse>>this._requestService.get('/appUser/reAuthenticate')
 
         // Finally, check the response from the server and react appropriately.
         return observer.map((reAuthenticateResponse: LoginResponse): boolean => {
@@ -51,10 +51,10 @@ export class RoutePreprocessService implements CanActivate {
                 console.log(reAuthenticateResponse.message);
 
                 // Make sure we update the session info we are holding.
-                this.authSessionService.updateAppUserSessionData(reAuthenticateResponse.appUserInfo);
+                this._authSessionService.updateAppUserSessionData(reAuthenticateResponse.appUserInfo);
 
                 // If not authenticated, and we are visiting a route that requires us to be logged in, then redirect to login.
-                if (!reAuthenticateResponse.success && RoutePreprocessService.LOGIN_RESTRICTED_ROUTES.indexOf(state.url) >= 0) {
+                if (!reAuthenticateResponse.success && RoutePreprocessService._LOGIN_RESTRICTED_ROUTES.indexOf(state.url) >= 0) {
                     this.attemptLoginAndRedirect(state.url);
                     return false;
                 }
@@ -71,18 +71,18 @@ export class RoutePreprocessService implements CanActivate {
     private attemptLoginAndRedirect(toUrl: string): void {
 
         // Generate the login dialog.
-        let dialogObservable: Observable<any> = LoginComponent.display(this.dialog);
+        let dialogObservable: Observable<any> = LoginComponent.display(this._dialog);
 
         // Observe what the dialog result is.
         dialogObservable.subscribe(() => {
             
             // After done with login dialog, if we are logged in, then we can redirect to original intended link!
-            if (this.authSessionService.sessionDataAvailable()) {
-                this.router.navigate([toUrl]);
+            if (this._authSessionService.sessionDataAvailable()) {
+                this._router.navigate([toUrl]);
             }
             // Otherwise, simply navigate to page that notifies user that login is required.
             else {
-                this.router.navigate(['/loginRequired']);
+                this._router.navigate(['/loginRequired']);
             }
         });
     }

@@ -10,45 +10,45 @@ import * as _ from "lodash";
 export class SlickProgressSpinnerComponent implements OnChanges {
 
     // For follwing, see Angular Material's MatSpinner component documentation!
-    @Input() private spinnerColor: string;
-    @Input() private spinnerMode: string;
-    @Input() private spinnerValue: number;
+    @Input() public spinnerColor: string;
+    @Input() public spinnerMode: string;
+    @Input() public spinnerValue: number;
 
     /**
      * Default is 0 ms. The delay time before the progress spinner is displayed.
      */
-    @Input() private spinnerDelayMs: number;
+    @Input() public spinnerDelayMs: number;
     /**
      * Default value is 0. The minimum duration that the progress spinner must show for.
      */
-    @Input() private spinnerMinDurationMs: number;
+    @Input() public spinnerMinDurationMs: number;
     /**
      * Default is true. Determines whether or not to use the backdrop.
      */
-    @Input() private showSpinnerBackdrop: boolean;
+    @Input() public showSpinnerBackdrop: boolean;
     /**
      * The color of the backdrop (in css background style format).
      * Default is 'rgba(211, 211, 211, 0.5)' for semi-transparent lightgray.
      */
-    @Input() private spinnerBackdropColor: string;
+    @Input() public spinnerBackdropColor: string;
     /**
      * Triggers the display of the progress spinner if set true once delayMs has elapsed. Stops display if set false after minDurationMs has elapsed.
      */
-    @Input('slick-progress-spinner') private triggerShowSpinner: boolean;
+    @Input('slick-progress-spinner') public triggerShowSpinner: boolean;
     /**
      * An optional extra show condition.
      */
-    @Input() private showSpinnerCondition: boolean;
+    @Input() public showSpinnerCondition: boolean;
     /**
      * ID of the container for a sticky top spinner. If given, then the spinner will have stick top behavior inside the given container.
      */
-    @Input() private spinnerStickyTopId: string;
+    @Input() public spinnerStickyTopId: string;
     /**
      * Default is false. Set to true if testing spinner and it should be permanently displayed once first triggered.
      */
-    @Input() private spinnerTest: boolean;
+    @Input() public spinnerTest: boolean;
 
-    private showSpinner: boolean;
+    public showSpinner: boolean;
 
 
     public constructor() {

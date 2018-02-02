@@ -1,13 +1,13 @@
 import { Component, OnInit, Input, OnChanges, forwardRef, SimpleChange, SimpleChanges } from '@angular/core';
-import { FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormBuilder, FormArray, Validators } from '@angular/forms';
+import { FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormArray, Validators } from '@angular/forms';
 
-import { WeekdaySplitService } from '../scheduler-util/weekday-split.service';
-import { WeekdayForm } from '../scheduler-util/weekday-form';
+import { WeekdaySplitService } from './weekday-util/weekday-split.service';
+import { WeekdayForm } from './weekday-util/weekday-form';
 import { ValidationService } from '../../../common-util/services/validation.service';
 import { DateFormatterService } from '../../../common-util/services/date-formatter.service';
 
-import { TimeRange } from '../../../../../../shared/app-user/time-range';
 import { AbstractModelDrivenComponent } from '../../../common-util/components/abstract-model-driven-component';
+import { DateRange } from '../../../../../../shared/src/date-time-util/date-range';
 
 
 @Component({
@@ -19,7 +19,8 @@ import { AbstractModelDrivenComponent } from '../../../common-util/components/ab
             provide: NG_VALUE_ACCESSOR,
             useExisting: forwardRef(() => SlickWeekdayScheduleBuilderComponent),
             multi: true
-        }
+        },
+        WeekdaySplitService
     ]
 })
 export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenComponent implements OnInit, OnChanges, ControlValueAccessor {
@@ -28,27 +29,26 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
      * Set to true if this component should be in display mode rather than edit mode.
      * Default value is false.
      */
-    @Input() private displayOnly: boolean;
-    @Input() private allowAdd: boolean;
-    @Input() private allowRemove: boolean;
+    @Input() public displayOnly: boolean;
+    @Input() public allowAdd: boolean;
+    @Input() public allowRemove: boolean;
     /**
      * When this value is set or changes to true, then the contained form will be forced to validate its controls and show any related errors.
      */
-    @Input() private validate: boolean;
+    @Input() public validate: boolean;
 
     /**
      * If set by parent component via model binding (implicitly calls registerOnChange method),
      * then this callback will be invoked whenever a change occurs.
      */
-    private onChange: (value: TimeRange[]) => void;
-    protected form: WeekdayForm;
+    private onChange: (value: DateRange[]) => void;
+    public form: WeekdayForm;
 
 
     public constructor (
-        private formBuilder: FormBuilder,
-        private weekdaySplitService: WeekdaySplitService,
-        protected validationService: ValidationService,
-        private dateFormatter: DateFormatterService
+        validationService: ValidationService,
+        dateFormatter: DateFormatterService,
+        public weekdaySplitService: WeekdaySplitService,
     ) {
         super(validationService);
 
@@ -56,7 +56,7 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
         this.allowAdd = true;
         this.allowRemove = true;
         this.form = new WeekdayForm(dateFormatter, null, this.validationService.requireAtLeastOneField());
-        this.onChange = (value: TimeRange[]) => {}; // If contained model is not bound to by parent, then swallow all changes here!
+        this.onChange = (value: DateRange[]) => {}; // If contained model is not bound to by parent, then swallow all changes here!
     }
 
 
@@ -88,7 +88,7 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
      * Adds a time range to a given weekday.
      * @param weekday The weekday to add the time range to.
      */
-    private addTimeRange(weekday: string): void {
+    private addAvailabilityRange(weekday: string): void {
         
         if (!this.allowAdd)  throw new Error('Attempting to add time range when allowAdd is: ' + this.allowAdd);
         (<FormArray>this.control(weekday)).push(new FormControl(null, Validators.required));
@@ -100,20 +100,10 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
      * @param weekday The weekday to remove the time range from.
      * @param index The index of the time range to remove.
      */
-    private removeTimeRange(weekday: string, index: number): void {
+    private removeAvailabilityRange(weekday: string, index: number): void {
 
         if (!this.allowRemove)  throw new Error('Attempting to remove time range when allowRemove is: ' + this.allowRemove);
         (<FormArray>this.control(weekday)).removeAt(index);
-    }
-
-
-    /**
-     * See DateFormatter.convertWeekdayStringToInt.
-     * @param weekday See DateFormatter.convertWeekdayStringToInt.
-     * @return See DateFormatter.convertWeekdayStringToInt.
-     */
-    private getWeekdayInd(weekday: string): number {
-        return this.dateFormatter.convertWeekdayStringToInt(weekday);
     }
 
 
@@ -122,12 +112,12 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
      * @param weekday The weekday that is being checked.
      * @return true if a new time range can be added, false if not.
      */
-    private canAddNewTimeRange(weekday: string): boolean {
+    private canAddNewAvailabilityRange(weekday: string): boolean {
 
         let weekdaysFormArr: FormArray = <FormArray>this.control(weekday);
-        let lastTimeRangeValid: boolean = ( weekdaysFormArr.length === 0 || weekdaysFormArr.at(weekdaysFormArr.length - 1).value != null );
+        let lastAvailabilityRangeValid: boolean = ( weekdaysFormArr.length === 0 || weekdaysFormArr.at(weekdaysFormArr.length - 1).value != null );
 
-        return ( this.allowAdd && lastTimeRangeValid && !this.displayOnly );
+        return ( this.allowAdd && lastAvailabilityRangeValid && !this.displayOnly );
     }
 
 
@@ -136,10 +126,10 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
      * @return The current value.
      *         NOTE: If any time range input filed is incomplete, then an empty array is returned.
      */
-    public readValue(): TimeRange[] {
+    public readValue(): DateRange[] {
 
         if (!this.form.valid)  return [];
-        return this.form.getTimeRanges();
+        return this.form.getAvailabilityRanges();
     }
 
 
@@ -149,8 +139,8 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
      * should be updated by a parent component.
      * @param value The value to write.
      */
-    public writeValue(value: TimeRange[]): void {
-        this.form.setTimeRanges(value);
+    public writeValue(value: DateRange[]): void {
+        this.form.setAvailabilityRanges(value);
         this.weekdaySplitService.updateWeekdaySplits(this.form, !this.displayOnly);
     }
 

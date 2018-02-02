@@ -18,7 +18,7 @@
 
         <!-- Regular Modal Dialog Body -->
         <form ngNativeValidate *ngIf="!displayRecoveryResponseMessage" class="modal-body" (ngSubmit)="loginUser($event)" id="login-form"
-            [formGroup]="loginForm" [slick-progress-spinner]="showProgressSpinner">
+            [formGroup]="form" [slick-progress-spinner]="showProgressSpinner">
 
             <div>
                 <mat-form-field>
@@ -33,14 +33,14 @@
             <div id="login-button-div">
                 <button id="login-button" mat-raised-button color="primary" class="button-md" type="submit">
                     {{forgotPassword ? "Recover"
-                                        : "Login"}}
+                                     : "Login"}}
                 </button>
             </div>
 
             <div class="link-content">
                 <a (click)="toggleForgotPassword()">
                     {{forgotPassword ? "Click here to login."
-                                        : "Forgot your password? Click here."}}
+                                     : "Forgot your password? Click here."}}
                 </a>
             </div>
 
@@ -48,7 +48,7 @@
 
         <!-- Password Recovery Response Message Dialog Body -->
         <div *ngIf="displayRecoveryResponseMessage" id="recovery-response-message" class="modal-body">
-            <p>We have sent a password reset message to your email address: <b>{{loginForm.value.email}}</b>.</p>
+            <p>We have sent a password reset message to your email address: <b>{{ form.value.email }}</b>.</p>
             <p>Please click on the link in the email message to reset your password.</p>
             <p>Thank-you!</p>
             <div id="login-button-div">

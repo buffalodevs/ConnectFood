@@ -7,9 +7,10 @@ import 'rxjs/add/operator/retry';
 import 'rxjs/add/observable/of';
 
 import { SessionDataService } from "./session-data.service";
+import { DeserializerService } from './deserializer.service';
 import { LoginComponent } from '../../app-user/login/login.component'
 
-import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web-response";
+import { FoodWebResponse } from "../../../../../shared/src/message-protocol/food-web-response";
 
 
 /**
@@ -21,9 +22,10 @@ import { FoodWebResponse } from "../../../../../shared/message-protocol/food-web
 export class RequestService {
 
     public constructor (
-        private http: HttpClient,
-        private sessionDataService: SessionDataService,
-        private dialog: MatDialog
+        private _http: HttpClient,
+        private _sessionDataService: SessionDataService,
+        private _dialog: MatDialog,
+        private _deserializer: DeserializerService
     ) {}
 
 
@@ -42,7 +44,7 @@ export class RequestService {
             })
         };
 
-        const postObservable: Observable<FoodWebResponse> = this.http.post<FoodWebResponse>(url, body, options);
+        const postObservable: Observable<FoodWebResponse> = this._http.post<FoodWebResponse>(url, body, options);
         
         return postObservable.mergeMap((foodWebResponse: FoodWebResponse) => {
             return this.handleResponse(postObservable, foodWebResponse);
@@ -58,7 +60,7 @@ export class RequestService {
      */
     public get(url: string): Observable<FoodWebResponse> {
 
-        const getObservable: Observable<FoodWebResponse> = this.http.get<FoodWebResponse>(url);
+        const getObservable: Observable<FoodWebResponse> = this._http.get<FoodWebResponse>(url);
 
         return getObservable.mergeMap((foodWebResponse: FoodWebResponse) => {
             return this.handleResponse(getObservable, foodWebResponse);
@@ -72,26 +74,26 @@ export class RequestService {
      * @param getOrPostObservable The original observable of the GET or POST request.
      * @param foodWebResponse The response of either an HTTP POST or GET request. In the format of the message JSON body.
      */
-    private handleResponse(getOrPostObservable: Observable<FoodWebResponse>, foodWebResponse: FoodWebResponse): Observable<FoodWebResponse> {
+    private handleResponse(getOrPostObservable: Observable<FoodWebResponse>, foodWebResponse: FoodWebResponse): Observable <FoodWebResponse> {
 
         if (foodWebResponse.signupConfirmRequired) {
             alert('Sorry, you must confirm your registration by following the email confirmation link sent to your email account before performing this action.');
         }
         else if (foodWebResponse.loginRequired) {
 
-            this.sessionDataService.clearSessionData(); // Mark the session ended (not logged in) in this client.
+            this._sessionDataService.clearSessionData(); // Mark the session ended (not logged in) in this client.
 
             // Attempt login (convert result promise to observable since we are chaining observables here).
-            return LoginComponent.display(this.dialog).mergeMap(() => {
+            return LoginComponent.display(this._dialog).mergeMap(() => {
 
                 // If login successful, then re-send original request and go through this process recursively. Else, return original error response.
-                return this.sessionDataService.sessionDataAvailable() ? getOrPostObservable.retry()
-                                                                      : Observable.of(foodWebResponse);
+                return this._sessionDataService.sessionDataAvailable() ? getOrPostObservable.retry()
+                                                                       : Observable.of(foodWebResponse);
             });
         }
 
-        // Either error not related to login encoutnered, or no error encountered.
-        return Observable.of(foodWebResponse);
+        // Either error not related to login encoutnered, or no error encountered (We must also try to automatically deserialize the result).
+        return Observable.of(this._deserializer.deserialize(foodWebResponse));
     }
 
 

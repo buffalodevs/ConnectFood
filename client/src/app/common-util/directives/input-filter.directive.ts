@@ -1,6 +1,6 @@
 import { Directive, OnInit, ElementRef, Input } from '@angular/core';
 import * as _ from "lodash";
-import { StringManipulation } from '../../../../../shared/common-util/string-manipulation'
+import { StringManipulation } from '../../../../../shared/src/common-util/string-manipulation'
 
 
 @Directive({
@@ -12,30 +12,30 @@ export class InputFilterDirective implements OnInit {
      * The direct input to the directive. Should be either a string literal, String object, or RegExp object.
      * Used to filter the input of the text input control.
      */
-    @Input('InputFilter') private filter: any;
+    @Input('InputFilter') public filter: any;
     /**
      * Input true if the filter should be case sensitive. Default is false.
      */
-    @Input() private caseSensitive: boolean;
+    @Input() public caseSensitive: boolean;
     /**
      * Set to max numeric value allowed.
      */
-    @Input() private max: number;
+    @Input() public max: number;
     /**
      * Set to min numeric value allowed.
      */
-    @Input() private min: number;
+    @Input() public min: number;
 
 
     public constructor (
-        private elementRef: ElementRef
+        private _elementRef: ElementRef
     ) {
         this.caseSensitive = false;
     }
 
 
     public ngOnInit(): void {
-        this.elementRef.nativeElement.onkeypress = this.filterKeyPress.bind(this);
+        this._elementRef.nativeElement.onkeypress = this.filterKeyPress.bind(this);
     }
 
 
@@ -50,10 +50,10 @@ export class InputFilterDirective implements OnInit {
         // IMPORTANT: Needed for some browsers like Firefox (doesn't automatically do this)!
         if (this.checkForImmuneKey(event))  return;
 
-        const charPosition: number = this.getCaretPosition(this.elementRef.nativeElement);
+        const charPosition: number = this.getCaretPosition(this._elementRef.nativeElement);
         const keyCode: number = event.keyCode ? event.keyCode
                                               : event.which;
-        let currentValue: string = this.removeSelectedChars(this.elementRef.nativeElement);
+        let currentValue: string = this.removeSelectedChars(this._elementRef.nativeElement);
         const newValue: string = StringManipulation.insertCharAt(currentValue, String.fromCharCode(keyCode), charPosition);
         
         // If we have min and/or max number constraint(s).

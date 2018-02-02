@@ -11,8 +11,6 @@ import { SlickExpansionPanelModule } from '../../../slick/slick-expansion-panel/
 import { SlickTimeRangeModule } from '../../slick-date-time/slick-time-range/slick-time-range.module';
 import { SlickWeekdayScheduleBuilderComponent } from './slick-weekday-schedule-builder.component';
 
-import { WeekdaySplitService } from '../scheduler-util/weekday-split.service';
-
 
 @NgModule({
     declarations: [
@@ -34,9 +32,6 @@ import { WeekdaySplitService } from '../scheduler-util/weekday-split.service';
     ],
     exports: [
         SlickWeekdayScheduleBuilderComponent
-    ],
-    providers: [
-        WeekdaySplitService
     ]
 })
 export class SlickWeekdayScheduleBuilderModule {}

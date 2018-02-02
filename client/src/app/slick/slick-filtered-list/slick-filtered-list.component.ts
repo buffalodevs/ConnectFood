@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { SlickListComponent } from './slick-list/slick-list.component';
-import { SlickListFilters } from './slick-list-filters/slick-list-filters';
+import { SlickListFilters } from '../../../../../shared/src/slick-list/slick-list-filters/slick-list-filters';
 
 
 @Component({
@@ -12,9 +12,9 @@ import { SlickListFilters } from './slick-list-filters/slick-list-filters';
 })
 export class SlickFilteredListComponent {
 
-    @Input() private filters: FormGroup;
-    @Input() private listings: SlickListComponent<any>;
-    @Input() private slickLeftPanelButtonTitle: string;
+    @Input() public filters: FormGroup;
+    @Input() public listings: SlickListComponent<any>;
+    @Input() public slickLeftPanelButtonTitle: string;
 
 
     public constructor() {

@@ -1,9 +1,10 @@
-#slick-list-item-container {
+.slick-list-item {
     text-align: left;
 }
 
 .list-div {
-    box-shadow: 0px 0px 8px;
+    border: 1px solid lightgray;
+    box-shadow: 5px 4px 17px 0px #222222;
     margin-bottom: 10px;
     border-radius: 3%;
     padding: 15px;
@@ -13,9 +14,10 @@
     text-align: center;
     border-bottom: 1px solid lightgray;
     padding-bottom: 5px;
+    box-shadow: 0px 3px;
 }
 
-#slick-list-item-img {
+.slick-list-item-img {
     float: left;
     max-width: 300px;
     width: 100%;
@@ -23,11 +25,13 @@
     margin-bottom: 15px;
 }
 
-#slick-list-item-img img {
+:host ::ng-deep .slick-list-item-img img {
     display: block;
+    border-radius: 2%;
+    max-width: 100%;
 }
 
-#slick-list-item-body-container {
+.slick-list-item-body-container {
     font-size: 18px;
     margin-bottom: 15px;
     width: 100%;
@@ -35,17 +39,17 @@
     vertical-align: top;
 }
 
-#slick-list-item-body-header {
+.slick-list-item-body-header {
     display: table;
 }
 
-#slick-list-item-body {
+.slick-list-item-body {
     font-size: 16px;
     text-align: left;
     margin-left: 330px;
 }
 
-#slick-list-item-footer {
+.slick-list-item-footer {
     width: 100%;
 }
 
@@ -57,47 +61,32 @@
 /* Mobile small screens only (phone) */
 @media only screen and (max-width: 767px) {
 
-    #slick-list-item-container {
+    .list-div {
+        padding: 5px;
+    }
+
+    .slick-list-item {
         text-align: center;
     }
 
-    #slick-list-item-img {
-        display: inline-block;
+    .slick-list-item-img {
+        display: block;
         float: none;
+        margin: auto;
     }
 
-    #slick-list-item-img img {
+    .slick-list-item-img img {
         display: initial;
     }
 
-    #slick-list-item-body-container {
+    .slick-list-item-body-container {
         display: inline-block;
         width: auto;
         min-height: auto;
     }
 
-    #slick-list-item-body {
+    .slick-list-item-body {
         margin-left: 1px;
         margin-right: 1px;
     }
-}
-
-
-mat-card {
-    max-width: 300px;
-    height: 500px;
-    margin: 10px;
-}
-
-:host ::ng-deep .mat-card-image {
-    height: 100%;
-    max-height: 300px;
-    border-top: 1px solid lightgray;
-    border-bottom: 1px solid lightgray;
-}
-
-mat-card-content {
-    height: 70px;
-    overflow-y: auto;
-    overflow-x: hidden;
 }

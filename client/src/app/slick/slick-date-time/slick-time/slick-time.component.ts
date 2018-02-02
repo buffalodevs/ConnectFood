@@ -1,12 +1,12 @@
 import { Component, Input, OnInit, AfterViewInit, ViewChild, forwardRef } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators, ValidatorFn } from '@angular/forms';
 
 import { AbstractModelDrivenComponent } from '../../../common-util/components/abstract-model-driven-component';
 import { SlickTimeValidationService } from './slick-time-validation.service';
 import { SlickTypeaheadService } from '../../slick-type-ahead/slick-type-ahead.service';
 import { DateFormatterService } from '../../../common-util/services/date-formatter.service';
 
-import { DateFormatter } from '../../../../../../shared/common-util/date-formatter';
+import { DateFormatter } from '../../../../../../shared/src/date-time-util/date-formatter';
 
 
 @Component({
@@ -24,25 +24,34 @@ import { DateFormatter } from '../../../../../../shared/common-util/date-formatt
 })
 export class SlickTimeComponent extends AbstractModelDrivenComponent implements OnInit, ControlValueAccessor {
 
-    @Input() private validate: boolean;
+    public readonly GROUP_VALIDATORS: ValidatorFn[][];
 
+    @Input() public validate: boolean;
+
+    /**
+     * View model for contained input control.
+     */
+    public timeControl: FormControl;
     /**
      * A callback function provided by a parent component (via directive such as ngModel).
      * ControlValueAccessor interface's registerOnChange method is used to register this callback.
      */
     private onChange: (value: string) => void;
-    /**
-     * View model for contained input control.
-     */
-    private timeControl: FormControl;
 
 
     public constructor (
-        protected validationService: SlickTimeValidationService,
-        private typeaheadService: SlickTypeaheadService,
-        private dateFormatter: DateFormatterService
+        public validationService: SlickTimeValidationService,
+        public typeaheadService: SlickTypeaheadService,
+        public dateFormatter: DateFormatterService
     ) {
         super(validationService);
+
+        // Set required validators for contained Slick Input Group controls.
+        this.GROUP_VALIDATORS = [
+            [ Validators.required, Validators.pattern(this.validationService.HH_REGEX) ],
+            [ Validators.required, Validators.pattern(this.validationService.MM_REGEX) ],
+            [ Validators.required, Validators.pattern(this.validationService.AM_OR_PM_REGEX) ]
+        ];
 
         this.validate = false;
         this.onChange = (value: any) => {}; // If no change listener given later, then all change will be swallowed here!

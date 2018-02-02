@@ -1,20 +1,20 @@
 "use strict";
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { FormGroup, AbstractControl, ValidationErrors } from '@angular/forms';
+import { FormGroup, AbstractControl, ValidationErrors, FormControl } from '@angular/forms';
 
 import { DateFormatterService } from '../../../common-util/services/date-formatter.service';
 import { ValidationService, Validation } from '../../../common-util/services/validation.service';
 export { ValidationService, Validation };
 
-import { DateFormatter } from '../../../../../../shared/common-util/date-formatter';
+import { DateFormatter } from '../../../../../../shared/src/date-time-util/date-formatter';
 
 
 @Injectable()
 export class SlickTimeRangeValidationService extends ValidationService {
 
     public constructor (
-        private dateFormatter: DateFormatterService
+        private _dateFormatter: DateFormatterService
     ) {
         super();
     }
@@ -25,17 +25,20 @@ export class SlickTimeRangeValidationService extends ValidationService {
      * @param startTimeControlName The optional name of the start time control for the time range. Default is 'startTime'.
      * @param endTimeControlName The optional name of the end time control for the time range. Default is 'endTime'.
      */
-    public timeOrder(startTimeControlName: string = 'startTime', endTimeControlName: string = 'endTime'): (group: FormGroup) => any {
+    public timeOrder(startTimeControlName: string = 'startTimeStr', endTimeControlName: string = 'endTimeStr'): (group: FormGroup) => any {
         
         return (group: FormGroup): {[key: string]: any} => {
 
-            // Get the time strings from the from controls.
-            let startTime: string = group.get(startTimeControlName).value;
-            let endTime: string = group.get(endTimeControlName).value;
+            const startTimeStrControl: AbstractControl = group.get(startTimeControlName);
+            const endTimeStrControl: AbstractControl = group.get(endTimeControlName);
+
+            // Ensure that controls exist with given control names!
+            if (startTimeStrControl == null)    throw new Error('Start time control does not exist with name: ' + startTimeControlName);
+            if (endTimeStrControl == null)      throw new Error('End time control does not exist with name: ' + endTimeControlName);
 
             // Convert the time strings into dates for easy comparison.
-            let startDate: Date = this.dateFormatter.setWallClockTimeForDate(new Date(), startTime);
-            let endDate: Date = this.dateFormatter.setWallClockTimeForDate(new Date(), endTime);
+            const startDate: Date = this._dateFormatter.setWallClockTimeForDate(new Date(), startTimeStrControl.value);
+            const endDate: Date = this._dateFormatter.setWallClockTimeForDate(new Date(), endTimeStrControl.value);
 
             if (startDate != null && endDate != null) {
                 
@@ -56,7 +59,7 @@ export class SlickTimeRangeValidationService extends ValidationService {
      */
     public errorMsgFor(control: AbstractControl): string {
 
-        let errors: ValidationErrors = control.errors;
+        const errors: ValidationErrors = control.errors;
 
         if (errors != null) {
 

@@ -5,10 +5,10 @@ import { SessionOptions } from 'express-session';
 let RedisStore = require('connect-redis')(session);
 import { RedisStoreOptions } from 'connect-redis';
 
-import { GPSCoordinate } from '../../../shared/common-util/geocode';
+import { GPSCoordinate } from '../../../shared/src/geocode/gps-coordinate';
 
-import { FoodWebResponse } from "./../../../shared/message-protocol/food-web-response";
-import { AppUserInfo } from './../../../shared/app-user/app-user-info';
+import { FoodWebResponse } from "./../../../shared/src/message-protocol/food-web-response";
+import { AppUserInfo } from './../../../shared/src/app-user/app-user-info';
 
 export { AppUserInfo };
 

@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { DateFormatter } from "../../../../../shared/common-util/date-formatter";
+import { DateFormatter } from "../../../../../shared/src/date-time-util/date-formatter";
 
 
 @Injectable()

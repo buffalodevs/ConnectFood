@@ -5,8 +5,8 @@ import 'rxjs/add/operator/map';
 
 import { RequestService } from "../../../common-util/services/request.service";
 
-import { CancelDeliveryRequest } from "./../../../../../../shared/deliverer/message/cancel-delivery-message";
-import { FoodWebResponse } from "./../../../../../../shared/message-protocol/food-web-response";
+import { CancelDeliveryRequest } from "./../../../../../../shared/src/deliverer/message/cancel-delivery-message";
+import { FoodWebResponse } from "./../../../../../../shared/src/message-protocol/food-web-response";
 
 
 /**
@@ -16,7 +16,7 @@ import { FoodWebResponse } from "./../../../../../../shared/message-protocol/foo
 export class CancelDeliveryService {
     
     public constructor (
-        private requestService: RequestService
+        private _requestService: RequestService
     ) {}
 
 
@@ -29,7 +29,7 @@ export class CancelDeliveryService {
      */
     public cancelDelivery(deliveryFoodListingKey: number, cancelReason: string, foodRejected: boolean): Observable <void> {
 
-        return this.requestService.post('/deliverer/cancelDelivery', new CancelDeliveryRequest(deliveryFoodListingKey, cancelReason, foodRejected))
-                                  .map(this.requestService.genericResponseMap);
+        return this._requestService.post('/deliverer/cancelDelivery', new CancelDeliveryRequest(deliveryFoodListingKey, cancelReason, foodRejected))
+                                   .map(this._requestService.genericResponseMap);
     }
 }

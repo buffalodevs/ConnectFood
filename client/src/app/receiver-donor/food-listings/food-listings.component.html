@@ -2,7 +2,8 @@
 <hr>
 
 
-<div id="food-listings" class="slick-list" [slick-progress-spinner]="showProgressSpinner" spinnerStickyTopId="food-listings" spinnerBackdropColor="white">
+<div id="food-listings" class="slick-list" [slick-progress-spinner]="showProgressSpinner"
+ spinnerStickyTopId="food-listings" spinnerBackdropColor="white" [ngClass]="{ 'slick-list-spinner-showing': showProgressSpinner }">
 
     <!-- This is the Food Listings (generated via loop) -->
     <slick-list-item *ngFor="let foodListing of listData; let i = index">
