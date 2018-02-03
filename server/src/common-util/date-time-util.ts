@@ -85,17 +85,17 @@ function checkForAndFixAvailabilityWeekOverflow(availabilityDateRange: DateRange
  * Converts (relative) availability date ranges to absolutely positioned date ranges whose start and end time members fall on the same weekdays as the availaiblity date range
  * start and end time members. Also, the resulting time ranges will either contain the current time or fall on the closest aligned time after the current time.
  * @param availabilityDateRanges The (relative) availability date ranges that are to be converted.
+ * @param utcOffsetMins The offset (minutes) of the client's time zone form UTC time zone.
  * @return The absolute date ranges.
  */
-export function availabilityToAbsDateRanges(availabilityDateRanges: DateRange[]): DateRange[] {
+export function availabilityToAbsDateRanges(availabilityDateRanges: DateRange[], utcOffsetMins: number): DateRange[] {
 
     let absDateRanges: DateRange[] = [];
 
     for (let i: number = 0; i < availabilityDateRanges.length; i++) {
 
-        let absDateRange: DateRange = availabilityToAbsDateRange(availabilityDateRanges[i]);
-        absDateRange = ensureDateRangeContainsOrAfterNow(absDateRange);
-        absDateRanges.push(absDateRange);
+        const genAbsDateRanges: DateRange[] = availabilityToAbsDateRange(availabilityDateRanges[i], utcOffsetMins);
+        absDateRanges = absDateRanges.concat(genAbsDateRanges);
     }
 
     return absDateRanges.sort(DateRange.compare);
@@ -103,39 +103,58 @@ export function availabilityToAbsDateRanges(availabilityDateRanges: DateRange[])
 
 
 /**
- * Converts an availability date range to an absolute positoned date range that falls on the date nearest to today with a weekday that
- * aligns with the availability dates weekday.
- * NOTE: The generated time range will either contain the current time or fall completely after it (it will never fall completely before it).
+ * Converts an availability date range to absolute positoned date range(s) that falls on the date nearest to today with a weekday that
+ * aligns with the availability dates weekday. Can generate up to 2 date ranges if the current time falls within a given availability range (will be split between
+ * range portion that falls immediately after current time and the portion that falls before offset by one week).
  * @param availabilityDateRange The availability date range to convert.
- * @return The absolutely positioned date range (positioned around or after the current time), which corresponds with the availability date range input.
+ * @param utcOffsetMins The offset (minutes) of the client's time zone form UTC time zone.
+ * @return The absolutely positioned date range(s) which corresponds with the availability date range input. The date ranges returned are garunteed to fall after the
+ *         current time.
  */
-function availabilityToAbsDateRange(availabilityDateRange: DateRange): DateRange {
+function availabilityToAbsDateRange(availabilityDateRange: DateRange, utcOffsetMins): DateRange[] {
 
     let absDateRange: DateRange = new DateRange (
         DATE_FORMATTER.setDateToNearestWeekday(availabilityDateRange.startTime),
         DATE_FORMATTER.setDateToNearestWeekday(availabilityDateRange.endTime)
     );
 
-    return ensureDateRangeContainsOrAfterNow(absDateRange);
+    return ensureDateRangeContainsOrAfterNow(absDateRange, utcOffsetMins);
 }
 
 
 /**
- * Ensures that a given absolutely positioned date range either contains the current time or completely falls after the current time (never completely before).
+ * Ensures that a given absolutely positioned date range falls after the current time. If a portion of it or all of it falls before the current time,
+ * then either the portion that falls before or the whole range that falls before is shifted to the next week.
  * @param absDateRange The absolutely positione date range to check.
- * @return The (possibly) corrected absolutely positioned date range.
+ * @param utcOffsetMins The offset (minutes) of the client's time zone form UTC time zone.
+ * @return An array containing the date range corrections. If no corrections were made, then it simply contains the input date range.
  */
-function ensureDateRangeContainsOrAfterNow(absDateRange: DateRange): DateRange {
+function ensureDateRangeContainsOrAfterNow(absDateRange: DateRange, utcOffsetMins: number): DateRange[] {
 
     const now: Date = new Date();
-    let retDateRange: DateRange = absDateRange;
+    let retDateRanges: DateRange[] = [];
+    
+    // If the absolute date range falls at least paritally after the current time, then take portion of range that falls on or after current time.
+    if (absDateRange.endTime > now) {
 
-    if (absDateRange.endTime <= now) {
-        retDateRange = new DateRange (
-            moment(absDateRange.startTime).add(7, 'days').toDate(),
-            moment(absDateRange.endTime).add(7, 'days').toDate()
-        )
+        // Generate Date range that falls completely after now (without offsetting it by one week).
+        const startTimeAfterNow: Date = (absDateRange.startTime > now) ? absDateRange.startTime
+                                                                       : DATE_FORMATTER.roundDateUpToNearestHalfHour(absDateRange.startTime);
+        const dateRangeAfterNow: DateRange = new DateRange(startTimeAfterNow, absDateRange.endTime);
+
+        retDateRanges.push(dateRangeAfterNow);
     }
 
-    return retDateRange;
+    // If the absolute date range falls partially on the current day, then we will generate the date range for next week as well.
+    if (DATE_FORMATTER.isDateOnOrBeforeToday(absDateRange.startTime, utcOffsetMins)) {
+
+        const offsetDateRange: DateRange = new DateRange (
+            moment(absDateRange.startTime).add(7, 'days').toDate(),
+            moment(absDateRange.endTime).add(7, 'days').toDate()
+        );
+
+        retDateRanges.push(offsetDateRange);
+    }
+
+    return retDateRanges;
 }

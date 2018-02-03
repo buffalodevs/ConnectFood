@@ -294,4 +294,41 @@ export class DateFormatter {
         return moment(new Date()).add(1, 'days').startOf('isoWeek').add(weekday - 1, 'days')
                                  .add(date.getHours(), 'hours').add(date.getMinutes(), 'minutes').toDate();
     }
+
+
+    /**
+     * Rounds a given date up to the nearest half hour.
+     * @param date The date to round up.
+     * @return The rounded date.
+     */
+    public roundDateUpToNearestHalfHour(date: Date): Date {
+
+        let m: moment.Moment = moment(date);
+        const curMinute: number = m.minute();
+
+        m = (curMinute < 30) ? m.add(30 - m.minute(), 'minute')
+                             : m.add(60 - m.minute(), 'minute')
+
+        return m.subtract(m.second(), 'second').subtract(m.millisecond(), 'millisecond').toDate();
+    }
+
+
+    /**
+     * Checks if a given date is before today.
+     * @param date The date to check.
+     * @param utcOffsetMins The (optionsal) offset (in minutes) of the time zone that we are to use when comparing the dates.
+     *                      Default is this computer's time zone.
+     * @return true if the given date is before today, false if not.
+     */
+    public isDateOnOrBeforeToday(date: Date, utcOffsetMins: number = date.getTimezoneOffset()): boolean {
+
+        // Get the current time in the timezone specified by utcOffsetMins.
+        let now: Date = new Date();
+        now = moment(now).subtract(now.getTimezoneOffset(), 'minutes').add(utcOffsetMins, 'minutes').toDate();
+
+        // Transition the input comparison date to the correct time zone.
+        date = moment(date).subtract(date.getTimezoneOffset(), 'minutes').add(utcOffsetMins, 'minutes').toDate();
+
+        return ( date < now || (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDay() === now.getDay()) );
+    }
 }

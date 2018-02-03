@@ -20,9 +20,10 @@ const DESERIALIZER: Deserializer = new Deserializer();
  * @param filters The filter criteria.
  * @param myAppUserKey The key identifier for the App User that is logged in (making this call).
  * @param myGPSCoordinate The GPS Coordinates of the (driver) App User that is logged in.
+ * @param myUtcOffsetMins The offset (in minutes) of the (driver) logged in App User's time zone from the UTC time zone.
  * @return A Promise that resolves to an array of Food Listings that have been retrieved.
  */
-export async function getDeliveries(filters: DeliveryFilters, myAppUserKey: number, myGPSCoordinate: GPSCoordinate): Promise <Delivery[]> {
+export async function getDeliveries(filters: DeliveryFilters, myAppUserKey: number, myGPSCoordinate: GPSCoordinate, myUtcOffsetMins: number): Promise <Delivery[]> {
    
     // Build our prepared statement.
     let queryArgs: any[] = [
@@ -47,7 +48,7 @@ export async function getDeliveries(filters: DeliveryFilters, myAppUserKey: numb
         const queryResult: QueryResult = await query(queryString, queryArgs);
 
         logSqlQueryResult(queryResult.rows);
-        return generateResultArray(queryResult.rows, myGPSCoordinate);
+        return generateResultArray(queryResult.rows, myGPSCoordinate, myUtcOffsetMins);
     }
     catch (err) {
         console.log(err);
@@ -59,9 +60,11 @@ export async function getDeliveries(filters: DeliveryFilters, myAppUserKey: numb
 /**
  * Generates the result Food Listing array. All Food Listings that have met the filter criteria will be entered into this array.
  * @param rows The database function result rows.
+ * @param myGPSCoordinate The GPS Coordinates of the (driver) App User that is logged in.
+ * @param myUtcOffsetMins The offset (in minutes) of the (driver) logged in App User's time zone from the UTC time zone.
  * @return The Delivery Food Listings array that was generated.
  */
-function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate): Promise <Delivery[]> {
+function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate, myUtcOffsetMins: number): Promise <Delivery[]> {
 
     let deliveries: Delivery[] = [];
 
@@ -70,7 +73,7 @@ function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate): Promi
 
         // Insert deserialized returned data into result arrays.
         let delivery: Delivery = DESERIALIZER.deserialize(rows[i].delivery, Delivery);
-        delivery.possibleDeliveryTimes = availabilityToAbsDateRanges(delivery.possibleDeliveryTimes);
+        delivery.possibleDeliveryTimes = availabilityToAbsDateRanges(delivery.possibleDeliveryTimes, myUtcOffsetMins);
         deliveries.push(delivery);
     }
 

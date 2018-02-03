@@ -3,5 +3,6 @@ p {
 }
 
 #scheduler-container {
+    max-width: 1030px;
     margin-bottom: 30px;
 }

@@ -2,7 +2,8 @@
 <hr>
 
 
-<div id="delivery-listings" class="slick-list" [slick-progress-spinner]="showProgressSpinner" spinnerStickyTopId="delivery-listings" spinnerBackdropColor="white">
+<div id="delivery-listings" class="slick-list" [slick-progress-spinner]="showProgressSpinner"
+ spinnerStickyTopId="delivery-listings" spinnerBackdropColor="white" [ngClass]="{ 'slick-list-spinner-showing': showProgressSpinner }">
     
     <slick-list-item *ngFor="let deliveryListing of listData; let i = index;">
 
