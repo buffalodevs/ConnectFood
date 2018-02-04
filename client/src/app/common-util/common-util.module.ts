@@ -1,4 +1,5 @@
-import { NgModule, isDevMode } from '@angular/core';
+import { NgModule } from '@angular/core';
+import { environment } from '../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { TextMaskModule } from 'angular2-text-mask';
@@ -22,6 +23,9 @@ import { DeserializerService } from './services/deserializer.service';
 import { RequestResponseLoggerService } from './services/logging/request-response-logger.service';
 
 
+console.log('Production: ' + environment.production);
+
+
 @NgModule({
     declarations: [
         DateFormatterPipe,
@@ -36,8 +40,8 @@ import { RequestResponseLoggerService } from './services/logging/request-respons
         TextMaskModule,
         SlickProgressSpinnerModule,
         LoggerModule.forRoot({
-            level: isDevMode() ? NgxLoggerLevel.TRACE // Want to log everything to developer's console.
-                               : NgxLoggerLevel.OFF, // Do not want to log to user's browser console.
+            level: environment.production ? NgxLoggerLevel.OFF      // Do not want to log to user's browser console.
+                                          : NgxLoggerLevel.TRACE,   // Want to log everything to developer's console.
             serverLoggingUrl: '/logging/logClientData',
             serverLogLevel: NgxLoggerLevel.WARN // Want to send all warn and error messages to the server to be logged.
         })
