@@ -1,6 +1,7 @@
 import { SessionData } from "../../common-util/session-data";
 import { UnclaimNotificationData } from './unclaim-notification-data';
 import { sendEmail, EmailConfig } from "../../email/email";
+import { logger, prettyjsonRender } from '../../logging/logger';
 
 import { AppUserType, AppUserInfo } from "../../../../shared/src/app-user/app-user-info";
 
@@ -45,7 +46,7 @@ export function notifyReceiverOfUnclaim(unclaimNotificationData: UnclaimNotifica
     )
 
     return sendEmail(emailConfig)
-        .catch((err: Error) => { console.log(err); });
+        .catch((err: Error) => { logger.error(prettyjsonRender(err)); });
 }
 
 
@@ -94,7 +95,7 @@ export function notifyDonorOfLostDelivery(unclaimNotificationData: UnclaimNotifi
     )
 
     return sendEmail(emailConfig)
-        .catch((err: Error) => { console.log(err); });
+        .catch((err: Error) => { logger.error(prettyjsonRender(err)); });
 }
 
 
@@ -140,7 +141,7 @@ export function notifyDelivererOfLostDelivery(sourceSessionData: SessionData, so
     )
 
     return sendEmail(emailConfig)
-        .catch((err: Error) => { console.log(err); });
+        .catch((err: Error) => { logger.error(prettyjsonRender(err)); });
 }
 
 

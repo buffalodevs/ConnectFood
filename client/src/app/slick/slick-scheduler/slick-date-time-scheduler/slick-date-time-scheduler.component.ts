@@ -48,9 +48,7 @@ export class SlickDateTimeSchedulerComponent extends AbstractModelDrivenComponen
         this.form = formBuilder.group({
             'scheduledDate': [null, Validators.required]
         })
-        this.onChange = (value: Date) => {
-            console.log('No onChange listener binding from parent');
-        };
+        this.onChange = (value: Date) => {};
     }
 
 

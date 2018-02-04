@@ -48,8 +48,6 @@ export class RoutePreprocessService implements CanActivate {
         // Finally, check the response from the server and react appropriately.
         return observer.map((reAuthenticateResponse: LoginResponse): boolean => {
 
-                console.log(reAuthenticateResponse.message);
-
                 // Make sure we update the session info we are holding.
                 this._authSessionService.updateAppUserSessionData(reAuthenticateResponse.appUserInfo);
 

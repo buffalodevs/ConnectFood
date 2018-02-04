@@ -8,6 +8,7 @@ import 'rxjs/add/observable/of';
 
 import { SessionDataService } from "./session-data.service";
 import { DeserializerService } from './deserializer.service';
+import { RequestResponseLoggerService } from '../../common-util/services/logging/request-response-logger.service';
 import { LoginComponent } from '../../app-user/login/login.component'
 
 import { FoodWebResponse } from "../../../../../shared/src/message-protocol/food-web-response";
@@ -25,7 +26,8 @@ export class RequestService {
         private _http: HttpClient,
         private _sessionDataService: SessionDataService,
         private _dialog: MatDialog,
-        private _deserializer: DeserializerService
+        private _deserializer: DeserializerService,
+        private _requestResponseLogger: RequestResponseLoggerService
     ) {}
 
 
@@ -36,7 +38,7 @@ export class RequestService {
      * @param url The destination URL for the request. Can be a relative URL.
      * @param body The body or payload of the request. This will be sent in JSON format.
      */
-    public post(url: string, body: any): Observable<FoodWebResponse> {
+    public post(url: string, body: any): Observable <FoodWebResponse> {
 
         const options = {
             headers: new HttpHeaders({
@@ -44,10 +46,11 @@ export class RequestService {
             })
         };
 
+        this._requestResponseLogger.logRequest(url, 'POST', body);
         const postObservable: Observable<FoodWebResponse> = this._http.post<FoodWebResponse>(url, body, options);
         
         return postObservable.mergeMap((foodWebResponse: FoodWebResponse) => {
-            return this.handleResponse(postObservable, foodWebResponse);
+            return this.handleResponse(url, postObservable, foodWebResponse);
         });
     }
 
@@ -58,12 +61,13 @@ export class RequestService {
      * then it will resend the request. If not, then it will fail with appropriate error flag and message.
      * @param url The destination URL for the request. Can be a relative URL.
      */
-    public get(url: string): Observable<FoodWebResponse> {
+    public get(url: string): Observable <FoodWebResponse> {
 
+        this._requestResponseLogger.logRequest(url, 'GET');
         const getObservable: Observable<FoodWebResponse> = this._http.get<FoodWebResponse>(url);
 
         return getObservable.mergeMap((foodWebResponse: FoodWebResponse) => {
-            return this.handleResponse(getObservable, foodWebResponse);
+            return this.handleResponse(url, getObservable, foodWebResponse);
         });
     }
 
@@ -71,10 +75,13 @@ export class RequestService {
     /**
      * Handles the response of either an HTTP POST or GET request.
      * If login is required (due to session termination), then generates the login dialog, waits for dialog to submit or close, and resends the request.
+     * @param url The URL from which the response originated.
      * @param getOrPostObservable The original observable of the GET or POST request.
      * @param foodWebResponse The response of either an HTTP POST or GET request. In the format of the message JSON body.
      */
-    private handleResponse(getOrPostObservable: Observable<FoodWebResponse>, foodWebResponse: FoodWebResponse): Observable <FoodWebResponse> {
+    private handleResponse(url: string, getOrPostObservable: Observable<FoodWebResponse>, foodWebResponse: FoodWebResponse): Observable <FoodWebResponse> {
+
+        this._requestResponseLogger.logResponse(url, foodWebResponse);
 
         if (foodWebResponse.signupConfirmRequired) {
             alert('Sorry, you must confirm your registration by following the email confirmation link sent to your email account before performing this action.');
@@ -104,8 +111,6 @@ export class RequestService {
      *         If it was unsuccessful, then an Error is thrown with the error message from the server as its message content.
      */
     public genericResponseMap(foodWebResponse: FoodWebResponse): void {
-
-        console.log(foodWebResponse.message);
         
         // On failure.
         if (!foodWebResponse.success) {

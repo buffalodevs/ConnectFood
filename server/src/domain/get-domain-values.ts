@@ -1,5 +1,6 @@
-import { logSqlQueryExec, logSqlQueryResult } from "../logging/sql-logger";
 import { query, QueryResult } from "../database-util/connection-pool";
+import { logSqlQueryExec, logSqlQueryResult } from "../logging/sql-logger";
+import { logger, prettyjsonRender } from '../logging/logger';
 
 
 const DOMAIN_COL: string = 'domainCol';
@@ -27,7 +28,7 @@ export async function getDomainValues(domainName: string): Promise <string[]> {
     }
     catch (err) {
         // Should never happen!
-        console.log(err);
+        logger.error(prettyjsonRender(err));
         throw new Error('Failed to get values in domain: ' + domainName);
     }
 }

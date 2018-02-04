@@ -1,63 +1,51 @@
-// This file contains some function definitions for logging information pertaining to SQL.
+import { logger, prettyjsonRender } from "./logger";
+require('dotenv');
 
-let _enclosingString : string = "\n=================================================\n";
-
-/**
- * Formats and prints out a message pertaining to the success of obtaining a SQL connection.
- * @param err: If provided, then it signifies that obtaining the connection failed. If not provided, then it signifies that the connection was successful.
- */
-export function logSqlConnect(err? : Error) : void {
-    console.log(_enclosingString);
-
-    // If no error provided, then simply log that the connection succeeded.
-    if (err != null) {
-        console.log("SQL connection obtained successfully");
-    }
-    // If an error is provided, then log that obtaining the connection failed and the error.
-    else {
-        console.log("SQL connect failed with error message: ");
-        console.log(err);
-    }
-
-    console.log(_enclosingString);
-}
 
 /**
  * Formats and prints out information pertaining to executing a SQL Query.
  * @param query: The SQL query.
  * @param args: The arguments to the SQL query if using a prepared statement.
  */
-export function logSqlQueryExec(query : string, args? : Array<any>) : void {
-    console.log(_enclosingString);
+export function logSqlQueryExec(query: string, args?: any[]): void {
 
-    // Print the SQL query.
-    console.log("SQL Query: ");
-    console.log(query);
+    let logLevel: string = 'info';
+    let logStr: string = ( 'SQL Query:\n' + query + '\n\n' );
     
     // Print the arguments to the SQL query.
-    if (args != null) {
-        console.log("SQL Query Arguments: ");
+    // IMPORTANT: Only do this in developer mode since this can potentially expose private information in production mode!
+    if (args != null && process.env.DEVELOPER_MODE.toLowerCase() === 'true') {
+
+        logLevel = 'debug'; // For safe measures, set logger to debug mode if enter into here (in case DEVELOPER_MDOE not set properly)!
+
         for (let i : number = 0; i < args.length; i++) {
-            console.log((i + 1).toString() + "$: " + args[i]);
+
+            const argPlaceholder: string = ( '$' + (i + 1).toString() );
+            logStr = logStr.replace(argPlaceholder, args[i].toString());
         }
     }
 
-    console.log(_enclosingString);
+    logger.log(logLevel, logStr);
 }
+
 
 /**
  * Formats and prints out information pertaining to the result of a SQL Query.
  * @param rows The resulting rows of the SQL Query.
  */
-export function logSqlQueryResult(rows : Array<any>) : void {
-    console.log(_enclosingString);
+export function logSqlQueryResult(rows: any[]): void {
 
-    console.log("Number of rows in query result: " + rows.length);
+    logger.info('Number of rows in query result: ' + rows.length);
 
-    if (rows.length > 0) {
-        console.log("\n");
-        console.log(rows);
+    // IMPORTANT: Only log in DEVELOPER_MDOE (since production mode will slow down and may contain SENSITIVE DATA).
+    if (process.env.DEVELOPER_MODE.toLowerCase() === 'true') {
+
+        let logStr: string = '';
+
+        if (rows.length > 0) {
+            logStr += ( '\n' + prettyjsonRender(rows) + '\n' );
+        }
+
+        logger.debug(logStr);
     }
-
-    console.log(_enclosingString);
 }

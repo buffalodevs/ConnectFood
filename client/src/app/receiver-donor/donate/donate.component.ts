@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, Validators, AbstractControl, ValidatorFn, FormControl } from '@angular/forms';
 import { ImageCropperComponent, CropperSettings } from 'ng2-img-cropper';
 import { MatHorizontalStepper, ErrorStateMatcher } from '@angular/material';
+import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
@@ -32,9 +33,10 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
 
 
     public constructor (
-        private _addFoodListingService: AddFoodListingService,
-        public dateFormatter: DateFormatterPipe,
         validationService: ValidationService,
+        public dateFormatter: DateFormatterPipe,
+        private _addFoodListingService: AddFoodListingService,
+        private _logger: NGXLogger
     ) {
         super(validationService);
 
@@ -182,7 +184,7 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
                         stepper.next();
                     },
                     (err: Error) => {
-                        console.log(err);
+                        this._logger.error(err);
                         alert(err.message);
                     }
                 );

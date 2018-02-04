@@ -1,7 +1,8 @@
 'use strict'
 import { query, QueryResult } from './../database-util/connection-pool';
 import { addArgPlaceholdersToQueryStr } from './../database-util/prepared-statement-util';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
+import { logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
+import { logger, prettyjsonRender } from '../logging/logger';
 
 import { getDrivingDistTime, GPSCoordinate, DriveDistTime } from './../geocode/geocode';
 import { fillFullTripDrivingDistances } from './delivery-util/delivery-geocode-util';
@@ -51,7 +52,7 @@ export async function getDeliveries(filters: DeliveryFilters, myAppUserKey: numb
         return generateResultArray(queryResult.rows, myGPSCoordinate, myUtcOffsetMins);
     }
     catch (err) {
-        console.log(err);
+        logger.error(prettyjsonRender(err));
         throw new Error('Food listing search unexpectedly failed');
     }
 }

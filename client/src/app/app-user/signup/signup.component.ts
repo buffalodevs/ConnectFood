@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
+import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
@@ -67,7 +68,8 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
         public appUserConstants: AppUserConstantsService,
         public typeaheadService: SlickTypeaheadService,
         private _formBuilder: FormBuilder,
-        private _signupService: SignupService
+        private _signupService: SignupService,
+        private _logger: NGXLogger
     ) {
         super(validationService);
 
@@ -202,7 +204,7 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
                     // When we have errors connecting to server.
                     (err: Error) => {
                         this._signupError = 'Error: could not communication with server';
-                        console.log(err);
+                        this._logger.error(err);
                     }
                 );
     }

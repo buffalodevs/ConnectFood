@@ -1,5 +1,6 @@
 import { logSqlQueryExec, logSqlQueryResult } from "../../logging/sql-logger";
 import { query, QueryResult } from "../../database-util/connection-pool";
+import { logger } from "../../logging/logger";
 
 import { SessionData, AppUserInfo } from "../../common-util/session-data";
 import { login } from '../login-app-user/app-user-login';
@@ -28,7 +29,7 @@ export async function updateAppUser(appUserUpdateInfo: AppUserInfo, newPassword:
 
         // Make sure that whenever an address is updated we also update the timezone information (could go out of sync if user moves to another timezone)!
         if (appUserUpdateInfo.utcOffsetMins == null) {
-            console.log('Cannot update address information without also updating the offset from UTC timezone (utcOffsetMins is null).')
+            logger.error('Attempting to update user address data without also providing an updated utcOffsetMins value.')
             throw new Error('An unexpected error has occured.');
         }
     }
@@ -54,7 +55,6 @@ async function checkPassword(currentEmail: string, currentPassword: string): Pro
         await login(currentEmail, currentPassword);
     }
     catch (err) {
-        console.log(err);
         throw new Error(AppUserErrorMsgs.INCORRECT_PASSWORD);
     }
 }

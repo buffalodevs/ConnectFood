@@ -1,7 +1,8 @@
 'use strict'
 import { query, QueryResult } from './../database-util/connection-pool';
 import { addArgPlaceholdersToQueryStr } from '../database-util/prepared-statement-util';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
+import { logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
+import { logger, prettyjsonRender } from '../logging/logger';
 import { SessionData } from '../common-util/session-data';
 import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotificationData } from './delivery-util/delivery-update-notification';
 
@@ -32,7 +33,7 @@ export async function scheduleDelivery(claimedFoodListingKey: number, delivererS
         return handleScheduleDeliveryResult(delivererSessionData, queryResult);
     }
     catch (err) {
-        console.log(err);
+        logger.error(prettyjsonRender(err));
         throw new Error('Sorry, an unexpected error occured when ' + (startImmediately ? 'starting' : 'scheduling') + ' the delivery');
     }
 }
@@ -49,10 +50,10 @@ function handleScheduleDeliveryResult(delivererSessionData: SessionData, queryRe
     logSqlQueryResult(queryResult.rows);
     
     if (queryResult.rowCount === 1) {
-        console.log('Successfully scheduled a new Delivery');
+        logger.info('Successfully scheduled a new Delivery');
         const deliveryUpdateNotificationData: DeliveryUpdateNotificationData = queryResult.rows[0].deliveryupdatenotification;
         return notifyReceiverAndDonorOfDeliveryUpdate(delivererSessionData, deliveryUpdateNotificationData);
     }
 
-    throw new Error('An incorrect number of rows have returned from the scheduleDelivery() SQL function call');
+    throw new Error('No rows have returned from the scheduleDelivery() SQL function call, caused by deliverer with ID ' + delivererSessionData.appUserKey);
 }

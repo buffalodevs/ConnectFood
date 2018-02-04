@@ -12,13 +12,8 @@
             <img DefaultImg [src]="( foodListing.imgUrls ? foodListing.imgUrls[0] : null )" alt="Image Not Available"/>
         </ng-container>
 
-        <ng-container slick-list-item-header>
-            <a (click)="selectListing(i)" title="Click for Details">{{ foodListing.foodTitle }}</a>
-        </ng-container>
-
-        <ng-container slick-list-item-body-header>
-            <a (click)="selectListing(i)" title="Click for Details">{{ foodListing.foodTitle }}</a>
-        </ng-container>
+        <a (click)="selectListing(i)" title="Click for Details" slick-list-item-header>{{ foodListing.foodTitle }}</a>
+        <a (click)="selectListing(i)" title="Click for Details" slick-list-item-body-header>{{ foodListing.foodTitle }}</a>
         
         <div slick-list-item-body id="slick-list-item-body" class="row">
 

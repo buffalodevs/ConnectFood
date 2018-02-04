@@ -60,8 +60,6 @@ export class ConsumableListingCacheService <LIST_T> {
         return this._requestService.post(url, null)
             .map((response: FoodWebResponse) => {
                 
-                console.log(response.message);
-
                 if (!response.success) {
                     alert('An unexpected error occured with message: ' + response.message);
                 }

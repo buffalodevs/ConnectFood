@@ -53,8 +53,6 @@ export class GetDomainValuesService {
      */
     private extractDomainsFromResponse(getDomainValuesResponse: GetDomainValuesResponse, domainName: string): string[] {
 
-        console.log(getDomainValuesResponse.message);
-
         if (getDomainValuesResponse.success) {
             
             // Fill cache with domain values retrieved for the given domain name.

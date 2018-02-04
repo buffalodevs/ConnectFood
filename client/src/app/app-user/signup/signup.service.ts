@@ -29,8 +29,6 @@ export class SignupService {
         
         return observer.map((signupResponse: FoodWebResponse): FoodWebResponse => {
             
-            console.log(signupResponse.message);
-
             // On successful signup, cache the App User's data in global front end session storage.
             if (signupResponse.success) {
                 this.sessionDataService.updateAppUserSessionData(appUserSignupInfo);

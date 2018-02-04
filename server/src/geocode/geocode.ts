@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 
 import { DriveDistTime } from './drive-dist-time';
 import { GPSCoordinate } from '../../../shared/src/geocode/gps-coordinate';
+import { logger, prettyjsonRender } from '../logging/logger';
 
 export { DriveDistTime, GPSCoordinate };
 
@@ -108,18 +109,18 @@ export function getDrivingDistTime(originGpsCoordinate: GPSCoordinate, destinati
                             driveDistTime.push(new DriveDistTime(distance, duration));
                         }
 
-                        console.log('Successfully calculated distances.');
+                        logger.debug('Successfully calculated distances.');
                         return resolve(driveDistTime);
                     }
 
                     // On over query limit (retry).
                     if (err === 'OVER_QUERY_LIMIT') {
-                        console.log('Geocoder over query limit, retrying now.');
+                        logger.debug('Geocoder over query limit, retrying now.');
                         return getDrivingDistTime(originGpsCoordinate, destinationGpsCoordinate);
                     }
 
                     // On fatal error, just quit and let error bubble up!
-                    console.log(err);
+                    logger.error(prettyjsonRender(err));
                     return reject(new Error('Unexpected error encountered when calculating driving distances.'));
                 }
             );

@@ -1,6 +1,6 @@
 'use strict';
 import { query, QueryResult } from '../../database-util/connection-pool';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
+import { logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
 import { SessionData } from '../../common-util/session-data';
 import { UnclaimNotificationData, notifyReceiverOfUnclaim, notifyDelivererOfLostDelivery } from '../receiver-donor-util/unclaim-notification';

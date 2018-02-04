@@ -133,7 +133,6 @@ export class DeliveryListingInfoComponent implements OnChanges {
             this._scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, true)
                 .finally(() => { this._showProgressSpinner = false; })
                 .subscribe(() => {
-                    console.log('Delivery started');
                     this.delivery.deliveryStateInfo.deliveryState = DeliveryState.started;
                     if (!this.isCart) this.removeListing.emit();
                     this._startComplete = true;

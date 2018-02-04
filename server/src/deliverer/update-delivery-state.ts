@@ -1,7 +1,8 @@
 'use strict'
 import { query, QueryResult } from './../database-util/connection-pool';
 import { addArgPlaceholdersToQueryStr } from '../database-util/prepared-statement-util';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
+import { logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
+import { logger, prettyjsonRender } from '../logging/logger';
 import { SessionData } from '../common-util/session-data';
 import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotificationData } from './delivery-util/delivery-update-notification';
 
@@ -20,10 +21,10 @@ export async function updateDeliveryState(deliveryFoodListingKey: number, delive
 
     try {
         const queryResult: QueryResult = await query(queryString, queryArgs);
-        return handleUpdateDeliveryStateResult(delivererSessionData, queryResult, deliveryState);
+        return handleUpdateDeliveryStateResult(deliveryFoodListingKey, delivererSessionData, queryResult, deliveryState);
     }
     catch (err) {
-        console.log(err);
+        logger.error(prettyjsonRender(err));
         throw new Error('Sorry, an unexpected error occured when updating the state of the delivery');
     }
 }
@@ -36,15 +37,16 @@ export async function updateDeliveryState(deliveryFoodListingKey: number, delive
  * @param deliveryState The delivery state that the delivery was updated to.
  * @return On success, a promise that resolves to nothing. On failure, an error is thrown.
  */
-export function handleUpdateDeliveryStateResult(delivererSessionData: SessionData, queryResult: QueryResult, deliveryState: DeliveryState): Promise <void> {
-
+export function handleUpdateDeliveryStateResult(deliveryFoodListingKey: number, delivererSessionData: SessionData,
+                                                queryResult: QueryResult, deliveryState: DeliveryState): Promise <void>
+{
     logSqlQueryResult(queryResult.rows);
     
     if (queryResult.rowCount === 1) {
-        console.log('Successfully updated the delivery state to: ' + deliveryState);
+        logger.info('Successfully updated the delivery state of delivery with ID ' + deliveryFoodListingKey + ' to: ' + deliveryState);
         const deliveryUpdateNotificationData: DeliveryUpdateNotificationData = queryResult.rows[0].deliveryupdatenotification;
         return notifyReceiverAndDonorOfDeliveryUpdate(delivererSessionData, deliveryUpdateNotificationData);
     }
 
-    throw new Error('An incorrect number of rows have returned from the updateDeliveryState() SQL function call');
+    throw new Error('No rows have returned from the updateDeliveryState() SQL function call, caused by deliverer with ID ' + delivererSessionData.appUserKey);
 }

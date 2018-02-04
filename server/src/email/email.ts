@@ -2,6 +2,7 @@ import * as _ from "lodash";
 
 import { EmailConfig } from "./email-config";
 import { AppUserType } from "../../../shared/src/app-user/app-user-info";
+import { logger, prettyjsonRender } from "../logging/logger";
 
 export { EmailConfig };
 
@@ -41,7 +42,10 @@ export async function sendEmail(emailConfig: EmailConfig): Promise <void> {
             html: emailHTMLStr
         })
     }
-    catch (err) { console.log(err); }
+    catch (err) {
+        logger.error(prettyjsonRender(err));
+        throw err;
+    }
 }
 
 
@@ -71,7 +75,7 @@ function genEmailHTMLStrFromHTMLFile(emailConfig: EmailConfig): Promise <string>
         fs.readFile(global['clientEmailDir'] + emailConfig.contentHTMLPath, 'utf8', (err: Error, contentHTMLStr: string) => {
     
             if (err != null) {
-                console.log(err);
+                logger.error(prettyjsonRender(err));
                 return reject(new Error('Could not open and read HTML file contents: ' + emailConfig.contentHTMLPath));
             }
     
@@ -97,7 +101,7 @@ function genEmailHTMLStrFromHTMLStr(emailConfig: EmailConfig): Promise<string> {
         fs.readFile(global['clientEmailDir'] + EMAIL_CONTAINER_HTML_PATH, 'utf8', (err: Error, containerHTMLStr: string) => {
     
             if (err != null) {
-                console.log(err);
+                logger.error(prettyjsonRender(err));
                 return reject(new Error('Could not open and read ' + EMAIL_CONTAINER_HTML_PATH + ' file contents'));
             }
 

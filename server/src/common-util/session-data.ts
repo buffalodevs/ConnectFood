@@ -4,6 +4,7 @@ let session = require('express-session');
 import { SessionOptions } from 'express-session';
 let RedisStore = require('connect-redis')(session);
 import { RedisStoreOptions } from 'connect-redis';
+import { logger, prettyjsonRender } from '../logging/logger';
 
 import { GPSCoordinate } from '../../../shared/src/geocode/gps-coordinate';
 
@@ -140,7 +141,10 @@ export class SessionData {
      */
     public static deleteSessionData(request: Request): void {
         request.session.destroy((err: Error) => {
-            console.log(err);
+
+            if (err != null) {
+                logger.error(prettyjsonRender(err));
+            }
         });
     }
 }

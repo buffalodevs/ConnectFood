@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MatDialogConfig } from '@angular/material';
 import { Observable } from "rxjs/Observable";
+import { NGXLogger } from 'ngx-logger';
 import 'rxjs/add/operator/finally';
 
 import { LoginService } from './login.service';
@@ -58,6 +59,7 @@ export class LoginComponent extends AbstractModelDrivenComponent implements OnIn
         private _formBuilder: FormBuilder,
         private _loginService: LoginService,
         private _passwordRecoveryService: PasswordRecoveryService,
+        private _logger: NGXLogger,
         @Optional() private _dialogRef?: MatDialogRef <LoginComponent>
     ) {
         super(validationService)
@@ -116,8 +118,6 @@ export class LoginComponent extends AbstractModelDrivenComponent implements OnIn
                 .subscribe (
                     (response: FoodWebResponse) => {
 
-                        console.log(response.message);
-
                         if (response.success) {
                             
                             this._loginError = null;
@@ -134,7 +134,7 @@ export class LoginComponent extends AbstractModelDrivenComponent implements OnIn
                     },
 
                     (err: Error) => {
-                        console.log(err); // Shouldn't happen!
+                        this._logger.error(err); // Shouldn't happen!
                     }
                 );
     }

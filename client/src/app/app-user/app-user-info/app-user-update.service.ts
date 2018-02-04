@@ -37,8 +37,6 @@ export class AppUserUpdateService {
 
         return observer.map((appUserUpdateResponse: UpdateAppUserResponse): FoodWebResponse => {
 
-            console.log(appUserUpdateResponse.message);
-
             // Immediately update client session data on success!
             if (appUserUpdateResponse.success) {
                 this._sessionDataService.updateAppUserSessionData(appUserUpdateResponse.appUserInfo);

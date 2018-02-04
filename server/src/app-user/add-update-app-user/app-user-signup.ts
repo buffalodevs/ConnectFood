@@ -1,6 +1,7 @@
 'use strict';
 import { SessionData, AppUserInfo } from '../../common-util/session-data';
 import { addOrUpdateAppUser } from './app-user-add-update';
+import { logger, prettyjsonRender } from '../../logging/logger';
 import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
 import { logSqlQueryExec } from '../../logging/sql-logger';
 import { query } from '../../database-util/connection-pool';
@@ -34,10 +35,10 @@ export function signupVerify(appUserKey: number, verificationToken: String): Pro
 
     return query(queryString, queryArgs)
         .then(() => {
-            console.log('Successfully verified new user.');
+            logger.info('Successfully verified new user with ID: ' + appUserKey);
         })
         .catch((err: Error) => {
-            console.log(err);
+            logger.warn(prettyjsonRender(err));
             throw new Error('Sorry, something went wrong. Unable to verify you.');
         });
 }
@@ -72,7 +73,7 @@ function sendVerificationEmail(sessionData: SessionData) : Promise<SessionData> 
             return Promise.resolve(sessionData);
         })
         .catch((err) => {
-            console.log(err);
+            logger.error(prettyjsonRender(err));
             throw new Error('Sorry, unable to send signup verification email');
         });
 }

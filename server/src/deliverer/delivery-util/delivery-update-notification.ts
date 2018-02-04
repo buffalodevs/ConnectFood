@@ -91,7 +91,6 @@ function generateAndSendEmail(delivererSessionData: SessionData, deliveryUpdateN
     // Send the email with our generated mail configuration.
     return sendEmail(emailConfig)
         .catch((err: Error) => {
-            console.log(err);
             throw new Error('Failed to email notification of delivery update to concerned donor and receiver');
         });
 } 

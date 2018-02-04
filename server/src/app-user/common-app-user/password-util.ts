@@ -4,6 +4,7 @@
  */
 'use strict'; 
 import { hash, genSalt, compare } from 'bcrypt';
+import { logger, prettyjsonRender } from '../../logging/logger';
 
 
 /**
@@ -19,7 +20,8 @@ export async function hashPassword(password: string): Promise <string> {
         return hash(password, salt);
     }
     catch (err) {
-        console.log(err);
+        
+        logger.error(prettyjsonRender(err,));
         throw new Error('An unexpected error has occured.');
     }
 };

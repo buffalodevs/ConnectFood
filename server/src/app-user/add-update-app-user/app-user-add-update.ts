@@ -1,7 +1,8 @@
 'use strict';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
+import { logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 import { query, QueryResult, connect, Client } from '../../database-util/connection-pool';
 import { addArgPlaceholdersToQueryStr } from "../../database-util/prepared-statement-util";
+import { logger, prettyjsonRender } from "../../logging/logger";
 
 import { SessionData, AppUserInfo } from '../../common-util/session-data';
 import { hashPassword } from '../common-app-user/password-util';
@@ -62,7 +63,6 @@ function genGPSCoordinate(appUserAddress: Address): Promise <GPSCoordinate> {
 
     return getGPSCoordinate(appUserAddress.address, appUserAddress.city, appUserAddress.state, appUserAddress.zip)
         .catch((err: Error) => {
-            console.log(err);
             throw new Error(AppUserErrorMsgs.INVALID_ADDRESS);
         });
 }
@@ -113,7 +113,8 @@ async function addOrUpdateAppUserInSQL(appUserInfo: AppUserInfo, hashedPassword?
     return query(queryString, queryArgs)
         .catch((err: Error) => {
 
-            console.log(err);
+            logger.error(prettyjsonRender(err));
+
             if (!isUpdate || appUserInfo.email != null) throw new Error(AppUserErrorMsgs.DUPLICATE_EMAIL);
             else                                        throw new Error('An unexpected error has occured');
         });
@@ -132,15 +133,16 @@ function handleResult(addOrUpdateResult: QueryResult, isUpdate: boolean): Sessio
 
     if (addOrUpdateResult.rows.length === 1) {
 
-        console.log('Successfully ' + (isUpdate ? 'updated' : 'added') + ' user in database.');
-
         let sessionData: SessionData = addOrUpdateResult.rows[0].sessiondata;
         // Deserialize and prepare the app user info that was retrieved from database operation.
         sessionData.appUserInfo = DESERIALIZER.deserialize(sessionData.appUserInfo, AppUserInfo);
+
+        logger.info('Successfully ' + (isUpdate ? 'updated' : 'added') + ' user in database with email: ' + sessionData.appUserInfo.email);
         return sessionData;
     }
 
     // Fail: we didn't get one row back when adding or updating a new App User.
-    console.log('Incorrect result returned form addAppUser SQL function.');
+    logger.error('No rows were returned from ' + (isUpdate ? 'updateAppUser()'
+                                                           : 'addAppUser()') + ' SQL function');
     throw new Error('An unexpected error has occured.');
 }

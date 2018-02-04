@@ -2,25 +2,28 @@
 import { query, QueryResult } from '../../database-util/connection-pool';
 import { logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
+import { logger, prettyjsonRender } from '../../logging/logger';
 import { SessionData } from '../../common-util/session-data';
 import { UnclaimNotificationData, notifyDelivererOfLostDelivery, notifyDonorOfLostDelivery } from '../receiver-donor-util/unclaim-notification';
 
 
-export function claimFoodListing(foodListingKey: number, receiverSessionData: SessionData): Promise <void> {
+export async function claimFoodListing(foodListingKey: number, receiverSessionData: SessionData): Promise <void> {
     
     let queryArgs: any[] = [ foodListingKey, receiverSessionData.appUserKey ];
     let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM claimFoodListing()', queryArgs);
 
-    return execClaimOrUnclaimQuery(true, queryString, queryArgs);
+    await execClaimOrUnclaimQuery(true, queryString, queryArgs);
+    logger.info('Receiver with ID ' + receiverSessionData.appUserKey + ' successfully claimed Food Listing with ID ' + foodListingKey);
 }
 
 
-export function unclaimFoodListing(foodListingKey: number, receiverSessionData: SessionData, unclaimReason: string): Promise <void> {
+export async function unclaimFoodListing(foodListingKey: number, receiverSessionData: SessionData, unclaimReason: string): Promise <void> {
 
     let queryArgs: any[] = [ foodListingKey, receiverSessionData.appUserKey, unclaimReason ];
     let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM unclaimFoodListing()', queryArgs);
 
-    return execClaimOrUnclaimQuery(false, queryString, queryArgs, receiverSessionData);
+    await execClaimOrUnclaimQuery(false, queryString, queryArgs, receiverSessionData);
+    logger.info('Receiver with ID ' + receiverSessionData.appUserKey + ' successfully unclaimed Food Listing with ID ' + foodListingKey);
 }
 
 
@@ -32,11 +35,11 @@ async function execClaimOrUnclaimQuery(isClaim: boolean, queryString: string, qu
         const queryResult: QueryResult = await query(queryString, queryArgs);
         logSqlQueryResult(queryResult.rows);
 
-        return ( isClaim ? Promise.resolve() // If claim, then just resolve.
-                         : handleUnclaimQueryResult(receiverSessionData, queryResult) );
+        await ( isClaim ? Promise.resolve() // If claim, then just resolve.
+                        : handleUnclaimQueryResult(receiverSessionData, queryResult) );
     }
     catch (err) {
-        console.log(err);
+        logger.error(prettyjsonRender(err));
         return Promise.reject(new Error((isClaim ? 'Claim' : 'Unclaim') + ' Food Listing Unexpectedly Failed.'));
     }
 }

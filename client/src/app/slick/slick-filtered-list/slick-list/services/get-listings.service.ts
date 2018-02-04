@@ -1,5 +1,6 @@
 "use strict";
 import { Injectable, Optional } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/map';
@@ -30,11 +31,12 @@ export class GetListingsService <LIST_T, FILTERS_T extends SlickListFilters> {
      * @param _requestService The Food Web App wrapper around http requests.
      */
     public constructor (
-        private _requestService: RequestService
+        private _requestService: RequestService,
+        private _logger: NGXLogger
     ) {
         this._retrievalAmount = 5;
         this._noMoreListingsToRetrieve = false;
-        this._listingsBuffer = new ListingsBuffer(_requestService);
+        this._listingsBuffer = new ListingsBuffer(_requestService, _logger);
 
         this._previousRoute = null;
         this._previousFilters = null;

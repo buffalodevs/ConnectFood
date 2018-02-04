@@ -1,7 +1,8 @@
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { TextMaskModule } from 'angular2-text-mask';
+import { LoggerModule, NgxLoggerLevel, LoggerConfig } from 'ngx-logger';
 
 import { SlickProgressSpinnerModule } from '../slick/slick-progress-spinner/slick-progress-spinner.module';
 import { DateFormatterPipe } from './pipes/date-formatter.pipe';
@@ -18,6 +19,7 @@ import { ResponsiveService } from './services/responsive.service';
 import { ValidationService } from './services/validation.service';
 import { DateFormatterService } from './services/date-formatter.service';
 import { DeserializerService } from './services/deserializer.service';
+import { RequestResponseLoggerService } from './services/logging/request-response-logger.service';
 
 
 @NgModule({
@@ -32,7 +34,13 @@ import { DeserializerService } from './services/deserializer.service';
         CommonModule,
         HttpClientModule,
         TextMaskModule,
-        SlickProgressSpinnerModule
+        SlickProgressSpinnerModule,
+        LoggerModule.forRoot({
+            level: isDevMode() ? NgxLoggerLevel.TRACE // Want to log everything to developer's console.
+                               : NgxLoggerLevel.OFF, // Do not want to log to user's browser console.
+            serverLoggingUrl: '/logging/logClientData',
+            serverLogLevel: NgxLoggerLevel.WARN // Want to send all warn and error messages to the server to be logged.
+        })
     ],
     exports: [
         DateFormatterPipe,
@@ -51,7 +59,8 @@ import { DeserializerService } from './services/deserializer.service';
         ResponsiveService,
         ValidationService,
         DateFormatterService,
-        DeserializerService
+        DeserializerService,
+        RequestResponseLoggerService
     ]
 })
 export class CommonUtilModule {}

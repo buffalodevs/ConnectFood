@@ -32,7 +32,6 @@ export class PasswordRecoveryService {
 
         return observer.map((recoverPasswordResponse: FoodWebResponse): any => {
             
-            console.log(recoverPasswordResponse.message);
             return recoverPasswordResponse;
         });
     }

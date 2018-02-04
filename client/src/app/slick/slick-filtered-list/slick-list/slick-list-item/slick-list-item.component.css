@@ -17,6 +17,10 @@
     box-shadow: 0px 3px;
 }
 
+:host ::ng-deep .slick-list-item-header a {
+    display: block;
+}
+
 .slick-list-item-img {
     float: left;
     max-width: 300px;

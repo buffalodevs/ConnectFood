@@ -5,6 +5,7 @@ import 'rxjs/add/operator/map';
 
 import { SessionDataService } from '../../common-util/services/session-data.service';
 import { DeserializerService } from '../../common-util/services/deserializer.service';
+import { RequestResponseLoggerService } from '../../common-util/services/logging/request-response-logger.service';
 
 import { LoginRequest, LoginResponse } from '../../../../../shared/src/app-user/message/login-message';
 import { FoodWebResponse } from '../../../../../shared/src/message-protocol/food-web-response';
@@ -13,11 +14,17 @@ import { FoodWebResponse } from '../../../../../shared/src/message-protocol/food
 @Injectable()
 export class LoginService {
 
+    private readonly _LOGIN_ROUTE: string;
+
+
     public constructor (
         private _http: HttpClient,
         private _sessionDataService: SessionDataService,
-        private _deserializer: DeserializerService
-    ) {}
+        private _deserializer: DeserializerService,
+        private _requestResponseLogger: RequestResponseLoggerService
+    ) {
+        this._LOGIN_ROUTE = '/appUser/login';
+    }
 
 
     /**
@@ -35,18 +42,20 @@ export class LoginService {
             })
         };
 
+        const loginRequest: LoginRequest = new LoginRequest(email, password);
+        this._requestResponseLogger.logRequest(this._LOGIN_ROUTE, 'POST', loginRequest);
         // NOTE: Should user raw http request here instead of RequestService wrapper since RequestService depends on this LoginService (prevent circular dependency)!
-        const observer: Observable<LoginResponse> = this._http.post<LoginResponse>('/appUser/login', new LoginRequest(email, password), requestOptions);
+        const observer: Observable<LoginResponse> = this._http.post<LoginResponse>(this._LOGIN_ROUTE, loginRequest, requestOptions);
 
-        return observer.map((loginResponse: LoginResponse): any /* AppUserInfo */ => {
-
-            console.log(loginResponse.message);
+        return observer.map((loginResponse: LoginResponse): any => {
 
             if (loginResponse.success) {
                 
                 loginResponse = this._deserializer.deserialize(loginResponse);
                 this._sessionDataService.updateAppUserSessionData(loginResponse.appUserInfo);
             }
+
+            this._requestResponseLogger.logResponse(this._LOGIN_ROUTE, loginResponse);
 
             return (loginResponse as FoodWebResponse);
         });

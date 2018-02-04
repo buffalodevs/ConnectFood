@@ -1,6 +1,7 @@
 'use strict';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
+import { logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 import { connect, query, Client, QueryResult } from '../../database-util/connection-pool';
+import { logger, prettyjsonRender } from '../../logging/logger';
 import { checkPassword } from '../common-app-user/password-util';
 import { SessionData, AppUserInfo } from "../../common-util/session-data";
 import { DESERIALIZER } from '../../deserialization/deserialization';
@@ -21,11 +22,11 @@ export async function login(email: string, password: string): Promise <SessionDa
         // Get user info from database, extract and deserialize session data, and validate password.
         const getAppUserInfoResult: QueryResult = await getAppUserInfo(email);
         const sessionData: SessionData = extractAndDeserializeSessionData(email, getAppUserInfoResult);
-        await validatePassword(password, getAppUserInfoResult);
+        await validatePassword(email, password, getAppUserInfoResult);
         return sessionData;
     }
     catch (err) {
-        console.log(err);
+        logger.info(prettyjsonRender(err)); // Not a true error, but want to capture it.
         throw new Error(AppUserErrorMsgs.INCORRECT_LOGIN);
     }
 }
@@ -66,17 +67,18 @@ function extractAndDeserializeSessionData(email: string, getAppUserInfoResult: Q
 /**
  * Anyalyzes the result of getting the App User's primary info. If the App User does exist, then we will check the password and bring back all organizations
  * associated with the given App User if the password is correct.
+ * @param email The email of the user that we are validating the password for.
  * @param password The plain text password that is to be hashed.
  * @param getAppUserInfoResult The query result that on success should contain a single row with the App User info.
  * @return A promise that resolves with no payload on success.
  */
-async function validatePassword(password: string, getAppUserInfoResult: QueryResult): Promise <void> {
+async function validatePassword(email: string, password: string, getAppUserInfoResult: QueryResult): Promise <void> {
 
     let firstRowResult: any = getAppUserInfoResult.rows[0];
     let hashPassword: string = firstRowResult.password;
     
     const isMatch: boolean = await checkPassword(password, hashPassword);
     if (!isMatch) {
-        throw new Error('Password is incorrect');
+        throw new Error('Password is incorrect for user with email: ' + email);
     }
 }

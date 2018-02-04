@@ -7,10 +7,6 @@
     
     <slick-list-item *ngFor="let deliveryListing of listData; let i = index;">
 
-        <ng-container slick-list-item-header>
-            <a (click)="selectListing(i)" title="Click for Details">{{ deliveryListing.foodTitle }}</a>
-        </ng-container>
-
         <ng-container slick-list-item-img>
 
             <slick-map #SlickMapComponent
@@ -22,9 +18,8 @@
         </ng-container>
 
 
-        <ng-container slick-list-item-body-header>
-            <a (click)="selectListing(i)" title="Click for Details">{{ deliveryListing.foodTitle }}</a>
-        </ng-container>
+        <a (click)="selectListing(i)" title="Click for Details" slick-list-item-header>{{ deliveryListing.foodTitle }}</a>
+        <a (click)="selectListing(i)" title="Click for Details" slick-list-item-body-header>{{ deliveryListing.foodTitle }}</a>
 
         <div slick-list-item-body id="slick-list-item-body" class="row">
 

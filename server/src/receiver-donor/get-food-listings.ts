@@ -1,7 +1,8 @@
 'use strict'
 import { query, QueryResult } from '../database-util/connection-pool';
 import { addArgPlaceholdersToQueryStr } from '../database-util/prepared-statement-util';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../logging/sql-logger';
+import { logSqlQueryExec, logSqlQueryResult } from '../logging/sql-logger';
+import { logger, prettyjsonRender } from '../logging/logger';
 import * as _ from 'lodash';
 
 import { getDrivingDistTime, GPSCoordinate, DriveDistTime } from '../geocode/geocode';
@@ -46,7 +47,7 @@ export async function getFoodListings(filters: FoodListingsFilters, myAppUserKey
         return generateResultArray(queryResult.rows, myGPSCoordinate, (filters.listingsStatus === LISTINGS_STATUS.myDonatedListings));
     }
     catch (err) {
-        console.log(err);
+        logger.error(prettyjsonRender(err));
         return Promise.reject(new Error('Food listing search failed'));
     }
 }

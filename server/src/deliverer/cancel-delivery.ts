@@ -1,7 +1,8 @@
 'use strict'
 import { query, QueryResult } from './../database-util/connection-pool';
 import { addArgPlaceholdersToQueryStr } from '../database-util/prepared-statement-util';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
+import { logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
+import { logger, prettyjsonRender } from '../logging/logger';
 import { SessionData } from '../common-util/session-data';
 import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotificationData } from './delivery-util/delivery-update-notification';
 
@@ -17,10 +18,10 @@ export async function cancelDelivery(deliveryFoodListingKey: number, delivererSe
 
     try {
         const queryResult: QueryResult = await query(queryString, queryArgs);
-        return handleCancelDeliveryResult(delivererSessionData, queryResult);
+        return handleCancelDeliveryResult(deliveryFoodListingKey, delivererSessionData, queryResult);
     }
     catch (err) {
-        console.log(err);
+        logger.error(prettyjsonRender(err))
         throw new Error('Sorry, an unexpected error occured when cancelling the delivery');
     }
 }
@@ -28,19 +29,21 @@ export async function cancelDelivery(deliveryFoodListingKey: number, delivererSe
 
 /**
  * Handles cancelDelivery() query result and mails cancelled delivery notifications to involved Donor and Receiver.
+ * @param deliveryFoodListingKey The key identifier of the Delivery Food Listing that had been cancelled.
  * @param delivererSessionData The session information for the deliverer.
  * @param queryResult The result of the cancelDelivery() SQL query.
  * @return On success, a promise that resolves to nothing. On failure, an error is thrown.
  */
-function handleCancelDeliveryResult(delivererSessionData: SessionData, queryResult: QueryResult): Promise<void> {
+function handleCancelDeliveryResult(deliveryFoodListingKey: number, delivererSessionData: SessionData, queryResult: QueryResult): Promise <void> {
 
     logSqlQueryResult(queryResult.rows);
     
     if (queryResult.rowCount === 1) {
-        console.log('Successfully cancelled a Delivery');
+        logger.info('Deliverer with ID ' + delivererSessionData.appUserKey + ' successfully cancelled a Delivery with ID: ' + deliveryFoodListingKey);
         const deliveryUpdateNotificationData: DeliveryUpdateNotificationData = queryResult.rows[0].deliveryupdatenotification;
         return notifyReceiverAndDonorOfDeliveryUpdate(delivererSessionData, deliveryUpdateNotificationData);
     }
 
-    throw new Error('An incorrect number of rows have returned from the cancelDelivery() SQL function call');
+    throw new Error('No rows have returned from the cancelDelivery() SQL function call for delivery with ID ' +
+                    deliveryFoodListingKey + ', caused by deliverer with ID ' + delivererSessionData.appUserKey);
 }

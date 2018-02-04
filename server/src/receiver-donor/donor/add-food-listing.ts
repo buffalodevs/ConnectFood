@@ -5,7 +5,8 @@ import * as _ from 'lodash';
 
 import { query, QueryResult } from '../../database-util/connection-pool';
 import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
-import { logSqlConnect, logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
+import { logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
+import { logger, prettyjsonRender } from '../../logging/logger';
 
 import { FoodListingUpload } from '../../../../shared/src/receiver-donor/food-listing-upload';
 import { FoodListing } from '../../../../shared/src/receiver-donor/food-listing';
@@ -63,10 +64,11 @@ export async function addFoodListing(foodListingUpload: FoodListingUpload, donor
             await writeImgs(foodListingUpload.imageUploads, imageUrls, imageNames);
         }
 
+        logger.info('Food listing with key ' + foodListingKey + ' successfully added by donor with ID ' + donorAppUserKey);
         return foodListingKey;
     }
     catch (err) {
-        console.log(err);
+        logger.error(prettyjsonRender(err));
         throw new Error('Donor submission failed.');
     }
 }
@@ -131,11 +133,11 @@ function writeImgToLocalFs(image: string, imageUrl: string): Promise <void> {
         fs.writeFile(global['rootDir'] + imageUrl, image, {encoding: 'base64'}, (err: Error) => {
             
             if (err) {
-                console.log(err);
+                logger.error(prettyjsonRender(err));
                 reject();
             }
             else {
-                console.log('successfully saved the image on local filesystem!');
+                logger.debug('successfully saved the image on local filesystem!');
                 resolve();
             }
         });
@@ -171,7 +173,7 @@ async function writeImgToBucket(image: string, imageName: string): Promise <void
         return await file.save(imageBinary, saveConfig);
     }
     catch (err) {
-        console.log(err);
+        logger.error(prettyjsonRender(err));
         throw new Error('Failed to save image in Google Cloud storage bucket.');
     } 
 }

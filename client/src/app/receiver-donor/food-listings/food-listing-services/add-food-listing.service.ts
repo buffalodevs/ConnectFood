@@ -33,8 +33,6 @@ export class AddFoodListingService {
 
         return observer.map((addFoodListingResponse: AddFoodListingResponse) => {
 
-            console.log(addFoodListingResponse.message);
-
             if (addFoodListingResponse.success) {
                 return addFoodListingResponse.foodListingKey;
             }

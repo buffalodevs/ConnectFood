@@ -1,3 +1,4 @@
+import { NGXLogger } from "ngx-logger";
 import { Observable } from "rxjs/Observable";
 import { Observer } from "rxjs/Observer";
 import { Subscription } from "rxjs/Subscription";
@@ -23,6 +24,7 @@ export class ListingsBuffer <LIST_T, FILTERS_T extends SlickListFilters> {
 
     public constructor (
         private _requestService: RequestService,
+        private _logger: NGXLogger,
         /**
          * The size of the buffer. The buffer will always attempt to fill itself to this capacity with listings from the server. Default is 5.
          */
@@ -206,8 +208,7 @@ export class ListingsBuffer <LIST_T, FILTERS_T extends SlickListFilters> {
      */
     private fillBufferFromServerResponse(retrievalAmount: number, route: string, filters: FILTERS_T, getListingsResponse: GetListingsResponse <LIST_T>): void {
 
-        console.log(getListingsResponse.message);
-        console.log('Got ' + getListingsResponse.listData.length + ' listings out of retrieval amount: ' + retrievalAmount);
+        this._logger.debug('Got ' + getListingsResponse.listData.length + ' listings out of retrieval amount: ' + retrievalAmount);
 
         // Record if we have reached end of listings on server with given set of filters (didn't get all requested listings from server).
         this._endOfListingsOnServer = ( getListingsResponse.listData.length < retrievalAmount );
