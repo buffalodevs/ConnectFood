@@ -32,19 +32,21 @@
 
                 <h4>Organization Name:</h4>
 
-                <span *ngIf="!getEditDataFor('organizationName').editing" class="link-content" (click)="setEditable('organizationName')" title="edit">
-                    {{ control('organizationName').value}}<i class="material-icons">&#xe254;</i>
+                <span *ngIf="!getEditDataFor('organization.name').editing" class="link-content" (click)="setEditable('organization.name')" title="edit">
+                    {{ control('organization.name').value}}<i class="material-icons">&#xe254;</i>
                 </span>
 
-                <form [formGroup]="form" (ngSubmit)="save('organizationName')"
-                [slick-progress-spinner]="getEditDataFor('organizationName').showProgressSpinner" *ngIf="getEditDataFor('organizationName').editing">
+                <form formGroupName="organization" (ngSubmit)="save('organization.name')"
+                [slick-progress-spinner]="getEditDataFor('organization.name').showProgressSpinner" *ngIf="getEditDataFor('organization.name').editing">
 
                     <mat-input-container floatPlaceholder="never">
-                        <input matInput id="organizationName" formControlName="organizationName" placeholder="Organization Name">
+                        <input matInput id="name" formControlName="name" placeholder="Organization Name">
                     </mat-input-container>
 
                     <button mat-raised-button color="primary" class="button-sm" type="submit">Save</button>
-                    <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('organizationName', false)">Cancel</button>
+                    <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('organization.name', false)">
+                        Cancel
+                    </button>
 
                 </form>
 
@@ -88,13 +90,14 @@
 
                 <h4>Organization Tax Id:</h4>
 
-                <div class="form-group" *ngIf="!getEditDataFor('taxId').editing">
-                    <span class="link-content" (click)="setEditable('taxId')" title="edit">
-                        {{ control('taxId').value }}<i class="material-icons">&#xe254;</i>
+                <div class="form-group" *ngIf="!getEditDataFor('organization.taxId').editing">
+                    <span class="link-content" (click)="setEditable('organization.taxId')" title="edit">
+                        {{ control('organization.taxId').value }}<i class="material-icons">&#xe254;</i>
                     </span>
                 </div>
 
-                <form [formGroup]="form" (ngSubmit)="save('taxId')" [slick-progress-spinner]="getEditDataFor('taxId').showProgressSpinner" *ngIf="getEditDataFor('taxId').editing">
+                <form formGroupName="organization" (ngSubmit)="save('organization.taxId')"
+                 [slick-progress-spinner]="getEditDataFor('organization.taxId').showProgressSpinner" *ngIf="getEditDataFor('organization.taxId').editing">
 
                     <mat-input-container floatPlaceholder="never">
                         <input matInput placeholder="Organization Tax ID" [textMask]="{ mask: appUserConstants.TAX_ID_MASK, placeholderChar: '\u2000' }"
@@ -102,7 +105,7 @@
                     </mat-input-container>
                     
                     <button mat-raised-button color="primary" class="button-sm" type="submit">Save</button>
-                    <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('taxId', false)">Cancel</button>
+                    <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('organization.taxId', false)">Cancel</button>
 
                 </form>
 
@@ -120,15 +123,16 @@
 
             <h4>Address:</h4>
 
-            <div class="form-group" *ngIf="!getEditDataFor('address').editing">
-                <span class="link-content" (click)="setManyEditable(['address', 'city', 'state', 'zip'])" title="edit">
-                    {{ control('address').value }}<br>
-                    {{ control('city').value }}, {{ control('state').value }} {{ control('zip').value }}<i class="material-icons">&#xe254;</i>
+            <div class="form-group" *ngIf="!getEditDataFor('contactInfo.address').editing">
+                <span class="link-content" (click)="setManyEditable(['contactInfo.address', 'contactInfo.city', 'contactInfo.state', 'contactInfo.zip'])" title="edit">
+                    {{ control('contactInfo.address').value }}<br>
+                    {{ control('contactInfo.city').value }}, {{ control('contactInfo.state').value }} {{ control('contactInfo.zip').value }}
+                    <i class="material-icons">&#xe254;</i>
                 </span>
             </div>
 
-            <form [formGroup]="form" (ngSubmit)="saveMany(['address', 'city', 'state', 'zip'])" class="form-group"
-             [slick-progress-spinner]="getEditDataFor('address').showProgressSpinner" *ngIf="getEditDataFor('address').editing">
+            <form formGroupName="contactInfo" (ngSubmit)="saveMany(['contactInfo.address', 'contactInfo.city', 'contactInfo.state', 'contactInfo.zip'])"
+             class="form-group" [slick-progress-spinner]="getEditDataFor('contactInfo.address').showProgressSpinner" *ngIf="getEditDataFor('contactInfo.address').editing">
 
                 <mat-input-container floatPlaceholder="never" class="form-group">
                     <input matInput id="address" placeholder="Street Address" name="address" formControlName="address">
@@ -147,16 +151,16 @@
 
                     <mat-input-container floatPlaceholder="never" class="form-group col-md-4">
                         <input matInput placeholder="Zip" name="zip" [InputFilter]="appUserConstants.DYNAMIC_ZIP_REGEX" formControlName="zip">
-                        <mat-error *ngIf="hasError('zip')">{{ errorMsgFor('zip') }}</mat-error>
+                        <mat-error *ngIf="hasError('contactInfo.zip')">{{ errorMsgFor('contactInfo.zip') }}</mat-error>
                     </mat-input-container>
 
                 </div>
 
-                <mat-error *ngIf="hasError('address')">{{ errorMsgFor('address') }}</mat-error>
+                <mat-error *ngIf="hasError('contactInfo.address')">{{ errorMsgFor('contactInfo.address') }}</mat-error>
 
                 <button mat-raised-button color="primary" class="button-sm" type="submit">Save</button>
                 <button mat-raised-button color="primary" class="button-sm warn-button" type="button"
-                 (click)="setManyEditable(['address', 'city', 'state', 'zip'], false)">Cancel</button>
+                 (click)="setManyEditable(['contactInfo.address', 'contactInfo.city', 'contactInfo.state', 'contactInfo.zip'], false)">Cancel</button>
 
             </form>
 
@@ -167,20 +171,21 @@
 
                 <h4>Phone Number:</h4>
 
-                <div class="form-group" *ngIf="!getEditDataFor('phone').editing">
-                    <span class="link-content" (click)="setEditable('phone')" title="edit">
-                        {{ control('phone').value }}<i class="material-icons">&#xe254;</i>
+                <div class="form-group" *ngIf="!getEditDataFor('contactInfo.phone').editing">
+                    <span class="link-content" (click)="setEditable('contactInfo.phone')" title="edit">
+                        {{ control('contactInfo.phone').value }}<i class="material-icons">&#xe254;</i>
                     </span>
                 </div>
 
-                <form [formGroup]="form" (ngSubmit)="save('phone')" [slick-progress-spinner]="getEditDataFor('phone').showProgressSpinner" *ngIf="getEditDataFor('phone').editing">
+                <form formGroupName="contactInfo" (ngSubmit)="save('contactInfo.phone')"
+                 [slick-progress-spinner]="getEditDataFor('contactInfo.phone').showProgressSpinner" *ngIf="getEditDataFor('contactInfo.phone').editing">
 
                     <mat-input-container floatPlaceholder="never">
                         <input matInput placeholder="phone number" [textMask]="{ mask: appUserConstants.PHONE_MASK, placeholderChar: '\u2000' }" formControlName="phone">
                     </mat-input-container>
                     
                     <button mat-raised-button color="primary" class="button-sm" type="submit">Save</button>
-                    <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('phone', false)">Cancel</button>
+                    <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('contactInfo.phone', false)">Cancel</button>
 
                 </form>
 
@@ -191,25 +196,27 @@
 
     <h2>Availability</h2>
     <hr>
-    <div id="schedule-builder-container" class="row" [slick-progress-spinner]="getEditDataFor('availability').showProgressSpinner" spinnerStickyTopId="schedule-builder-container">
+    <form id="schedule-builder-container" class="row" [slick-progress-spinner]="getEditDataFor('availability.timeRanges').showProgressSpinner"
+     formGroupName="availability" spinnerStickyTopId="schedule-builder-container">
 
-        <slick-weekday-schedule-builder #availability id="availability" [displayOnly]="!getEditDataFor('availability').editing" formControlName="availability">
-        </slick-weekday-schedule-builder>
+        <slick-weekday-schedule-builder #availability id="availability" [displayOnly]="!getEditDataFor('availability.timeRanges').editing"
+         formControlName="timeRanges"></slick-weekday-schedule-builder>
 
         <div class="col-md-6">
 
-            <button mat-raised-button color="primary" class="button-sm" *ngIf="!getEditDataFor('availability').editing" (click)="setEditable('availability')">
+            <button mat-raised-button color="primary" class="button-sm" *ngIf="!getEditDataFor('availability.timeRanges').editing"
+             (click)="setEditable('availability.timeRanges')">
                 Update Availability
             </button>
 
-            <form [formGroup]="form" (ngSubmit)="save('availability')" *ngIf="getEditDataFor('availability').editing">
+            <form [formGroup]="form" (ngSubmit)="save('availability.timeRanges')" *ngIf="getEditDataFor('availability.timeRanges').editing">
                 <button mat-raised-button color="primary" class="button-sm" type="submit">Save</button>
-                <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('availability', false)">Cancel</button>
+                <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('availability.timeRanges', false)">Cancel</button>
             </form>
 
         </div>
 
-    </div><br><br><br>
+    </form><br><br><br>
 
     <h2>Password</h2>
     <hr>

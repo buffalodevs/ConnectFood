@@ -1,6 +1,5 @@
-import { AppUserInfo } from './../app-user-info';
+import { AppUser } from './../app-user';
 import { deserializable, deepDeserializable } from '../../deserialization/deserializer';
-import {  } from '../../deserialization/deserializable-registration/deserializable-annotations';
 
 
 /**
@@ -9,15 +8,15 @@ import {  } from '../../deserialization/deserializable-registration/deserializab
 @deserializable('SignupRequest')
 export class SignupRequest {
 
-    @deepDeserializable(AppUserInfo)
-    public appUserInfo: AppUserInfo;
+    @deepDeserializable(AppUser)
+    public appUser: AppUser;
 
 
     public constructor (
-        appUserInfo: AppUserInfo = null,
+        appUser: AppUser = null,
         public password: string = null
     ) {
-        this.appUserInfo = appUserInfo;
+        this.appUser = appUser;
     }
 }
 

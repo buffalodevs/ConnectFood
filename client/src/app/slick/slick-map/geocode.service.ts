@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { GPSCoordinate } from '../../../../../shared/src/geocode/gps-coordinate';
-import { Address } from '../../../../../shared/src/app-user/app-user-info';
+import { ContactInfo } from '../../../../../shared/src/app-user/contact-info';
 
 export { GPSCoordinate };
 
@@ -22,7 +22,7 @@ export class GeocodeService {
      * @param addresses The addresses form which to generate the Google Maps link href.
      * @return The generated href.
      */
-    public generateGoogleMapsHref(addresses: Address[]): string {
+    public generateGoogleMapsHref(addresses: ContactInfo[]): string {
         
         let href: string = this.BASE_GOOGLE_MAPS_HREF;
 

@@ -2,7 +2,7 @@ import { logSqlQueryExec, logSqlQueryResult } from "../../logging/sql-logger";
 import { query, QueryResult } from "../../database-util/connection-pool";
 import { logger } from "../../logging/logger";
 
-import { SessionData, AppUserInfo } from "../../common-util/session-data";
+import { SessionData, AppUser } from "../../common-util/session-data";
 import { login } from '../login-app-user/app-user-login';
 import { addOrUpdateAppUser } from "./app-user-add-update";
 import { AppUserErrorMsgs } from "../../../../shared/src/app-user/message/app-user-error-msgs";
@@ -10,36 +10,36 @@ import { AppUserErrorMsgs } from "../../../../shared/src/app-user/message/app-us
 
 /**
  * Performs the update of the App User associated with the held session data.
- * @param appUserUpdateInfo The update information for the App User.
+ * @param appUserUpdate The update information for the App User.
  * @param newPassword The new password for the App User. May be null if the password is not changing.
  * @param currentPasswordCheck The current password of the App User (to be checked if provided from the client).
  * @param appUserSessionData The session data for the App User. Contains the current email and address info of the App User.
  * @return A promise without a payload. If it resolves, then the update was successful.
  */
-export async function updateAppUser(appUserUpdateInfo: AppUserInfo, newPassword: string,
+export async function updateAppUser(appUserUpdate: AppUser, newPassword: string,
                                     currentPasswordCheck: string, appUserSessionData: SessionData): Promise <SessionData>
 {   
     // VERY IMPORTANT: Must first check if the current password is correct if user is updating to a new password.
-    await ( (newPassword != null) ? checkPassword(appUserSessionData.appUserInfo.email, currentPasswordCheck)
+    await ( (newPassword != null) ? checkPassword(appUserSessionData.appUser.email, currentPasswordCheck)
                                   : null );
 
     // Check if this is an address field(s) update, and fill any null address field(s) with session data for new GPS coordinates.
-    if (isAddressInfoUpdate(appUserUpdateInfo)) {
-        fillAddressUpdateInfo(appUserUpdateInfo, appUserSessionData.appUserInfo);
+    if (isAddressInfoUpdate(appUserUpdate)) {
+        fillAddressUpdateInfo(appUserUpdate, appUserSessionData.appUser);
 
         // Make sure that whenever an address is updated we also update the timezone information (could go out of sync if user moves to another timezone)!
-        if (appUserUpdateInfo.utcOffsetMins == null) {
+        if (appUserUpdate.contactInfo.utcOffsetMins == null) {
             logger.error('Attempting to update user address data without also providing an updated utcOffsetMins value.')
             throw new Error('An unexpected error has occured.');
         }
     }
 
     // Check if this is an app user availability update, and fill in utc offset information so proper UTC times can be calculated.
-    if (appUserUpdateInfo.availability != null) {
-        appUserUpdateInfo.utcOffsetMins = appUserSessionData.appUserInfo.utcOffsetMins;
+    if (appUserUpdate.availability.timeRanges != null) {
+        appUserUpdate.contactInfo.utcOffsetMins = appUserSessionData.appUser.contactInfo.utcOffsetMins;
     }
     
-    return addOrUpdateAppUser(appUserUpdateInfo, newPassword, appUserSessionData.appUserKey);
+    return addOrUpdateAppUser(appUserUpdate, newPassword, appUserSessionData.appUserKey);
 }
 
 
@@ -65,12 +65,12 @@ async function checkPassword(currentEmail: string, currentPassword: string): Pro
  * @param appUserUpdateInfo The update info that may contain address update fields.
  * @return true if we have address update fields, false if not.
  */
-function isAddressInfoUpdate(appUserUpdateInfo: AppUserInfo): boolean {
+function isAddressInfoUpdate(appUserUpdate: AppUser): boolean {
 
-    return (appUserUpdateInfo.address != null
-        ||  appUserUpdateInfo.city != null
-        ||  appUserUpdateInfo.state != null
-        ||  appUserUpdateInfo.zip != null);
+    return (appUserUpdate.contactInfo.address != null
+        ||  appUserUpdate.contactInfo.city != null
+        ||  appUserUpdate.contactInfo.state != null
+        ||  appUserUpdate.contactInfo.zip != null);
 }
 
 
@@ -79,10 +79,10 @@ function isAddressInfoUpdate(appUserUpdateInfo: AppUserInfo): boolean {
  * @param appUserUpdateInfo The update info from the client.
  * @param request The request from the client (incldues session data to fill missing address parts with).
  */
-function fillAddressUpdateInfo(appUserUpdateInfo: AppUserInfo, appUserSessionInfo: AppUserInfo): void {
+function fillAddressUpdateInfo(appUserUpdate: AppUser, appUserFromSession: AppUser): void {
 
-    if (appUserUpdateInfo.address == null)  appUserUpdateInfo.address = appUserSessionInfo.address;
-    if (appUserUpdateInfo.city == null)     appUserUpdateInfo.city = appUserSessionInfo.city;
-    if (appUserUpdateInfo.state == null)    appUserUpdateInfo.state = appUserSessionInfo.state;
-    if (appUserUpdateInfo.zip == null)      appUserUpdateInfo.zip = appUserSessionInfo.zip;
+    if (appUserUpdate.contactInfo.address == null)  appUserUpdate.contactInfo.address = appUserFromSession.contactInfo.address;
+    if (appUserUpdate.contactInfo.city == null)     appUserUpdate.contactInfo.city = appUserFromSession.contactInfo.city;
+    if (appUserUpdate.contactInfo.state == null)    appUserUpdate.contactInfo.state = appUserFromSession.contactInfo.state;
+    if (appUserUpdate.contactInfo.zip == null)      appUserUpdate.contactInfo.zip = appUserFromSession.contactInfo.zip;
 }

@@ -2,7 +2,7 @@ import { Component, Input, SimpleChanges, OnChanges } from '@angular/core';
 
 import { GeocodeService, GPSCoordinate } from './geocode.service';
 
-import { Address } from '../../../../../shared/src/app-user/app-user-info';
+import { ContactInfo } from '../../../../../shared/src/app-user/contact-info';
 
 
 @Component({
@@ -16,7 +16,7 @@ export class SlickMapComponent implements OnChanges {
     @Input() public gpsCenterCoordinate: GPSCoordinate;
     @Input() public zoom: number;
     @Input() public diameterMi: number;
-    @Input() public addresses: Address[];
+    @Input() public addresses: ContactInfo[];
     @Input() public addressNames: string[];
 
     
@@ -72,7 +72,7 @@ export class SlickMapComponent implements OnChanges {
      * @return A GPS Coordinate that contains the center point of the map.
      *         NOTE: If no addresses provided, then (0, 0) is returned.
      */
-    private calcCenterFromAddresses(addresses: Address[]): GPSCoordinate {
+    private calcCenterFromAddresses(addresses: ContactInfo[]): GPSCoordinate {
 
         let latitudeSum: number = 0;
         let longitudeSum: number = 0;

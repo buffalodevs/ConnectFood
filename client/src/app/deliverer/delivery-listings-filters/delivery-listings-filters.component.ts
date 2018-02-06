@@ -43,8 +43,8 @@ export class DeliveryListingsFiltersComponent extends FormGroup implements OnIni
 
         const medianDistanceMi: number = this.maxDistances[Math.floor(this.maxDistances.length / 2)];
         this.addControl('maxDistance', new FormControl(medianDistanceMi));
-        this.addControl('maxTotalWeight', new FormControl(null));
-        this.addControl('vehicleType', new FormControl(null));
+        this.addControl('maxEstimatedWeight', new FormControl(null));
+        this.addControl('recommendedVehicleType', new FormControl(null));
 
         // Add any parent specified additional filter controls.
         if (this.additionalFilters != null) {

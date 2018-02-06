@@ -40,10 +40,10 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
 
     public constructor (
         public validationService: SlickTimeRangeValidationService,
-        private _formBuilder: FormBuilder,
-        private _dateFormatter: DateFormatterService
+        private _dateFormatter: DateFormatterService,
+        formBuilder: FormBuilder
     ) {
-        super(validationService);
+        super(validationService, formBuilder);
 
         this.onChange = (timeRange: DateRange) => {}; // If not bound to by parent component, then swallow all changes here!
     }

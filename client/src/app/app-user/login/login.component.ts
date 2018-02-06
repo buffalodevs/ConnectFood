@@ -54,15 +54,15 @@ export class LoginComponent extends AbstractModelDrivenComponent implements OnIn
 
 
     public constructor (
-        validationService: ValidationService,
         private _router: Router,
-        private _formBuilder: FormBuilder,
         private _loginService: LoginService,
         private _passwordRecoveryService: PasswordRecoveryService,
         private _logger: NGXLogger,
+        validationService: ValidationService,
+        formBuilder: FormBuilder,
         @Optional() private _dialogRef?: MatDialogRef <LoginComponent>
     ) {
-        super(validationService)
+        super(validationService, formBuilder);
 
         this._forgotPassword = false;
         this._displayRecoveryResponseMessage = false;

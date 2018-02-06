@@ -1,5 +1,5 @@
 import { DateRange } from '../date-time-util/date-range';
-import { FoodListingUser } from '../common-receiver-donor-deliverer/food-listing-user';
+import { AppUser } from '../app-user/app-user';
 import { DeliveryStateInfo, DeliveryState } from '../common-receiver-donor-deliverer/delivery-state-info';
 import { Deserializer, deserializable, deepDeserializable } from '../deserialization/deserializer';
 
@@ -32,8 +32,8 @@ export class Delivery {
          * The estimated weight of the delivery (in lbs).
          */
         public estimatedWeight: number = null,
-        public donorInfo: FoodListingUser = null,     // Driving distance and time here is from driver to donor!
-        public receiverInfo: FoodListingUser = null,  // Driving distance and time here is from donor to receiver!
+        public donorInfo: AppUser = null,     // Driving distance and time here is from driver to donor!
+        public receiverInfo: AppUser = null,  // Driving distance and time here is from donor to receiver!
         possibleDeliveryTimes: DateRange[] = null
     ) {
         this.possibleDeliveryTimes = possibleDeliveryTimes;

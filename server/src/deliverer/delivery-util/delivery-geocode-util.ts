@@ -18,8 +18,8 @@ export async function fillFullTripDrivingDistances(deliveries: Delivery[], myGPS
 
     // First, extract a list of Donor & Receiver GPS Coordinates from deliveryFoodListings results.
     for (let i: number = 0; i < deliveries.length; i++) {
-        donorGPSCoordinates.push(deliveries[i].donorInfo.gpsCoordinate);
-        receiverGPSCoordinates.push(deliveries[i].receiverInfo.gpsCoordinate);
+        donorGPSCoordinates.push(deliveries[i].donorInfo.contactInfo.gpsCoordinate);
+        receiverGPSCoordinates.push(deliveries[i].receiverInfo.contactInfo.gpsCoordinate);
     }
 
     // Next calculate and store Deliverer to Donor and Donor to Receiver driving distances & times.
@@ -42,8 +42,8 @@ async function fillDrivingDistTimeToDonors(deliveries: Delivery[], myGPSCoordina
     const driveDistTime: DriveDistTime[] = await getDrivingDistTime(myGPSCoordinate, donorGPSCoordinates);
 
     for (let i: number = 0; i < driveDistTime.length; i++) {
-        deliveries[i].donorInfo.drivingDistance = driveDistTime[i].driveDistanceMi;
-        deliveries[i].donorInfo.drivingTime = driveDistTime[i].driveDurationMin;
+        deliveries[i].donorInfo.contactInfo.drivingDistance = driveDistTime[i].driveDistanceMi;
+        deliveries[i].donorInfo.contactInfo.drivingTime = driveDistTime[i].driveDurationMin;
     }
 
     return deliveries;
@@ -74,8 +74,8 @@ async function fillDrivingDistTimeFromDonorsToReceivers(deliveries: Delivery[], 
 
     // Handle results of all promises.
     for (let i: number = 0; i < driveDistTimes.length; i++) {
-        deliveries[i].receiverInfo.drivingDistance = driveDistTimes[i][0].driveDistanceMi;
-        deliveries[i].receiverInfo.drivingTime = driveDistTimes[i][0].driveDurationMin;
+        deliveries[i].receiverInfo.contactInfo.drivingDistance = driveDistTimes[i][0].driveDistanceMi;
+        deliveries[i].receiverInfo.contactInfo.drivingTime = driveDistTimes[i][0].driveDurationMin;
     }
 
     return deliveries;

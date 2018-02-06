@@ -25,8 +25,8 @@ export function handleGetDeliveries(request: Request, response: Response): void 
     getDeliveries (
         getDeliveriesRequest.filters,
         sessionData.appUserKey,
-        sessionData.appUserInfo.gpsCoordinate,
-        sessionData.appUserInfo.utcOffsetMins
+        sessionData.appUser.contactInfo.gpsCoordinate,
+        sessionData.appUser.contactInfo.utcOffsetMins
     ).then((deliveries: Delivery[]) => {
         response.send(new GetDeliveriesResponse(deliveries, true, 'Delivery Food Listings Successfully Retrieved'));
     })

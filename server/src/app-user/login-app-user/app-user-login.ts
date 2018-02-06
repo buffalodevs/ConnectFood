@@ -3,11 +3,12 @@ import { logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 import { connect, query, Client, QueryResult } from '../../database-util/connection-pool';
 import { logger, prettyjsonRender } from '../../logging/logger';
 import { checkPassword } from '../common-app-user/password-util';
-import { SessionData, AppUserInfo } from "../../common-util/session-data";
+import { SessionData, AppUser } from "../../common-util/session-data";
 import { DESERIALIZER } from '../../deserialization/deserialization';
 
-import { AppUserErrorMsgs} from '../../../../shared/src/app-user/message/app-user-error-msgs';
+import { AppUserErrorMsgs } from '../../../../shared/src/app-user/message/app-user-error-msgs';
 import { DateRange } from '../../../../shared/src/date-time-util/date-range';
+import { AvailabilityType } from '../../../../shared/src/app-user/app-user-availability';
 
 
 /**
@@ -20,9 +21,9 @@ export async function login(email: string, password: string): Promise <SessionDa
 
     try {
         // Get user info from database, extract and deserialize session data, and validate password.
-        const getAppUserInfoResult: QueryResult = await getAppUserInfo(email);
-        const sessionData: SessionData = extractAndDeserializeSessionData(email, getAppUserInfoResult);
-        await validatePassword(email, password, getAppUserInfoResult);
+        const getAppUserSessionResult: QueryResult = await getAppUserSession(email);
+        const sessionData: SessionData = extractAndDeserializeSessionData(email, getAppUserSessionResult);
+        await validatePassword(email, password, getAppUserSessionResult);
         return sessionData;
     }
     catch (err) {
@@ -37,7 +38,7 @@ export async function login(email: string, password: string): Promise <SessionDa
  * @param email: The email (username) of the user to get the salt for.
  * @return A promise with the query result. The query result should simply contain one row information pertaining to the App User.
  */
-function getAppUserInfo(email: string): Promise <QueryResult> {
+function getAppUserSession(email: string): Promise <QueryResult> {
 
     let queryString: string = `SELECT * FROM getAppUserSessionData(NULL, $1, TRUE);`;
     let queryArgs: Array <string> = [ email ];
@@ -47,15 +48,16 @@ function getAppUserInfo(email: string): Promise <QueryResult> {
 }
 
 
-function extractAndDeserializeSessionData(email: string, getAppUserInfoResult: QueryResult): SessionData {
+function extractAndDeserializeSessionData(email: string, getAppUserSessionResult: QueryResult): SessionData {
 
-    logSqlQueryResult(getAppUserInfoResult.rows);
+    logSqlQueryResult(getAppUserSessionResult.rows);
 
     // We should only be getting one row back with the app user data!
-    if (getAppUserInfoResult.rowCount === 1) {
+    if (getAppUserSessionResult.rowCount === 1) {
 
-        let sessionData: SessionData = getAppUserInfoResult.rows[0].sessiondata;
-        sessionData.appUserInfo = DESERIALIZER.deserialize(sessionData.appUserInfo, AppUserInfo);
+        let sessionData: SessionData = getAppUserSessionResult.rows[0].sessiondata;
+        sessionData.appUser = DESERIALIZER.deserialize(sessionData.appUser, AppUser);
+        sessionData.appUser.availability.availabilityType = AvailabilityType.regularWeekly;
         return sessionData;
     }
 
@@ -69,12 +71,12 @@ function extractAndDeserializeSessionData(email: string, getAppUserInfoResult: Q
  * associated with the given App User if the password is correct.
  * @param email The email of the user that we are validating the password for.
  * @param password The plain text password that is to be hashed.
- * @param getAppUserInfoResult The query result that on success should contain a single row with the App User info.
+ * @param getAppUserSessionResult The query result that on success should contain a single row with the App User info.
  * @return A promise that resolves with no payload on success.
  */
-async function validatePassword(email: string, password: string, getAppUserInfoResult: QueryResult): Promise <void> {
+async function validatePassword(email: string, password: string, getAppUserSessionResult: QueryResult): Promise <void> {
 
-    let firstRowResult: any = getAppUserInfoResult.rows[0];
+    let firstRowResult: any = getAppUserSessionResult.rows[0];
     let hashPassword: string = firstRowResult.password;
     
     const isMatch: boolean = await checkPassword(password, hashPassword);

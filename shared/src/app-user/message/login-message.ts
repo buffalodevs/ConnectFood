@@ -1,5 +1,5 @@
 import { FoodWebResponse } from '../../message-protocol/food-web-response';
-import { AppUserInfo } from '../../app-user/app-user-info';
+import { AppUser } from '../../app-user/app-user';
 import { deserializable, deepDeserializable } from '../../deserialization/deserializer';
 
 
@@ -15,15 +15,15 @@ export class LoginRequest {
 @deserializable('LoginResponse')
 export class LoginResponse extends FoodWebResponse {
 
-    @deepDeserializable(AppUserInfo)
-    public appUserInfo: AppUserInfo;
+    @deepDeserializable(AppUser)
+    public appUser: AppUser;
 
 
     public constructor (
         /**
          * The shared info related to the App User that has successfully signed up.
          */
-        appUserInfo: AppUserInfo = null,
+        appUser: AppUser = null,
         /**
          * Indicates whether or not the operation on the back end was successful.
          */
@@ -43,6 +43,6 @@ export class LoginResponse extends FoodWebResponse {
         public signupConfirmRequired: boolean = false
     ) {
         super(success, message, loginRequired, signupConfirmRequired);
-        this.appUserInfo = appUserInfo;
+        this.appUser = appUser;
     }
 }

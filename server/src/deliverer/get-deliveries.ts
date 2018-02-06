@@ -38,7 +38,8 @@ export async function getDeliveries(filters: DeliveryFilters, myAppUserKey: numb
         filters.unscheduledDeliveries,
         filters.myScheduledDeliveries,
         filters.matchRegularAvailability,
-        filters.deliveryState
+        filters.deliveryState,
+        filters.recommendedVehicleType
     ];
 
     // Insert query argument placeholders and preprocess query arguments.

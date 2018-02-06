@@ -29,7 +29,7 @@
             <!-- Food Info (Cell 2) -->
             <div class="col-xl-6 col-lg-12 desktop-space-bottom">
 
-                <mat-expansion-panel SlickExpansionPanel [collapseWidth]="1199" [expanded]="true" heightStyleWhenOpen="100%">
+                <mat-expansion-panel SlickExpansionPanel [collapseWidth]="1199" [expanded]="true">
 
                     <mat-expansion-panel-header>
                         <mat-panel-title>Food Info</mat-panel-title>
@@ -65,7 +65,7 @@
                 <ng-container *ngFor="let foodListingUserAccessor of FOOD_LISTING_USER_ACCESSORS; let i = index">
                     <ng-container *ngIf="shouldShowFoodListingUser(foodListingUserAccessor)">
 
-                        <mat-expansion-panel SlickExpansionPanel [collapseWidth]="1199" [expanded]="true" heightStyleWhenOpen="100%">
+                        <mat-expansion-panel SlickExpansionPanel [collapseWidth]="1199" [expanded]="true">
     
                             <mat-expansion-panel-header>
                                 <mat-panel-title>{{ FOOD_LISTING_USER_TITLES[i] }} Info</mat-panel-title>
@@ -73,9 +73,9 @@
                             
                             <ng-container *ngIf="getFoodListingUser(foodListingUserAccessor) != null">
 
-                                <div class="space-bottom" *ngIf="getFoodListingUser(foodListingUserAccessor).organizationName != null">
+                                <div class="space-bottom" *ngIf="getFoodListingUser(foodListingUserAccessor).organization.name != null">
                                     <b>{{ FOOD_LISTING_USER_TITLES[i] }} Organization:</b>
-                                    <span class="inline-block">{{ getFoodListingUser(foodListingUserAccessor).organizationName }}</span>
+                                    <span class="inline-block">{{ getFoodListingUser(foodListingUserAccessor).organization.name }}</span>
                                 </div>
 
                                 <div class="space-bottom">
@@ -90,18 +90,19 @@
                                         <b>{{ FOOD_LISTING_USER_TITLES[i] }} Address:</b>
                                     </div>
                                     <div class="inline-block">
-                                        <span>{{ getFoodListingUser(foodListingUserAccessor).address }}</span><br>
+                                        <span>{{ getFoodListingUser(foodListingUserAccessor).contactInfo.address }}</span><br>
                                         <span>
-                                            {{ getFoodListingUser(foodListingUserAccessor).city }}, {{ getFoodListingUser(foodListingUserAccessor).state }}
-                                            {{ getFoodListingUser(foodListingUserAccessor).zip }}
+                                            {{ getFoodListingUser(foodListingUserAccessor).contactInfo.city }},
+                                            {{ getFoodListingUser(foodListingUserAccessor).contactInfo.state }}
+                                            {{ getFoodListingUser(foodListingUserAccessor).contactInfo.zip }}
                                         </span>
                                     </div>
                                 </div>
 
                                 <div class="space-bottom">
                                     <b>{{ FOOD_LISTING_USER_TITLES[i] }} Phone:</b>
-                                    <a href="tel:{{ getFoodListingUser(foodListingUserAccessor).phone }}" class="no-word-wrap link-content">
-                                        {{ getFoodListingUser(foodListingUserAccessor).phone }}
+                                    <a href="tel:{{ getFoodListingUser(foodListingUserAccessor).contactInfo.phone }}" class="no-word-wrap link-content">
+                                        {{ getFoodListingUser(foodListingUserAccessor).contactInfo.phone }}
                                     </a>
                                 </div>
 
@@ -112,9 +113,9 @@
                                     </a>
                                 </div>
 
-                                <div class ="space-bottom" *ngIf="getFoodListingUser(foodListingUserAccessor).drivingDistance != null">
+                                <div class ="space-bottom" *ngIf="getFoodListingUser(foodListingUserAccessor).contactInfo.drivingDistance != null">
                                     <b>Driving Distance:</b>
-                                    <span class="inline-block">{{ getFoodListingUser(foodListingUserAccessor).drivingDistance + ' miles' }}</span>
+                                    <span class="inline-block">{{ getFoodListingUser(foodListingUserAccessor).contactInfo.drivingDistance + ' miles' }}</span>
                                 </div>
 
                             </ng-container>

@@ -52,7 +52,7 @@ export class LoginService {
             if (loginResponse.success) {
                 
                 loginResponse = this._deserializer.deserialize(loginResponse);
-                this._sessionDataService.updateAppUserSessionData(loginResponse.appUserInfo);
+                this._sessionDataService.updateAppUserSessionData(loginResponse.appUser);
             }
 
             this._requestResponseLogger.logResponse(this._LOGIN_ROUTE, loginResponse);

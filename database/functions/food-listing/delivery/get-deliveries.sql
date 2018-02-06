@@ -15,7 +15,8 @@ CREATE OR REPLACE FUNCTION getDeliveries
     _myScheduledDeliveries  BOOLEAN                                         DEFAULT FALSE,  -- Set to TRUE if we should only pull back deliveries that are scheduled for deliverer.
     _matchAvailability      BOOLEAN                                         DEFAULT TRUE,   -- If TRUE, matches the availability of the Driver with that of the Receiver and Donor.
                                                                                             -- When set FALSE, only grabs Deliveries that are available to start immediately.
-    _deliveryState          DeliveryState                                   DEFAULT NULL    -- If set, then only pull back deliveries in given state.
+    _deliveryState          DeliveryState                                   DEFAULT NULL,   -- If set, then only pull back deliveries in given state.
+    _recommendedVehicleType VehicleType                                     DEFAULT NULL    -- If set, then only pull back deliveries with recommended vehicle type size equal or smaller.
 )
 RETURNS TABLE
 (
@@ -88,8 +89,8 @@ BEGIN
                                             ),
                 'foodTitle',                FoodListing.foodTitle,
                 -- NOTE: We may want to remove these getAppUserSessionData() function calls for performance improvements! They create subqueries (likely inlined though).
-                'donorInfo',                ( SELECT sessionData->'appUserInfo' FROM getAppUserSessionData(DonorAppUser.appUserKey) ),
-                'receiverInfo',             ( SELECT sessionData->'appUserInfo' FROM getAppUserSessionData(ReceiverAppUser.appUserKey) ),
+                'donorInfo',                ( SELECT sessionData->'appUser' FROM getAppUserSessionData(DonorAppUser.appUserKey) ),
+                'receiverInfo',             ( SELECT sessionData->'appUser' FROM getAppUserSessionData(ReceiverAppUser.appUserKey) ),
                 'foodDescription',          FoodListing.foodDescription,
                 'needsRefrigeration',       FoodListing.needsRefrigeration,
                 'availableUntilDate',       FoodListing.availableUntilDate,
@@ -156,6 +157,7 @@ BEGIN
                                                                                                         DeliveryFoodListing.dropOffTime)))
       -- By default, don't include dropped off (completed) deliveries unless explicit delivery state filter selected!
       AND       (_deliveryState IS NOT NULL         OR DeliveryFoodListing.dropOffTime IS NULL)
+      AND       (_recommendedVehicleType IS NULL    OR FoodListing.recommendedVehicleType <= _recommendedVehicleType)
     ORDER BY    ClaimedFoodListing.claimedFoodListingKey,
                 -- Sort by relavent Delivery State filter.
                 CASE WHEN _deliveryState IS NULL        THEN DeliveryFoodListing.scheduledStartTime END ASC,
@@ -169,4 +171,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-SELECT * FROM getDeliveries(1, 0, 10);
+--SELECT * FROM getDeliveries(1, 0, 10, null, null, 15, 50, true, null, true, null, null);

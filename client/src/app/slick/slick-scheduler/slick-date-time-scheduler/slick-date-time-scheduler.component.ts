@@ -38,12 +38,12 @@ export class SlickDateTimeSchedulerComponent extends AbstractModelDrivenComponen
 
 
     public constructor (
-        formBuilder: FormBuilder,
-        validationService: ValidationService,
         public scheduleTimeManagement: ScheduleTimeManagementService,
-        private _dateFormatter: DateFormatterService
+        private _dateFormatter: DateFormatterService,
+        validationService: ValidationService,
+        formBuilder: FormBuilder
     ) {
-        super(validationService);
+        super(validationService, formBuilder);
 
         this.form = formBuilder.group({
             'scheduledDate': [null, Validators.required]

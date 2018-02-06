@@ -40,7 +40,7 @@ async function execClaimOrUnclaimQuery(isClaim: boolean, queryString: string, qu
     }
     catch (err) {
         logger.error(prettyjsonRender(err));
-        return Promise.reject(new Error((isClaim ? 'Claim' : 'Unclaim') + ' Food Listing Unexpectedly Failed.'));
+        throw new Error((isClaim ? 'Claim' : 'Unclaim') + ' Food Listing Unexpectedly Failed.');
     }
 }
 

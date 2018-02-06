@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { login } from "./login-app-user/app-user-login";
 import { signup, signupVerify } from './add-update-app-user/app-user-signup';
 import { updateAppUser } from './add-update-app-user/app-user-update';
-import { SessionData, AppUserInfo } from "../common-util/session-data";
+import { SessionData, AppUser } from "../common-util/session-data";
 
 import { FoodWebResponse } from "../../../shared/src/message-protocol/food-web-response";
 import { LoginRequest, LoginResponse } from '../../../shared/src/app-user/message/login-message';
@@ -21,7 +21,7 @@ export function handleReAuthenticateRequest(request: Request, response: Response
     response.setHeader('Content-Type', 'application/json');
 
     if (SessionData.doesSessionExist(request)) {
-        response.send(new LoginResponse(SessionData.loadSessionData(request).appUserInfo, true, 'Logged in'));
+        response.send(new LoginResponse(SessionData.loadSessionData(request).appUser, true, 'Logged in'));
     }
     else {
         SessionData.deleteSessionData(request);
@@ -43,7 +43,7 @@ export function handleLoginRequest(request: Request, response: Response): void {
     login(loginRequest.email, loginRequest.password)
         .then((sessionData: SessionData) => {
             SessionData.saveSessionData(request, sessionData);
-            response.send(new LoginResponse(sessionData.appUserInfo, true, 'Login successful'));
+            response.send(new LoginResponse(sessionData.appUser, true, 'Login successful'));
         })
         .catch((err: Error) => {
             response.send(new LoginResponse(null, false, err.message));
@@ -74,7 +74,7 @@ export function handleSignupRequest(request: Request, response: Response): void 
     response.setHeader('Content-Type', 'application/json');
     let signupRequest: SignupRequest = request.body;
 
-    signup(signupRequest.appUserInfo, signupRequest.password)
+    signup(signupRequest.appUser, signupRequest.password)
         .then((sessionData: SessionData) => {
             SessionData.saveSessionData(request, sessionData);
             response.send(new FoodWebResponse(true, 'Signup successful'));
@@ -94,7 +94,7 @@ export function handleUpdateAppUserRequest(request: Request, response: Response)
     response.setHeader('Content-Type', 'application/json');
     
     let updateAppUserRequest: UpdateAppUserRequest = request.body;
-    let appUserUpdateInfo: AppUserInfo = updateAppUserRequest.appUserUpdateInfo;
+    let appUserUpdateInfo: AppUser = updateAppUserRequest.appUserUpdate;
     let sessionData: SessionData = SessionData.loadSessionData(request);
     let newPassword: string = updateAppUserRequest.newPassword;
     let currentPassword: string = updateAppUserRequest.currentPassword;
@@ -102,7 +102,7 @@ export function handleUpdateAppUserRequest(request: Request, response: Response)
     updateAppUser(appUserUpdateInfo, newPassword, currentPassword, sessionData)
         .then((sessionData: SessionData) => {
             SessionData.saveSessionData(request, sessionData);
-            response.send(new UpdateAppUserResponse(sessionData.appUserInfo, true, 'App User Update Successful'));
+            response.send(new UpdateAppUserResponse(sessionData.appUser, true, 'App User Update Successful'));
         })
         .catch((err: Error) => {
             response.send(new UpdateAppUserResponse(null, false, err.message));

@@ -9,9 +9,9 @@ import { logger, prettyjsonRender } from '../logging/logger';
 import { GPSCoordinate } from '../../../shared/src/geocode/gps-coordinate';
 
 import { FoodWebResponse } from "./../../../shared/src/message-protocol/food-web-response";
-import { AppUserInfo } from './../../../shared/src/app-user/app-user-info';
+import { AppUser } from './../../../shared/src/app-user/app-user';
 
-export { AppUserInfo };
+export { AppUser };
 
 
 /**
@@ -23,7 +23,7 @@ export class SessionData {
 
 
     public constructor (
-        public appUserInfo: AppUserInfo = new AppUserInfo(),
+        public appUser: AppUser = new AppUser(),
         public appUserKey?: number,
         public verificationToken?: string
     ) { }

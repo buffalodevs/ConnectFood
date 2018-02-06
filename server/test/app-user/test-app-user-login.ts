@@ -57,9 +57,9 @@ function validateLoginSuccessResponse(done: MochaDone, err: any, response: ChaiH
     const loginResponse: LoginResponse = response.body;
     loginResponse.should.be.a('object');
 
-    loginResponse.should.have.property('appUserInfo');
-    loginResponse.appUserInfo.should.be.a('object');
-    expect(loginResponse.appUserInfo).to.not.equal(null);
+    loginResponse.should.have.property('appUser');
+    loginResponse.appUser.should.be.a('object');
+    expect(loginResponse.appUser).to.not.equal(null);
 
     loginResponse.should.have.property('success');
     loginResponse.success.should.be.a('boolean');
@@ -90,8 +90,8 @@ function validateLoginFailureResponse(done: MochaDone, err: any, response: ChaiH
     const loginResponse: LoginResponse = response.body;
     loginResponse.should.be.a('object');
 
-    loginResponse.should.have.property('appUserInfo');
-    expect(loginResponse.appUserInfo).to.equal(null);
+    loginResponse.should.have.property('appUser');
+    expect(loginResponse.appUser).to.equal(null);
 
     loginResponse.should.have.property('success');
     loginResponse.success.should.be.a('boolean');

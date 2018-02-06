@@ -15,6 +15,7 @@ export class AddFoodListingRequest {
         foodListingUpload: FoodListingUpload = null
     ) {
         this.foodListingUpload = foodListingUpload;
+        
     }
 }
 

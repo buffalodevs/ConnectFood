@@ -4,7 +4,7 @@ import { FormControl, AbstractControl } from '@angular/forms';
 import { SessionDataService } from '../../common-util/services/session-data.service';
 
 import { FoodListingsFilters, LISTINGS_STATUS } from "../../../../../shared/src/receiver-donor/food-listings-filters";
-import { AppUserInfo, AppUserType } from "../../../../../shared/src/app-user/app-user-info";
+import { AppUser, AppUserType } from "../../../../../shared/src/app-user/app-user";
 
 
 @Component({
@@ -24,9 +24,9 @@ export class FoodListingCartComponent {
         sessionDataService: SessionDataService
     ) {
 
-        const appUserInfo: AppUserInfo = sessionDataService.getAppUserSessionData();
-        const listingsStatus: LISTINGS_STATUS = (appUserInfo.appUserType === AppUserType.Receiver) ? LISTINGS_STATUS.myClaimedListings
-                                                                                                   : LISTINGS_STATUS.myDonatedListings;
+        const appUser: AppUser = sessionDataService.getAppUserSessionData();
+        const listingsStatus: LISTINGS_STATUS = (appUser.appUserType === AppUserType.Receiver) ? LISTINGS_STATUS.myClaimedListings
+                                                                                               : LISTINGS_STATUS.myDonatedListings;
 
         this.additionalFilters = new Map <string, AbstractControl>([
             [ 'listingsStatus', new FormControl(listingsStatus) ]

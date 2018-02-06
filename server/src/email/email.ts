@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 
 import { EmailConfig } from "./email-config";
-import { AppUserType } from "../../../shared/src/app-user/app-user-info";
+import { AppUserType } from "../../../shared/src/app-user/app-user";
 import { logger, prettyjsonRender } from "../logging/logger";
 
 export { EmailConfig };

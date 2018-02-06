@@ -225,19 +225,19 @@ BEGIN
                     'imgUrls',              ( SELECT * FROM getFoodListingImgUrls(FoodListing.foodListingKey) ),
 
                     -- App user information of all user's associated with Food Listing (Donor, Receiver(s), & Deliverer(s)).
-                    'donorInfo',            ( SELECT sessionData->'appUserInfo' FROM getAppUserSessionData(DonorAppUser.appUserKey) ),
+                    'donorInfo',            ( SELECT sessionData->'appUser' FROM getAppUserSessionData(DonorAppUser.appUserKey) ),
                     -- Form an array of claim information objects here.
                     'claimInfo',            JSON_BUILD_OBJECT (
                                                 'receiverInfo',         CASE WHEN (ReceiverAppUser.appUserKey IS NOT NULL)
                                                                             THEN (
-                                                                                SELECT sessionData->'appUserInfo'
+                                                                                SELECT sessionData->'appUser'
                                                                                 FROM getAppUserSessionData(ReceiverAppUser.appUserKey)
                                                                             )
                                                                             ELSE NULL
                                                                         END,
                                                 'delivererInfo',        CASE WHEN (DelivererAppUser.appUserKey IS NOT NULL)
                                                                             THEN (
-                                                                                SELECT sessionData->'appUserInfo'
+                                                                                SELECT sessionData->'appUser'
                                                                                 FROM getAppUserSessionData(DelivererAppUser.appUserKey)
                                                                             )
                                                                             ELSE NULL

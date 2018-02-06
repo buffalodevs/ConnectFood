@@ -1,4 +1,4 @@
-import { AppUserInfo } from '../app-user-info';
+import { AppUser } from '../app-user';
 import { FoodWebResponse } from '../../message-protocol/food-web-response';
 import { deserializable, deepDeserializable } from '../../deserialization/deserializer';
 
@@ -9,16 +9,16 @@ import { deserializable, deepDeserializable } from '../../deserialization/deseri
 @deserializable('UpdateAppUserRequest')
 export class UpdateAppUserRequest {
 
-    @deepDeserializable(AppUserInfo)
-    public appUserUpdateInfo: AppUserInfo;
+    @deepDeserializable(AppUser)
+    public appUserUpdate: AppUser;
 
     
     public constructor (
-        appUserUpdateInfo: AppUserInfo = null,
+        appUserUpdate: AppUser = null,
         public newPassword: string = null,
         public currentPassword: string = null
     ) {
-        this.appUserUpdateInfo = appUserUpdateInfo;
+        this.appUserUpdate = appUserUpdate;
     }
 }
 
@@ -26,15 +26,15 @@ export class UpdateAppUserRequest {
 @deserializable('UpdateAppUserResponse')
 export class UpdateAppUserResponse extends FoodWebResponse {
 
-    @deepDeserializable(AppUserInfo)
-    public appUserInfo: AppUserInfo;
+    @deepDeserializable(AppUser)
+    public appUser: AppUser;
 
 
     public constructor (
         /**
          * The updated App User info to be set as the Session data on client.
          */
-        appUserInfo: AppUserInfo = null,
+        appUser: AppUser = null,
         /**
          * Indicates whether or not the operation on the back end was successful.
          */
@@ -54,6 +54,6 @@ export class UpdateAppUserResponse extends FoodWebResponse {
         public signupConfirmRequired: boolean = false
     ) {
         super(success, message, loginRequired, signupConfirmRequired);
-        this.appUserInfo = appUserInfo;
+        this.appUser = appUser;
     }
 }

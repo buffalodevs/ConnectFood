@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, AfterViewInit, ViewChild, forwardRef } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators, ValidatorFn } from '@angular/forms';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators, ValidatorFn, FormBuilder } from '@angular/forms';
 
 import { AbstractModelDrivenComponent } from '../../../common-util/components/abstract-model-driven-component';
 import { SlickTimeValidationService } from './slick-time-validation.service';
@@ -42,9 +42,10 @@ export class SlickTimeComponent extends AbstractModelDrivenComponent implements 
     public constructor (
         public validationService: SlickTimeValidationService,
         public typeaheadService: SlickTypeaheadService,
-        public dateFormatter: DateFormatterService
+        public dateFormatter: DateFormatterService,
+        formBuilder: FormBuilder
     ) {
-        super(validationService);
+        super(validationService, formBuilder);
 
         // Set required validators for contained Slick Input Group controls.
         this.GROUP_VALIDATORS = [

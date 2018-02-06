@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { MatInputModule, MatButtonModule, MatStepperModule, MatRadioModule, MatCheckboxModule, MatExpansionModule } from '@angular/material';
+import { MatInputModule, MatButtonModule, MatStepperModule, MatRadioModule, MatCheckboxModule, MatExpansionModule, MatSelectModule } from '@angular/material';
 
 import { CommonUtilModule } from '../common-util/common-util.module';
 import { SlickDatePickerModule } from '../slick/slick-date-time/slick-date-picker/slick-date-picker.module';
@@ -85,6 +85,7 @@ const receiverDonorRoutes: Routes = [
         MatRadioModule,
         MatCheckboxModule,
         MatExpansionModule,
+        MatSelectModule,
         CommonUtilModule,
         SlickDatePickerModule,
         SlickExpansionPanelModule,

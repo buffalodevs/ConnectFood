@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AppUserInfo } from "./../../../../../shared/src/app-user/app-user-info";
+import { AppUser } from "./../../../../../shared/src/app-user/app-user";
 
 
 @Injectable()
@@ -8,7 +8,7 @@ export class SessionDataService {
     /**
      * Raw client session data. The App User Info belonging to the current signed in user.
      */
-    private static _appUserInfo: AppUserInfo = null;
+    private static _appUser: AppUser = null;
 
 
     public constructor() {}
@@ -16,19 +16,19 @@ export class SessionDataService {
 
     /**
      * Updates the client's session data based off of given App User info.
-     * @param appUserInfo The App User info to update the client session data with.
+     * @param appUser The App User info to update the client session data with.
      */
-    public updateAppUserSessionData(appUserInfo: AppUserInfo): void {
-        SessionDataService._appUserInfo = appUserInfo;
+    public updateAppUserSessionData(appUser: AppUser): void {
+        SessionDataService._appUser = appUser;
     }
 
 
     /**
-     * Fills and returns an AppUserInfo container with available client session data.
-     * @return The filled AppUserInfo container.
+     * Fills and returns an AppUser container with available client session data.
+     * @return The filled AppUser container.
      */
-    public getAppUserSessionData(): AppUserInfo {
-        return SessionDataService._appUserInfo;
+    public getAppUserSessionData(): AppUser {
+        return SessionDataService._appUser;
     }
 
 
@@ -36,7 +36,7 @@ export class SessionDataService {
      * Clears the current session data.
      */
     public clearSessionData(): void {
-        SessionDataService._appUserInfo = null;
+        SessionDataService._appUser = null;
     }
 
 
@@ -45,6 +45,6 @@ export class SessionDataService {
      * @return true if session data is available, false if not (it is clear).
      */
     public sessionDataAvailable(): boolean {
-        return ( SessionDataService._appUserInfo != null );
+        return ( SessionDataService._appUser != null );
     }
 }

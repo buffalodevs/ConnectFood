@@ -12,6 +12,7 @@ CREATE OR REPLACE FUNCTION addFoodListing
     _estimatedWeight        FoodListing.estimatedWeight%TYPE        DEFAULT NULL,   -- The estimated weight of the Food Listing (in pounds).
     _estimatedValue         FoodListing.estimatedValue%TYPE         DEFAULT NULL,   -- The estimated monetary value of the Food Listing (in $).
     _foodDescription        FoodListing.foodDescription%TYPE        DEFAULT NULL,   -- A (long) description of the Food Listing.
+    _recommendedVehicleType VehicleType                             DEFAULT NULL,   -- Recommended vehicle to use for delivery.
     _imgUrls                TEXT[]                                  DEFAULT NULL    -- URL(s) for the image(s) being stored/uploaded.
 )
 RETURNS FoodListing.foodListingKey%TYPE -- The food listing key of the new food listing (can be used as reference for edit).
@@ -30,7 +31,8 @@ BEGIN
         needsRefrigeration,
         availableUntilDate,
         estimatedWeight,
-        foodDescription
+        foodDescription,
+        recommendedVehicleType
     )
     VALUES (
         _donorAppUserKey,
@@ -38,7 +40,8 @@ BEGIN
         _needsRefrigeration,
         _availableUntilTimestamp,
         _estimatedWeight,
-        _foodDescription
+        _foodDescription,
+        _recommendedVehicleType
     )
     RETURNING   foodListingKey
     INTO        _foodListingKey;

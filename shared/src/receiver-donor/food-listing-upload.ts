@@ -48,7 +48,11 @@ export class FoodListingUpload {
          * The string representation of the image(s) associated with the listing.
          * Should only be populated for the addition or upload of a new Food Listing.
          */
-        public imageUploads: string[] = null
+        public imageUploads: string[] = null,
+        /**
+         * The recommended vehicle type (size) for the delivery.
+         */
+        public recommendedVehicleType: string = null,
     ) {
         this.availableUntilDate = availableUntilDate;
     }

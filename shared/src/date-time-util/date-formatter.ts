@@ -1,5 +1,5 @@
 import * as moment from "moment";
-import { Validation } from "../common-util/validation";
+import { Validation } from "../validation/validation";
 import * as _ from "lodash";
 
 

@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, OnChanges, forwardRef, SimpleChange, SimpleChanges } from '@angular/core';
-import { FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormArray, Validators } from '@angular/forms';
+import { FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormArray, Validators, FormBuilder } from '@angular/forms';
 
 import { WeekdaySplitService } from './weekday-util/weekday-split.service';
 import { WeekdayForm } from './weekday-util/weekday-form';
@@ -46,11 +46,12 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
 
 
     public constructor (
+        public weekdaySplitService: WeekdaySplitService,
         validationService: ValidationService,
         dateFormatter: DateFormatterService,
-        public weekdaySplitService: WeekdaySplitService,
+        formBuilder: FormBuilder
     ) {
-        super(validationService);
+        super(validationService, formBuilder);
 
         this.displayOnly = false;
         this.allowAdd = true;

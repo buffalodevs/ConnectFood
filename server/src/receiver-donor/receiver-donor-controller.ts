@@ -20,7 +20,7 @@ export function handleGetFoodListings(request: Request, response: Response): voi
     let getFoodListingsRequest: GetFoodListingsRequest = request.body;
     let sessionData: SessionData = SessionData.loadSessionData(request);
 
-    getFoodListings(getFoodListingsRequest.filters, sessionData.appUserKey, sessionData.appUserInfo.gpsCoordinate)
+    getFoodListings(getFoodListingsRequest.filters, sessionData.appUserKey, sessionData.appUser.contactInfo.gpsCoordinate)
         .then((foodListings: FoodListing[]) => {
             response.send(new GetFoodListingsResponse(foodListings, true, 'Food Listings Successfully Retrieved'));
         })

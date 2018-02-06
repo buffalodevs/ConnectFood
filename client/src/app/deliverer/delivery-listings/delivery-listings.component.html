@@ -10,8 +10,8 @@
         <ng-container slick-list-item-img>
 
             <slick-map #SlickMapComponent
-                [addresses]="[ sessionDataService.getAppUserSessionData(), deliveryListing.donorInfo, deliveryListing.receiverInfo ]"
-                [addressNames]="[ 'Me', deliveryListing.donorInfo.organizationName, deliveryListing.receiverInfo.organizationName ]"
+                [addresses]="[ sessionDataService.getAppUserSessionData().contactInfo, deliveryListing.donorInfo.contactInfo, deliveryListing.receiverInfo.contactInfo ]"
+                [addressNames]="[ 'Me', deliveryListing.donorInfo.organization.name, deliveryListing.receiverInfo.organization.name ]"
                 [diameterMi]="deliveryUtilService.calcMaxMapDiameterFromDelivery(deliveryListing)">
             </slick-map>
 
@@ -27,9 +27,12 @@
             
                 <div class="space-bottom">
                     <b>Donor</b><br>
-                    <span class="inline-block">{{ deliveryListing.donorInfo.organizationName }}</span><br>
-                    <span>{{ deliveryListing.donorInfo.address }}</span><br>
-                    <span>{{ deliveryListing.donorInfo.city }}, {{ deliveryListing.donorInfo.state }} {{ deliveryListing.donorInfo.zip }}</span>
+                    <span class="inline-block">{{ deliveryListing.donorInfo.organization.name }}</span><br>
+                    <span>{{ deliveryListing.donorInfo.contactInfo.address }}</span><br>
+                    <span>
+                        {{ deliveryListing.donorInfo.contactInfo.city }}, {{ deliveryListing.donorInfo.contactInfo.state }}
+                        {{ deliveryListing.donorInfo.contactInfo.zip }}
+                    </span>
                 </div>
 
             </div>
@@ -38,9 +41,12 @@
 
                 <div class="space-bottom">
                     <b>Receiver</b><br>
-                    <span class="inline-block">{{ deliveryListing.receiverInfo.organizationName }}</span><br>
-                    <span>{{ deliveryListing.receiverInfo.address }}</span><br>
-                    <span>{{ deliveryListing.receiverInfo.city }}, {{ deliveryListing.receiverInfo.state }} {{ deliveryListing.receiverInfo.zip }}</span>
+                    <span class="inline-block">{{ deliveryListing.receiverInfo.organization.name }}</span><br>
+                    <span>{{ deliveryListing.receiverInfo.contactInfo.address }}</span><br>
+                    <span>
+                        {{ deliveryListing.receiverInfo.contactInfo.city }}, {{ deliveryListing.receiverInfo.contactInfo.state }}
+                        {{ deliveryListing.receiverInfo.contactInfo.zip }}
+                    </span>
                 </div>
 
             </div>

@@ -84,7 +84,7 @@
 
         </mat-step>
 
-        <mat-step [stepControl]="control('addressPhone')" [formGroup]="control('addressPhone')" label="Address & Phone">
+        <mat-step [stepControl]="control('contactInfo')" [formGroup]="control('contactInfo')" label="Address & Phone">
 
             <!-- Then, get the user's contact information -->
             <h3 class="center-text">Address and Phone</h3>
@@ -112,7 +112,7 @@
 
                             <mat-input-container id="zip" class="form-group col-md-4">
                                 <input matInput placeholder="Zip" name="zip" [InputFilter]="appUserConstants.DYNAMIC_ZIP_REGEX" formControlName="zip">
-                                <mat-error *ngIf="hasError('addressPhone.zip')">{{ errorMsgFor('addressPhone.zip') }}</mat-error>
+                                <mat-error *ngIf="hasError('contactInfo.zip')">{{ errorMsgFor('contactInfo.zip') }}</mat-error>
                             </mat-input-container>
 
                         </div>
@@ -127,7 +127,7 @@
             </div>
 
             <button mat-raised-button color="primary" class="button-md warn-button" type="button" matStepperPrevious>Back</button>
-            <button mat-raised-button color="primary" class="button-md" (click)="validateField('addressPhone')" matStepperNext>Next</button>
+            <button mat-raised-button color="primary" class="button-md" (click)="validateField('contactInfo')" matStepperNext>Next</button>
 
         </mat-step>
 

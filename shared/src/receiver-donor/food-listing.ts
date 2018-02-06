@@ -1,26 +1,23 @@
-import { FoodListingUser } from '../common-receiver-donor-deliverer/food-listing-user';
-import { DeliveryStateInfo } from '../common-receiver-donor-deliverer/delivery-state-info';
 import { deserializable, deepDeserializable } from '../deserialization/deserializer';
+import { AppUser } from '../app-user/app-user';
+import { DeliveryStateInfo } from '../common-receiver-donor-deliverer/delivery-state-info';
+import { ClaimInfo } from './claim-info';
 
 
-/**
- * Contains information pertaining to a claim on a food listing.
- */
-@deserializable('ClaimInfo')
-export class ClaimInfo {
-
-    @deepDeserializable(DeliveryStateInfo)
-    public deliveryStatInfo: DeliveryStateInfo;
-
-
-    public constructor (
-        public receiverInfo: FoodListingUser = null,
-        public delivererInfo: FoodListingUser = null,
-        deliveryStateInfo: DeliveryStateInfo = null
-    ) {
-        this.deliveryStatInfo = deliveryStateInfo;
-    }
-}
+/*export enum FoodType {
+    produce,
+    cannedGood,
+    dessert,
+    frozen,
+    grain,
+    dairy,
+    meat,
+    seaFood,
+    bakedGood,
+    beverage,
+    snack,
+    meal
+}*/
 
 
 /**
@@ -48,7 +45,7 @@ export class FoodListing {
          * NOTE: The first url in the array should be the image marked as the primary one. The rest are in the order they were uploaded.
          */
         public imgUrls: string[] = null,
-        public donorInfo: FoodListingUser = null,
+        public donorInfo: AppUser = null,
         /**
          * Information pertaining to all claims on this Food Listing.
          */

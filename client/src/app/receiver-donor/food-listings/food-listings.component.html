@@ -23,14 +23,14 @@
 
                     <div class="space-bottom">
                         <div><b>Donor</b></div>
-                        <span>{{ foodListing.donorInfo.organizationName }}</span>
+                        <span>{{ foodListing.donorInfo.organization.name }}</span>
                     </div>
 
                     <div class="space-bottom">
                         <div><b>Donor Address</b></div>
                         <div class="inline-block">
-                            <span>{{ foodListing.donorInfo.address }}</span><br>
-                            <span>{{ foodListing.donorInfo.city }}, {{ foodListing.donorInfo.state }}</span>
+                            <span>{{ foodListing.donorInfo.contactInfo.address }}</span><br>
+                            <span>{{ foodListing.donorInfo.contactInfo.city }}, {{ foodListing.donorInfo.contactInfo.state }}</span>
                         </div>
                     </div>
 
@@ -48,9 +48,9 @@
 
                 <div class="col-lg-6 hide-phone">
 
-                    <div class ="space-bottom" *ngIf="foodListing.donorInfo.drivingDistance != null">
+                    <div class ="space-bottom" *ngIf="foodListing.donorInfo.contactInfo.drivingDistance != null">
                         <div><b>Drive Distance</b></div>
-                        <span class="inline-block">{{ foodListing.donorInfo.drivingDistance + ' miles' }}</span>
+                        <span class="inline-block">{{ foodListing.donorInfo.contactInfo.drivingDistance + ' miles' }}</span>
                     </div>
 
                     <div class="space-bottom">
@@ -68,15 +68,15 @@
 
                     <div class="space-bottom">
                         <div><b>Receiver</b></div>
-                        <span *ngIf="foodListing.claimInfo.receiverInfo != null">{{ foodListing.claimInfo.receiverInfo.organizationName }}</span>
+                        <span *ngIf="foodListing.claimInfo.receiverInfo != null">{{ foodListing.claimInfo.receiverInfo.organization.name }}</span>
                         <span *ngIf="foodListing.claimInfo.receiverInfo == null">None</span>
                     </div>
 
                     <div class="space-bottom" *ngIf="foodListing.claimInfo.receiverInfo != null">
                         <div><b>Receiver Address</b></div>
                         <div class="inline-block">
-                            <span>{{ foodListing.claimInfo.receiverInfo.address }}</span><br>
-                            <span>{{ foodListing.claimInfo.receiverInfo.city }}, {{ foodListing.claimInfo.receiverInfo.state }}</span>
+                            <span>{{ foodListing.claimInfo.receiverInfo.contactInfo.address }}</span><br>
+                            <span>{{ foodListing.claimInfo.receiverInfo.contactInfo.city }}, {{ foodListing.claimInfo.receiverInfo.contactInfo.state }}</span>
                         </div>
                     </div>
 

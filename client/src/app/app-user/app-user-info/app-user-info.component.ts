@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { FormGroup, Validators, AbstractControl, FormControl, ValidatorFn } from '@angular/forms';
+import { FormGroup, Validators, AbstractControl, FormControl, ValidatorFn, FormBuilder } from '@angular/forms';
 import { Observable } from "rxjs/Observable";
 import 'rxjs/add/operator/finally';
+import * as _ from 'lodash';
 
 import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
 import { AppUserValidationService } from '../common-app-user/app-user-validation.service';
@@ -10,11 +11,13 @@ import { SlickTypeaheadService } from '../../slick/slick-type-ahead/slick-type-a
 import { AppUserUpdateService } from "./app-user-update.service";
 import { SessionDataService } from "../../common-util/services/session-data.service";
  
-import { AppUserInfo } from "../../../../../shared/src/app-user/app-user-info";
-import { Validation } from "../../../../../shared/src/common-util/validation";
+import { AppUser, AppUserType } from "../../../../../shared/src/app-user/app-user";
+import { Validation } from "../../../../../shared/src/validation/validation";
 import { FoodWebResponse } from "../../../../../shared/src/message-protocol/food-web-response";
 import { AppUserErrorMsgs } from '../../../../../shared/src/app-user/message/app-user-error-msgs';
 import { ObjectManipulation } from '../../../../../shared/src/common-util/object-manipulation';
+import { ContactInfo } from '../../../../../shared/src/app-user/contact-info';
+import { Organization } from '../../../../../shared/src/app-user/organization';
 
 
 /**
@@ -46,59 +49,59 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
         public appUserConstants: AppUserConstantsService,
         public typeaheadService: SlickTypeaheadService,
         private _appUserUpdateService: AppUserUpdateService,
-        private _sessionDataService: SessionDataService
+        private _sessionDataService: SessionDataService,
+        formBuilder: FormBuilder,
     ) {
-        super(validationService);
+        super(validationService, formBuilder);
 
-        let appUserInfo: AppUserInfo = _sessionDataService.getAppUserSessionData();
+        let appUser: AppUser = _sessionDataService.getAppUserSessionData();
 
         // Set some form labels based off of whether or not user is an organization.
-        this.IS_ORGANIZATION = (appUserInfo.organizationName != null);
+        this.IS_ORGANIZATION = ( appUser.appUserType !== AppUserType.Deliverer );
 
         this.form = new FormGroup({});
         this._editData = new Map <string, EditData>();
 
-        this.initAppUserInfoFormElements(appUserInfo);
-        this.initNonAppUserInfoFormElements();
+        this.initAppUserFormElements(appUser);
+        this.initPasswordFormElements();
     }
 
 
     public getEditDataFor(fieldName: string): EditData {
+
+        if (!this._editData.has(fieldName)) {
+            throw new Error('Edit data does not exist for form control with name: ' + fieldName);
+        }
+
         return this._editData.get(fieldName);
     }
 
 
     /**
-     * Initializes form elements that are part of the AppUserInfo object.
-     * @param appUserInfo The AppUserInfo object from which to initialize the elements.
+     * Initializes form elements that are part of the AppUser object.
+     * @param appUser The AppUser object from which to initialize the elements.
      */
-    private initAppUserInfoFormElements(appUserInfo: AppUserInfo): void {
+    private initAppUserFormElements(appUser: AppUser): void {
 
-        // Fill the form group model based off of the properties found in AppUserInfo.
-        // Also, add edit flags based off of the properties.
-        for (let property in appUserInfo) {
-            if (appUserInfo.hasOwnProperty(property)) {
+        const specificValidators: { [key: string]: ValidatorFn[] } = {
+            'email':            [ Validators.pattern(this.validationService.EMAIL_REGEX) ],
+            'contactInfo.zip':  [ Validators.pattern(this.validationService.ZIP_REGEX) ]
+        } 
+    
+        this.form = this.genFormGroupFromObject(appUser, [ Validators.required ], specificValidators);
+        // Don't want timeRanges control to be form array, but rather, a form control element whose value is an array.
+        (<FormGroup>this.form.get('availability')).setControl('timeRanges', new FormControl(appUser.availability.timeRanges));
 
-                let validators: ValidatorFn[] = [ Validators.required ];
-
-                // Add additional needed validators for email and password fields.
-                switch (property) {
-                    case 'email':       validators.push(Validators.pattern(this.validationService.EMAIL_REGEX));    break;
-                    case 'zip':         validators.push(Validators.pattern(this.validationService.ZIP_REGEX));      break;
-                }
-
-                let initValue: any = (appUserInfo[property] == null) ? '' : appUserInfo[property];
-                this.form.addControl(property, new FormControl(initValue, validators));
-                this._editData.set(property, new EditData());
-            }
-        }
+        this.applyFormControls(this, (controlPath: string, control: AbstractControl) => {
+            this._editData.set(controlPath, new EditData());
+        }, true);
     }
 
 
     /**
-     * Initialize form elements that are not part of the AppUserInfo object (such as password).
+     * Initialize form elements that are not part of the AppUser object (such as password).
      */
-    private initNonAppUserInfoFormElements(): void {
+    private initPasswordFormElements(): void {
 
         const passControlNames: string[] = ['password', 'currentPassword', 'confirmPassword'];
 
@@ -135,7 +138,7 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
             this.control(editFormControlIds[i]).markAsUntouched();                
 
             // Set the form control value to the session data value for consistency.
-            this.control(editFormControlIds[i]).setValue(this._sessionDataService.getAppUserSessionData()[editFormControlIds[i]]);
+            this.control(editFormControlIds[i]).setValue(_.get(this._sessionDataService.getAppUserSessionData(), editFormControlIds[i]));
 
             this._editData.get(editFormControlIds[i]).editing = editing;
         }
@@ -184,7 +187,7 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
      */
     private saveMany(saveFormControlNames: string[], newPassword: string = null, currentPassword: string = null): void {
 
-        let appUserInfoUpdate: AppUserInfo = new AppUserInfo();
+        let appUserUpdate: AppUser = new AppUser();
 
         // Go through each form control checking valid state and adding value to update object (password form members packaged separately).
         if (newPassword === null) {
@@ -196,14 +199,14 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
                     return; // Invalid control, force out now!
                 }
                 
-                // Handle all non-password updates by writing to appUserInfoUpdate container. Password handled separately from shared
-                // object (AppUserInfo) due to possible security concerns (don't want to make it easy to accidentally send password to client).
-                appUserInfoUpdate[saveFormControlNames[i]] = saveFormControl.value;
+                // Handle all non-password updates by writing to appUserUpdate container. Password handled separately from shared
+                // object (AppUser) due to possible security concerns (don't want to make it easy to accidentally send password to client).
+                _.set(appUserUpdate, saveFormControlNames[i], saveFormControl.value);
             }
         }
 
         // Send save field update to server and listen for response.
-        let observable: Observable<FoodWebResponse> = this._appUserUpdateService.updateAppUserInfo(appUserInfoUpdate, newPassword, currentPassword);
+        let observable: Observable<FoodWebResponse> = this._appUserUpdateService.updateAppUser(appUserUpdate, newPassword, currentPassword);
         
         for (let i: number = 0; i < saveFormControlNames.length; i++) {
             this._editData.get(saveFormControlNames[i]).showProgressSpinner = true;

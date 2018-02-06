@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, Validators, AbstractControl, ValidatorFn, FormControl } from '@angular/forms';
+import { FormGroup, Validators, AbstractControl, ValidatorFn, FormControl, FormBuilder } from '@angular/forms';
 import { ImageCropperComponent, CropperSettings } from 'ng2-img-cropper';
 import { MatHorizontalStepper, ErrorStateMatcher } from '@angular/material';
 import { NGXLogger } from 'ngx-logger';
@@ -7,12 +7,13 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
 import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
+import { GetDomainValuesService } from '../../domain/get-domain-values.service';
 import { ValidationService } from '../../common-util/services/validation.service';
 import { AddFoodListingService } from "../food-listings/food-listing-services/add-food-listing.service";
 import { DateFormatterPipe } from "../../common-util/pipes/date-formatter.pipe"
 
 import { FoodListingUpload } from "../../../../../shared/src/receiver-donor/food-listing-upload";
-import { Validation } from '../../../../../shared/src/common-util/validation';
+import { Validation } from '../../../../../shared/src/validation/validation';
 
 
 @Component({
@@ -30,15 +31,18 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
     public image: string;
     public cropperSettings: CropperSettings;
     public showProgressSpinner: boolean;
+    public vehicleTypes: string[];
 
 
     public constructor (
-        validationService: ValidationService,
         public dateFormatter: DateFormatterPipe,
         private _addFoodListingService: AddFoodListingService,
-        private _logger: NGXLogger
+        private _logger: NGXLogger,
+        validationService: ValidationService,
+        formBuilder: FormBuilder,
+        domainService: GetDomainValuesService
     ) {
-        super(validationService);
+        super(validationService, formBuilder);
 
         this.TITLE_MAX_LENGTH = 30;
 
@@ -57,6 +61,10 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
         this.cropperSettings.canvasHeight = this.cropperSettings.height;
         this.cropperSettings.noFileInput = true;
         this.cropperSettings.fileType = 'image/jpeg';
+
+        domainService.getDomainValues('VehicleType').subscribe((vehicleTypes: string[]) => {
+            this.vehicleTypes = vehicleTypes;
+        });
 
         this.showProgressSpinner = false;
         this.form = new FormGroup({});

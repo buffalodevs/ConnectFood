@@ -33,10 +33,10 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
      */
     @Input() public initiallyChecked: boolean;
     /**
-     * The maximum number of elements per column (if reached, will generate another column). Default is 6.
+     * The preferred number of elements per column (if reached, will generate another column). Default is 6.
      * NOTE: Will not generate more than 4 columns, so if no more columns can be made, then this is ignored!
      */
-    @Input() public maxElementsPerColumn: number;
+    @Input() public preferredElementsPerColumn: number;
     /**
      * The maximum number of columns that the Food Types checkboxes will be displayed in. Default is 2.
      */
@@ -73,7 +73,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
         this.displayOnly = false;
         this.condensedDisplay = false;
         this.initiallyChecked = true;
-        this.maxElementsPerColumn = 6;
+        this.preferredElementsPerColumn = 6;
         this.maxNumColumns = 2;
         this.required = false;
         this.validate = false;
@@ -286,7 +286,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
 
         const numDisplayFoodTypes: number = this.isCondesnedDisplayOnlyMode() ? this._selectedFoodTypes.length
                                                                               : this.foodTypes.length;
-        const numDivisions: number = Math.ceil(numDisplayFoodTypes / this.maxElementsPerColumn);
+        const numDivisions: number = Math.ceil(numDisplayFoodTypes / this.preferredElementsPerColumn);
 
         // If max number of columns exceeds the number of divisions, then set it to number of divisions, otherwise max number of columns.
         return (numDivisions < this.maxNumColumns) ? numDivisions

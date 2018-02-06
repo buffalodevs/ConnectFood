@@ -1,12 +1,12 @@
 import { Component, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import * as _ from 'lodash';
 
+import { DateFormatterService } from '../../../../common-util/services/date-formatter.service';
 import { ResponsiveService } from '../../../../common-util/services/responsive.service';
 
 import { FoodListing } from './../../../../../../../shared/src/receiver-donor/food-listing';
-import { FoodListingUser } from '../../../../../../../shared/src/common-receiver-donor-deliverer/food-listing-user';
-import * as _ from 'lodash';
-import { DateFormatterService } from '../../../../common-util/services/date-formatter.service';
+import { AppUser } from '../../../../../../../shared/src/app-user/app-user';
 
 
 @Component({
@@ -77,7 +77,7 @@ export class FoodListingInfoComponent {
      * @param foodListingUserAccessor The accessor string associated with the user.
      * @return The Food Listing User.
      */
-    private getFoodListingUser(foodListingUserAccessor: string): FoodListingUser {
+    private getFoodListingUser(foodListingUserAccessor: string): AppUser {
         return _.get(this.foodListing, foodListingUserAccessor);
     }
 }

@@ -1,4 +1,4 @@
-import { AppUserType } from "../../../shared/src/app-user/app-user-info";
+import { AppUserType } from "../../../shared/src/app-user/app-user";
 
 
 /**

@@ -11,7 +11,7 @@ import { AppUserValidationService, Validation } from '../common-app-user/app-use
 import { SlickTypeaheadService } from '../../slick/slick-type-ahead/slick-type-ahead.service';
 import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
 
-import { AppUserInfo, AppUserType } from "../../../../../shared/src/app-user/app-user-info";
+import { AppUser, AppUserType, Organization, ContactInfo, AppUserAvailability, AvailabilityType } from "../../../../../shared/src/app-user/app-user";
 import { FoodWebResponse } from "../../../../../shared/src/message-protocol/food-web-response";
 import { ObjectManipulation } from '../../../../../shared/src/common-util/object-manipulation';
 import { AppUserErrorMsgs } from '../../../../../shared/src/app-user/message/app-user-error-msgs';
@@ -63,15 +63,16 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
 
 
     public constructor (
-        appUserTypesService: AppUserTypesService,
         public validationService: AppUserValidationService,
         public appUserConstants: AppUserConstantsService,
         public typeaheadService: SlickTypeaheadService,
-        private _formBuilder: FormBuilder,
         private _signupService: SignupService,
-        private _logger: NGXLogger
+        private _logger: NGXLogger,
+        appUserTypesService: AppUserTypesService,
+        formBuilder: FormBuilder,
+
     ) {
-        super(validationService);
+        super(validationService, formBuilder);
 
         this._signupError = null;
         this._signupComplete = false;
@@ -102,7 +103,7 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
                 'confirmPassword':  [null, [Validators.required, Validators.pattern(this.validationService.PASSWORD_REGEX)]]
             }, { validator: this.validationService.confirmPasswordEqual() }),
 
-            'addressPhone': this._formBuilder.group({
+            'contactInfo': this._formBuilder.group({
                 'address':          [null, Validators.required],
                 'city':             [null, Validators.required],
                 'state':            [null, [Validators.required, Validators.minLength(2), Validators.maxLength(2)]],
@@ -121,7 +122,7 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
             }
         );
 
-        // Listen for changes to the appUserType member of the AppUserInfo Form, so we can change form fields appropriately.
+        // Listen for changes to the appUserType member of the AppUser Form, so we can change form fields appropriately.
         this.form.get('primary.appUserType').valueChanges.subscribe(this.listenAppUserTypeChange.bind(this));
     }
 
@@ -187,15 +188,19 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
         this._fieldValidateFlags.set('availability', true);
         if (!valid)  return;
 
-        let appUserInfo: AppUserInfo = new AppUserInfo();
-        let password: string = value.primary.password;
+        let appUser: AppUser = new AppUser();
+        const password: string = value.primary.password;
 
-        // Copy form values to AppUserInfo object.
-        ObjectManipulation.shallowCopy(value.primary, appUserInfo);
-        ObjectManipulation.shallowCopy(value.addressPhone, appUserInfo);
-        appUserInfo.availability = value.availability;
+        // Copy form values to AppUser object.
+        ObjectManipulation.shallowCopy(value.primary, appUser, null, true);
+        appUser.organization = new Organization();
+        ObjectManipulation.shallowCopy(value.primary, appUser.organization, null, true);
+        appUser.contactInfo = new ContactInfo();
+        ObjectManipulation.shallowCopy(value.addressPhone, appUser, null, true);
+        appUser.availability = new AppUserAvailability(AvailabilityType.regularWeekly);
+        appUser.availability.timeRanges = value.availability;
 
-        let observer: Observable<FoodWebResponse> = this._signupService.signup(appUserInfo, password);
+        let observer: Observable <FoodWebResponse> = this._signupService.signup(appUser, password);
         this._showProgressSpinner = true;
 
         observer.finally(() => { this._showProgressSpinner = false; })

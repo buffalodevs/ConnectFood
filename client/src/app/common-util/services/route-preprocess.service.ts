@@ -49,7 +49,7 @@ export class RoutePreprocessService implements CanActivate {
         return observer.map((reAuthenticateResponse: LoginResponse): boolean => {
 
                 // Make sure we update the session info we are holding.
-                this._authSessionService.updateAppUserSessionData(reAuthenticateResponse.appUserInfo);
+                this._authSessionService.updateAppUserSessionData(reAuthenticateResponse.appUser);
 
                 // If not authenticated, and we are visiting a route that requires us to be logged in, then redirect to login.
                 if (!reAuthenticateResponse.success && RoutePreprocessService._LOGIN_RESTRICTED_ROUTES.indexOf(state.url) >= 0) {

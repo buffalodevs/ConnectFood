@@ -1,5 +1,5 @@
 'use strict';
-import { SessionData, AppUserInfo } from '../../common-util/session-data';
+import { SessionData, AppUser } from '../../common-util/session-data';
 import { addOrUpdateAppUser } from './app-user-add-update';
 import { logger, prettyjsonRender } from '../../logging/logger';
 import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
@@ -7,18 +7,18 @@ import { logSqlQueryExec } from '../../logging/sql-logger';
 import { query } from '../../database-util/connection-pool';
 import { sendEmail, EmailConfig } from '../../email/email';
 
-import { AppUserType } from '../../../../shared/src/app-user/app-user-info';
+import { AppUserType } from '../../../../shared/src/app-user/app-user';
 
 
 /**
  * Performs the signup for a new app user.
- * @param appUserInfo App user into used for signup.
+ * @param appUser App user into used for signup.
  * @param password The password for the new app user.
  * @return A promise that on success will contain the new app user's session data.
  */
-export async function signup(appUserInfo: AppUserInfo, password: string): Promise<SessionData> {
+export async function signup(appUser: AppUser, password: string): Promise<SessionData> {
 
-    const sessionData: SessionData = await addOrUpdateAppUser(appUserInfo, password);
+    const sessionData: SessionData = await addOrUpdateAppUser(appUser, password);
     return sendVerificationEmail(sessionData);
 }
 
@@ -49,9 +49,9 @@ function sendVerificationEmail(sessionData: SessionData) : Promise<SessionData> 
     const verificationLink = process.env.HOST_ADDRESS + '/appUser/verify?appUserKey='
                            + sessionData.appUserKey + '&verificationToken=' + sessionData.verificationToken;
 
-    const appUserInfo: AppUserInfo = sessionData.appUserInfo;
-    const receiverName: string = (appUserInfo.appUserType === AppUserType.Deliverer) ? ( appUserInfo.firstName + ' ' + appUserInfo.lastName )
-                                                                                     : appUserInfo.organizationName;
+    const appUser: AppUser = sessionData.appUser;
+    const receiverName: string = appUser.isOrganization() ? appUser.organization.name
+                                                          : ( appUser.firstName + ' ' + appUser.lastName );
 
     const htmlStr: string = `
         <p>
@@ -63,8 +63,8 @@ function sendVerificationEmail(sessionData: SessionData) : Promise<SessionData> 
     let emailConfig: EmailConfig = new EmailConfig (
         'Verify Your Food Web Account',
         receiverName,
-        appUserInfo.email,
-        appUserInfo.appUserType,
+        appUser.email,
+        appUser.appUserType,
         htmlStr
     );
 

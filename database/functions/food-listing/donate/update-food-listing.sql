@@ -14,6 +14,7 @@ CREATE OR REPLACE FUNCTION updateFoodListing
     _estimatedWeight        FoodListing.estimatedWeight%TYPE        DEFAULT NULL,   -- The total weight of the Food Listing (in pounds).
     _estimatedValue         FoodListing.estimatedValue%TYPE         DEFAULT NULL,   -- The estimated value of the Food Listing (in $).
     _foodDescription        FoodListing.foodDescription%TYPE        DEFAULT NULL,   -- A (long) description of the Food Listing.
+    _recommendedVehicleType VehicleType                             DEFAULT NULL,   -- Recommended vehicle to use for delivery.
     _imgUrls                TEXT[]                                  DEFAULT NULL    -- URL(s) for the image being stored/uploaded.
 )
 RETURNS VOID -- TODO: Return data pertaining to contacts of Receivers (Claimers) who are negatively effected by this update (for contacting them)!
@@ -75,7 +76,8 @@ BEGIN
             availableUntilDate = _availableUntilDate,
             estimatedWeight = _estimatedWeight,
             estimatedValue = _estimatedValue,
-            foodDescription = _foodDescription
+            foodDescription = _foodDescription,
+            recommendedVehicleType = _recommendedVehicleType
     WHERE   FoodListing.foodListingKey = _foodListingKey;
 
 END;

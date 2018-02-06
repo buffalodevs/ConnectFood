@@ -24,7 +24,7 @@ export async function removeFoodListing(foodListingKey: number, donorSessionData
     const queryResult: QueryResult = await query(queryString, queryArgs);
     
     logSqlQueryResult(queryResult.rows);
-    return notifyAffectedAppUsers(donorSessionData, queryResult);
+    return await notifyAffectedAppUsers(donorSessionData, queryResult);
 }
 
 

@@ -49,6 +49,7 @@ export async function addFoodListing(foodListingUpload: FoodListingUpload, donor
                       foodListingUpload.estimatedWeight,
                       foodListingUpload.estimatedValue,
                       foodListingUpload.foodDescription,
+                      foodListingUpload.recommendedVehicleType,
                       imageUrls ];
     let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM addFoodListing();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);

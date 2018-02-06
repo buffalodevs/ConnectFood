@@ -29,36 +29,42 @@ AS $$
             -- @ts-sql class="SessionData" file="/server/src/common-util/session-data.ts"
             JSON_BUILD_OBJECT (
                 'appUserKey',           AppUser.appUserKey,
-                -- @ts-sql class="AppUserInfo" file="/shared/authentication/app-user-info.ts"
-                'appUserInfo',          JSON_BUILD_OBJECT (
+                -- @ts-sql class="AppUser" file="/shared/authentication/app-user.ts"
+                'appUser',              JSON_BUILD_OBJECT (
                                             'email',            AppUser.email,
                                             'appUserType',      AppUser.appUserType,
-                                            'organizationName', Organization.name,
                                             'lastName',         AppUser.lastName,
                                             'firstName',        AppUser.firstName,
-                                            'address',          ContactInfo.address,
-                                            'city',             ContactInfo.city,
-                                            'state',            ContactInfo.state,
-                                            'zip',              ContactInfo.zip,
-                                            -- @ts-sql class="GPSCoordinate" file="/shared/common-util/geocode.ts"
-                                            'gpsCoordinate',    JSON_BUILD_OBJECT (
-                                                                    'latitude',         ST_Y(ContactInfo.gpsCoordinate::GEOMETRY),
-                                                                    'longitude',        ST_X(ContactInfo.gpsCoordinate::GEOMETRY)
+                                            'contactInfo',      JSON_BUILD_OBJECT (
+                                                                    'address',          ContactInfo.address,
+                                                                    'city',             ContactInfo.city,
+                                                                    'state',            ContactInfo.state,
+                                                                    'zip',              ContactInfo.zip,
+                                                                    -- @ts-sql class="GPSCoordinate" file="/shared/common-util/geocode.ts"
+                                                                    'gpsCoordinate',    JSON_BUILD_OBJECT (
+                                                                                            'latitude',     ST_Y(ContactInfo.gpsCoordinate::GEOMETRY),
+                                                                                            'longitude',    ST_X(ContactInfo.gpsCoordinate::GEOMETRY)
+                                                                                        ),
+                                                                    'utcOffsetMins',    ContactInfo.utcOffsetMins,
+                                                                    'phone',            ContactInfo.phone
                                                                 ),
-                                            'utcOffsetMins',    ContactInfo.utcOffsetMins,
-                                            'phone',            ContactInfo.phone,
-                                            'availability',     (
-                                                                    SELECT  ARRAY_AGG (
-                                                                                -- @ts-sql class="TimeRangeStr" file="/shared/common-util/time-range.ts"
-                                                                                JSON_BUILD_OBJECT (
-                                                                                    '_startTime',    timestampToUtcText(AppUserAvailability.startTime),
-                                                                                    '_endTime',      timestampToUtcText(AppUserAvailability.endTime)
-                                                                                )
-                                                                            )
-                                                                    FROM    AppUserAvailability
-                                                                    WHERE   AppUserAvailability.appUserKey = AppUser.appUserKey
+                                            'organization',     JSON_BUILD_OBJECT (
+                                                                    'name',     Organization.name,
+                                                                    'taxId',    Organization.taxId
                                                                 ),
-                                            'taxId',            Organization.taxId
+                                            'availability',     JSON_BUILD_OBJECT (
+                                                                    'timeRanges',   (
+                                                                                        SELECT  ARRAY_AGG (
+                                                                                            -- @ts-sql class="TimeRangeStr" file="/shared/common-util/time-range.ts"
+                                                                                            JSON_BUILD_OBJECT (
+                                                                                                '_startTime',    timestampToUtcText(AppUserAvailability.startTime),
+                                                                                                '_endTime',      timestampToUtcText(AppUserAvailability.endTime)
+                                                                                            )
+                                                                                        )
+                                                                                        FROM    AppUserAvailability
+                                                                                        WHERE   AppUserAvailability.appUserKey = AppUser.appUserKey
+                                                                                    )
+                                                                )
                                         ),
                 'verificationToken',    UnverifiedAppUser.verificationToken
             )

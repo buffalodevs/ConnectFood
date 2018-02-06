@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 import { getDrivingDistTime, GPSCoordinate, DriveDistTime } from '../geocode/geocode';
 import { FoodListingsFilters, LISTINGS_STATUS } from '../../../shared/src/receiver-donor/food-listings-filters';
 import { FoodListing } from "../../../shared/src/receiver-donor/food-listing";
-import { Validation } from '../../../shared/src/common-util/validation';
+import { Validation } from '../../../shared/src/validation/validation';
 import { DateFormatter } from '../../../shared/src/date-time-util/date-formatter';
 
 
@@ -42,13 +42,13 @@ export async function getFoodListings(filters: FoodListingsFilters, myAppUserKey
 
     try {
         const queryResult: QueryResult = await query(queryString, queryArgs);
-        
         logSqlQueryResult(queryResult.rows);
-        return generateResultArray(queryResult.rows, myGPSCoordinate, (filters.listingsStatus === LISTINGS_STATUS.myDonatedListings));
+
+        return await generateResultArray(queryResult.rows, myGPSCoordinate, (filters.listingsStatus === LISTINGS_STATUS.myDonatedListings));
     }
     catch (err) {
         logger.error(prettyjsonRender(err));
-        return Promise.reject(new Error('Food listing search failed'));
+        throw new Error('Food listing search failed');
     }
 }
 
@@ -131,9 +131,14 @@ async function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate, 
 
     // Go through each row of the database output (each row corresponds to a Food Listing).
     for (let i: number = 0; i < rows.length; i++) {
+        
         // Insert returned data into result arrays.
         foodListings.push(rows[i].foodlisting);
-        donorGPSCoordinates.push(foodListings[i].donorInfo.gpsCoordinate);
+
+        if (foodListings[i].donorInfo == null) {
+            throw new Error('donorInfo member of queried Food Listing should NOT be null.');
+        }
+        donorGPSCoordinates.push(foodListings[i].donorInfo.contactInfo.gpsCoordinate);
     }
 
     // If in Donor Cart, then we don't care about seeing driving distances!
@@ -143,8 +148,8 @@ async function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate, 
     const driveDistTime: DriveDistTime[] = await getDrivingDistTime(myGPSCoordinate, donorGPSCoordinates);
     
     for (let i: number = 0; i < driveDistTime.length; i++) {
-        foodListings[i].donorInfo.drivingDistance = driveDistTime[i].driveDistanceMi;
-        foodListings[i].donorInfo.drivingTime = driveDistTime[i].driveDurationMin;
+        foodListings[i].donorInfo.contactInfo.drivingDistance = driveDistTime[i].driveDistanceMi;
+        foodListings[i].donorInfo.contactInfo.drivingTime = driveDistTime[i].driveDurationMin;
     }
 
     return foodListings;

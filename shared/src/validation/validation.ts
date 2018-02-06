@@ -1,6 +1,6 @@
 import { FormGroup, AbstractControl, ValidatorFn } from "@angular/forms";
-import { AppUserInfo } from "../app-user/app-user-info";
-import { ObjectManipulation } from "./object-manipulation";
+import { AppUser } from "../app-user/app-user";
+import { ObjectManipulation } from "../common-util/object-manipulation";
 
 
 /**
@@ -187,13 +187,13 @@ export class Validation {
 
     /**
      * Validates given app user information and password.
-     * @param appUserInfo The app user info to validate.
+     * @param appUser The app user to validate.
      * @param password The password to validate.
      * @return On successful validation, null. On unsuccess, then an error is returned.
      */
-    public validateAppUserInfo(appUserInfo: AppUserInfo, password: string): Error {
+    public validateAppUser(appUser: AppUser, password: string): Error {
 
-        if (appUserInfo.email != null && !this.emailValidator(appUserInfo.email)) {
+        if (appUser.email != null && !this.emailValidator(appUser.email)) {
             return new Error('Provided email not in correct format.');
         }
 
@@ -201,7 +201,7 @@ export class Validation {
             return new Error('Incorrect password format. Password must contain a minimum of 6 characters and at least one number');
         }
 
-        if (appUserInfo.zip != null && !this.zipValidator(appUserInfo.zip.toString())) {
+        if (appUser.contactInfo != null && appUser.contactInfo.zip != null && !this.zipValidator(appUser.contactInfo.zip.toString())) {
             return new Error('Incorrect ZIP code format. The ZIP code must contain exactly 5 digits.');
         }
 

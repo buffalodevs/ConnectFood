@@ -85,12 +85,14 @@
 
                         <!-- needsRefrigeration -->
                         <div class="form-group col-md-6 field-margin-bottom">
-                            <h4 [style.margin-bottom.px]="18">Needs Refrigeration</h4>
-                            <mat-radio-group #needsRefrigeration [ngClass]="{'warn-foreground': isInvalid(control('needsRefrigeration'))}"
-                                             formControlName="needsRefrigeration" required>
-                                <mat-radio-button name="needsRefrigeration" id="needsRefrigeration-yes" [value]="true">Yes</mat-radio-button>
-                                <mat-radio-button name="needsRefrigeration" [value]="false">No</mat-radio-button>
-                            </mat-radio-group>
+                            <h4>Recommended Vehicle</h4>
+                            <mat-input-container floatPlaceholder="never">
+                                <mat-select placeholder="Vehicle Type (Size) *" [errorStateMatcher]="this" formControlName="recommendedVehicleType">
+                                    <mat-option *ngFor="let vehicleType of vehicleTypes" [value]="vehicleType">
+                                        {{ vehicleType }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-input-container>
                         </div>
 
                     </div>
@@ -99,6 +101,16 @@
                     <div class="form-group food-types-container field-margin-bottom">
                         <h4>Food Types</h4>
                         <food-types formControlName="foodTypes" [initiallyChecked]="false" [required]="true" [validate]="validate"></food-types>
+                    </div>
+
+                    <!-- needsRefrigeration -->
+                    <div class="form-group field-margin-bottom">
+                        <h4 [style.margin-bottom.px]="18">Needs Refrigeration</h4>
+                        <mat-radio-group #needsRefrigeration [ngClass]="{'warn-foreground': isInvalid(control('needsRefrigeration'))}"
+                                            formControlName="needsRefrigeration" required>
+                            <mat-radio-button name="needsRefrigeration" id="needsRefrigeration-yes" [value]="true">Yes</mat-radio-button>
+                            <mat-radio-button name="needsRefrigeration" [value]="false">No</mat-radio-button>
+                        </mat-radio-group>
                     </div>
 
                     <!-- foodDescription -->

@@ -1,12 +1,12 @@
 import * as moment from 'moment';
 
-import { SessionData, AppUserInfo } from "../../common-util/session-data";
+import { SessionData, AppUser } from "../../common-util/session-data";
 import { DeliveryUpdateNotificationData } from './delivery-update-notification-data';
 import { DriveDistTime, GPSCoordinate, getRouteSegmentDrivingDistTimes, getEstimatedArrivalTimes } from "../../geocode/geocode";
 import { EmailConfig, sendEmail } from "../../email/email";
 
 import { DeliveryUtil, DeliveryState } from "../../../../shared/src/deliverer/delivery-util";
-import { AppUserType } from '../../../../shared/src/app-user/app-user-info';
+import { AppUserType } from '../../../../shared/src/app-user/app-user';
 import { DateFormatter } from "../../../../shared/src/date-time-util/date-formatter";
 
 export { DeliveryUpdateNotificationData }
@@ -76,13 +76,13 @@ function generateAndSendEmail(delivererSessionData: SessionData, deliveryUpdateN
     const htmlBodyMid: string = generateHTMLBodyMid(delivererSessionData, deliveryUpdateNotificationData, appUserType, estimatedArrivalTime);
 
     // Are we targeting the Donor or Receiver?
-    const targetUser: AppUserInfo = (appUserType === AppUserType.Receiver) ? deliveryUpdateNotificationData.receiverSessionData.appUserInfo
-                                                                            : deliveryUpdateNotificationData.donorSessionData.appUserInfo;
+    const targetUser: AppUser = (appUserType === AppUserType.Receiver) ? deliveryUpdateNotificationData.receiverSessionData.appUser
+                                                                       : deliveryUpdateNotificationData.donorSessionData.appUser;
 
     // Generate our mail configuration for sending the update notification email (includes options and payload data).
     const emailConfig: EmailConfig = new EmailConfig (
         deliveryUpdateNotificationData.foodTitle + ' Update Notification',
-        targetUser.organizationName,
+        targetUser.organization.name,
         targetUser.email,
         appUserType,
         ( generateHTMLBodyStart(delivererSessionData, deliveryUpdateNotificationData) + htmlBodyMid )
@@ -105,7 +105,7 @@ function generateAndSendEmail(delivererSessionData: SessionData, deliveryUpdateN
 function generateHTMLBodyStart(delivererSessionData: SessionData, deliveryUpdateNotificationData: DeliveryUpdateNotificationData): string {
 
     const foodTitle: string = deliveryUpdateNotificationData.foodTitle;
-    const delivererName: string = ( delivererSessionData.appUserInfo.firstName + ' ' + delivererSessionData.appUserInfo.lastName );
+    const delivererName: string = ( delivererSessionData.appUser.firstName + ' ' + delivererSessionData.appUser.lastName );
     const readableDeliveryState: string = DeliveryUtil.getReadableDeliveryState(deliveryUpdateNotificationData.newDeliveryState);
 
     const stateReverted: boolean = ( DeliveryUtil.compareDeliveryStates(deliveryUpdateNotificationData.newDeliveryState, deliveryUpdateNotificationData.oldDeliveryState) < 0 );
@@ -286,9 +286,9 @@ async function getEstimatedArrivalTimeStrs(delivererSessionData: SessionData, de
     const wasDroppedOff: boolean = ( deliveryUpdateNotificationData.newDeliveryState === DeliveryState.droppedOff );
     if (wasDroppedOff)  return new Map ();
 
-    const delivererGPSCoordinate: GPSCoordinate = delivererSessionData.appUserInfo.gpsCoordinate;
-    const donorGPSCoordinate: GPSCoordinate     = deliveryUpdateNotificationData.donorSessionData.appUserInfo.gpsCoordinate;
-    const receiverGPSCoordinate: GPSCoordinate  = deliveryUpdateNotificationData.receiverSessionData.appUserInfo.gpsCoordinate;
+    const delivererGPSCoordinate: GPSCoordinate = delivererSessionData.appUser.contactInfo.gpsCoordinate;
+    const donorGPSCoordinate: GPSCoordinate     = deliveryUpdateNotificationData.donorSessionData.appUser.contactInfo.gpsCoordinate;
+    const receiverGPSCoordinate: GPSCoordinate  = deliveryUpdateNotificationData.receiverSessionData.appUser.contactInfo.gpsCoordinate;
 
     // Generate travel start time based one whether or not in scheduled state.
     const inScheduledState: boolean = ( deliveryUpdateNotificationData.newDeliveryState === DeliveryState.scheduled );

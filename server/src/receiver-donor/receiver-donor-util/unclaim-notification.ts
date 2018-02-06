@@ -3,7 +3,7 @@ import { UnclaimNotificationData } from './unclaim-notification-data';
 import { sendEmail, EmailConfig } from "../../email/email";
 import { logger, prettyjsonRender } from '../../logging/logger';
 
-import { AppUserType, AppUserInfo } from "../../../../shared/src/app-user/app-user-info";
+import { AppUserType, AppUser } from "../../../../shared/src/app-user/app-user";
 
 export { UnclaimNotificationData };
 
@@ -15,10 +15,10 @@ export { UnclaimNotificationData };
  */
 export function notifyReceiverOfUnclaim(unclaimNotificationData: UnclaimNotificationData): Promise <void> {
     
-    const receiverEmail: string = unclaimNotificationData.receiverSessionData.appUserInfo.email;
-    const receiverOrganization: string = unclaimNotificationData.receiverSessionData.appUserInfo.organizationName;
+    const receiverEmail: string = unclaimNotificationData.receiverSessionData.appUser.email;
+    const receiverOrganization: string = unclaimNotificationData.receiverSessionData.appUser.organization.name;
     const foodTitle: string = unclaimNotificationData.foodTitle;
-    const donorOrganization: string = unclaimNotificationData.donorSessionData.appUserInfo.organizationName;
+    const donorOrganization: string = unclaimNotificationData.donorSessionData.appUser.organization.name;
 
     let htmlContents: string = `
         <p>
@@ -56,12 +56,12 @@ export function notifyReceiverOfUnclaim(unclaimNotificationData: UnclaimNotifica
  */
 export function notifyDonorOfLostDelivery(unclaimNotificationData: UnclaimNotificationData): Promise <void> {
 
-    const donorEmail: string = unclaimNotificationData.donorSessionData.appUserInfo.email;
-    const donorOrganization: string = unclaimNotificationData.donorSessionData.appUserInfo.organizationName;
-    const receiverOrganization: string = unclaimNotificationData.receiverSessionData.appUserInfo.organizationName;
+    const donorEmail: string = unclaimNotificationData.donorSessionData.appUser.email;
+    const donorOrganization: string = unclaimNotificationData.donorSessionData.appUser.organization.name;
+    const receiverOrganization: string = unclaimNotificationData.receiverSessionData.appUser.organization.name;
     const foodTitle: string = unclaimNotificationData.foodTitle;
-    const delivererAppUserInfo: AppUserInfo = unclaimNotificationData.delivererSessionData.appUserInfo;
-    const delivererName: string = ( delivererAppUserInfo.firstName + ' ' + delivererAppUserInfo.lastName );
+    const delivererAppUser: AppUser = unclaimNotificationData.delivererSessionData.appUser;
+    const delivererName: string = ( delivererAppUser.firstName + ' ' + delivererAppUser.lastName );
 
     let htmlContents: string = `
         <p>
@@ -107,11 +107,11 @@ export function notifyDonorOfLostDelivery(unclaimNotificationData: UnclaimNotifi
  */
 export function notifyDelivererOfLostDelivery(sourceSessionData: SessionData, sourceAppUserType: string, unclaimNotificationData: UnclaimNotificationData): Promise <void> {
     
-    const delivererEmail: string = unclaimNotificationData.delivererSessionData.appUserInfo.email;
-    const delivererName: string = ( unclaimNotificationData.delivererSessionData.appUserInfo.firstName + ' ' +
-                                    unclaimNotificationData.delivererSessionData.appUserInfo.lastName );
+    const delivererEmail: string = unclaimNotificationData.delivererSessionData.appUser.email;
+    const delivererName: string = ( unclaimNotificationData.delivererSessionData.appUser.firstName + ' ' +
+                                    unclaimNotificationData.delivererSessionData.appUser.lastName );
     const foodTitle: string = unclaimNotificationData.foodTitle;
-    const sourceOrganization: string = sourceSessionData.appUserInfo.organizationName;
+    const sourceOrganization: string = sourceSessionData.appUser.organization.name;
 
     let htmlContents: string = `
         <p>

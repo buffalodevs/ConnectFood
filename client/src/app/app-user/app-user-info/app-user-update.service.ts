@@ -6,7 +6,7 @@ import { RequestService } from '../../common-util/services/request.service';
 import { SessionDataService } from '../../common-util/services/session-data.service';
 
 import { UpdateAppUserRequest, UpdateAppUserResponse } from '../../../../../shared/src/app-user/message/update-app-user-message';
-import { AppUserInfo } from "../../../../../shared/src/app-user/app-user-info";
+import { AppUser } from "../../../../../shared/src/app-user/app-user";
 import { FoodWebResponse } from "../../../../../shared/src/message-protocol/food-web-response";
 
 
@@ -21,25 +21,25 @@ export class AppUserUpdateService {
 
     /**
      * Sends App User Update Info to the server and listens for a response.
-     * @param appUserInfoUpdate Contains the update information. Any non-null values will be used to update App User information.
+     * @param appUserUpdate Contains the update information. Any non-null values will be used to update App User information.
      * @param newPassword The password update.
      * @param currentPassword Only required when the password is being updated. Should contain the current password of the user.
      */
-    public updateAppUserInfo(appUserInfoUpdate: AppUserInfo, newPassword?: string, currentPassword?: string): Observable <FoodWebResponse> {
+    public updateAppUser(appUserUpdate: AppUser, newPassword?: string, currentPassword?: string): Observable <FoodWebResponse> {
 
-        let body: UpdateAppUserRequest = new UpdateAppUserRequest(appUserInfoUpdate, newPassword, currentPassword);
+        let body: UpdateAppUserRequest = new UpdateAppUserRequest(appUserUpdate, newPassword, currentPassword);
         let observer: Observable <UpdateAppUserResponse> = <Observable <UpdateAppUserResponse>>this._requestService.post('/appUser/updateAppUser', body);
 
         // If we are updating the address of the user, then we must also update their timezone offset (since when moving they can move across timezones).
-        if (appUserInfoUpdate.address != null) {
-            appUserInfoUpdate.utcOffsetMins = (new Date()).getTimezoneOffset();
+        if (appUserUpdate.contactInfo.address != null) {
+            appUserUpdate.contactInfo.utcOffsetMins = (new Date()).getTimezoneOffset();
         }
 
         return observer.map((appUserUpdateResponse: UpdateAppUserResponse): FoodWebResponse => {
 
             // Immediately update client session data on success!
             if (appUserUpdateResponse.success) {
-                this._sessionDataService.updateAppUserSessionData(appUserUpdateResponse.appUserInfo);
+                this._sessionDataService.updateAppUserSessionData(appUserUpdateResponse.appUser);
             }
 
             return appUserUpdateResponse;
