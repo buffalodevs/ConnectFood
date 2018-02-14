@@ -53,7 +53,7 @@ SessionData.sessionBootstrap(app);
 app.use(deserialize);   // Automatically perform Custom Deserialization of all incomming data. 
 app.use(logRequest);    // Log all express requests.
 app.use(logResponse);   // Log all express responses.
-app.set('port', (process.env.FOOD_WEB_SERVER_PORT || 5000));
+app.set('port', (process.env.PORT || process.env.FOOD_WEB_SERVER_PORT || 5000));
 module.exports = app; // Make available for mocha testing suites.
 
 
