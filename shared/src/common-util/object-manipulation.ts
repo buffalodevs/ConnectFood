@@ -36,6 +36,8 @@ export class ObjectManipulation {
      */
     public static shallowCopy(src: any, dest: any, excludeProperties: string[] = [], propertyPresentBoth: boolean = true): void {
 
+        if (excludeProperties == null)  excludeProperties = [];
+
         for (let property in src) {
             if (src.hasOwnProperty(property) && (!propertyPresentBoth || dest.hasOwnProperty(property)) && excludeProperties.indexOf(property) === -1) {
                 dest[property] = src[property];

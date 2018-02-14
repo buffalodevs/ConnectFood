@@ -1,4 +1,4 @@
-import { DeliveryState } from "../delivery";
+import { DeliveryState } from "../../common-receiver-donor-deliverer/delivery-info";
 
 
 /**
@@ -8,9 +8,9 @@ export class ManageDeliveryRequest {
     
     public constructor (
         /**
-         * The key identifier of the Claimed Food Listing whose delivery is to be (un)claimed.
+         * The key identifier of delivery that is being managed.
          */
-        public deliveryFoodListingKey: number,
+        public deliveryInfoKey: number,
         /**
          * The delivery state that the Delivery Food Listing should be set to.
          */

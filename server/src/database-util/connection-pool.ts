@@ -9,20 +9,22 @@ require('dotenv');
  * For deployment on Heroku (test-bed), we will explicitly set the environmental variables using 'heroku config:set ENVIRONEMNTAL_VAR_NAME = value' via the heroku cli.
  * For deployment on Google Cloud (production), we will use a private configuration file containing environmental variables.
  */
-const config : PoolConfig = {
-    user:       process.env.DATABASE_USERNAME,
-    password:   process.env.DATABASE_PASSWORD,
-    host:       process.env.DATABASE_HOST,
-    port:       parseInt(process.env.DATABASE_PORT),
-    database:   process.env.DATABASE_DATABASE,
-    ssl:        (process.env.DATABASE_SSL.toLowerCase() === 'true')
+const CONFIG : PoolConfig = {
+    user:       process.env.FOOD_WEB_DATABASE_USERNAME,
+    password:   (process.env.FOOD_WEB_DATABASE_PASSWORD !== 'null') ? process.env.FOOD_WEB_DATABASE_PASSWORD
+                                                                    : undefined,
+    host:       process.env.FOOD_WEB_DATABASE_HOST,
+    port:       parseInt(process.env.FOOD_WEB_DATABASE_PORT),
+    database:   process.env.FOOD_WEB_DATABASE_DATABASE,
+    ssl:        (process.env.FOOD_WEB_DATABASE_HOST !== 'localhost') ? (process.env.FOOD_WEB_DATABASE_SSL.toLowerCase() === 'true')
+                                                                     : false
 }
 
 
 /**
  * A static instace of a connection pool for pgsql.
  */
-const pool : Pool = new Pool(config);
+const POOL : Pool = new Pool(CONFIG);
 
  
 /**
@@ -33,8 +35,8 @@ const pool : Pool = new Pool(config);
  * @return A JavaScript Promise that will contain the result of the query upon success and error information upon failure.
  */
 export function query(text: string, values: Array<any> = null) : Promise <QueryResult> {
-    return (values != null) ? pool.query(text, values)
-                            : pool.query(text);
+    return (values != null) ? POOL.query(text, values)
+                            : POOL.query(text);
 }
 
     
@@ -45,5 +47,5 @@ export function query(text: string, values: Array<any> = null) : Promise <QueryR
  * @return A Promise that will provide a client or connection object on success that can have queries executed on it.
  */ 
 export function connect() : Promise <Client> {
-    return pool.connect();
+    return POOL.connect();
 }

@@ -5,9 +5,6 @@ import { MatCheckboxModule } from '@angular/material';
 
 import { FoodTypesComponent } from './food-types/food-types.component';
 import { FoodTypesService } from './food-types/food-types.service';
-import { VehicleTypesService } from './vehicle-types/vehicle-types.service';
-import { AppUserTypesService } from './app-user-types/app-user-types.service';
-import { GetDomainValuesService } from './get-domain-values.service';
 
 
 @NgModule({
@@ -24,9 +21,7 @@ import { GetDomainValuesService } from './get-domain-values.service';
         FoodTypesComponent
     ],
     providers: [
-        FoodTypesService,
-        VehicleTypesService,
-        AppUserTypesService
+        FoodTypesService
     ]
 })
 export class CommonFoodListingDomainsModule {}

@@ -4,9 +4,8 @@ import 'rxjs/add/operator/finally';
 
 import { CancelDeliveryService } from '../../delivery-services/cancel-delivery.service';
 
-import { Delivery } from '../../../../../../../shared/src/deliverer/delivery';
-import { DeliveryState } from '../../../../../../../shared/src/deliverer/message/get-deliveries-message';
-import { runInThisContext } from 'vm';
+import { FoodListing } from '../../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
+import { DeliveryState } from '../../../../../../../shared/src/common-receiver-donor-deliverer/delivery-info';
 
 
 @Component({
@@ -17,35 +16,16 @@ import { runInThisContext } from 'vm';
 })
 export class DeliveryListingCancelComponent {
 
-    @Input() public delivery: Delivery;
+    @Input() public delivery: FoodListing;
 
     @Output() public removeListing: EventEmitter <void>;
     @Output() public close: EventEmitter <void>;
 
-    private _form: FormGroup;
-    get form(): FormGroup {
-        return this._form
-    }
-
-    private _validate: boolean;
-    get validate(): boolean {
-        return this._validate;
-    }
-
-    private _cancelComplete: boolean;
-    get cancelComplete(): boolean {
-        return this._cancelComplete;
-    }
-
-    private _showProgressSpinner: boolean;
-    get showProgressSpinner(): boolean {
-        return this._showProgressSpinner;
-    }
-
-    private _errMsg: string;
-    get errMsg(): string {
-        return this._errMsg;
-    }
+    public form: FormGroup;
+    public validate: boolean;
+    public cancelComplete: boolean;
+    public showProgressSpinner: boolean;
+    public errMsg: string;
 
 
     public constructor (
@@ -54,40 +34,40 @@ export class DeliveryListingCancelComponent {
         this.removeListing = new EventEmitter <void>();
         this.close = new EventEmitter <void>();
 
-        this._form = new FormGroup({
+        this.form = new FormGroup({
             'cancelReason': new FormControl('', [Validators.required]),
             'foodRejected': new FormControl('', [Validators.required])
         });
 
-        this._validate = false;
-        this._cancelComplete = false;
-        this._showProgressSpinner = false;
-        this._errMsg = null;
+        this.validate = false;
+        this.cancelComplete = false;
+        this.showProgressSpinner = false;
+        this.errMsg = null;
     }
 
 
     /**
      * Cancels the delivery with a cancel reason from the contained cancelForm.
      */
-    private cancelDelivery(): void {
+    public cancelDelivery(): void {
 
-        this._validate = true;
+        this.validate = true;
         if (!this.form.valid)  return;
-        this._showProgressSpinner = true;
+        this.showProgressSpinner = true;
 
         const cancelReason: string = this.form.get('cancelReason').value;
         const foodRejected: boolean = this.form.get('foodRejected').value;
 
-        this.cancelDeliveryService.cancelDelivery(this.delivery.deliveryFoodListingKey, cancelReason, foodRejected)
+        this.cancelDeliveryService.cancelDelivery(this.delivery.claimInfo.deliveryInfo.deliveryInfoKey, cancelReason, foodRejected)
             .finally(() => {
-                this._cancelComplete = true;
-                this._showProgressSpinner = false;
+                this.cancelComplete = true;
+                this.showProgressSpinner = false;
             })
             .subscribe(() => {
                 this.removeListing.emit(); // Emit signal to parent (Dialog) so it can close and remove the cancelled listing.
             },
             (err: Error) => {
-                this._errMsg = err.message;
+                this.errMsg = err.message;
             });
     }
 }

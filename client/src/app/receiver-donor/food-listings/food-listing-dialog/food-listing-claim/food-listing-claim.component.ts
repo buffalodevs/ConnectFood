@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
 import { ManageFoodListingService } from '../../food-listing-services/manage-food-listing.service';
-import { FoodListing } from './../../../../../../../shared/src/receiver-donor/food-listing';
+import { FoodListing } from './../../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
 
 
 @Component({
@@ -45,7 +45,7 @@ export class FoodListingClaimComponent {
     /**
      * Claims the currently selected Food Listing.
      */
-    private claimSelectedFoodListing(): void {
+    public claimSelectedFoodListing(): void {
         
         let observer: Observable <void> = this._manageFoodListingService.claimFoodListing(this.foodListing.foodListingKey);
         this.showProgressSpinner = true;

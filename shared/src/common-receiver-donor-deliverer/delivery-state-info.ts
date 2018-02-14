@@ -1,16 +1,7 @@
 import { deserializable, deepDeserializable } from "../deserialization/deserializer";
+import { DeliveryState } from "./food-listing-domain/delivery-state";
 
-
-/**
- * The state (implies location) of the Delivery Food Listing
- */
-export enum DeliveryState {
-    unscheduled = 'unscheduled',
-    scheduled = 'scheduled',
-    started = 'started',
-    pickedUp = 'pickedUp',
-    droppedOff = 'droppedOff'
-}
+export { DeliveryState };
 
 
 /**

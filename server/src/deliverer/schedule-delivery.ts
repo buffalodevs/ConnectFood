@@ -7,7 +7,6 @@ import { SessionData } from '../common-util/session-data';
 import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotificationData } from './delivery-util/delivery-update-notification';
 
 import { DateFormatter } from '../../../shared/src/date-time-util/date-formatter';
-import { Delivery } from '../../../shared/src/deliverer/delivery';
 
 
 export async function scheduleDelivery(claimedFoodListingKey: number, delivererSessionData: SessionData, startImmediately: boolean, scheduledStartTime: Date): Promise <void> {

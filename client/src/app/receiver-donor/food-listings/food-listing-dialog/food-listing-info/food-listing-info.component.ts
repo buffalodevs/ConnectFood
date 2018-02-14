@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { DateFormatterService } from '../../../../common-util/services/date-formatter.service';
 import { ResponsiveService } from '../../../../common-util/services/responsive.service';
 
-import { FoodListing } from './../../../../../../../shared/src/receiver-donor/food-listing';
+import { FoodListing } from './../../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
 import { AppUser } from '../../../../../../../shared/src/app-user/app-user';
 
 
@@ -47,7 +47,7 @@ export class FoodListingInfoComponent {
         public responsiveService: ResponsiveService,
         public dateFormatter: DateFormatterService
     ) {
-        this.FOOD_LISTING_USER_ACCESSORS = [ 'donorInfo', 'claimInfo.receiverInfo', 'claimInfo.delivererInfo' ];
+        this.FOOD_LISTING_USER_ACCESSORS = [ 'donorInfo', 'claimInfo.receiverInfo', 'claimInfo.deliveryInfo.delivererInfo' ];
         this.FOOD_LISTING_USER_TITLES = [ 'Donor', 'Receiver', 'Deliverer' ];
 
         this.isClaimedCart = false;
@@ -64,11 +64,11 @@ export class FoodListingInfoComponent {
      * @param foodListingUserAccessor The accessor for the Food Listing User (from the FOOD_LISTING_USER_ACCESSORS array instance).
      * @return true if the user info should be shown, false if not.
      */
-    private shouldShowFoodListingUser(foodListingUserAccessor: string): boolean {
+    public shouldShowFoodListingUser(foodListingUserAccessor: string): boolean {
 
         return (    (foodListingUserAccessor != 'donorInfo' || !this.isDonatedCart)
                 &&  (foodListingUserAccessor != 'claimInfo.receiverInfo' || this.isDonatedCart)
-                &&  (foodListingUserAccessor != 'claimInfo.delivererInfo' || this.isDonatedCart || this.isClaimedCart) );
+                &&  (foodListingUserAccessor != 'claimInfo.deliveryInfo.delivererInfo' || this.isDonatedCart || this.isClaimedCart) );
     }
 
 
@@ -77,7 +77,7 @@ export class FoodListingInfoComponent {
      * @param foodListingUserAccessor The accessor string associated with the user.
      * @return The Food Listing User.
      */
-    private getFoodListingUser(foodListingUserAccessor: string): AppUser {
+    public getFoodListingUser(foodListingUserAccessor: string): AppUser {
         return _.get(this.foodListing, foodListingUserAccessor);
     }
 }

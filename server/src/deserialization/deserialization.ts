@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { Deserializer } from "../../../shared/src/deserialization/deserializer";
 
+// Necessary to prevent tree shaking from removing deserializable registration via class decorators (ensures modules are loaded).
+import '../../../shared/src/deserialization/deserializable-import-bundle';
+
 
 export const DESERIALIZER: Deserializer = new Deserializer();
 

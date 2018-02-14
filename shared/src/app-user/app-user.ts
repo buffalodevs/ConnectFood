@@ -1,11 +1,10 @@
 import { DateRange } from '../date-time-util/date-range';
-import { AppUserType } from './app-user-type';
-import { AppUserAvailability, AvailabilityType } from './app-user-availability';
+import { AppUserType } from './app-user-domain/app-user-type';
 import { deserializable, deepDeserializable } from '../deserialization/deserializer';
 import { ContactInfo, GPSCoordinate } from './contact-info';
 import { Organization } from './organization';
 
-export { DateRange, AppUserType, ContactInfo, GPSCoordinate, Organization, AppUserAvailability, AvailabilityType };
+export { DateRange, AppUserType, ContactInfo, GPSCoordinate, Organization };
 
 
 /**
@@ -14,8 +13,8 @@ export { DateRange, AppUserType, ContactInfo, GPSCoordinate, Organization, AppUs
 @deserializable('AppUser')
 export class AppUser {
 
-    @deepDeserializable(AppUserAvailability)
-    public availability: AppUserAvailability;
+    @deepDeserializable(DateRange)
+    public availability: DateRange[];
 
     
     public constructor (
@@ -25,7 +24,7 @@ export class AppUser {
         public firstName: string = null,
         public contactInfo: ContactInfo = new ContactInfo(),
         public organization: Organization = new Organization(),
-        availability: AppUserAvailability = new AppUserAvailability()
+        availability: DateRange[] = null
     ) {
         this.availability = availability;
     }

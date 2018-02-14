@@ -1,6 +1,5 @@
 -- Keeps records of all removed food listings (donations).
 
---DROP TABLE RemovedFoodListing CASCADE; 
 CREATE TABLE IF NOT EXISTS RemovedFoodListing
 (
     removedFoodListingKey SERIAL PRIMARY KEY

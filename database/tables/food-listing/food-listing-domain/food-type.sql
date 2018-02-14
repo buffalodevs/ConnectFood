@@ -11,12 +11,12 @@ BEGIN
 
 END$$;
 
--- Fill the Enum with all of our Food Types. Each one has an external string representation, but is internally an integer!
+
 ALTER TYPE FoodType ADD VALUE IF NOT EXISTS 'Produce';
 ALTER TYPE FoodType ADD VALUE IF NOT EXISTS 'Canned Good';
 ALTER TYPE FoodType ADD VALUE IF NOT EXISTS 'Dessert';
 ALTER TYPE FoodType ADD VALUE IF NOT EXISTS 'Frozen';
-ALTER TYPE FoodType ADD VALUE IF NOT EXISTS 'Grain';
+ALTER TYPE FoodType ADD VALUE IF NOT EXISTS 'Gran';
 ALTER TYPE FoodType ADD VALUE IF NOT EXISTS 'Dairy';
 ALTER TYPE FoodType ADD VALUE IF NOT EXISTS 'Meat';
 ALTER TYPE FoodType ADD VALUE IF NOT EXISTS 'Sea Food';
@@ -25,4 +25,4 @@ ALTER TYPE FoodType ADD VALUE IF NOT EXISTS 'Beverage';
 ALTER TYPE FoodType ADD VALUE IF NOT EXISTS 'Snack';
 ALTER TYPE FoodType ADD VALUE IF NOT EXISTS 'Meal';
 
-SELECT unnest(enum_range(NULL::FoodType)) AS foodType;
+SELECT unnest(enum_range(NULL::FoodType));

@@ -26,7 +26,7 @@ export class SlickTimeComponent extends AbstractModelDrivenComponent implements 
 
     public readonly GROUP_VALIDATORS: ValidatorFn[][];
 
-    @Input() public validate: boolean;
+    @Input() public activateValidation: boolean;
 
     /**
      * View model for contained input control.
@@ -54,7 +54,7 @@ export class SlickTimeComponent extends AbstractModelDrivenComponent implements 
             [ Validators.required, Validators.pattern(this.validationService.AM_OR_PM_REGEX) ]
         ];
 
-        this.validate = false;
+        this.activateValidation = false;
         this.onChange = (value: any) => {}; // If no change listener given later, then all change will be swallowed here!
         this.timeControl = new FormControl();
     }

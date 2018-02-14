@@ -1,7 +1,7 @@
 <slick-filtered-list #filteredList [filters]="filters" [listings]="listings">
 
     <ng-container filters>
-        <food-listings-filters #filters [formGroup]="filters" header="Search" [additionalFilters]="additionalFilters">
+        <food-listing-filters #filters [formGroup]="filters" header="Search" [additionalFilters]="additionalFilters">
 
             <ng-container bottom>
                 
@@ -18,7 +18,7 @@
 
             </ng-container>
 
-        </food-listings-filters>
+        </food-listing-filters>
     </ng-container>
 
 

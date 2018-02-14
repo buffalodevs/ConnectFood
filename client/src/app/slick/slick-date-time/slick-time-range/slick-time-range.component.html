@@ -1,12 +1,34 @@
 <div id="wrapper" [formGroup]="form">
 
-    <slick-time [validate]="validate" formControlName="startTimeStr" *ngIf="!displayOnly"></slick-time>
-    <span *ngIf="displayOnly">{{ control('startTimeStr').value }}</span>
+    <ng-container *ngIf="includeDate">
+
+        <mat-input-container class="input-group time-range-date" floatPlaceholder="never" *ngIf="!displayOnly">
+            <input matInput id="start-date" [matDatepicker]="startDatePicker" placeholder="mm/dd/yyyy" formControlName="startDate">
+            <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker touchUi="true" #startDatePicker></mat-datepicker>
+        </mat-input-container>
+        <span *ngIf="displayOnly"><b>{{ dateFormatter.dateToMonthDayYearString(control('startDate').value) }}</b>,</span>
+
+    </ng-container>
+
+    <slick-time [activateValidation]="activateValidation" formControlName="startTimeStr" *ngIf="!displayOnly"></slick-time>
+    <span *ngIf="displayOnly"><b>{{ control('startTimeStr').value }}</b></span>
 
     <span id="to-separator">to</span>
 
-    <slick-time [validate]="validate" formControlName="endTimeStr" *ngIf="!displayOnly"></slick-time>
-    <span *ngIf="displayOnly">{{ control('endTimeStr').value }}</span>
+    <ng-container *ngIf="includeDate">
+
+        <mat-input-container class="input-group time-range-date" floatPlaceholder="never" *ngIf="includeDate && !displayOnly">
+            <input matInput id="end-date" [matDatepicker]="endDatePicker" placeholder="mm/dd/yyyy" formControlName="endDate">
+            <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker touchUi="true" #endDatePicker></mat-datepicker>
+        </mat-input-container>
+        <span *ngIf="displayOnly"><b>{{ dateFormatter.dateToMonthDayYearString(control('endDate').value) }}</b>,</span>
+
+    </ng-container>
+
+    <slick-time [activateValidation]="activateValidation" formControlName="endTimeStr" *ngIf="!displayOnly"></slick-time>
+    <span *ngIf="displayOnly"><b>{{ control('endTimeStr').value }}</b></span>
 
     <div id="err-msg" class="warn-foreground" *ngIf="hasError('.') != null">
         <span>{{ errorMsgFor('.') }}</span>

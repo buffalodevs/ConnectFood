@@ -1,18 +1,18 @@
 mat-input-container {
     max-width: 30px;
+    width:100%;
 }
 
 mat-input-container, :host ::ng-deep input {
     text-align: center;
 }
 
-#time-form {
+.time-form {
     white-space: nowrap;
     display: inline-block;
 }
 
-#am-pm {
-    width: 30px;
+.am-pm {
     text-align: center;
-    padding-left: 10px;
+    margin-left: 3px;
 }

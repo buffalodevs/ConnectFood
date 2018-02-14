@@ -43,7 +43,8 @@ BEGIN
             city,
             state,
             zip,
-            phone
+            phone,
+            utcOffsetMins
         )
         VALUES
         (
@@ -53,7 +54,8 @@ BEGIN
             _city,
             _state,
             _zip,
-            _phone
+            _phone,
+            _utcOffsetMins
         )
         RETURNING   ContactInfo.contactInfoKey
         INTO        _contactInfoKey;
@@ -66,7 +68,8 @@ BEGIN
                     city            = COALESCE(_city, city),
                     state           = COALESCE(_state, state),
                     zip             = COALESCE(_zip, zip),
-                    phone           = COALESCE(_phone, phone)
+                    phone           = COALESCE(_phone, phone),
+                    utcOffsetMins   = COALESCE(_utcOffsetMins, utcOffsetMins)
         WHERE       appUserKey = _appUserKey
         RETURNING   contactInfoKey
         INTO        _contactInfoKey;

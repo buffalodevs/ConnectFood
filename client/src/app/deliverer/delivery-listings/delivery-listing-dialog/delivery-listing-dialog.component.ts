@@ -3,7 +3,6 @@ import { FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { DeliveryListingDialogData } from './delivery-listing-dialog-data';
-import { Delivery, DeliveryState } from '../../../../../../shared/src/deliverer/delivery';
 import { SlickListDialogData, SlickListDialog } from '../../../slick/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog';
 
 export { DeliveryListingDialogData };

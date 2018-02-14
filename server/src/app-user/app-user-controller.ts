@@ -2,8 +2,9 @@
 import { Request, Response } from "express";
 
 import { login } from "./login-app-user/app-user-login";
-import { signup, signupVerify } from './add-update-app-user/app-user-signup';
-import { updateAppUser } from './add-update-app-user/app-user-update';
+import { signup } from './signup-update-app-user/app-user-signup';
+import { signupVerify } from "./signup-update-app-user/app-user-signup-verification";
+import { updateAppUser } from './signup-update-app-user/app-user-update';
 import { SessionData, AppUser } from "../common-util/session-data";
 
 import { FoodWebResponse } from "../../../shared/src/message-protocol/food-web-response";
@@ -72,7 +73,7 @@ export function handleLogoutRequest(request: Request, response: Response): void 
 export function handleSignupRequest(request: Request, response: Response): void {
 
     response.setHeader('Content-Type', 'application/json');
-    let signupRequest: SignupRequest = request.body;
+    let signupRequest: SignupRequest = new SignupRequest(request.body.appUser, request.body.password);
 
     signup(signupRequest.appUser, signupRequest.password)
         .then((sessionData: SessionData) => {

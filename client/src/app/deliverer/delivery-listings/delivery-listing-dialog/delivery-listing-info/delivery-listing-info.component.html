@@ -6,8 +6,8 @@
         <ng-container slick-list-item-img>
 
             <slick-map #SlickMapComponent
-                [addresses]="[ sessionDataService.getAppUserSessionData().contactInfo, delivery.donorInfo.contactInfo, delivery.receiverInfo.contactInfo ]"
-                [addressNames]="[ 'Me', delivery.donorInfo.organization.name, delivery.receiverInfo.organization.name ]"
+                [addresses]="[ sessionDataService.getAppUserSessionData().contactInfo, delivery.donorInfo.contactInfo, delivery.claimInfo.receiverInfo.contactInfo ]"
+                [addressNames]="[ 'Me', delivery.donorInfo.organization.name, delivery.claimInfo.receiverInfo.organization.name ]"
                 [diameterMi]="deliveryUtilService.calcMaxMapDiameterFromDelivery(delivery)">
             </slick-map>
 
@@ -43,10 +43,10 @@
 
                     <div>
                         <b>Delivery State:</b>
-                        <div class="inline-block">{{ deliveryUtilService.getReadableDeliveryState(delivery.deliveryStateInfo.deliveryState) }}</div>
+                        <div class="inline-block">{{ deliveryUtilService.getReadableDeliveryState(delivery.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState) }}</div>
                     </div>
 
-                    <div *ngIf="delivery.deliveryStateInfo.scheduledStartTime != null">
+                    <div *ngIf="delivery.claimInfo.deliveryInfo.deliveryStateInfo.scheduledStartTime != null">
                         <b>Scheduled Start Time:</b>
                         <div class="inline-block">{{ getReadableScheduledStartTime() }}</div>
                     </div>
@@ -79,13 +79,16 @@
                         <mat-panel-title>Receiver Contact</mat-panel-title>
                     </mat-expansion-panel-header>
 
-                    <span class="inline-block">{{ delivery.receiverInfo.organization.name }}</span><br>
-                    <span>{{ delivery.receiverInfo.contactInfo.address }}</span><br>
+                    <span class="inline-block">{{ delivery.claimInfo.receiverInfo.organization.name }}</span><br>
+                    <span>{{ delivery.claimInfo.receiverInfo.contactInfo.address }}</span><br>
                     <span>
-                        {{ delivery.receiverInfo.contactInfo.city }}, {{ delivery.receiverInfo.contactInfo.state }} {{ delivery.receiverInfo.contactInfo.zip }}
+                        {{ delivery.claimInfo.receiverInfo.contactInfo.city }}, {{ delivery.claimInfo.receiverInfo.contactInfo.state }}
+                        {{ delivery.claimInfo.receiverInfo.contactInfo.zip }}
                     </span><br><br>
-                    <a href="tel:{{delivery.receiverInfo.contactInfo.phone}}" class="link-content no-word-wrap">{{ delivery.receiverInfo.contactInfo.phone }}</a><br>
-                    <a href="mailto:{{ delivery.receiverInfo.email }}" class="inline-block link-content">{{ delivery.receiverInfo.email }}</a>
+                    <a href="tel:{{delivery.claimInfo.receiverInfo.contactInfo.phone}}" class="link-content no-word-wrap">
+                        {{ delivery.claimInfo.receiverInfo.contactInfo.phone }}
+                    </a><br>
+                    <a href="mailto:{{ delivery.claimInfo.receiverInfo.email }}" class="inline-block link-content">{{ delivery.claimInfo.receiverInfo.email }}</a>
 
                 </mat-expansion-panel>
             </div>
@@ -126,7 +129,7 @@
 
 <ng-container *ngIf="stateChangeComplete">
     
-    <p>The delivery status has been updated to: <b>{{ deliveryUtilService.getReadableDeliveryState(delivery.deliveryStateInfo.deliveryState) }}</b>.</p>
+    <p>The delivery status has been updated to: <b>{{ deliveryUtilService.getReadableDeliveryState(delivery.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState) }}</b>.</p>
     <p>Both the Donor and Receiver will automatically be notified concerning the delivery status change.</p>
 
     <div class="modal-button-group">

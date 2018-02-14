@@ -52,18 +52,16 @@ AS $$
                                                                     'name',     Organization.name,
                                                                     'taxId',    Organization.taxId
                                                                 ),
-                                            'availability',     JSON_BUILD_OBJECT (
-                                                                    'timeRanges',   (
-                                                                                        SELECT  ARRAY_AGG (
-                                                                                            -- @ts-sql class="TimeRangeStr" file="/shared/common-util/time-range.ts"
-                                                                                            JSON_BUILD_OBJECT (
-                                                                                                '_startTime',    timestampToUtcText(AppUserAvailability.startTime),
-                                                                                                '_endTime',      timestampToUtcText(AppUserAvailability.endTime)
-                                                                                            )
-                                                                                        )
-                                                                                        FROM    AppUserAvailability
-                                                                                        WHERE   AppUserAvailability.appUserKey = AppUser.appUserKey
-                                                                                    )
+                                            'availability',     (
+                                                                    SELECT  ARRAY_AGG (
+                                                                        -- @ts-sql class="TimeRangeStr" file="/shared/common-util/time-range.ts"
+                                                                        JSON_BUILD_OBJECT (
+                                                                            '_startTime',    timestampToUtcText(LOWER(AppUserAvailability.timeRange)),
+                                                                            '_endTime',      timestampToUtcText(UPPER(AppUserAvailability.timeRange))
+                                                                        )
+                                                                    )
+                                                                    FROM    AppUserAvailability
+                                                                    WHERE   AppUserAvailability.appUserKey = AppUser.appUserKey
                                                                 )
                                         ),
                 'verificationToken',    UnverifiedAppUser.verificationToken

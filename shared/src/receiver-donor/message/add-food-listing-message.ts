@@ -1,20 +1,22 @@
-import { FoodWebResponse } from '../../message-protocol/food-web-response'
-import { FoodListingUpload } from '../food-listing-upload';
 import { deserializable, deepDeserializable } from '../../deserialization/deserializer';
-export { FoodListingUpload };
+import { FoodWebResponse } from '../../message-protocol/food-web-response'
+import { FoodListing } from '../../common-receiver-donor-deliverer/food-listing';
+
+export { FoodListing };
 
 
 @deserializable('AddFoodListingRequest')
 export class AddFoodListingRequest {
     
-    @deepDeserializable(FoodListingUpload)
-    public foodListingUpload: FoodListingUpload;
+    @deepDeserializable(FoodListing)
+    public foodListing: FoodListing;
 
 
     public constructor (
-        foodListingUpload: FoodListingUpload = null
+        foodListing: FoodListing = null,
+        public imgUploads: string[] = null
     ) {
-        this.foodListingUpload = foodListingUpload;
+        this.foodListing = foodListing;
         
     }
 }

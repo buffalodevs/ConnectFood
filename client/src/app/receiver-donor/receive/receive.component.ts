@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 
-import { LISTINGS_STATUS } from "../../../../../shared/src/receiver-donor/food-listings-filters";
+import { FoodListingsStatus } from "../../../../../shared/src/common-receiver-donor-deliverer/food-listing";
+import { FoodListingFilters } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters';
 
 
 @Component({
@@ -11,14 +12,18 @@ import { LISTINGS_STATUS } from "../../../../../shared/src/receiver-donor/food-l
 })
 export class ReceiveComponent {
 
-    public additionalFilters: Map<string, AbstractControl>;
+    public additionalFilters: Map <string, AbstractControl>;
 
     
     public constructor() {
-        this.additionalFilters = new Map<string, AbstractControl>([
-            ['listingsStatus', new FormControl(LISTINGS_STATUS.unclaimedListings)],
-            ['matchRegularAvailability', new FormControl(true)],
-            ['matchSpecifiedAvailability', new FormControl(false)]
+
+        // Get default filters values by default constructing a new filters object.
+        const filters: FoodListingFilters = new FoodListingFilters();
+
+        this.additionalFilters = new Map <string, AbstractControl>([
+            [ 'foodListingsStatus', new FormControl(FoodListingsStatus.unclaimedListings) ],
+            [ 'matchRegularAvailability', new FormControl(filters.matchRegularAvailability) ],
+            [ 'matchSpecifiedAvailability', new FormControl(filters.matchSpecifiedAvailability) ]
         ]);
     }
 }

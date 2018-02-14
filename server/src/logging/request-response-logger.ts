@@ -4,7 +4,7 @@ import { logger, prettyjsonRender, colors } from "./logger";
 import { FoodWebResponse } from "../message-protocol/food-web-response";
 
 
-const DEVELOPER_MODE: boolean = ( process.env.DEVELOPER_MODE.toLowerCase() === 'true' );
+const DEVELOPER_MODE: boolean = ( process.env.FOOD_WEB_DEVELOPER_MODE.toLowerCase() === 'true' );
 
 
 /**

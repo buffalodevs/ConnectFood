@@ -33,7 +33,7 @@ export function notifyReceiverOfUnclaim(unclaimNotificationData: UnclaimNotifica
 
         <p>
             We are sorry for any inconvenience that this has caused you. Please browse and claim other available food donations
-            on our website at our <a href="` + process.env.HOST_ADDRESS + `/receive">Receive</a> tab.
+            on our website at our <a href="` + process.env.FOOD_WEB_SERVER_HOST_ADDRESS + `/receive">Receive</a> tab.
         </p>
     `
 
@@ -128,7 +128,7 @@ export function notifyDelivererOfLostDelivery(sourceSessionData: SessionData, so
 
         <p>
             We are sorry for any inconvenience that this has caused you. Please browse and schedule other deliveries
-            on our website at our <a href="` + process.env.HOST_ADDRESS + `/deliver">Deliver</a> tab.
+            on our website at our <a href="` + process.env.FOOD_WEB_SERVER_HOST_ADDRESS + `/deliver">Deliver</a> tab.
         </p>
     `;
 

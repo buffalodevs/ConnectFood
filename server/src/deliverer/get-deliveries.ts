@@ -1,19 +1,13 @@
 'use strict'
-import { query, QueryResult } from './../database-util/connection-pool';
-import { addArgPlaceholdersToQueryStr } from './../database-util/prepared-statement-util';
-import { logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
+import { sanitizeFilters, queryGetFoodListings, QueryResult, processGetFoodListingsResult } from "./../common-receiver-donor-deliverer/get-food-listings-util";
 import { logger, prettyjsonRender } from '../logging/logger';
 
-import { getDrivingDistTime, GPSCoordinate, DriveDistTime } from './../geocode/geocode';
+import { getDrivingDistTime, GPSCoordinate } from './../geocode/geocode';
 import { fillFullTripDrivingDistances } from './delivery-util/delivery-geocode-util';
 import { availabilityToAbsDateRanges } from '../common-util/date-time-util';
 
-import { DeliveryFilters } from './../../../shared/src/deliverer/delivery-filters';
-import { Delivery } from "./../../../shared/src/deliverer/delivery";
-import { Deserializer } from "./../../../shared/src/deserialization/deserializer";
-
-
-const DESERIALIZER: Deserializer = new Deserializer();
+import { FoodListing } from '../../../shared/src/common-receiver-donor-deliverer/food-listing';
+import { FoodListingFilters } from '../../../shared/src/common-receiver-donor-deliverer/food-listing-filters';
 
 
 /**
@@ -24,60 +18,35 @@ const DESERIALIZER: Deserializer = new Deserializer();
  * @param myUtcOffsetMins The offset (in minutes) of the (driver) logged in App User's time zone from the UTC time zone.
  * @return A Promise that resolves to an array of Food Listings that have been retrieved.
  */
-export async function getDeliveries(filters: DeliveryFilters, myAppUserKey: number, myGPSCoordinate: GPSCoordinate, myUtcOffsetMins: number): Promise <Delivery[]> {
+export async function getDeliveries(filters: FoodListingFilters, myAppUserKey: number, myGPSCoordinate: GPSCoordinate, myUtcOffsetMins: number): Promise <FoodListing[]> {
    
-    // Build our prepared statement.
-    let queryArgs: any[] = [
-        myAppUserKey,
-        filters.retrievalOffset,
-        filters.retrievalAmount,
-        filters.deliveryFoodListingKey,
-        filters.claimedFoodListingKey,
-        filters.maxDistance,
-        filters.maxEstimatedWeight,
-        filters.unscheduledDeliveries,
-        filters.myScheduledDeliveries,
-        filters.matchRegularAvailability,
-        filters.deliveryState,
-        filters.recommendedVehicleType
-    ];
-
-    // Insert query argument placeholders and preprocess query arguments.
-    let queryString: string = addArgPlaceholdersToQueryStr('SELECT * FROM getDeliveries();', queryArgs);
-    logSqlQueryExec(queryString, queryArgs);
+    sanitizeFilters(filters);
 
     try {
-        const queryResult: QueryResult = await query(queryString, queryArgs);
-
-        logSqlQueryResult(queryResult.rows);
-        return generateResultArray(queryResult.rows, myGPSCoordinate, myUtcOffsetMins);
+        const queryResult: QueryResult = await queryGetFoodListings(filters, myAppUserKey);
+        return await generateResultArray(queryResult, myGPSCoordinate, myUtcOffsetMins);
     }
     catch (err) {
         logger.error(prettyjsonRender(err));
-        throw new Error('Food listing search unexpectedly failed');
+        throw new Error('Food listing (Delivery) search unexpectedly failed');
     }
 }
 
 
 /**
  * Generates the result Food Listing array. All Food Listings that have met the filter criteria will be entered into this array.
- * @param rows The database function result rows.
+ * @param queryResult The getFoodListings() SQL function query result.
  * @param myGPSCoordinate The GPS Coordinates of the (driver) App User that is logged in.
  * @param myUtcOffsetMins The offset (in minutes) of the (driver) logged in App User's time zone from the UTC time zone.
- * @return The Delivery Food Listings array that was generated.
+ * @return The (Delivery) Food Listings array that was generated.
  */
-function generateResultArray(rows: any[], myGPSCoordinate: GPSCoordinate, myUtcOffsetMins: number): Promise <Delivery[]> {
+async function generateResultArray(queryResult: QueryResult, myGPSCoordinate: GPSCoordinate, myUtcOffsetMins: number): Promise <FoodListing[]> {
 
-    let deliveries: Delivery[] = [];
+    let foodListings: FoodListing[] = processGetFoodListingsResult(queryResult, (foodListing: FoodListing) => {
+        
+        foodListing.claimInfo.possibleDeliveryTimes = availabilityToAbsDateRanges(foodListing.claimInfo.possibleDeliveryTimes, myUtcOffsetMins);
+        return foodListing;
+    });
 
-    // Go through each row of the database output (each row corresponds to a Food Listing).
-    for (let i: number = 0; i < rows.length; i++) {
-
-        // Insert deserialized returned data into result arrays.
-        let delivery: Delivery = DESERIALIZER.deserialize(rows[i].delivery, Delivery);
-        delivery.possibleDeliveryTimes = availabilityToAbsDateRanges(delivery.possibleDeliveryTimes, myUtcOffsetMins);
-        deliveries.push(delivery);
-    }
-
-    return fillFullTripDrivingDistances(deliveries, myGPSCoordinate);
+    return await fillFullTripDrivingDistances(foodListings, myGPSCoordinate);
 }

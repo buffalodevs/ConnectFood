@@ -1,5 +1,5 @@
-import { Delivery } from "../delivery";
 import { GPSCoordinate, DriveDistTime, getDrivingDistTime } from "../../geocode/geocode";
+import { FoodListing } from "../../common-receiver-donor-deliverer/food-listing";
 
 
 /**
@@ -11,15 +11,15 @@ import { GPSCoordinate, DriveDistTime, getDrivingDistTime } from "../../geocode/
  * @param receivergpscoordinates The GPS Coordinates of the receivers.
  * @return A promise that resolves to the Delivery Food Listings array that was passed in with filled in distance data.
  */
-export async function fillFullTripDrivingDistances(deliveries: Delivery[], myGPSCoordinate: GPSCoordinate): Promise <Delivery[]>
+export async function fillFullTripDrivingDistances(deliveries: FoodListing[], myGPSCoordinate: GPSCoordinate): Promise <FoodListing[]>
 {
     const donorGPSCoordinates: Array<GPSCoordinate> = new Array<GPSCoordinate>();
     const receiverGPSCoordinates: Array<GPSCoordinate> = new Array<GPSCoordinate>();
 
-    // First, extract a list of Donor & Receiver GPS Coordinates from deliveryFoodListings results.
+    // First, extract a list of Donor & Receiver GPS Coordinates from deliveries (Food Listings) results.
     for (let i: number = 0; i < deliveries.length; i++) {
         donorGPSCoordinates.push(deliveries[i].donorInfo.contactInfo.gpsCoordinate);
-        receiverGPSCoordinates.push(deliveries[i].receiverInfo.contactInfo.gpsCoordinate);
+        receiverGPSCoordinates.push(deliveries[i].claimInfo.receiverInfo.contactInfo.gpsCoordinate);
     }
 
     // Next calculate and store Deliverer to Donor and Donor to Receiver driving distances & times.
@@ -37,7 +37,7 @@ export async function fillFullTripDrivingDistances(deliveries: Delivery[], myGPS
  * @param donorGPSCoordinates The GPS Coordinates of the donors.
  * @return A promise that resolves to the Delivery Food Listings array that was passed in, but with added filled in to-donor distance data.
  */
-async function fillDrivingDistTimeToDonors(deliveries: Delivery[], myGPSCoordinate: GPSCoordinate, donorGPSCoordinates: GPSCoordinate[]): Promise <Delivery[]> {
+async function fillDrivingDistTimeToDonors(deliveries: FoodListing[], myGPSCoordinate: GPSCoordinate, donorGPSCoordinates: GPSCoordinate[]): Promise <FoodListing[]> {
 
     const driveDistTime: DriveDistTime[] = await getDrivingDistTime(myGPSCoordinate, donorGPSCoordinates);
 
@@ -59,8 +59,8 @@ async function fillDrivingDistTimeToDonors(deliveries: Delivery[], myGPSCoordina
  * @param index Should not be provided by external call to this function!!! Used to keep track of index in recursvie function calls (internally ONLY)!
  * @return A promise that resolves to the Delivery Food Listings array that was passed in, but with added filled in donor-to-receiver distance data.
  */
-async function fillDrivingDistTimeFromDonorsToReceivers(deliveries: Delivery[], donorGPSCoordinates: GPSCoordinate[],
-                                                        receiverGPSCoordinates: GPSCoordinate[]): Promise <Delivery[]>
+async function fillDrivingDistTimeFromDonorsToReceivers(deliveries: FoodListing[], donorGPSCoordinates: GPSCoordinate[],
+                                                        receiverGPSCoordinates: GPSCoordinate[]): Promise <FoodListing[]>
 {
     let driveDistTimePromises: Promise <DriveDistTime[]>[] = [];
 
@@ -74,8 +74,8 @@ async function fillDrivingDistTimeFromDonorsToReceivers(deliveries: Delivery[], 
 
     // Handle results of all promises.
     for (let i: number = 0; i < driveDistTimes.length; i++) {
-        deliveries[i].receiverInfo.contactInfo.drivingDistance = driveDistTimes[i][0].driveDistanceMi;
-        deliveries[i].receiverInfo.contactInfo.drivingTime = driveDistTimes[i][0].driveDurationMin;
+        deliveries[i].claimInfo.receiverInfo.contactInfo.drivingDistance = driveDistTimes[i][0].driveDistanceMi;
+        deliveries[i].claimInfo.receiverInfo.contactInfo.drivingTime = driveDistTimes[i][0].driveDurationMin;
     }
 
     return deliveries;

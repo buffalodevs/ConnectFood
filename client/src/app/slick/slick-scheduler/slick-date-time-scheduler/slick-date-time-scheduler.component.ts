@@ -27,7 +27,7 @@ export class SlickDateTimeSchedulerComponent extends AbstractModelDrivenComponen
     /**
      * When this value is set or changes to true, then the contained form will be forced to validate its controls and show any related errors.
      */
-    @Input() public validate: boolean;
+    @Input() public activateValidation: boolean;
     @Input() public possibleScheduleTimeRanges: DateRange[];
 
     /**
@@ -60,14 +60,14 @@ export class SlickDateTimeSchedulerComponent extends AbstractModelDrivenComponen
         });
 
         // Trigger validate after full form initialization (if validate is set).
-        this.ngOnChanges({ validate: new SimpleChange(this.validate, this.validate, false) });
+        this.ngOnChanges({ validate: new SimpleChange(this.activateValidation, this.activateValidation, false) });
     }
 
 
     public ngOnChanges(changes: SimpleChanges): void {
         
         // Make sure we validate the contained form when validate is marked as true.
-        if (changes.validate && changes.validate.currentValue) {
+        if (changes.activateValidation && changes.activateValidation.currentValue) {
             this.validationService.markAllAsTouched(this.form);
         }
         

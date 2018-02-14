@@ -68,14 +68,10 @@ export class ValidationService extends Validation {
 
 
     /**
-     * Generic validator for requiring at least one field to be validly filled out in a form group.
-     * @param group The form group to check for at least one valid filled field in.
-     * @return If the validator fails (on error), then an object of { 'required': true } is returned. Otherwise null if no error.
+     * Generates a generic validator function for requiring at least one field to be validly filled out or present in a form group or array.
+     * @return A validator function that when fails (on error), an object of { 'required': 'At least one entry is required.' } is returned. Otherwise null if no error.
      */
     public requireAtLeastOneField(): ValidatorFn {
-
-        // Must set self reference to this so that we can refer to it in function that may be called as first class variable (not with correct this scope).
-        let self: ValidationService = this;
 
         return (group: FormGroup | FormArray) => {
 
@@ -86,7 +82,7 @@ export class ValidationService extends Validation {
 
                         // If the current control is a nested form group/array, then recursively call on the child form group/array.
                         if (group.controls[control] instanceof FormGroup || group.controls[control] instanceof FormArray) {
-                            if (self.requireAtLeastOneField()(<FormGroup | FormArray>group.controls[control]) == null)
+                            if (this.requireAtLeastOneField()(<FormGroup | FormArray>group.controls[control]) == null)
                             { return null; }
                         }
 
@@ -99,7 +95,7 @@ export class ValidationService extends Validation {
             }
 
             // If here, then we could not find a child of the form group with a valid value.
-            return { 'required': true };
+            return { 'required': 'At least one entry is required.' };
         }
     }
 

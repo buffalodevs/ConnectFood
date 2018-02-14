@@ -12,7 +12,7 @@ import { SlickFilteredListModule } from '../slick/slick-filtered-list/slick-filt
 import { CommonFoodListingDomainsModule } from '../domain/common-food-listing-domains.module';
 import { ImageCropperModule } from 'ng2-img-cropper';
 
-import { FoodListingsFiltersComponent } from './food-listings-filters/food-listings-filters.component';
+import { FoodListingFiltersComponent } from './food-listings-filters/food-listing-filters.component';
 import { FoodListingDialogComponent } from './food-listings/food-listing-dialog/food-listing-dialog.component';
 import { FoodListingInfoComponent } from './food-listings/food-listing-dialog/food-listing-info/food-listing-info.component';
 import { FoodListingClaimComponent } from './food-listings/food-listing-dialog/food-listing-claim/food-listing-claim.component';
@@ -25,45 +25,32 @@ import { FoodListingCartComponent } from './food-listing-cart/food-listing-cart.
 
 import { RoutePreprocessService } from '../common-util/services/route-preprocess.service';
 import { FoodTypesService } from '../domain/food-types/food-types.service';
-import { VehicleTypesService } from '../domain/vehicle-types/vehicle-types.service';
 import { ManageFoodListingService } from './food-listings/food-listing-services/manage-food-listing.service';
+import { SlickDateTimeScheduleBuilderModule } from '../slick/slick-scheduler/slick-date-time-schedule-builder/slick-date-time-schedule-builder.module';
 
 
 const receiverDonorRoutes: Routes = [
     {
         path: 'donate',
         component: DonateComponent,
-        canActivate: [RoutePreprocessService],
-        // Make sure that we get the FoodTypes and VehicleTypes from the back end before routing to the donor interface!
-        resolve: {
-            foodTypes: FoodTypesService,
-            vehicleTypes: VehicleTypesService
-        }
+        canActivate: [RoutePreprocessService]
     },
     {
         path: 'receive',
         component: ReceiveComponent,
-        canActivate: [RoutePreprocessService],
-        // Make sure that we get the FoodTypes from the back end before routing to the receiver interface!
-        resolve: {
-            foodTypes: FoodTypesService
-        }
+        canActivate: [RoutePreprocessService]
     },
     {
         path: 'foodListingCart',
         component: FoodListingCartComponent,
-        canActivate: [RoutePreprocessService],
-        // Make sure that we get the FoodTypes from the back end before routing to the cart interface!
-        resolve: {
-            foodTypes: FoodTypesService
-        }
+        canActivate: [RoutePreprocessService]
     }
 ];
 
 
 @NgModule({
     declarations: [
-        FoodListingsFiltersComponent,
+        FoodListingFiltersComponent,
         FoodListingDialogComponent,
         FoodListingInfoComponent,
         FoodListingClaimComponent,
@@ -90,6 +77,7 @@ const receiverDonorRoutes: Routes = [
         SlickDatePickerModule,
         SlickExpansionPanelModule,
         SlickFilteredListModule,
+        SlickDateTimeScheduleBuilderModule,
         CommonFoodListingDomainsModule,
         ImageCropperModule
     ],

@@ -16,41 +16,41 @@ WHERE       Receiver.appUserKey = 1
 
 --delete from AppUserPassword where appUserKey = 1 and createDate <> (select min(createDate) from AppUserPassword where appUserKey = 1);
 
---SELECT * FROM ClaimedFoodListing;
+--SELECT * FROM ClaimInfo;
 
---SELECT * FROM DeliveryFoodListing;
+--SELECT * FROM DeliveryInfo;
 
---SELECT * FROM CancelledDeliveryFoodListing;
+--SELECT * FROM CancelledDeliveryInfo;
 
 --SELECT * FROM AppUserAvailability;
 
 
 /*SELECT      *
 FROM        FoodListing
-LEFT JOIN   ClaimedFoodListing ON FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
+LEFT JOIN   ClaimInfo ON FoodListing.foodListingKey = ClaimInfo.foodListingKey
 WHERE       FoodLIsting.foodTitle = 'Test';*/
 
 --DELETE FROM FoodListingFoodTypeMap WHERE foodLIstingKey IN (SELECT foodListingKey FROM FoodListing WHERE foodTitle = 'Test');
 --DELETE FROM FoodListing WHERE foodTitle = 'Test';
 
 
-/*SELECT DeliveryFoodListing.scheduledStartTime FROM FoodListing 
-LEFT JOIN ClaimedFoodListing ON ClaimedFoodListing.foodListingKey = FoodListing.foodListingKey
-LEFT JOIN DeliveryFoodListing ON DeliveryFoodListing.claimedFoodListingKey = ClaimedFoodLIsting.claimedFoodLIstingKey
+/*SELECT DeliveryInfo.scheduledStartTime FROM FoodListing 
+LEFT JOIN ClaimInfo ON ClaimInfo.foodListingKey = FoodListing.foodListingKey
+LEFT JOIN DeliveryInfo ON DeliveryInfo.ClaimInfoKey = ClaimInfo.ClaimInfoKey
                               AND NOT EXISTS (
-                                  SELECT 1 FROM CancelledDeliveryFoodListing
-                                  WHERE CancelledDeliveryFoodLIsting.deliveryFoodLIstingKey = DeliveryFoodListing.deliveryFOodLIstingKey
+                                  SELECT 1 FROM CancelledDeliveryInfo
+                                  WHERE CancelledDeliveryInfo.deliveryInfoKey = DeliveryInfo.deliveryInfoKey
                               )
 WHERE foodTitle = 'Lots of beans';*/
 
 /*SELECT * FROM FoodListing
 LEFT JOIN RemovedFoodListing ON FoodListing.foodListingKey = RemovedFoodListing.foodListingKey;
 
-SELECT * FROM ClaimedFoodListing
-LEFT JOIN UnclaimedFoodListing ON ClaimedFoodListing.claimedFoodListingKey = UnclaimedFoodListing.claimedFoodListingKey;
+SELECT * FROM ClaimInfo
+LEFT JOIN UnClaimInfo ON ClaimInfo.ClaimInfoKey = UnClaimInfo.ClaimInfoKey;
 
-SELECT * FROM DeliveryFoodListing
-LEFT JOIN CancelledDeliveryFoodListing ON DeliveryFoodListing.deliveryFoodListingKey = CancelledDeliveryFoodListing.deliveryFoodListingKey;
+SELECT * FROM DeliveryInfo
+LEFT JOIN CancelledDeliveryInfo ON DeliveryInfo.deliveryInfoKey = CancelledDeliveryInfo.deliveryInfoKey;
 
 SELECT * FROM AppUserAvailability;*/
 
@@ -78,3 +78,5 @@ DELETE FROM UnverifiedAppUser WHERE appUserKey NOT IN (1, 2, 4);
 DELETE FROM ContactInfo WHERE appUserKey NOT IN (1, 2, 4);
 DELETE FROM AppUser WHERE appUserKey NOT IN (1, 2, 4);
 */
+
+SELECT * FROM UnverifiedAppUser;

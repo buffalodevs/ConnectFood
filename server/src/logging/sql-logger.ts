@@ -14,7 +14,7 @@ export function logSqlQueryExec(query: string, args?: any[]): void {
     
     // Print the arguments to the SQL query.
     // IMPORTANT: Only do this in developer mode since this can potentially expose private information in production mode!
-    if (args != null && process.env.DEVELOPER_MODE.toLowerCase() === 'true') {
+    if (args != null && process.env.FOOD_WEB_DEVELOPER_MODE.toLowerCase() === 'true') {
 
         logLevel = 'debug'; // For safe measures, set logger to debug mode if enter into here (in case DEVELOPER_MDOE not set properly)!
 
@@ -38,7 +38,7 @@ export function logSqlQueryResult(rows: any[]): void {
     logger.info('Number of rows in query result: ' + rows.length);
 
     // IMPORTANT: Only log in DEVELOPER_MDOE (since production mode will slow down and may contain SENSITIVE DATA).
-    if (process.env.DEVELOPER_MODE.toLowerCase() === 'true') {
+    if (process.env.FOOD_WEB_DEVELOPER_MODE.toLowerCase() === 'true') {
 
         let logStr: string = '';
 

@@ -15,7 +15,6 @@ import { InputFilterDirective } from './directives/input-filter.directive';
 import { RequestService } from './services/request.service';
 import { RoutePreprocessService } from './services/route-preprocess.service';
 import { SessionDataService } from './services/session-data.service';
-import { GetDomainValuesService } from '../domain/get-domain-values.service';
 import { ResponsiveService } from './services/responsive.service';
 import { ValidationService } from './services/validation.service';
 import { DateFormatterService } from './services/date-formatter.service';

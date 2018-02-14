@@ -4,11 +4,12 @@ import 'rxjs/add/operator/finally';
 
 import { ScheduleDeliveryService } from '../../delivery-services/schedule-delivery.service';
 import { SessionDataService } from '../../../../common-util/services/session-data.service';
-import { Delivery, DeliveryState, DeliveryUtilService } from '../../delivery-services/delivery-util.service';
+import { DeliveryState, DeliveryUtilService } from '../../delivery-services/delivery-util.service';
 import { ManageDeliveryService } from '../../delivery-services/manage-deliveries.service';
 import { DateFormatterService } from '../../../../common-util/services/date-formatter.service';
 
 import { FoodWebResponse } from '../../../../../../../shared/src/message-protocol/food-web-response';
+import { FoodListing } from '../../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
 
 
 @Component({
@@ -22,7 +23,7 @@ export class DeliveryListingInfoComponent implements OnChanges {
      * Set to true if the Delivery Listings are for a Delivery Cart. Default is false.
      */
     @Input() public isCart: boolean;
-    @Input() public delivery: Delivery;
+    @Input() public delivery: FoodListing;
 
     /**
      * Emitted whenever the 'Schedule Delivery' button is selected.
@@ -35,20 +36,9 @@ export class DeliveryListingInfoComponent implements OnChanges {
     @Output() public removeListing: EventEmitter<void>;
     @Output() public close: EventEmitter<void>;
 
-    private _startComplete: boolean;
-    get startComplete(): boolean {
-        return this._startComplete;
-    }
-
-    private _stateChangeComplete: boolean;
-    get stateChangeComplete(): boolean {
-        return this._stateChangeComplete;
-    }
-
-    private _showProgressSpinner: boolean;
-    get showProgressSpinner(): boolean {
-        return this._showProgressSpinner;
-    }
+    public startComplete: boolean;
+    public stateChangeComplete: boolean;
+    public showProgressSpinner: boolean;
 
     private _showButtonFlags: Map <string, boolean>;
 
@@ -65,8 +55,8 @@ export class DeliveryListingInfoComponent implements OnChanges {
         this.removeListing = new EventEmitter<void>();
         this.close = new EventEmitter <void>();
 
-        this._startComplete = false;
-        this._stateChangeComplete = false;
+        this.startComplete = false;
+        this.stateChangeComplete = false;
         this._showButtonFlags = new Map <string, boolean> ([
             ['startButton', false],
             ['pickedUpButton', false],
@@ -82,8 +72,8 @@ export class DeliveryListingInfoComponent implements OnChanges {
         // Show the start button if the delivery state is before onRouteToDonor.
         if (changes.delivery.currentValue != null) {
 
-            const delivery: Delivery = changes.delivery.currentValue;
-            const deliveryState: DeliveryState = delivery.deliveryStateInfo.deliveryState;
+            const delivery: FoodListing = changes.delivery.currentValue;
+            const deliveryState: DeliveryState = delivery.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState;
 
             this._showButtonFlags.set('startButton', this.shouldShowStartButton(delivery));
             this._showButtonFlags.set('pickedUpButton', ( deliveryState === DeliveryState.started ));
@@ -98,9 +88,9 @@ export class DeliveryListingInfoComponent implements OnChanges {
      * @param delivery The Delivery dialog data used to determine if the start button should be shown.
      * @return true if it should be shown, false if not.
      */
-    private shouldShowStartButton(delivery: Delivery): boolean {
+    private shouldShowStartButton(delivery: FoodListing): boolean {
 
-        const deliveryState: DeliveryState = delivery.deliveryStateInfo.deliveryState;
+        const deliveryState: DeliveryState = delivery.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState;
 
         return this.deliveryUtilService.isPossibleDeliveryTimeNow(delivery)
             && this.deliveryUtilService.compareDeliveryStates(deliveryState, DeliveryState.started) < 0;
@@ -120,7 +110,7 @@ export class DeliveryListingInfoComponent implements OnChanges {
     /**
      * Starts a delivery by updating its state to onRouteToDonor or scheduling the delivery with startImmediately flag set true.
      */
-    private startDelivery(): void {
+    public startDelivery(): void {
 
         // If in Cart (Delivery already scheduled), then update delivery state. Otherwise, schedule new Delivery with startImmediately flag set true.
         if (this.isCart) {
@@ -128,14 +118,14 @@ export class DeliveryListingInfoComponent implements OnChanges {
         }
         else {
 
-            this._showProgressSpinner = true;
+            this.showProgressSpinner = true;
 
-            this._scheduleDeliveryService.scheduleDelivery(this.delivery.claimedFoodListingKey, true)
-                .finally(() => { this._showProgressSpinner = false; })
+            this._scheduleDeliveryService.scheduleDelivery(this.delivery.claimInfo.claimInfoKey, true)
+                .finally(() => { this.showProgressSpinner = false; })
                 .subscribe(() => {
-                    this.delivery.deliveryStateInfo.deliveryState = DeliveryState.started;
+                    this.delivery.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState = DeliveryState.started;
                     if (!this.isCart) this.removeListing.emit();
-                    this._startComplete = true;
+                    this.startComplete = true;
                 },
                 (err: Error) => {
                     // If we get here, then we have encountered a fatal error...
@@ -148,7 +138,7 @@ export class DeliveryListingInfoComponent implements OnChanges {
     /**
      * Marks the delivery as picked up (on route from Donor to Receiver).
      */
-    private markPickedUp(): void {
+    public markPickedUp(): void {
         this.updateDeliveryState(DeliveryState.pickedUp);
     }
 
@@ -156,7 +146,7 @@ export class DeliveryListingInfoComponent implements OnChanges {
     /**
      * Marks the delivery as dropped off (completed at the Receiver).
      */
-    private markDroppedOff(): void {
+    public markDroppedOff(): void {
         this.updateDeliveryState(DeliveryState.droppedOff);
     }
 
@@ -165,15 +155,15 @@ export class DeliveryListingInfoComponent implements OnChanges {
      * Updates the Delivery's state.
      * @param deliveryState The new Delivery state.
      */
-    private updateDeliveryState(deliveryState: DeliveryState): void {
+    public updateDeliveryState(deliveryState: DeliveryState): void {
 
         this._showButtonFlags.set('progressSpinner', true);
 
-        this._manageDeliveryService.updateDeliveryState(this.delivery.deliveryFoodListingKey, deliveryState)
+        this._manageDeliveryService.updateDeliveryState(this.delivery.claimInfo.deliveryInfo.deliveryInfoKey, deliveryState)
             .finally(() => { this._showButtonFlags.set('progressSpinner', false); })
             .subscribe(() => {
-                this.delivery.deliveryStateInfo.deliveryState = deliveryState;
-                this._stateChangeComplete = true;
+                this.delivery.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState = deliveryState;
+                this.stateChangeComplete = true;
             },
             (err: Error) => {
                 // If we get here, then we have encountered a fatal error...
@@ -186,9 +176,9 @@ export class DeliveryListingInfoComponent implements OnChanges {
      * Gets human friendly readable version of scheduled start time.
      * @return The readable version if not null, and if null, then null is returned.
      */
-    private getReadableScheduledStartTime(): string {
+    public getReadableScheduledStartTime(): string {
 
-        const scheduledStartTime: Date = this.delivery.deliveryStateInfo.scheduledStartTime;
+        const scheduledStartTime: Date = this.delivery.claimInfo.deliveryInfo.deliveryStateInfo.scheduledStartTime;
 
         return (scheduledStartTime != null) ? ( this._dateFormatter.dateToMonthDayYearString(scheduledStartTime) + ' at ' +
                                                 this._dateFormatter.dateToWallClockString(scheduledStartTime) )

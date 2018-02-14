@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
 import { ManageFoodListingService } from '../../food-listing-services/manage-food-listing.service';
-import { FoodListing } from './../../../../../../../shared/src/receiver-donor/food-listing';
+import { FoodListing } from './../../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
 
 
 @Component({
@@ -47,7 +47,7 @@ export class FoodListingUnclaimComponent {
     /**
      * Unclaims the currently selected Food Listing.
      */
-    private unclaimSelectedFoodListing(): void {
+    public unclaimSelectedFoodListing(): void {
 
         if (!this.unclaimForm.valid) return;
         

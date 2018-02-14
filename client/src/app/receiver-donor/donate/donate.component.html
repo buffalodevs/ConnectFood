@@ -100,7 +100,7 @@
                     <!-- foodTypes -->
                     <div class="form-group food-types-container field-margin-bottom">
                         <h4>Food Types</h4>
-                        <food-types formControlName="foodTypes" [initiallyChecked]="false" [required]="true" [validate]="validate"></food-types>
+                        <food-types formControlName="foodTypes" [initiallyChecked]="false" [required]="true" [activateValidation]="activateValidation"></food-types>
                     </div>
 
                     <!-- needsRefrigeration -->
@@ -131,6 +131,20 @@
             </form>
 
         </mat-step>
+
+        <!--<mat-step>
+
+            <h1>Donation Availability</h1>
+            <hr>
+
+            <slick-date-time-schedule-builder></slick-date-time-schedule-builder>
+
+            <div class="button-group">
+                <button mat-raised-button color="primary" class="button-md warn-button" type="button" (click)="editDonation(stepper)">Edit Donation</button>
+                <button mat-raised-button type="submit" color="primary" class="button-md">Next</button>
+            </div>
+
+        </mat-step>-->
 
         <!-- Step 2: Donation Review -->
         <mat-step>

@@ -22,7 +22,6 @@ import { DeliverComponent } from './deliver/deliver.component';
 import { DeliveryCartComponent } from './delivery-cart/delivery-cart.component';
 
 import { RoutePreprocessService } from '../common-util/services/route-preprocess.service';
-import { VehicleTypesService } from '../domain/vehicle-types/vehicle-types.service';
 import { DeliveryUtilService } from './delivery-listings/delivery-services/delivery-util.service';
 import { ManageDeliveryService } from './delivery-listings/delivery-services/manage-deliveries.service';
 import { ScheduleDeliveryService } from './delivery-listings/delivery-services/schedule-delivery.service';
@@ -32,20 +31,12 @@ const delivererRoutes: Routes = [
     {
         path: 'deliver',
         component: DeliverComponent,
-        canActivate: [RoutePreprocessService],
-        // Make sure that we get the VehicleTypes from the back end before routing to the delivery interface!
-        resolve: {
-            vehicleTypes: VehicleTypesService
-        }
+        canActivate: [RoutePreprocessService]
     },
     {
         path: 'deliveryCart',
         component: DeliveryCartComponent,
-        canActivate: [RoutePreprocessService],
-        // Make sure that we get the VehicleTypes from the back end before routing to the delivery cart interface!
-        resolve: {
-            VehicleTypes: VehicleTypesService
-        }
+        canActivate: [RoutePreprocessService]
     }
 ];
 

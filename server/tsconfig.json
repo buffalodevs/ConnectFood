@@ -19,7 +19,6 @@
     },
     "exclude": [
         "./test/",
-        "./type-orm-sandbox",
         "./database-orm"
     ]
 }

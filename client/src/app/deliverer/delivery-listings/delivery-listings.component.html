@@ -10,8 +10,8 @@
         <ng-container slick-list-item-img>
 
             <slick-map #SlickMapComponent
-                [addresses]="[ sessionDataService.getAppUserSessionData().contactInfo, deliveryListing.donorInfo.contactInfo, deliveryListing.receiverInfo.contactInfo ]"
-                [addressNames]="[ 'Me', deliveryListing.donorInfo.organization.name, deliveryListing.receiverInfo.organization.name ]"
+                [addresses]="[ sessionDataService.getAppUserSessionData().contactInfo, deliveryListing.donorInfo.contactInfo, deliveryListing.claimInfo.receiverInfo.contactInfo ]"
+                [addressNames]="[ 'Me', deliveryListing.donorInfo.organization.name, deliveryListing.claimInfo.receiverInfo.organization.name ]"
                 [diameterMi]="deliveryUtilService.calcMaxMapDiameterFromDelivery(deliveryListing)">
             </slick-map>
 
@@ -41,11 +41,11 @@
 
                 <div class="space-bottom">
                     <b>Receiver</b><br>
-                    <span class="inline-block">{{ deliveryListing.receiverInfo.organization.name }}</span><br>
-                    <span>{{ deliveryListing.receiverInfo.contactInfo.address }}</span><br>
+                    <span class="inline-block">{{ deliveryListing.claimInfo.receiverInfo.organization.name }}</span><br>
+                    <span>{{ deliveryListing.claimInfo.receiverInfo.contactInfo.address }}</span><br>
                     <span>
-                        {{ deliveryListing.receiverInfo.contactInfo.city }}, {{ deliveryListing.receiverInfo.contactInfo.state }}
-                        {{ deliveryListing.receiverInfo.contactInfo.zip }}
+                        {{ deliveryListing.claimInfo.receiverInfo.contactInfo.city }}, {{ deliveryListing.claimInfo.receiverInfo.contactInfo.state }}
+                        {{ deliveryListing.claimInfo.receiverInfo.contactInfo.zip }}
                     </span>
                 </div>
 

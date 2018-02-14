@@ -1,16 +1,16 @@
 <slick-filtered-list [filters]="filters" [listings]="listings">
         
     <ng-container filters>
-        <food-listings-filters #filters [formGroup]="filters" header="Search" [additionalFilters]="additionalFilters" [defaultAvailableAfterDateNow]="false">
+        <food-listing-filters #filters [formGroup]="filters" header="Search" [additionalFilters]="additionalFilters" [defaultAvailableAfterDateNow]="false">
 
             <ng-container top>
 
                 <h5>Cart Type:</h5>
                 <div class="form-group">
-                    <mat-radio-group formControlName="listingsStatus">
+                    <mat-radio-group formControlName="foodListingsStatus">
 
                         <label for="claimed" class="checkbox-compress">
-                            <mat-radio-button type="radio" id="claimed" name="listingsStatus" [value]="LISTINGS_STATUS.myClaimedListings"
+                            <mat-radio-button type="radio" id="claimed" name="foodListingsStatus" [value]="FoodListingsStatus.myClaimedListings"
                                 title="Check this to only show my claimed food.">
                                 Claimed
                             </mat-radio-button>
@@ -18,7 +18,7 @@
                         <br>
 
                         <label for="donated" class="checkbox-compress">
-                            <mat-radio-button type="radio" id="donated" name="listingsStatus" [value]="LISTINGS_STATUS.myDonatedListings"
+                            <mat-radio-button type="radio" id="donated" name="foodListingsStatus" [value]="FoodListingsStatus.myDonatedListings"
                                 title="Check this to only show my donated food.">
                                 Donated
                             </mat-radio-button>
@@ -29,7 +29,7 @@
 
             </ng-container>
 
-        </food-listings-filters>
+        </food-listing-filters>
     </ng-container>
 
 

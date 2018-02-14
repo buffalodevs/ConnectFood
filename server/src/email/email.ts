@@ -10,9 +10,9 @@ let nodemailer = require("nodemailer-promise");
 let fs = require('fs');
 let juice = require('juice');
 let _sendEmail = nodemailer.config({
-    email: process.env.NOREPLY_EMAIL,
-    password: process.env.NOREPLY_PASSWORD,
-    server: process.env.NOREPLY_SERVER
+    email: process.env.FOOD_WEB_NOREPLY_EMAIL,
+    password: process.env.FOOD_WEB_NOREPLY_PASSWORD,
+    server: process.env.FOOD_WEB_NOREPLY_SERVER
 });
 require('dotenv');
 
@@ -110,8 +110,8 @@ function genEmailHTMLStrFromHTMLStr(emailConfig: EmailConfig): Promise<string> {
                 [ 'headerLinks', generateHeaderLinks(emailConfig) ],
                 [ 'receiverName', emailConfig.receiverName ],
                 [ 'bodyContents', emailConfig.contentHTMLStr ],
-                [ 'process.env.HOST_ADDRESS', process.env.HOST_ADDRESS ],
-                [ 'process.env.HOST_ADDRESS_READABLE', process.env.HOST_ADDRESS_READABLE ]
+                [ 'process.env.FOOD_WEB_SERVER_HOST_ADDRESS', process.env.FOOD_WEB_SERVER_HOST_ADDRESS ],
+                [ 'process.env.FOOD_WEB_SERVER_HOST_ADDRESS_READABLE', process.env.FOOD_WEB_SERVER_HOST_ADDRESS_READABLE ]
             ]);
             let containerAndContentsHTMLStr: string = injectVariables(containerHTMLStr, emailContainerInjections);
 
@@ -138,8 +138,8 @@ function generateHeaderLinks(emailConfig: EmailConfig): string {
     if (emailConfig.receiverAppUserType === AppUserType.Deliverer) {
 
         headerLinks += `
-            <a href="` + process.env.HOST_ADDRESS + `/deliver">Delivery</a> |
-            <a href="` + process.env.HOST_ADDRESS + `/deliveryCart">Delivery Cart</a> |
+            <a href="` + process.env.FOOD_WEB_SERVER_HOST_ADDRESS + `/deliver">Delivery</a> |
+            <a href="` + process.env.FOOD_WEB_SERVER_HOST_ADDRESS + `/deliveryCart">Delivery Cart</a> |
         `;
     }
     // For donor and receiver.
@@ -148,18 +148,18 @@ function generateHeaderLinks(emailConfig: EmailConfig): string {
         // For donor.
         if (emailConfig.receiverAppUserType === AppUserType.Donor) {
             headerLinks += `
-                <a href="` + process.env.HOST_ADDRESS + `/donate">Donate</a> |
+                <a href="` + process.env.FOOD_WEB_SERVER_HOST_ADDRESS + `/donate">Donate</a> |
             `;
         }
         // For receiver.
         else {
             headerLinks += `
-                <a href="` + process.env.HOST_ADDRESS + `/receive">Receive</a> |
+                <a href="` + process.env.FOOD_WEB_SERVER_HOST_ADDRESS + `/receive">Receive</a> |
             `;
         }
 
         headerLinks += `
-            <a href="` + process.env.HOST_ADDRESS + `/foodListingCart">Food Cart</a> |
+            <a href="` + process.env.FOOD_WEB_SERVER_HOST_ADDRESS + `/foodListingCart">Food Cart</a> |
         `;
     }
 

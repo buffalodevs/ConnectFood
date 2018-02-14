@@ -11,7 +11,6 @@ import { ReceiverDonorModule } from './receiver-donor/receiver-donor.module';
 import { DelivererModule } from './deliverer/deliverer.module';
 
 import { AppComponent } from './app.component';
-import { GetDomainValuesService } from './domain/get-domain-values.service';
 
 
 const appRoutes: Routes = [
@@ -42,9 +41,6 @@ const appRoutes: Routes = [
     ],
     bootstrap: [
         AppComponent
-    ],
-    providers: [
-        GetDomainValuesService        
     ]
 })
 export class AppModule {}

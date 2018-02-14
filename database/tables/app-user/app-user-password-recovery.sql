@@ -1,6 +1,5 @@
 -- Table for holding passwordRecoveryTokens for users who have requested to reset their password.
 
---DROP TABLE AppUserPasswordRecovery CASCADE;
 CREATE TABLE IF NOT EXISTS AppUserPasswordRecovery
 (
 	appUserKey INTEGER PRIMARY KEY REFERENCES AppUser (appUserKey)

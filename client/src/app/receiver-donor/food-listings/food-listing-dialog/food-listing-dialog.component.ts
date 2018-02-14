@@ -3,7 +3,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
 import { FoodListingDialogData } from './food-listing-dialog-data';
 import { SlickListDialogData, SlickListDialog } from '../../../slick/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog';
-import { FoodListing } from './../../../../../../shared/src/receiver-donor/food-listing';
 
 export { FoodListingDialogData };
 

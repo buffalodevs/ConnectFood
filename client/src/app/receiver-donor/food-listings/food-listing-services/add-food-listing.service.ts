@@ -5,7 +5,7 @@ import 'rxjs/add/operator/map';
 
 import { RequestService } from "../../../common-util/services/request.service";
 
-import { FoodListingUpload } from "./../../../../../../shared/src/receiver-donor/food-listing-upload";
+import { FoodListing } from "./../../../../../../shared/src/common-receiver-donor-deliverer/food-listing";
 import { AddFoodListingRequest, AddFoodListingResponse } from "./../../../../../../shared/src/receiver-donor/message/add-food-listing-message";
 import { FoodWebResponse } from "./../../../../../../shared/src/message-protocol/food-web-response";
 
@@ -24,11 +24,9 @@ export class AddFoodListingService {
      * @param imageUploads The image(s) associated with the food listing that is to be added.
      * @return An observable that on success will provide the added food listings key (unique ID).
      */
-    public addFoodListing(foodListingUpload: FoodListingUpload, imageUpload: string): Observable <number> {
+    public addFoodListing(foodListingUpload: FoodListing, imageUpload: string): Observable <number> {
 
-        foodListingUpload.imageUploads = [ imageUpload ];
-
-        let body: AddFoodListingRequest = new AddFoodListingRequest(foodListingUpload);
+        let body: AddFoodListingRequest = new AddFoodListingRequest(foodListingUpload, [ imageUpload ]);
         let observer: Observable <AddFoodListingResponse> = <Observable <AddFoodListingResponse>>this.requestService.post('/receiverDonor/donor/addFoodListing', body);
 
         return observer.map((addFoodListingResponse: AddFoodListingResponse) => {

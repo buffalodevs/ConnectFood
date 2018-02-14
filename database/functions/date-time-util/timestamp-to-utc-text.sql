@@ -9,9 +9,7 @@ CREATE OR REPLACE FUNCTION timestampToUtcText
 )
 RETURNS TEXT
 AS $$
-BEGIN
 
-    RETURN TO_CHAR(_timestampToConvert, 'YYYY-MM-DD"T"HH24:MI:SS"Z"')::TEXT;
+    SELECT TO_CHAR(_timestampToConvert, 'YYYY-MM-DD"T"HH24:MI:SS"Z"')::TEXT;
 
-END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE sql;

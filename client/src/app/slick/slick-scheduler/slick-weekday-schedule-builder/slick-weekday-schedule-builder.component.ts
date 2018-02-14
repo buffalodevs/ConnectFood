@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, OnChanges, forwardRef, SimpleChange, SimpleChanges } from '@angular/core';
-import { FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormArray, Validators, FormBuilder } from '@angular/forms';
+import { FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormArray, Validators, FormBuilder, AbstractControl, Validator, NG_VALIDATORS } from '@angular/forms';
 
 import { WeekdaySplitService } from './weekday-util/weekday-split.service';
 import { WeekdayForm } from './weekday-util/weekday-form';
@@ -13,18 +13,28 @@ import { DateRange } from '../../../../../../shared/src/date-time-util/date-rang
 @Component({
     selector: 'slick-weekday-schedule-builder',
     templateUrl: './slick-weekday-schedule-builder.component.html',
-    styleUrls: ['./slick-weekday-schedule-builder.component.css'],
+    styleUrls: ['./slick-weekday-schedule-builder.component.css', '../common-scheduler/schedule-builder.css'],
     providers: [
         { 
             provide: NG_VALUE_ACCESSOR,
             useExisting: forwardRef(() => SlickWeekdayScheduleBuilderComponent),
             multi: true
         },
+        {
+        provide: NG_VALIDATORS,
+        useExisting: forwardRef(() => SlickWeekdayScheduleBuilderComponent),
+        multi: true,
+        },
         WeekdaySplitService
     ]
 })
-export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenComponent implements OnInit, OnChanges, ControlValueAccessor {
+export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenComponent implements OnInit, OnChanges, ControlValueAccessor, Validator {
     
+    /**
+     * Set to true if at least one entry should be required.
+     * Default value is false (which will allow 0 entries to be entered).
+     */
+    @Input() public requireAtLeastOne: boolean;
     /**
      * Set to true if this component should be in display mode rather than edit mode.
      * Default value is false.
@@ -35,7 +45,7 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
     /**
      * When this value is set or changes to true, then the contained form will be forced to validate its controls and show any related errors.
      */
-    @Input() public validate: boolean;
+    @Input() public activateValidation: boolean;
 
     /**
      * If set by parent component via model binding (implicitly calls registerOnChange method),
@@ -47,34 +57,38 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
 
     public constructor (
         public weekdaySplitService: WeekdaySplitService,
+        private _dateFormatter: DateFormatterService,
         validationService: ValidationService,
-        dateFormatter: DateFormatterService,
         formBuilder: FormBuilder
     ) {
         super(validationService, formBuilder);
 
+        this.requireAtLeastOne = false;
         this.displayOnly = false;
         this.allowAdd = true;
         this.allowRemove = true;
-        this.form = new WeekdayForm(dateFormatter, null, this.validationService.requireAtLeastOneField());
         this.onChange = (value: DateRange[]) => {}; // If contained model is not bound to by parent, then swallow all changes here!
     }
 
 
     public ngOnInit(): void {
 
+        // Initialize weekday form with correct validator.
+        this.form = new WeekdayForm(this._dateFormatter, null, this.requireAtLeastOne ? this.validationService.requireAtLeastOneField()
+                                                                                      : null);
+
         // Listen for any form value changes.
         this.form.valueChanges.subscribe(() => { this.onChange(this.readValue()); });
 
         // Trigger validate after full form initialization (if validate is set).
-        this.ngOnChanges({ validate: new SimpleChange(this.validate, this.validate, false) });
+        this.ngOnChanges({ validate: new SimpleChange(this.activateValidation, this.activateValidation, false) });
     }
 
 
     public ngOnChanges(changes: SimpleChanges): void {
         
         // Make sure we validate the contained form when validate is marked as true.
-        if (changes.validate && changes.validate.currentValue) {
+        if (changes.activateValidation && changes.activateValidation.currentValue) {
             this.validationService.markAllAsTouched(this.form);
         }
         
@@ -92,7 +106,7 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
     private addAvailabilityRange(weekday: string): void {
         
         if (!this.allowAdd)  throw new Error('Attempting to add time range when allowAdd is: ' + this.allowAdd);
-        (<FormArray>this.control(weekday)).push(new FormControl(null, Validators.required));
+        this.form.addAvailabilityRange(weekday);
     }
 
 
@@ -104,7 +118,7 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
     private removeAvailabilityRange(weekday: string, index: number): void {
 
         if (!this.allowRemove)  throw new Error('Attempting to remove time range when allowRemove is: ' + this.allowRemove);
-        (<FormArray>this.control(weekday)).removeAt(index);
+        this.form.removeAvailabilityRange(weekday, index);
     }
 
 
@@ -154,6 +168,21 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
         this.onChange = onChange;
     }
 
+
+    public validate(c: AbstractControl): { [key: string]: any; } {
+
+        if (!this.form.valid) {
+
+            // Is the error directly with the contained form, or is it for some child control?
+            return (this.form.errors != null) ? this.form.errors
+                                              : { 'invalidTimeRange': 'Please complete or fix any invalid time ranges.' };
+        }
+
+        return null;
+    }
+
+
+    public registerOnValidatorChange?(fn: () => void): void {}
 
     /**
      * @param onTouched 

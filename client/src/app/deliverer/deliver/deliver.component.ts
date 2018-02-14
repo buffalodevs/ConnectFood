@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { FormControl, AbstractControl } from '@angular/forms';
 import { DeliveryUtilService } from '../delivery-listings/delivery-services/delivery-util.service';
+import { FoodListingsStatus } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
+import { FoodListingFilters } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters';
 
 
 @Component({
@@ -16,9 +18,11 @@ export class DeliverComponent {
     public constructor (
         private deliveryUtilService: DeliveryUtilService
     ) {
+        const filters: FoodListingFilters = new FoodListingFilters();
+
         this.additionalFilters = new Map<string, AbstractControl>([
-            [ 'matchRegularAvailability', new FormControl(true) ],
-            [ 'unscheduledDeliveries', new FormControl(true) ]
+            [ 'matchRegularAvailability', new FormControl(filters.matchRegularAvailability) ],
+            [ 'foodListingsStatus', new FormControl(FoodListingsStatus.unscheduledDeliveries) ]
         ]);
     }
 }

@@ -12,33 +12,33 @@ CREATE OR REPLACE FUNCTION removeFoodListing
 )
 -- Return user information of (receiver/deliverer) app users who were affected by the removal of the donation.
 RETURNS TABLE (
-    claimedFoodListingKey   ClaimedFoodListing.claimedFoodListingKey%TYPE,
+    claimInfoKey            ClaimInfo.claimInfoKey%TYPE,
     unclaimNotificationData JSON
 )
 AS $$
-    DECLARE _claimedFoodListingKey ClaimedFoodListing.claimedFoodListingKey%TYPE;
+    DECLARE _claimInfoKey ClaimInfo.claimInfoKey%TYPE;
 BEGIN
 
     -- Make sure the food listing we are to delete exists and was donated by user issuing this command.
     IF NOT EXISTS (
         SELECT      1
         FROM        FoodListing
-        LEFT JOIN   ClaimedFoodListing      ON  FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
-                                            AND NOT EXISTS (
-                                                SELECT  1
-                                                FROM    UnclaimedFoodListing
-                                                WHERE   UnclaimedFoodListing.claimedFoodListingKey = ClaimedFoodListing.claimedFoodListingKey
-                                            )
-        LEFT JOIN   DeliveryFoodListing     ON  ClaimedFoodListing.claimedFoodListingKey = DeliveryFoodListing.claimedFoodListingKey
-                                            AND NOT EXISTS (
-                                                SELECT  1
-                                                FROM    CancelledDeliveryFoodListing
-                                                WHERE   CancelledDeliveryFoodListing.deliveryFoodListingKey = DeliveryFoodListing.deliveryFoodListingKey
-                                            )
+        LEFT JOIN   ClaimInfo       ON  FoodListing.foodListingKey = ClaimInfo.foodListingKey
+                                    AND NOT EXISTS (
+                                        SELECT  1
+                                        FROM    UnclaimInfo
+                                        WHERE   UnclaimInfo.claimInfoKey = ClaimInfo.claimInfoKey
+                                    )
+        LEFT JOIN   DeliveryInfo    ON  ClaimInfo.claimInfoKey = DeliveryInfo.claimInfoKey
+                                    AND NOT EXISTS (
+                                        SELECT  1
+                                        FROM    CancelledDeliveryInfo
+                                        WHERE   CancelledDeliveryInfo.deliveryInfoKey = DeliveryInfo.deliveryInfoKey
+                                    )
         WHERE       FoodListing.foodListingKey = _foodListingKey
           AND       (   FoodListing.donorAppUserKey = _removedByAppUserKey
-                     OR ClaimedFoodListing.receiverAppUserKey = _removedByAppUserKey
-                     OR DeliveryFoodListing.delivererAppUserKey = _removedByAppUserKey )
+                     OR ClaimInfo.receiverAppUserKey = _removedByAppUserKey
+                     OR DeliveryInfo.delivererAppUserKey = _removedByAppUserKey )
 
     )
     THEN
@@ -63,14 +63,14 @@ BEGIN
 
 
     -- Make sure we return any unclaim notification data if there were claimed food listings associated with the removed food listing.
-    SELECT      ClaimedFoodListing.claimedFoodListingKey
-    INTO        _claimedFoodListingKey
+    SELECT      ClaimInfo.claimInfoKey
+    INTO        _claimInfoKey
     FROM        FoodListing
-    INNER JOIN  ClaimedFoodListing ON FoodListing.foodListingKey = ClaimedFoodListing.foodListingKey
+    INNER JOIN  ClaimInfo ON FoodListing.foodListingKey = ClaimInfo.foodListingKey
     WHERE       FoodListing.foodListingKey = _foodListingKey;
 
     RETURN QUERY
-    SELECT * FROM getUnclaimNotificationData(_claimedFoodListingKey, _removalReason);
+    SELECT * FROM getUnclaimNotificationData(_claimInfoKey, _removalReason);
 
 END;
 $$ LANGUAGE plpgsql;

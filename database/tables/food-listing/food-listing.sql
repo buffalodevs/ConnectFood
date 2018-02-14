@@ -1,6 +1,5 @@
 -- Food Listings table for holding record of all food that Donors have posted.
 
---DROP TABLE FoodListing CASCADE; 
 CREATE TABLE IF NOT EXISTS FoodListing
 (
     foodListingKey SERIAL PRIMARY KEY
@@ -28,7 +27,7 @@ ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS estimatedWeight            NUME
 ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS estimatedValue             NUMERIC(6, 2)   DEFAULT NULL;
 
 -- The recommended vehicle type (size) for food delivery.
-ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS recommendedVehicleType     VehicleType     NOT NULL DEFAULT 'Sedan';
+ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS recommendedVehicleType     VehicleType     NOT NULL;
 
 
 -- Add more columns here --

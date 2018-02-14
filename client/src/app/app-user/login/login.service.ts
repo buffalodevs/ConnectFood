@@ -7,6 +7,7 @@ import { SessionDataService } from '../../common-util/services/session-data.serv
 import { DeserializerService } from '../../common-util/services/deserializer.service';
 import { RequestResponseLoggerService } from '../../common-util/services/logging/request-response-logger.service';
 
+import '../../../../../shared/src/app-user/message/login-message'; // IMPORTANT: So that class decorator for deserialization will run (won't be victim of tree shaking).
 import { LoginRequest, LoginResponse } from '../../../../../shared/src/app-user/message/login-message';
 import { FoodWebResponse } from '../../../../../shared/src/message-protocol/food-web-response';
 

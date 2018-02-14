@@ -89,8 +89,8 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
         } 
     
         this.form = this.genFormGroupFromObject(appUser, [ Validators.required ], specificValidators);
-        // Don't want timeRanges control to be form array, but rather, a form control element whose value is an array.
-        (<FormGroup>this.form.get('availability')).setControl('timeRanges', new FormControl(appUser.availability.timeRanges));
+        // Don't want availability control to be form array, but rather, a form control element whose value is an array.
+        (<FormGroup>this.form).setControl('availability', new FormControl(appUser.availability));
 
         this.applyFormControls(this, (controlPath: string, control: AbstractControl) => {
             this._editData.set(controlPath, new EditData());
@@ -240,7 +240,7 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
         else if (response.message === AppUserErrorMsgs.INVALID_ADDRESS) {
             this.validationService.addError(this.control(saveFormControlNames[0]), 'invalidAddress', response.message);
         }
-        else if (response.message === AppUserErrorMsgs.INCORRECT_PASSWORD) {
+        else if (response.message === AppUserErrorMsgs.INCORRECT_CURRENT_PASSWORD) {
             this.validationService.addError(this.control(saveFormControlNames[0]), 'incorrectPassword', response.message);
         }
     }

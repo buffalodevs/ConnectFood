@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACC
 // import { ActivatedRoute } from "@angular/router";
 
 import { FoodTypesService } from "./food-types.service";
+import { FOOD_TYPE_VALUES } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/food-type';
 
 
 @Component({
@@ -22,91 +23,67 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
     /**
      * If set to true, then this component will be used to merely display a list of Food Types.
      */
-    @Input() public displayOnly: boolean;
+    @Input() public displayOnly: boolean = false;
     /**
      * Set to true if the display only Food Types should be a condensed list.
      * The condensed list only includes Food Types that have been selected.
      */
-    @Input() public condensedDisplay: boolean;
+    @Input() public condensedDisplay: boolean = false;
     /**
      * Determines if the Food Type checkboxes should initially be checked. Default is true.
      */
-    @Input() public initiallyChecked: boolean;
+    @Input() public initiallyChecked: boolean = true;
     /**
      * The preferred number of elements per column (if reached, will generate another column). Default is 6.
      * NOTE: Will not generate more than 4 columns, so if no more columns can be made, then this is ignored!
      */
-    @Input() public preferredElementsPerColumn: number;
+    @Input() public preferredElementsPerColumn: number = 6;
     /**
      * The maximum number of columns that the Food Types checkboxes will be displayed in. Default is 2.
      */
-    @Input() public maxNumColumns: number;
+    @Input() public maxNumColumns: number = 2;
     /**
      * Determines if at least one selection is required. Default is false.
      */
-    @Input() public required: boolean;
+    @Input() public required: boolean = false;
     /**
      * Triggers validation of the form by marking all as touched.
      */
-    @Input() public validate: boolean;
+    @Input() public activateValidation: boolean = false;
     /**
      * Any extra required validation constraint. Ignored on default.
      */
-    @Input() public extraValidation: boolean;
+    @Input() public extraValidation: boolean = true;
 
-    public foodTypes: string[];
-    public foodTypesForm: FormGroup;
-    public foodTypeIndsColumns: number[][];
-    private _selectedFoodTypes: string[];
+    public foodTypes: string[] = FOOD_TYPE_VALUES;
+    public foodTypesForm: FormGroup = new FormGroup({});
+    public foodTypeIndsColumns: number[][] = [];
+
+    private _selectedFoodTypes: string[] = [];
 
     /**
      * A callback function provided by a parent component (via directive such as ngModel).
      * ControlValueAccessor interface's registerOnChange method is used to register this callback.
      */
-    private onChange: (selectedFoodTypes: string[]) => void;
+    private onChange: (selectedFoodTypes: string[]) => void = (selectedFoodTypes: string[]) => {}; // If no change listener, then swallow changes here!
 
     
     public constructor (
-        // private routerSnapshot: ActivatedRoute,
         private _foodTypesService: FoodTypesService
-    ) {
-        this.displayOnly = false;
-        this.condensedDisplay = false;
-        this.initiallyChecked = true;
-        this.preferredElementsPerColumn = 6;
-        this.maxNumColumns = 2;
-        this.required = false;
-        this.validate = false;
-        this.extraValidation = true;
-
-        this._selectedFoodTypes = [];
-        // Simply initialize empty form here. We will fill it with Food Types from server (or client cache) in ngOnInit()!
-        this.foodTypesForm = new FormGroup({});
-        this.foodTypeIndsColumns = [];
-        this.onChange = (selectedFoodTypes: string[]) => {}; // If no change listener, then swallow changes here!
-    }
+    ) {}
 
 
     public ngOnInit(): void {
-        // this.foodTypes = this.routerSnapshot.data['value']['foodTypes'];
+        
+        this.setToInitialCheckedState();
 
-        /*  Ideally, this should resolve immediately because of a resolver used in route to parent component! The Food Types should have
-            already been fetched and cached from the server before this component was initialized and rendered, but just in case we will
-            call getFoodTypes instead of directly getting results form router snapshop (like shown above in commment). */
-        this._foodTypesService.getFoodTypes().subscribe((foodTypes: string[]) => {
+        // Set initial display column data.
+        this.generateColumns();
 
-            // Set all base food types and their initial checked states.
-            this.foodTypes = foodTypes;
-            this.setToInitialCheckedState();
-
-            // Set initial display column data.
-            this.generateColumns();
-
-            // Register listener for changes in the contained checkbox form's values.
-            this.foodTypesForm.valueChanges.subscribe(this.valueChangesListener.bind(this));
-            this.foodTypesForm.updateValueAndValidity(); /* When finished adding all food type controls, then trigger a value update
-                                                            so callback will get the selected food types. */
-        });
+        // Register listener for changes in the contained checkbox form's values.
+        this.foodTypesForm.valueChanges.subscribe(this.valueChangesListener.bind(this));
+        this.foodTypesForm.updateValueAndValidity(); /* When finished adding all food type controls, then trigger a value update
+                                                        so callback will get the selected food types. */
     }
 
 
@@ -116,7 +93,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
     public ngOnChanges(changes: SimpleChanges): void {
 
         // If the validate input was changed to true, then trigger form validation.
-        if (changes.validate && this.validate) {
+        if (changes.activateValidation && this.activateValidation) {
             this.foodTypesForm.markAsTouched();
         }
         
@@ -253,7 +230,7 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
      * @return true if an error exists, false if not.
      */
     private hasError(): boolean {
-        return ( (this.foodTypesForm.touched || this.validate) && this.required && this._selectedFoodTypes.length === 0 && this.extraValidation );
+        return ( (this.foodTypesForm.touched || this.activateValidation) && this.required && this._selectedFoodTypes.length === 0 && this.extraValidation );
     }
 
 

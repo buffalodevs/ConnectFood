@@ -3,7 +3,7 @@ import { FormControl, AbstractControl } from '@angular/forms';
 
 import { SessionDataService } from '../../common-util/services/session-data.service';
 
-import { FoodListingsFilters, LISTINGS_STATUS } from "../../../../../shared/src/receiver-donor/food-listings-filters";
+import { FoodListingFilters, FoodListingsStatus, } from "../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters";
 import { AppUser, AppUserType } from "../../../../../shared/src/app-user/app-user";
 
 
@@ -15,7 +15,7 @@ import { AppUser, AppUserType } from "../../../../../shared/src/app-user/app-use
 export class FoodListingCartComponent {
 
     // Need to declare LISTINGS_STATUS enum inside component to be used in the HTML template!
-    public readonly LISTINGS_STATUS: typeof LISTINGS_STATUS = LISTINGS_STATUS;
+    public readonly FoodListingsStatus: typeof FoodListingsStatus = FoodListingsStatus;
 
     public additionalFilters: Map <string, AbstractControl>;
 
@@ -25,11 +25,11 @@ export class FoodListingCartComponent {
     ) {
 
         const appUser: AppUser = sessionDataService.getAppUserSessionData();
-        const listingsStatus: LISTINGS_STATUS = (appUser.appUserType === AppUserType.Receiver) ? LISTINGS_STATUS.myClaimedListings
-                                                                                               : LISTINGS_STATUS.myDonatedListings;
+        const listingsStatus: FoodListingsStatus = (appUser.appUserType === AppUserType.Receiver) ? FoodListingsStatus.myClaimedListings
+                                                                                                  : FoodListingsStatus.myDonatedListings;
 
         this.additionalFilters = new Map <string, AbstractControl>([
-            [ 'listingsStatus', new FormControl(listingsStatus) ]
+            [ 'foodListingsStatus', new FormControl(listingsStatus) ]
         ]);
     }
 
@@ -38,9 +38,9 @@ export class FoodListingCartComponent {
      * Gets the title of the listings based on the listings status (cart type).
      * @param filters The filters value.
      */
-    public getListingsTitle(filters: FoodListingsFilters): string {
-        return (filters.listingsStatus === LISTINGS_STATUS.myClaimedListings ? 'Claimed Food'
-                                                                             : 'Donated Food');
+    public getListingsTitle(filters: FoodListingFilters): string {
+        return (filters.foodListingsStatus === FoodListingsStatus.myClaimedListings ? 'Claimed Food'
+                                                                                    : 'Donated Food');
     }
 
 
@@ -49,8 +49,8 @@ export class FoodListingCartComponent {
      * @param filters The filters value to determine the cart type from.
      * @return true if claimed cart, false if not.
      */
-    public isClaimedCart(filters: FoodListingsFilters): boolean {
-        return ( filters.listingsStatus === LISTINGS_STATUS.myClaimedListings );
+    public isClaimedCart(filters: FoodListingFilters): boolean {
+        return ( filters.foodListingsStatus === FoodListingsStatus.myClaimedListings );
     }
 
 
@@ -59,7 +59,7 @@ export class FoodListingCartComponent {
      * @param filters The filters value to determine the cart type from.
      * @return true if donated cart, false if not.
      */
-    public isDonatedCart(filters: FoodListingsFilters): boolean {
-        return ( filters.listingsStatus === LISTINGS_STATUS.myDonatedListings );
+    public isDonatedCart(filters: FoodListingFilters): boolean {
+        return ( filters.foodListingsStatus === FoodListingsStatus.myDonatedListings );
     }
 }

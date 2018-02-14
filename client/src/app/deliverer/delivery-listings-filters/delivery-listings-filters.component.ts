@@ -1,7 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormControl, AbstractControl } from '@angular/forms';
 
-import { VehicleTypesService } from '../../domain/vehicle-types/vehicle-types.service';
+import { MAX_DISTANCE_VALUES } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/max-distance';
+import { MAX_ESTIMATED_WEIGHT_VALUES } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/max-estimated-weight';
+import { VEHICLE_TYPE_VALUES } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/vehicle-type';
+import { FoodListingFilters } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters';
 
 
 @Component({
@@ -11,40 +14,28 @@ import { VehicleTypesService } from '../../domain/vehicle-types/vehicle-types.se
 })
 export class DeliveryListingsFiltersComponent extends FormGroup implements OnInit {
 
-    @Input() public header: string;
+    public readonly MAX_DISTANCES: number[] = MAX_DISTANCE_VALUES;
+    public readonly MAX_TOTAL_WEIGHTS: number[] = MAX_ESTIMATED_WEIGHT_VALUES;
+    public readonly VEHICLE_TYPES: string[] = VEHICLE_TYPE_VALUES;
+
+    @Input() public header: string = 'Filters';
     /**
      * Additional filter controls and associated names.
      */
-    @Input() public additionalFilters: Map <string, AbstractControl>;
-
-    public readonly maxDistances: number[];
-    public readonly maxTotalWeights: number[];
-    public vehicleTypes: string[];
+    @Input() public additionalFilters: Map <string, AbstractControl> = null;
 
 
-    public constructor (
-        private vehicleTypesService: VehicleTypesService
-    ) {
+    public constructor() {
         super({});
-
-        this.header = 'Filters';
-        this.maxDistances = [ 5, 10, 15, 20, 25 ];
-        this.maxTotalWeights = [ null, 50, 100, 150, 200, 250 ];
-        this.vehicleTypes = [];
     }
 
 
     public ngOnInit(): void {
-        
-        // Fetch vehicle types domain values from client cache (should be prerequisite service for this component)
-        this.vehicleTypesService.getVehicleTypes().subscribe((vehicleTypes: string[]) => {
-            this.vehicleTypes = vehicleTypes;
-        });
 
-        const medianDistanceMi: number = this.maxDistances[Math.floor(this.maxDistances.length / 2)];
-        this.addControl('maxDistance', new FormControl(medianDistanceMi));
-        this.addControl('maxEstimatedWeight', new FormControl(null));
-        this.addControl('recommendedVehicleType', new FormControl(null));
+        const filters: FoodListingFilters = new FoodListingFilters();
+        this.addControl('maxDistance', new FormControl(filters.maxDistance));
+        this.addControl('maxEstimatedWeight', new FormControl(filters.maxEstimatedWeight));
+        this.addControl('recommendedVehicleType', new FormControl(filters.recommendedVehicleType));
 
         // Add any parent specified additional filter controls.
         if (this.additionalFilters != null) {

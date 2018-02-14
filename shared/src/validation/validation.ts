@@ -1,6 +1,7 @@
 import { FormGroup, AbstractControl, ValidatorFn } from "@angular/forms";
 import { AppUser } from "../app-user/app-user";
 import { ObjectManipulation } from "../common-util/object-manipulation";
+import { AppUserErrorMsgs } from "../app-user/message/app-user-error-msgs";
 
 
 /**
@@ -11,73 +12,60 @@ export class Validation {
     /**
      * Regular expression used for verifying email correctness.
      */
-    public readonly EMAIL_REGEX: RegExp;
+    public readonly EMAIL_REGEX: RegExp = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
 
     /**
      * Regular expression used for verifying password correctness.
      */
-    public readonly PASSWORD_REGEX: RegExp;
+    public readonly PASSWORD_REGEX: RegExp = /^.{6,20}$/;
 
     /**
      * Regular expression used for verifying 10 digit phone numbers with dashes.
      */
-    public readonly PHONE_REGEX: RegExp;
+    public readonly PHONE_REGEX: RegExp = /^\(\d{3}\) \d{3}\-\d{4}$/;
 
     /**
      * Regular expression used for verifying that the state input is in a correct format.
      */
-    public readonly STATE_REGEX: RegExp;
+    public readonly STATE_REGEX: RegExp = /^[a-zA-Z]{2}$/;
 
     /**
      * Regular expression used for verifying 5 digit ZIP codes.
      */
-    public readonly ZIP_REGEX: RegExp;
+    public readonly ZIP_REGEX: RegExp = /^\d{5}$/;
 
     /**
      * Regular expression used for verifying date string (mm/dd/yyyy) format.
      */
-    public readonly DATE_REGEX: RegExp;
+    public readonly DATE_REGEX: RegExp = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
 
     /**
      * Regular expression used for verifying wall clock time string (hh:mm [AM|PM]) format.
      */
-    public readonly TIME_REGEX: RegExp;
+    public readonly TIME_REGEX: RegExp = /^(0?[1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/;
 
     /**
      * Regular expression used for verifying hour format.
      */
-    public readonly HH_REGEX: RegExp;
+    public readonly HH_REGEX: RegExp = /^(0?[1-9]|1[0-2]?)$/;
 
     /**
      * Regular expression used for verifying minute format.
      */
-    public readonly MM_REGEX: RegExp;
+    public readonly MM_REGEX: RegExp = /^([0-5][0-9])$/;
 
     /**
      * Regular expression used for verifying Am or Pm string (non-case sensitive) format.
      */
-    public readonly AM_OR_PM_REGEX: RegExp;
+    public readonly AM_OR_PM_REGEX: RegExp = /^([aApP][mM])$/;
 
     /**
      * Regular expression used for verifying Organization Tax ID (TIN) format.
      */
-    public readonly TAX_ID_REGEX: RegExp;
+    public readonly TAX_ID_REGEX: RegExp = /^\d{2}\-\d{7}$/;
 
 
-    public constructor() {
-
-        this.EMAIL_REGEX = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-        this.PASSWORD_REGEX = /^[a-zA-Z0-9!@#$%^&*]{6,20}$/;
-        this.PHONE_REGEX = /^\(\d{3}\) \d{3}\-\d{4}$/;
-        this.STATE_REGEX = /^[a-zA-Z]{2}$/;
-        this.ZIP_REGEX = /^\d{5}$/;
-        this.DATE_REGEX = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
-        this.TIME_REGEX = /^(0?[1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/;
-        this.HH_REGEX = /^(0?[1-9]|1[0-2]?)$/;
-        this.MM_REGEX = /^([0-5][0-9])$/;
-        this.AM_OR_PM_REGEX = /^([aApP][mM])$/;
-        this.TAX_ID_REGEX = /^\d{2}\-\d{7}$/;
-    }
+    public constructor() {}
 
     
     /**
@@ -194,15 +182,30 @@ export class Validation {
     public validateAppUser(appUser: AppUser, password: string): Error {
 
         if (appUser.email != null && !this.emailValidator(appUser.email)) {
-            return new Error('Provided email not in correct format.');
+            return new Error(AppUserErrorMsgs.INVALID_EMAIL);
         }
 
         if (password != null && !this.passwordValidator(password)) {
-            return new Error('Incorrect password format. Password must contain a minimum of 6 characters and at least one number');
+            return new Error(AppUserErrorMsgs.INVALID_PASSWORD);
         }
 
-        if (appUser.contactInfo != null && appUser.contactInfo.zip != null && !this.zipValidator(appUser.contactInfo.zip.toString())) {
-            return new Error('Incorrect ZIP code format. The ZIP code must contain exactly 5 digits.');
+        if (appUser.contactInfo != null) {
+
+            if (appUser.contactInfo.zip != null && !this.zipValidator(appUser.contactInfo.zip.toString())) {
+                return new Error(AppUserErrorMsgs.INVALID_ZIP);
+            }
+    
+            if (appUser.contactInfo.state != null && !this.stateValidator(appUser.contactInfo.state)) {
+                return new Error(AppUserErrorMsgs.INVALID_STATE);
+            }
+
+            if (appUser.contactInfo.phone != null && !this.phoneValidator(appUser.contactInfo.phone)) {
+                return new Error(AppUserErrorMsgs.INVALID_PHONE);
+            }
+        }
+
+        if (appUser.organization != null && appUser.organization.taxId != null && !this.taxIdValidator(appUser.organization.taxId)) {
+            return new Error(AppUserErrorMsgs.INVALID_TAX_ID);
         }
 
         return null;

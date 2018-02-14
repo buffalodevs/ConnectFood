@@ -7,9 +7,9 @@ CREATE OR REPLACE FUNCTION claimFoodListing
      _foodListingKey        INTEGER,    -- This is the key of the Food Listing that is being claimed.
      _receiverAppUserKey    INTEGER     -- This is the key of the user who is claiming the Food Listing.
 )
-RETURNS INTEGER -- The claimedFoodListing primary key.
+RETURNS INTEGER -- The ClaimInfo primary key.
 AS $$
-    DECLARE _claimedFoodListingKey  INTEGER;
+    DECLARE _claimInfoKey  INTEGER;
 BEGIN
 
     -- TODO: Need to perform an edit check that ensures that the FoodListing and AppUser exist!!!
@@ -30,7 +30,7 @@ BEGIN
     END IF;*/
     
 
-    INSERT INTO ClaimedFoodListing
+    INSERT INTO ClaimInfo
     (
         receiverAppUserKey,
         foodListingKey
@@ -40,10 +40,10 @@ BEGIN
         _receiverAppUserKey,
         _foodListingKey
     )
-    RETURNING   ClaimedFoodListing.claimedFoodListingKey
-    INTO        _claimedFoodListingKey;
+    RETURNING   ClaimInfo.claimInfoKey
+    INTO        _claimInfoKey;
 
-    RETURN _claimedFoodListingKey;
+    RETURN _claimInfoKey;
 
 END;
 $$ LANGUAGE plpgsql;

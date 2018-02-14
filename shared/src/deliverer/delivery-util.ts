@@ -1,5 +1,5 @@
-import { Delivery, DeliveryState } from './delivery';
-export { Delivery, DeliveryState };
+import { DeliveryState } from '../common-receiver-donor-deliverer/delivery-info';
+export { DeliveryState };
 
 
 /**

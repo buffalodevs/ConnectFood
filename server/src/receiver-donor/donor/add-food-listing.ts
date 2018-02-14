@@ -8,9 +8,8 @@ import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-state
 import { logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 import { logger, prettyjsonRender } from '../../logging/logger';
 
-import { FoodListingUpload } from '../../../../shared/src/receiver-donor/food-listing-upload';
-import { FoodListing } from '../../../../shared/src/receiver-donor/food-listing';
 import { DateFormatter } from '../../../../shared/src/date-time-util/date-formatter';
+import { FoodListing } from '../message/add-food-listing-message';
 
 require('dotenv');
 
@@ -19,37 +18,38 @@ require('dotenv');
  * Storage bucket object used to communicate with Google Cloud.
  */
 let storageBucket: Storage = require('@google-cloud/storage') ({
-    projectId: process.env.GOOGLE_CLOUD_PROJECT_ID
+    projectId: process.env.FOOD_WEB_GOOGLE_CLOUD_PROJECT_ID
 });
 
 
 /**
  * Adds a food listing to the database and saves associated image to either a local filesystem (development mode) or Google photo bucket.
- * @param foodListingUpload The food listing that will be added.
+ * @param foodListing The food listing that will be added.
+ * @param imgUploads The (base64) image uploads for the new food listing.
  * @param donorAppUserKey The key identifier of the App User that donated the food listing.
  */
-export async function addFoodListing(foodListingUpload: FoodListingUpload, donorAppUserKey: number): Promise <number> {
+export async function addFoodListing(foodListing: FoodListing, imgUploads: string[], donorAppUserKey: number): Promise <number> {
 
     const dateFormatter: DateFormatter = new DateFormatter();
     let imageNames: string[] = [];
     let imageUrls: string[] = [];
 
     // If we have an image form the Donor, then generate the name and URL for it before we create database entry.
-    if (foodListingUpload.imageUploads != null) {
-        foodListingUpload.imageUploads = _.compact(foodListingUpload.imageUploads);
-        genAndFillImageUrlsAndNames(imageUrls, imageNames, foodListingUpload.imageUploads); // NOTE: imageUrls and imageNames modified internally!
+    if (imgUploads != null) {
+        imgUploads = _.compact(imgUploads);
+        genAndFillImageUrlsAndNames(imageUrls, imageNames, imgUploads); // NOTE: imageUrls and imageNames modified internally!
     }
     
     // Construct prepared statement.
     let queryArgs = [ donorAppUserKey,
-                      foodListingUpload.foodTypes,
-                      foodListingUpload.foodTitle,
-                      foodListingUpload.needsRefrigeration,
-                      foodListingUpload.availableUntilDate.toISOString(),
-                      foodListingUpload.estimatedWeight,
-                      foodListingUpload.estimatedValue,
-                      foodListingUpload.foodDescription,
-                      foodListingUpload.recommendedVehicleType,
+                      foodListing.foodTypes,
+                      foodListing.foodTitle,
+                      foodListing.needsRefrigeration,
+                      foodListing.availableUntilDate.toISOString(),
+                      foodListing.estimatedWeight,
+                      foodListing.estimatedValue,
+                      foodListing.foodDescription,
+                      foodListing.recommendedVehicleType,
                       imageUrls ];
     let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM addFoodListing();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);
@@ -61,8 +61,8 @@ export async function addFoodListing(foodListingUpload: FoodListingUpload, donor
         logSqlQueryResult(result.rows);
 
         // Save any image(s) to storage bucket / disk.
-        if (foodListingUpload.imageUploads != null) {
-            await writeImgs(foodListingUpload.imageUploads, imageUrls, imageNames);
+        if (foodListing.imgUrls != null) {
+            await writeImgs(foodListing.imgUrls, imageUrls, imageNames);
         }
 
         logger.info('Food listing with key ' + foodListingKey + ' successfully added by donor with ID ' + donorAppUserKey);
@@ -86,8 +86,8 @@ function genAndFillImageUrlsAndNames(imageUrls: string[], imageNames: string[], 
     for (let i: number = 0; i < imageUploads.length; i++) {
 
         imageNames.push('img-' + Date.now().toString() + '.jpeg');
-        imageUrls.push((process.env.DEVELOPER_MODE.toLowerCase() === 'true') ? ('/public/' + imageNames[i])
-                                                                             : (process.env.BUCKET_URL + imageNames[i]));
+        imageUrls.push((process.env.FOOD_WEB_DEVELOPER_MODE.toLowerCase() === 'true') ? ('/public/' + imageNames[i])
+                                                                             : (process.env.FOOD_WEB_BUCKET_URL + imageNames[i]));
     }
 }
 
@@ -110,7 +110,7 @@ async function writeImgs(imageUploads: string[], imageUrls: string[], imageNames
         const image: string = imageUploads[i].replace(/^data:image\/\w+;base64,/, '');
 
         // Write image to appropriate storage location.
-        imageUploadPromises.push( (process.env.DEVELOPER_MODE === 'true') ? writeImgToLocalFs(image, imageUrls[i])
+        imageUploadPromises.push( (process.env.FOOD_WEB_DEVELOPER_MODE === 'true') ? writeImgToLocalFs(image, imageUrls[i])
                                                                           : writeImgToBucket(image, imageNames[i]) );
     }
 
@@ -154,7 +154,7 @@ function writeImgToLocalFs(image: string, imageUrl: string): Promise <void> {
  */
 async function writeImgToBucket(image: string, imageName: string): Promise <void> {
 
-    let bucket: Bucket = storageBucket.bucket(process.env.GOOGLE_CLOUD_BUCKET_ID);
+    let bucket: Bucket = storageBucket.bucket(process.env.FOOD_WEB_GOOGLE_CLOUD_BUCKET_ID);
     let file: File = bucket.file(imageName);
     let imageBinary: Buffer = new Buffer(image, 'base64');
 

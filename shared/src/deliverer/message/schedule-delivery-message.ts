@@ -7,9 +7,9 @@ export class ScheduleDeliveryRequest {
     
     public constructor (
         /**
-         * The key identifier of the Claimed Food Listing whose delivery is to be scheduled.
+         * The key identifier of the claim that is to be scheduled for delivery.
          */
-        public claimedFoodListingKey: number,
+        public claimInfoKey: number,
         /**
          * Set to true if the delivery should be automatically started now. Set false if it should be scheduled for future time.
          */

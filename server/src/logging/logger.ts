@@ -6,7 +6,7 @@ import { LoggingWinston } from "@google-cloud/logging-winston";
 export { winston, prettyjson, colors };
 
 
-const DEVELOPER_MODE: boolean = ( process.env.DEVELOPER_MODE.toLowerCase() === 'true' );
+const DEVELOPER_MODE: boolean = ( process.env.FOOD_WEB_DEVELOPER_MODE.toLowerCase() === 'true' );
 const LOGGER_LEVEL: string = DEVELOPER_MODE ? 'silly'
                                             : 'info';
 

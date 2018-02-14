@@ -1,6 +1,5 @@
 -- Contains URLs of images associated with a food listing (1 - many relationship FoodListing - FoodListingImage).
 
---DROP TABLE FoodListingImg CASCADE; 
 CREATE TABLE IF NOT EXISTS FoodListingImg
 (
     foodListingImgKey SERIAL PRIMARY KEY

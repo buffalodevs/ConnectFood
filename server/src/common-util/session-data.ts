@@ -41,12 +41,12 @@ export class SessionData {
     public static sessionBootstrap(app: Application): void {
 
         let sessionOpts: SessionOptions = null;
-        let ttlMs: number = parseInt(process.env.SESSION_TTL_MS);
+        let ttlMs: number = parseInt(process.env.FOOD_WEB_SESSION_TTL_MS);
 
         // Developer mode (MemoryStore).
-        if (process.env.DEVELOPER_MODE === 'true') {
+        if (process.env.FOOD_WEB_DEVELOPER_MODE === 'true') {
             sessionOpts = {
-                secret:             process.env.SESSION_SECRET,
+                secret:             process.env.FOOD_WEB_SESSION_SECRET,
                 cookie:             {
                                         expires: new Date(Date.now() + ttlMs), // NOTE: Must use expires date for IE compatibility!
                                         maxAge: ttlMs, // The maximum age of the cookie (works in all browsers but IE...)
@@ -61,14 +61,14 @@ export class SessionData {
         // Production mode (Redis).
         else {
             let redisOpts: RedisStoreOptions = {
-                url:        process.env.REDIS_URL,
+                url:        process.env.FOOD_WEB_REDIS_URL,
                 ttl:        (ttlMs / 1000), // NOTE: Time-to-live here is in seconds!
-                pass:       process.env.REDIS_PASSWORD,
-                logErrors:  (process.env.LOG_CONSOLE_REDIS_ERRS === 'true')
+                pass:       process.env.FOOD_WEB_REDIS_PASSWORD,
+                logErrors:  (process.env.FOOD_WEB_LOG_CONSOLE_REDIS_ERRS === 'true')
             };
 
             sessionOpts = {
-                secret:             process.env.SESSION_SECRET,
+                secret:             process.env.FOOD_WEB_SESSION_SECRET,
                 store:              new RedisStore(redisOpts),
                 saveUninitialized:  false,
                 resave:             false,

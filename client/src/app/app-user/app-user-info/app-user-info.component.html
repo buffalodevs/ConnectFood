@@ -126,8 +126,8 @@
             <div class="form-group" *ngIf="!getEditDataFor('contactInfo.address').editing">
                 <span class="link-content" (click)="setManyEditable(['contactInfo.address', 'contactInfo.city', 'contactInfo.state', 'contactInfo.zip'])" title="edit">
                     {{ control('contactInfo.address').value }}<br>
-                    {{ control('contactInfo.city').value }}, {{ control('contactInfo.state').value }} {{ control('contactInfo.zip').value }}
-                    <i class="material-icons">&#xe254;</i>
+                    {{ control('contactInfo.city').value }}, {{ control('contactInfo.state').value }}
+                    {{ control('contactInfo.zip').value }}<i class="material-icons">&#xe254;</i>
                 </span>
             </div>
 
@@ -196,23 +196,25 @@
 
     <h2>Availability</h2>
     <hr>
-    <form id="schedule-builder-container" class="row" [slick-progress-spinner]="getEditDataFor('availability.timeRanges').showProgressSpinner"
-     formGroupName="availability" spinnerStickyTopId="schedule-builder-container">
+    <form id="schedule-builder-container" class="row" [slick-progress-spinner]="getEditDataFor('availability').showProgressSpinner"
+     [formGroup]="form" spinnerStickyTopId="schedule-builder-container">
 
-        <slick-weekday-schedule-builder #availability id="availability" [displayOnly]="!getEditDataFor('availability.timeRanges').editing"
-         formControlName="timeRanges"></slick-weekday-schedule-builder>
+        <slick-weekday-schedule-builder #availability id="availability" [displayOnly]="!getEditDataFor('availability').editing"
+         formControlName="availability"></slick-weekday-schedule-builder>
 
         <div class="col-md-6">
 
-            <button mat-raised-button color="primary" class="button-sm" *ngIf="!getEditDataFor('availability.timeRanges').editing"
-             (click)="setEditable('availability.timeRanges')">
+            <button mat-raised-button color="primary" class="button-sm" *ngIf="!getEditDataFor('availability').editing"
+             (click)="setEditable('availability')">
                 Update Availability
             </button>
 
-            <form [formGroup]="form" (ngSubmit)="save('availability.timeRanges')" *ngIf="getEditDataFor('availability.timeRanges').editing">
+            <form [formGroup]="form" (ngSubmit)="save('availability')" *ngIf="getEditDataFor('availability').editing">
                 <button mat-raised-button color="primary" class="button-sm" type="submit">Save</button>
-                <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('availability.timeRanges', false)">Cancel</button>
+                <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('availability', false)">Cancel</button>
             </form>
+
+            <mat-error *ngIf="hasError('availability')">{{ errorMsgFor('availability') }}</mat-error>
 
         </div>
 

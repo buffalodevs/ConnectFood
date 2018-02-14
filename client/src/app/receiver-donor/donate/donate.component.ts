@@ -7,13 +7,13 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
 import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
-import { GetDomainValuesService } from '../../domain/get-domain-values.service';
 import { ValidationService } from '../../common-util/services/validation.service';
 import { AddFoodListingService } from "../food-listings/food-listing-services/add-food-listing.service";
 import { DateFormatterPipe } from "../../common-util/pipes/date-formatter.pipe"
 
-import { FoodListingUpload } from "../../../../../shared/src/receiver-donor/food-listing-upload";
 import { Validation } from '../../../../../shared/src/validation/validation';
+import { FoodListing } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
+import { VEHICLE_TYPE_VALUES } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/vehicle-type';
 
 
 @Component({
@@ -24,14 +24,16 @@ import { Validation } from '../../../../../shared/src/validation/validation';
 })
 export class DonateComponent extends AbstractModelDrivenComponent implements OnInit, ErrorStateMatcher {
     
-    public readonly TITLE_MAX_LENGTH: number;
+    public readonly TITLE_MAX_LENGTH: number = 30;
 
-    public validate: boolean;
-    public dispUrl: string;
-    public image: string;
-    public cropperSettings: CropperSettings;
-    public showProgressSpinner: boolean;
-    public vehicleTypes: string[];
+    /**
+     * Want to force validators to process on submit. Non-text fields will only validate on submit too!
+     */
+    public activateValidation: boolean = false;
+    public image: string = null;
+    public cropperSettings: CropperSettings = new CropperSettings();
+    public showProgressSpinner: boolean = false;
+    public vehicleTypes: string[] = VEHICLE_TYPE_VALUES;
 
 
     public constructor (
@@ -39,19 +41,12 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
         private _addFoodListingService: AddFoodListingService,
         private _logger: NGXLogger,
         validationService: ValidationService,
-        formBuilder: FormBuilder,
-        domainService: GetDomainValuesService
+        formBuilder: FormBuilder
     ) {
         super(validationService, formBuilder);
 
-        this.TITLE_MAX_LENGTH = 30;
-
-        // Want to force validators to process on submit. Non-text fields will only validate on submit too!
-        this.validate = false;
-
         // If the window size goes below this threshold, then the cropper must be initialized below the optimal size of 300px.
         const thresholdCropperWidth: number = 367;
-        this.cropperSettings = new CropperSettings();
         this.cropperSettings.width = (window.innerWidth < thresholdCropperWidth ? 300 - (thresholdCropperWidth - window.innerWidth)
                                                                                 : 300);
         this.cropperSettings.height = this.cropperSettings.width;
@@ -61,13 +56,6 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
         this.cropperSettings.canvasHeight = this.cropperSettings.height;
         this.cropperSettings.noFileInput = true;
         this.cropperSettings.fileType = 'image/jpeg';
-
-        domainService.getDomainValues('VehicleType').subscribe((vehicleTypes: string[]) => {
-            this.vehicleTypes = vehicleTypes;
-        });
-
-        this.showProgressSpinner = false;
-        this.form = new FormGroup({});
     }
 
 
@@ -83,30 +71,30 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
 
         this.form = new FormGroup({});
 
-        let foodListingUpload: FoodListingUpload = new FoodListingUpload();
+        let foodListingUpload: FoodListing = new FoodListing();
 
         // Fill the form group view model based off of the properties found in FoodListingUpload.
         // This way, our view-model will always be in-sync with the shared object.
         for (let property in foodListingUpload) {
 
-            if (foodListingUpload.hasOwnProperty(property)) {
-
+            if (    !foodListingUpload.hasOwnProperty(property)
                 // All of these members are not included in the form view-model!
-                if (    property === 'foodListingKey'
-                    ||  property === 'imageUploads')
-                { continue; }
+                ||  property === 'foodListingKey'
+                ||  property === 'imgUrls'
+                ||  property === 'donorInfo'
+                ||  property === 'claimInfo'
+                ||  property === 'donationAvailability')
+            { continue; }
 
-                let validators: ValidatorFn[] = [ Validators.required ];
+            let validators: ValidatorFn[] = [ Validators.required ];
 
-                // Add additional needed validators for email and password fields.
-                switch (property) {
-                    case 'foodTitle':       validators.push(Validators.maxLength(this.TITLE_MAX_LENGTH));   break;
-                    case 'foodDescription': validators = null;                                              break;
-                }
-
-                this.form.addControl(property, new FormControl(null, validators));
+            // Add additional needed validators for email and password fields.
+            switch (property) {
+                case 'foodTitle':       validators.push(Validators.maxLength(this.TITLE_MAX_LENGTH));   break;
+                case 'foodDescription': validators = null;                                              break;
             }
 
+            this.form.addControl(property, new FormControl(null, validators));
         }
     }
 
@@ -139,7 +127,7 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
      * @return true if it is invalid, false if it is valid.
      */
     public isErrorState(control: FormControl | null): boolean {
-        return control.errors != null && (control.touched || this.validate);;
+        return control.errors != null && (control.touched || this.activateValidation);;
     }
 
 
@@ -149,7 +137,7 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
      * @return true if it is invalid, false if it is valid.
      */
     public isInvalid(validField: AbstractControl): boolean {
-        return validField != null && validField.errors != null && (validField.touched || this.validate);
+        return validField != null && validField.errors != null && (validField.touched || this.activateValidation);
     }
 
 
@@ -168,9 +156,9 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
      * If the form is valid, then it will proceed to the confirmation display.
      * @param stepper The horizontal stepper that will be invoked to proceed to confirmation display if form is valid.
      */
-    public ifValidProceedToReview(value: FoodListingUpload, valid: boolean, stepper: MatHorizontalStepper): void {
+    public ifValidProceedToReview(value: FoodListing, valid: boolean, stepper: MatHorizontalStepper): void {
 
-        this.validate = true;
+        this.activateValidation = true;
         if (valid)  stepper.next();
     }
 
@@ -181,7 +169,7 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
      * @param valid The valid state of the donation form.
      * @param stepper The stepper for this Donor Form.
      */
-    public submitDonation(value: FoodListingUpload, valid: boolean, stepper: MatHorizontalStepper): void {
+    public submitDonation(value: FoodListing, valid: boolean, stepper: MatHorizontalStepper): void {
         
         let observer: Observable<number> = this._addFoodListingService.addFoodListing(value, this.image);
         this.showProgressSpinner = true;
@@ -210,7 +198,7 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
         stepper.selectedIndex = 0;
 
         // Reset form and validation.
-        this.validate = false;
+        this.activateValidation = false;
         this.form.reset();
 
         // Reset image cropper.
@@ -223,7 +211,7 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
      * Allows the user to return to edit a Donation just after submitting it.
      */
     public editDonation(stepper: MatHorizontalStepper): void {
-        this.validate = false;
+        this.activateValidation = false;
         stepper.previous();
     }
 }

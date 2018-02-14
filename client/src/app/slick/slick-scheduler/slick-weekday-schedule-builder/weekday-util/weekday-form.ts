@@ -1,5 +1,5 @@
 "use strict";
-import { FormGroup, FormArray, FormControl, ValidatorFn } from '@angular/forms';
+import { FormGroup, FormArray, FormControl, ValidatorFn, Validators } from '@angular/forms';
 
 import { WeekdaySplitService } from './weekday-split.service';
 import { DateFormatterService } from '../../../../common-util/services/date-formatter.service';
@@ -91,8 +91,18 @@ export class WeekdayForm extends FormGroup {
         for (let i: number = 0; i < availabilityRanges.length; i++) {
             
             const weekday: string = this._dateFormatter.covertWeekdayIntToString(availabilityRanges[i].startTime.getDay());
-            (<FormArray>this.get(weekday)).push(new FormControl(new DateRange(availabilityRanges[i].startTime, availabilityRanges[i].endTime)));
+            this.addAvailabilityRange(weekday, availabilityRanges[i]);
         }
+    }
+
+
+    /**
+     * Adds a (given) Availability Range to a contained weekday Form Array.
+     * @param weekday The weekday to add the Availability Range to.
+     * @param value (Optional) The value to set for the new Availability Range control that was added. Default is null for empty.
+     */
+    public addAvailabilityRange(weekday: string, value: DateRange = null): void {
+        (<FormArray>this.get(weekday)).push(new FormControl(value, Validators.required));
     }
 
 
@@ -111,5 +121,15 @@ export class WeekdayForm extends FormGroup {
                 weekdaysFormArr.removeAt(0);
             }
         }
+    }
+
+
+    /**
+     * Removes a contained Availability Range at a given weekday and Form Array index.
+     * @param weekday The weekday (index [0, 6]) to remove the availability range from.
+     * @param index The index (within the weekday Form Array) of the availability range to remove.
+     */
+    public removeAvailabilityRange(weekday: string, index: number): void {
+        (<FormArray>this.get(weekday)).removeAt(index);
     }
 }

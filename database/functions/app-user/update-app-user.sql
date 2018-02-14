@@ -19,7 +19,7 @@ CREATE OR REPLACE FUNCTION updateAppUser
     _zip                    ContactInfo.zip%TYPE                DEFAULT NULL,
     _phone                  ContactInfo.phone%TYPE              DEFAULT NULL,
     _appUserType            AppUser.appUserType%TYPE            DEFAULT NULL,
-    _availability           JSON[]                              DEFAULT NULL,
+    _availabilityTimeRanges JSON[]                              DEFAULT NULL,
     _organizationName       Organization.name%TYPE              DEFAULT NULL,
     _taxId                  Organization.taxId%TYPE             DEFAULT NULL
 )
@@ -67,9 +67,9 @@ BEGIN
         VALUES      (_appUserKey, _password);
     END IF;
 
-    IF (_availability IS NOT NULL)
+    IF (_availabilityTimeRanges IS NOT NULL)
     THEN
-        PERFORM addOrUpdateAvailability(_appUserKey, _availability);
+        PERFORM addOrUpdateAvailability(_appUserKey, _availabilityTimeRanges);
     END IF;
 
     RETURN QUERY

@@ -6,16 +6,19 @@ import { MatDatepickerModule,
          DateAdapter,
          NativeDateAdapter,
          MAT_DATE_FORMATS,
-         MAT_NATIVE_DATE_FORMATS } from '@angular/material';
+         MAT_NATIVE_DATE_FORMATS, 
+         MatInputModule } from '@angular/material';
 
 
 @NgModule({
     imports: [
         CommonModule,
+        MatInputModule,
         MatDatepickerModule,
         MatNativeDateModule,
     ],
     exports: [
+        MatInputModule,
         MatDatepickerModule,
         MatNativeDateModule
     ],

@@ -6,12 +6,10 @@ import { removeFoodListing } from "./donor/remove-food-listing";
 import { getFoodListings } from './get-food-listings';
 import { claimFoodListing, unclaimFoodListing } from './receiver/claim-unclaim-food-listing';
 
-import { AddFoodListingRequest, AddFoodListingResponse, FoodListingUpload } from '../../../shared/src/receiver-donor/message/add-food-listing-message'
-import { GetFoodListingsRequest, GetFoodListingsResponse, FoodListing } from '../../../shared/src/receiver-donor/message/get-food-listings-message';
+import { AddFoodListingRequest, AddFoodListingResponse } from '../../../shared/src/receiver-donor/message/add-food-listing-message'
+import { GetFoodListingsRequest, GetFoodListingsResponse, FoodListing } from '../../../shared/src/common-receiver-donor-deliverer/message/get-food-listings-message';
 import { ManageFoodListingRequest } from '../../../shared/src/receiver-donor/message/manage-food-listing-message';
-import { LISTINGS_STATUS } from "../../../shared/src/receiver-donor/food-listings-filters";
 import { FoodWebResponse } from "../../../shared/src/message-protocol/food-web-response";
-import { Deserializer } from '../../../shared/src/deserialization/deserializer';
 
 
 export function handleGetFoodListings(request: Request, response: Response): void {
@@ -38,7 +36,7 @@ export function handleAddFoodListing(request: Request, response: Response): void
     // The currently logged in user must be the Donor.
     let donorAppUserKey: number = SessionData.loadSessionData(request).appUserKey;
 
-    addFoodListing(addFoodListingRequest.foodListingUpload, donorAppUserKey)
+    addFoodListing(addFoodListingRequest.foodListing, addFoodListingRequest.imgUploads, donorAppUserKey)
         .then((foodListingKey: number) => {
             response.send(new AddFoodListingResponse(foodListingKey, true, 'Food Listing Added Successfully'));
         })

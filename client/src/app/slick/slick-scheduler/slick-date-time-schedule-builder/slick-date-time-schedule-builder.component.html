@@ -1,0 +1,30 @@
+<form [formGroup]="form" class="container no-pad-top-input">
+
+    <div class="row" [formArrayName]="AVAILABILITY_RANGES_CTRL_NAME">
+
+        <div *ngFor="let availabilityRange of control(AVAILABILITY_RANGES_CTRL_NAME)['controls']; let i = index"
+            class="time-range-container" [ngClass]="{   'display-time-range-container': displayOnly,
+                                                        'edit-time-range-container': !displayOnly }">
+
+            <slick-time-range [activateValidation]="activateValidation" [displayOnly]="displayOnly" [includeDate]="true" [formControlName]="i"></slick-time-range>
+            <button (click)="removeAvailabilityRange(i)" type="button" class="remove-button" *ngIf="allowRemove && !displayOnly">&times;</button>
+
+        </div>
+
+        <div class="link-content add-container" *ngIf="canAddNewAvailabilityRange()">
+
+            <a (click)="addAvailabilityRange()">
+                <button type="button" class="add-button accent-background-darker">+</button>
+                <span class="add-span">Add Availability</span>
+            </a>
+
+        </div>
+
+    </div>
+
+    <div id="err-msg" class="warn-foreground" *ngIf="activateValidation && form.hasError('required')">
+        <span>* Must input at least one availability time range.</span>
+    </div>
+    <br>
+
+</form>

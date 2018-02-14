@@ -5,9 +5,9 @@ export class CancelDeliveryRequest {
     
     public constructor (
         /**
-         * The key identifier of the Claimed Food Listing whose delivery is to be (un)claimed.
+         * The key identifier of the delivery that is to be cancelled.
          */
-        public deliveryFoodListingKey: number,
+        public deliveryInfoKey: number,
         /**
          * The required reason for the cancellation.
          */

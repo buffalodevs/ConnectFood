@@ -5,7 +5,7 @@ import { getDeliveries } from './get-deliveries';
 import { scheduleDelivery } from './schedule-delivery';
 import { cancelDelivery } from './cancel-delivery';
 
-import { GetDeliveriesRequest, GetDeliveriesResponse, Delivery } from '../../../shared/src/deliverer/message/get-deliveries-message';
+import { GetFoodListingsRequest, GetFoodListingsResponse, FoodListing } from '../../../shared/src/common-receiver-donor-deliverer/message/get-food-listings-message'
 import { ScheduleDeliveryRequest } from '../../../shared/src/deliverer/message/schedule-delivery-message';
 import { ManageDeliveryRequest } from '../../../shared/src/deliverer/message/manage-delivery-message';
 import { CancelDeliveryRequest } from '../../../shared/src/deliverer/message/cancel-delivery-message';
@@ -19,7 +19,7 @@ export function handleGetDeliveries(request: Request, response: Response): void 
     
     response.setHeader('Content-Type', 'application/json');
 
-    const getDeliveriesRequest: GetDeliveriesRequest = request.body;
+    const getDeliveriesRequest: GetFoodListingsRequest = request.body;
     const sessionData: SessionData = SessionData.loadSessionData(request);
 
     getDeliveries (
@@ -27,11 +27,11 @@ export function handleGetDeliveries(request: Request, response: Response): void 
         sessionData.appUserKey,
         sessionData.appUser.contactInfo.gpsCoordinate,
         sessionData.appUser.contactInfo.utcOffsetMins
-    ).then((deliveries: Delivery[]) => {
-        response.send(new GetDeliveriesResponse(deliveries, true, 'Delivery Food Listings Successfully Retrieved'));
+    ).then((deliveries: FoodListing[]) => {
+        response.send(new GetFoodListingsResponse(deliveries, true, 'Delivery Food Listings Successfully Retrieved'));
     })
     .catch((err: Error) => {
-        response.send(new GetDeliveriesResponse(null, false, err.message));
+        response.send(new GetFoodListingsResponse(null, false, err.message));
     });
 }
 
@@ -44,7 +44,7 @@ export function handleScheduleDelivery(request: Request, response: Response): vo
     const sessionData: SessionData = SessionData.loadSessionData(request);
 
     scheduleDelivery (
-        scheduleDeliveryRequest.claimedFoodListingKey,
+        scheduleDeliveryRequest.claimInfoKey,
         sessionData,
         scheduleDeliveryRequest.startImmediately,
         scheduleDeliveryRequest.scheduledStartTime
@@ -65,7 +65,7 @@ export function handleCancelDelivery(request: Request, response: Response): void
     const sessionData: SessionData = SessionData.loadSessionData(request);
 
     cancelDelivery (
-        cancelDeliveryRequest.deliveryFoodListingKey,
+        cancelDeliveryRequest.deliveryInfoKey,
         sessionData,
         cancelDeliveryRequest.cancelReason,
         cancelDeliveryRequest.foodRejected
@@ -86,7 +86,7 @@ export function handleUpdateDeliveryState(request: Request, response: Response):
     const sessionData: SessionData = SessionData.loadSessionData(request);
 
     updateDeliveryState (
-        updateDeliveryStateRequest.deliveryFoodListingKey,
+        updateDeliveryStateRequest.deliveryInfoKey,
         sessionData,
         updateDeliveryStateRequest.deliveryState
     ).then(() => {

@@ -16,7 +16,7 @@ CREATE OR REPLACE FUNCTION addAppUser
     _zip                    ContactInfo.zip%TYPE,
     _phone                  ContactInfo.phone%TYPE,
     _appUserType            AppUser.appUserType%TYPE,
-    _availabilityDateRanges JSON[],
+    _availabilityTimeRanges JSON[],
     _organizationName       Organization.name%TYPE,
     _taxId                  Organization.taxId%TYPE
 )

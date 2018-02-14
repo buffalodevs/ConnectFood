@@ -4,17 +4,17 @@ import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
-import { AppUserTypesService } from '../../domain/app-user-types/app-user-types.service';
 import { SignupService } from './signup.service'
 import { AppUserConstantsService } from '../common-app-user/app-user-constants.service';
 import { AppUserValidationService, Validation } from '../common-app-user/app-user-validation.service';
 import { SlickTypeaheadService } from '../../slick/slick-type-ahead/slick-type-ahead.service';
 import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
 
-import { AppUser, AppUserType, Organization, ContactInfo, AppUserAvailability, AvailabilityType } from "../../../../../shared/src/app-user/app-user";
+import { AppUser, AppUserType, Organization, ContactInfo } from "../../../../../shared/src/app-user/app-user";
 import { FoodWebResponse } from "../../../../../shared/src/message-protocol/food-web-response";
 import { ObjectManipulation } from '../../../../../shared/src/common-util/object-manipulation';
 import { AppUserErrorMsgs } from '../../../../../shared/src/app-user/message/app-user-error-msgs';
+import { APP_USER_TYPE_VALUES } from "../../../../../shared/src/app-user/app-user-domain/app-user-type";
 
 
 @Component({
@@ -25,41 +25,22 @@ import { AppUserErrorMsgs } from '../../../../../shared/src/app-user/message/app
 })
 export class SignupComponent extends AbstractModelDrivenComponent implements OnInit {
 
-    private _appUserTypes: string[];
-    get appUserTypes(): string[] {
-        return this._appUserTypes
-    }
-
-    private _signupError: string;
-    get signupError(): string {
-        return this._signupError;
-    }
-
-    private _signupComplete: boolean;
-    get signupComplete(): boolean {
-        return this._signupComplete;
-    }
-
+    public appUserTypes: string[] = APP_USER_TYPE_VALUES;
+    public signupError: string;
+    public signupComplete: boolean;
     /**
      * This gets set to 'Admin' when the user signing up is an organization. If not, then it will be an empty string.
      */
-    private _adminPreStr: string;
-    get adminPreStr(): string {
-        return this._adminPreStr;
-    }
-
+    public adminPreStr: string;
     /**
      * Used to keep track of submission of signup so we can show progress spinner.
      */
-    private _showProgressSpinner: boolean;
-    get showProgressSpinner(): boolean {
-        return this._showProgressSpinner;
-    }
+    public showProgressSpinner: boolean;
 
     /**
      * Marks whether or not valiation should fire for a specific field in the form.
      */
-    private _fieldValidateFlags: Map <string, boolean>;
+    private _fieldValidateFlags: Map <string, boolean> = new Map <string, boolean>();
 
 
     public constructor (
@@ -68,19 +49,10 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
         public typeaheadService: SlickTypeaheadService,
         private _signupService: SignupService,
         private _logger: NGXLogger,
-        appUserTypesService: AppUserTypesService,
         formBuilder: FormBuilder,
 
     ) {
         super(validationService, formBuilder);
-
-        this._signupError = null;
-        this._signupComplete = false;
-        this._adminPreStr = '';
-        this._fieldValidateFlags = new Map <string, boolean>();
-        this._showProgressSpinner = false;
-
-        appUserTypesService.getAppUserTypes().subscribe((appUserTypes: string[]) => { this._appUserTypes = appUserTypes });
     }
 
 
@@ -156,12 +128,12 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
         let taxIdControl: FormControl = <FormControl>this.form.get('primary.taxId');
 
         if (this.isOrganization()) {
-            this._adminPreStr = 'Admin';
+            this.adminPreStr = 'Admin';
             this.validationService.setValidatorsAndRefresh(organizationNameControl, [Validators.required]);
             this.validationService.setValidatorsAndRefresh(taxIdControl, [Validators.required]);
         }
         else {
-            this._adminPreStr = '';
+            this.adminPreStr = '';
             this.validationService.setValidatorsAndRefresh(organizationNameControl, null);
             this.validationService.setValidatorsAndRefresh(taxIdControl, null);
         }
@@ -193,22 +165,20 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
 
         // Copy form values to AppUser object.
         ObjectManipulation.shallowCopy(value.primary, appUser, null, true);
-        appUser.organization = new Organization();
         ObjectManipulation.shallowCopy(value.primary, appUser.organization, null, true);
-        appUser.contactInfo = new ContactInfo();
-        ObjectManipulation.shallowCopy(value.addressPhone, appUser, null, true);
-        appUser.availability = new AppUserAvailability(AvailabilityType.regularWeekly);
-        appUser.availability.timeRanges = value.availability;
+        appUser.organization.name = value.primary.organizationName;
+        ObjectManipulation.shallowCopy(value.contactInfo, appUser.contactInfo, null, true);
+        appUser.availability = value.availability;
 
         let observer: Observable <FoodWebResponse> = this._signupService.signup(appUser, password);
-        this._showProgressSpinner = true;
+        this.showProgressSpinner = true;
 
-        observer.finally(() => { this._showProgressSpinner = false; })
+        observer.finally(() => { this.showProgressSpinner = false; })
                 .subscribe (
                     this.handleSignupUserResponse.bind(this),
                     // When we have errors connecting to server.
                     (err: Error) => {
-                        this._signupError = 'Error: could not communication with server';
+                        this.signupError = 'Error: could not communication with server';
                         this._logger.error(err);
                     }
                 );
@@ -222,12 +192,12 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
     private handleSignupUserResponse(signupResponse: FoodWebResponse): void {
 
         if (signupResponse.success) {
-            this._signupError = null;
-            this._signupComplete = true;
+            this.signupError = null;
+            this.signupComplete = true;
             scroll(0, 0);
         }
         else {
-            this._signupError = signupResponse.message;
+            this.signupError = signupResponse.message;
 
             if (this.signupError === AppUserErrorMsgs.DUPLICATE_EMAIL) {
                 // TODO: Goto primary info tab.

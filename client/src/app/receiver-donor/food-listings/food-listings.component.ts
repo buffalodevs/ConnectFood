@@ -8,8 +8,8 @@ import { GetListingsService } from '../../slick/slick-filtered-list/slick-list/s
 import { ConsumableListingCacheService } from '../../slick/slick-filtered-list/slick-list/services/consumable-listing-cache.service';
 import { DateFormatterService } from '../../common-util/services/date-formatter.service';
 
-import { FoodListing } from '../../../../../shared/src/receiver-donor/food-listing';
-import { FoodListingsFilters } from "../../../../../shared/src/receiver-donor/food-listings-filters";
+import { FoodListing } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
+import { FoodListingFilters } from "../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters";
 
 
 @Component({
@@ -17,7 +17,7 @@ import { FoodListingsFilters } from "../../../../../shared/src/receiver-donor/fo
     templateUrl: './food-listings.component.html',
     styleUrls: ['./food-listings.component.css', '../../slick/slick-filtered-list/slick-list/slick-list.component.css']
 })
-export class FoodListingsComponent extends SlickListComponent <FoodListing, FoodListingsFilters> {
+export class FoodListingsComponent extends SlickListComponent <FoodListing, FoodListingFilters> {
 
     @Input() public header: string;
     @Input() public isClaimedCart: boolean;
@@ -27,7 +27,7 @@ export class FoodListingsComponent extends SlickListComponent <FoodListing, Food
     public constructor (
         public dateFormatter: DateFormatterService,
         elementRef: ElementRef,
-        getListingsService: GetListingsService <FoodListing, FoodListingsFilters>,
+        getListingsService: GetListingsService <FoodListing, FoodListingFilters>,
         consumableListingCacheService: ConsumableListingCacheService <FoodListing>,
         router: Router,
         dialogService: MatDialog

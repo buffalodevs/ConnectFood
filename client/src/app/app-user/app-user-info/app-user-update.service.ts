@@ -6,6 +6,7 @@ import { RequestService } from '../../common-util/services/request.service';
 import { SessionDataService } from '../../common-util/services/session-data.service';
 
 import { UpdateAppUserRequest, UpdateAppUserResponse } from '../../../../../shared/src/app-user/message/update-app-user-message';
+import '../../../../../shared/src/app-user/message/update-app-user-message'; // IMPORTANT: So that class decorator for deserialization will run (won't be victim of tree shaking).
 import { AppUser } from "../../../../../shared/src/app-user/app-user";
 import { FoodWebResponse } from "../../../../../shared/src/message-protocol/food-web-response";
 

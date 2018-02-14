@@ -1,9 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, AbstractControl } from '@angular/forms';
-
 import { DeliveryUtilService } from '../delivery-listings/delivery-services/delivery-util.service';
-
-import { DeliveryFilters } from '../../../../../shared/src/deliverer/delivery-filters';
+import { FoodListingsStatus, FoodListingFilters } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters';
 
 
 @Component({
@@ -22,9 +20,11 @@ export class DeliveryCartComponent {
     ) {
         this.deliveryStates = this.deliveryUtilService.getDeliveryStateVals();
         this.deliveryStates[0] = null; // Replace 'Unscheduled' with null as first element for default 'Any State' value.
+
+        const filters: FoodListingFilters = new FoodListingFilters();
         this.additionalFilters = new Map <string, AbstractControl>([
-            [ 'deliveryState', new FormControl(null) ],
-            [ 'myScheduledDeliveries', new FormControl(true) ]
+            [ 'deliveryState', new FormControl(filters.deliveryState) ],
+            [ 'foodListingsStatus', new FormControl(FoodListingsStatus.myScheduledDeliveries) ]
         ]);
     }
 }

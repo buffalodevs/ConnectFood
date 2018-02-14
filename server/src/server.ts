@@ -33,8 +33,8 @@ import { handleGetDeliveries,
          handleScheduleDelivery, 
          handleCancelDelivery,
          handleUpdateDeliveryState } from './deliverer/deliverer-controller';
-import { handleGetDomainValues } from './domain/domain-controller';
 import { handleLogClientData } from './logging/client-data-logger';
+import { bootstrapDatabase } from './database-util/database-bootstrap/database-bootstrap';
 
 
 // Configure paths to client JS files and public resource files (such as images).
@@ -53,7 +53,7 @@ SessionData.sessionBootstrap(app);
 app.use(deserialize);   // Automatically perform Custom Deserialization of all incomming data. 
 app.use(logRequest);    // Log all express requests.
 app.use(logResponse);   // Log all express responses.
-app.set('port', (process.env.PORT || 5000));
+app.set('port', (process.env.FOOD_WEB_SERVER_PORT || 5000));
 module.exports = app; // Make available for mocha testing suites.
 
 
@@ -82,10 +82,6 @@ app.post('/deliverer/cancelDelivery',                   SessionData.ensureSessio
 app.post('/deliverer/updateDeliveryState',              SessionData.ensureSessionActive, handleUpdateDeliveryState);
 
 
-// Domain Controller.
-app.post('/domain/getDomainValues',                     handleGetDomainValues);
-
-
 app.post('/logging/logClientData',                      handleLogClientData);
 
 
@@ -108,7 +104,12 @@ app.get('*', function (request, response) {
 });
 
 
-// Log Message That Says When App is Up & Running.
-app.listen(app.get('port'), function() {
-    logger.info('Node app is running on port', app.get('port'));
+// Do any database initialization that is necessary before we start servicing requests.
+bootstrapDatabase().then(() => {
+
+    app.listen(app.get('port'), function() {
+        // Log Message That Says When App is Up & Running.
+        logger.info('Node app is running on port', app.get('port'));
+    }); 
+
 });

@@ -36,10 +36,10 @@
 
                     <div class="space-bottom" *ngIf="isClaimedCart">
                         <div><b>Deliverer</b></div>
-                        <span *ngIf="foodListing.claimInfo.delivererInfo != null">
-                            {{ foodListing.claimInfo.delivererInfo.firstName + ' ' + foodListing.claimInfo.delivererInfo.lastName }}
+                        <span *ngIf="foodListing.claimInfo.deliveryInfo.delivererInfo != null">
+                            {{ foodListing.claimInfo.deliveryInfo.delivererInfo.firstName + ' ' + foodListing.claimInfo.deliveryInfo.delivererInfo.lastName }}
                         </span>
-                        <span *ngIf="foodListing.claimInfo.delivererInfo == null">
+                        <span *ngIf="foodListing.claimInfo.deliveryInfo.delivererInfo == null">
                             None
                         </span>
                     </div>
@@ -86,10 +86,10 @@
 
                     <div class="space-bottom">
                         <div><b>Deliverer</b></div>
-                        <span *ngIf="foodListing.claimInfo.delivererInfo != null">
-                            {{ foodListing.claimInfo.delivererInfo.firstName + ' ' + foodListing.claimInfo.delivererInfo.lastName }}
+                        <span *ngIf="foodListing.claimInfo.deliveryInfo.delivererInfo != null">
+                            {{ foodListing.claimInfo.deliveryInfo.delivererInfo.firstName + ' ' + foodListing.claimInfo.deliveryInfo.delivererInfo.lastName }}
                         </span>
-                        <span *ngIf="foodListing.claimInfo.delivererInfo == null">
+                        <span *ngIf="foodListing.claimInfo.deliveryInfo.delivererInfo == null">
                             None
                         </span>
                     </div>

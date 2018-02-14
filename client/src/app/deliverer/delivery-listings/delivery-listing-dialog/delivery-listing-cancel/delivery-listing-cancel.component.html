@@ -1,7 +1,7 @@
 <form [formGroup]="form" *ngIf="!cancelComplete" [slick-progress-spinner]="showProgressSpinner">
 
     <h5>Has the food been judged inadquate and rejected?</h5>
-    <mat-radio-group name="foodRejected" formControlName="foodRejected" [ngClass]="{ 'warn-foreground': (validate && !cancelForm.get('foodRejected').valid) }">
+    <mat-radio-group name="foodRejected" formControlName="foodRejected" [ngClass]="{ 'warn-foreground': (activateValidation && !cancelForm.get('foodRejected').valid) }">
         <mat-radio-button name="foodRejected" [value]="true">Yes</mat-radio-button>
         <mat-radio-button id="food-rejected-no" name="foodRejected" [value]="false">No</mat-radio-button>
     </mat-radio-group>

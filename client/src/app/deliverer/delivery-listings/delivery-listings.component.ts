@@ -9,8 +9,8 @@ import { GetListingsService } from '../../slick/slick-filtered-list/slick-list/s
 import { ConsumableListingCacheService } from '../../slick/slick-filtered-list/slick-list/services/consumable-listing-cache.service';
 import { DeliveryListingDialogData, DeliveryListingDialogComponent } from './delivery-listing-dialog/delivery-listing-dialog.component';
 
-import { Delivery } from '../../../../../shared/src/deliverer/delivery';
-import { DeliveryFilters } from '../../../../../shared/src/deliverer/delivery-filters';
+import { FoodListing } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
+import { FoodListingFilters } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters';
 
 
 @Component({
@@ -18,7 +18,7 @@ import { DeliveryFilters } from '../../../../../shared/src/deliverer/delivery-fi
     templateUrl: './delivery-listings.component.html',
     styleUrls: ['./delivery-listings.component.css', '../../slick/slick-filtered-list/slick-list/slick-list.component.css']
 })
-export class DeliveryListingsComponent extends SlickListComponent <Delivery, DeliveryFilters> {
+export class DeliveryListingsComponent extends SlickListComponent <FoodListing, FoodListingFilters> {
 
     @Input() public header: string;
     @Input() public isCart: boolean;
@@ -26,8 +26,8 @@ export class DeliveryListingsComponent extends SlickListComponent <Delivery, Del
 
     public constructor (
         elementRef: ElementRef,
-        getListingsService: GetListingsService <Delivery, DeliveryFilters>,
-        consumableListingCacheService: ConsumableListingCacheService <Delivery>,
+        getListingsService: GetListingsService <FoodListing, FoodListingFilters>,
+        consumableListingCacheService: ConsumableListingCacheService <FoodListing>,
         router: Router,
         dialogService: MatDialog,
         public sessionDataService: SessionDataService, // Referenced in HTML template

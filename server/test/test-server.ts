@@ -1,10 +1,15 @@
 import * as chai from 'chai';
 import * as server from '../src/server';
+import { logger } from '../src/logging/logger';
 
 chai.use(require('chai-http'));
 let should: Chai.Should = chai.should();
 let expect: Chai.ExpectStatic = chai.expect;
 export { chai, server, should, expect };
+
+
+// Turn off logging for testing.
+logger.transports.console.level = 'error';
 
 
 export let enableLogResponse: boolean = false;

@@ -1,9 +1,10 @@
 "use strict";
 import { Injectable } from '@angular/core';
 import { DateFormatterService } from '../../../common-util/services/date-formatter.service';
-import { Delivery, DeliveryState, DeliveryUtil } from '../../../../../../shared/src/deliverer/delivery-util';
+import { DeliveryState, DeliveryUtil } from '../../../../../../shared/src/deliverer/delivery-util';
+import { FoodListing } from '../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
 
-export { Delivery, DeliveryState };
+export { DeliveryState };
 
 
 @Injectable()
@@ -18,8 +19,8 @@ export class DeliveryUtilService {
      * @param delivery The Delivery object which contains driving distance data (in miles).
      * @return The max possible diameter (in miles).
      */
-    public calcMaxMapDiameterFromDelivery(delivery: Delivery): number {
-        return (delivery.donorInfo.contactInfo.drivingDistance + delivery.receiverInfo.contactInfo.drivingDistance);
+    public calcMaxMapDiameterFromDelivery(delivery: FoodListing): number {
+        return (delivery.donorInfo.contactInfo.drivingDistance + delivery.claimInfo.receiverInfo.contactInfo.drivingDistance);
     }
 
 
@@ -28,8 +29,8 @@ export class DeliveryUtilService {
      * @param delivery The Delivery object which contains driving distance data.
      * @return The total driving distance for the delivery (in miles).
      */
-    public calcTotalDrivingDistance(delivery: Delivery): number {
-        return (Math.round((delivery.donorInfo.contactInfo.drivingDistance + delivery.receiverInfo.contactInfo.drivingDistance) * 100) / 100);
+    public calcTotalDrivingDistance(delivery: FoodListing): number {
+        return (Math.round((delivery.donorInfo.contactInfo.drivingDistance + delivery.claimInfo.receiverInfo.contactInfo.drivingDistance) * 100) / 100);
     }
 
 
@@ -38,8 +39,8 @@ export class DeliveryUtilService {
      * @param delivery The Delivery object which contains driving time data.
      * @return The total driving time for a delivery (in minutes).
      */
-    public calcTotalDrivingTime(delivery: Delivery): number {
-        return (Math.round((delivery.donorInfo.contactInfo.drivingTime + delivery.receiverInfo.contactInfo.drivingTime) * 100) / 100);
+    public calcTotalDrivingTime(delivery: FoodListing): number {
+        return (Math.round((delivery.donorInfo.contactInfo.drivingTime + delivery.claimInfo.receiverInfo.contactInfo.drivingTime) * 100) / 100);
     }
 
 
@@ -48,7 +49,7 @@ export class DeliveryUtilService {
      * @param delivery The delivery to check.
      * @return true if it can be started now, false if not.
      */
-    public isPossibleDeliveryTimeNow(delivery: Delivery): boolean {
+    public isPossibleDeliveryTimeNow(delivery: FoodListing): boolean {
 
         // The + 600000 is for a 10 minute buffer before the end of the possible delivery Time Range.
         const totalDeliveryTimeMs: number = ( this.calcTotalDrivingTime(delivery) * 60 * 1000 ) + 600000;
@@ -58,10 +59,10 @@ export class DeliveryUtilService {
         const currentTimeMs: number = currentDateTime.valueOf();
 
         // See if the current time falls in between any of the possible delivery time ranges.
-        for (let i: number = 0; i < delivery.possibleDeliveryTimes.length; i++) {
+        for (let i: number = 0; i < delivery.claimInfo.possibleDeliveryTimes.length; i++) {
 
-            const startTimeMs: number = delivery.possibleDeliveryTimes[i].startTime.valueOf();
-            const endTimeMs: number = delivery.possibleDeliveryTimes[i].endTime.valueOf();
+            const startTimeMs: number = delivery.claimInfo.possibleDeliveryTimes[i].startTime.valueOf();
+            const endTimeMs: number = delivery.claimInfo.possibleDeliveryTimes[i].endTime.valueOf();
 
             if (currentTimeMs >= startTimeMs && currentTimeMs <= (endTimeMs - totalDeliveryTimeMs))
             {  return true;  }

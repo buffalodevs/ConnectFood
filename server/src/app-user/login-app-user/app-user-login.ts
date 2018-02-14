@@ -8,7 +8,6 @@ import { DESERIALIZER } from '../../deserialization/deserialization';
 
 import { AppUserErrorMsgs } from '../../../../shared/src/app-user/message/app-user-error-msgs';
 import { DateRange } from '../../../../shared/src/date-time-util/date-range';
-import { AvailabilityType } from '../../../../shared/src/app-user/app-user-availability';
 
 
 /**
@@ -57,7 +56,6 @@ function extractAndDeserializeSessionData(email: string, getAppUserSessionResult
 
         let sessionData: SessionData = getAppUserSessionResult.rows[0].sessiondata;
         sessionData.appUser = DESERIALIZER.deserialize(sessionData.appUser, AppUser);
-        sessionData.appUser.availability.availabilityType = AvailabilityType.regularWeekly;
         return sessionData;
     }
 

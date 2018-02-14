@@ -10,6 +10,7 @@ import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 import { HomeComponent } from './home/home.component';
 import { BannerService } from '../common-util/services/banner.service';
+import { SlickDateTimeScheduleBuilderModule } from '../slick/slick-scheduler/slick-date-time-schedule-builder/slick-date-time-schedule-builder.module';
 
 
 const appBaseRoutes: Routes = [
@@ -31,7 +32,8 @@ const appBaseRoutes: Routes = [
         RouterModule.forChild(appBaseRoutes),
         NgbModule,
         MatButtonModule,
-        CommonUtilModule
+        CommonUtilModule,
+        SlickDateTimeScheduleBuilderModule
     ],
     exports: [
         HeaderComponent,

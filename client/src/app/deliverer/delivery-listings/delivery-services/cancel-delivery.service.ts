@@ -22,14 +22,14 @@ export class CancelDeliveryService {
 
     /**
      * Cancels a Delivery.
-     * @param deiveryFoodListingKey The key identifier of the Delivery Food Listing that is to be acted upon.
+     * @param deliveryInfoKey The key identifier of the Delivery that is to be acted upon.
      * @param cancelReason The reason for the cancellation.
      * @param foodRejected Determines whether or not the food was rejected due to an inadequate quality.
      * @return An observable that resolves to true on success, false on non-fatal failure (such as when need login), and throws an error on fatal failure.
      */
-    public cancelDelivery(deliveryFoodListingKey: number, cancelReason: string, foodRejected: boolean): Observable <void> {
+    public cancelDelivery(deliveryInfoKey: number, cancelReason: string, foodRejected: boolean): Observable <void> {
 
-        return this._requestService.post('/deliverer/cancelDelivery', new CancelDeliveryRequest(deliveryFoodListingKey, cancelReason, foodRejected))
+        return this._requestService.post('/deliverer/cancelDelivery', new CancelDeliveryRequest(deliveryInfoKey, cancelReason, foodRejected))
                                    .map(this._requestService.genericResponseMap);
     }
 }
