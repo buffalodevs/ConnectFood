@@ -22,7 +22,13 @@ export class DeliverComponent {
 
         this.additionalFilters = new Map<string, AbstractControl>([
             [ 'matchRegularAvailability', new FormControl(filters.matchRegularAvailability) ],
+            [ 'matchAvailableNow', new FormControl(filters.matchAvailableNow) ],
             [ 'foodListingsStatus', new FormControl(FoodListingsStatus.unscheduledDeliveries) ]
         ]);
+
+        // Make sure that we update matchAvailableNow filter based on value of matchRegularAvailability (cannot bind both controls to radio group).
+        this.additionalFilters.get('matchRegularAvailability').valueChanges.subscribe((value: boolean) => {
+            this.additionalFilters.get('matchAvailableNow').setValue(!value);
+        });
     }
 }

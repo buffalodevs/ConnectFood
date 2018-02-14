@@ -1,12 +1,13 @@
 import _ = require("lodash");
 import { QueryResult, query } from "../database-util/connection-pool";
-import { logSqlQueryResult, logSqlQueryExec } from "./../logging/sql-logger";
 import { addArgPlaceholdersToQueryStr } from "../database-util/prepared-statement-util";
+import { logSqlQueryResult, logSqlQueryExec } from "./../logging/sql-logger";
+import { logger, prettyjsonRender } from "../logging/logger";
+import { DESERIALIZER } from "../deserialization/deserialization";
 
 import { FoodListing } from "../../../shared/src/common-receiver-donor-deliverer/food-listing";
 import { FoodListingFilters, FoodType, FoodListingsStatus } from "../../../shared/src/common-receiver-donor-deliverer/food-listing-filters";
 import { Validation } from "../../../shared/src/validation/validation";
-import { DESERIALIZER } from "../deserialization/deserialization";
 
 export { QueryResult };
 
@@ -25,8 +26,10 @@ export function sanitizeFilters(filters: FoodListingFilters): void {
     }
 
     filters.foodTypes = sanitizeFoodTypes(filters.foodTypes);
-    filters.matchRegularAvailability = sanitizeMatchRegularAvailability(filters.matchRegularAvailability, filters.foodListingsStatus);
+    filters.matchRegularAvailability = sanitizeMatchRegularAvailability(filters);
     filters.needsRefrigeration = sanitizeNeedsRefrigeration(filters.needsRefrigeration, filters.notNeedsRefrigeration);
+
+    logger.debug(prettyjsonRender(filters));
 }
 
 
@@ -44,12 +47,19 @@ function sanitizeFoodTypes(foodTypes: FoodType[]): FoodType[] {
 /**
  * Generates a refined match regular availability flag arugment.
  * Make sure we are only matching regular availability when looking for other listings in Receive tab (not in user's personal cart).
- * @param matchRegularAvailability The original match regular availability filter.
- * @param listingsStatus The status of the listings to retrieve.
+ * @param filters The Food Listing Filters containing availability match flags.
  * @return true if we should match regular availability, false if not.
  */
-function sanitizeMatchRegularAvailability(matchRegularAvailability: boolean, listingsStatus: FoodListingsStatus): boolean {
-    return ( matchRegularAvailability && listingsStatus === FoodListingsStatus.unclaimedListings );
+function sanitizeMatchRegularAvailability(filters: FoodListingFilters): boolean {
+
+    // If we are in a cart, then we don't care about matching availability.
+    if (filters.foodListingsStatus === FoodListingsStatus.myClaimedListings ||
+        filters.foodListingsStatus === FoodListingsStatus.myDonatedListings ||
+        filters.foodListingsStatus === FoodListingsStatus.myScheduledDeliveries )
+    { return false; }
+
+    // Else, we want to match by some availability criteria if not in a cart. If no availability criteria is set, then force match regular availability.
+    return filters.matchRegularAvailability || ( !filters.matchAvailableNow && !filters.matchSpecifiedAvailability );
 }
 
 

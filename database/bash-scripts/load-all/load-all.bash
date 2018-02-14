@@ -59,8 +59,9 @@ psql --set=sslmode=require -h $1 -p $2 -d $3 -U $4 \
     -f ../../functions/food-listing/claim-unclaim/claim-food-listing.sql \
     -f ../../functions/food-listing/claim-unclaim/unclaim-food-listing.sql \
  \
-    -f ../../functions/food-listing/get-food-listing-img-urls.sql \
-    -f ../../functions/food-listing/get-food-listings.sql
+    -f ../../functions/food-listing/get-food-listings/get-food-listing-img-urls.sql \
+    -f ../../functions/food-listing/get-food-listings/gen-availability-overlap-filters.sql \
+    -f ../../functions/food-listing/get-food-listings/get-food-listings.sql
 
 
 if [ "$5" != "-child_script" ]

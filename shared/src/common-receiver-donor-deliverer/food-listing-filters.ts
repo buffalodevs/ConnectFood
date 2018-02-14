@@ -77,9 +77,14 @@ export class FoodListingFilters implements SlickListFilters {
     public matchRegularAvailability: boolean = true;
 
     /**
-     * Determines whether or not we should only pull back deliveries for Donors and Receivers whose availability times match specified absolute input availability times.
+     * Determines whether or not we should only pull back Food Listings whose availability times match specified absolute input availability times.
      */
     public matchSpecifiedAvailability: boolean = false;
+
+    /**
+     * Determines whether or not we should only pull back Food Listings that are available now for delivery.
+     */
+    public matchAvailableNow: boolean = false;
 
     /**
      * If set, then only Deliveries with given state will be retrieved. Otherwise, all peranent Deliveries to current tab will be retrieved.

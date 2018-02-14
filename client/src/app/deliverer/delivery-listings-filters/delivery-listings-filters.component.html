@@ -16,9 +16,9 @@
         </mat-select>
     </mat-form-field>
 
-    <h5>Max Total Weight:</h5>
+    <h5>Max Estimated Weight:</h5>
     <mat-form-field floatPlaceholder="never">
-        <mat-select formControlName="maxEstimatedWeight" placeholder="Any Weight" title="Max total weight of donation (in lbs)" panelClass="select-panel">
+        <mat-select formControlName="maxEstimatedWeight" placeholder="Any Weight" title="Max estimated weight of donation (in lbs)" panelClass="select-panel">
             <mat-option *ngFor="let maxTotalWeight of MAX_TOTAL_WEIGHTS" [value]="maxTotalWeight">
                 {{ (maxTotalWeight != null) ? (maxTotalWeight + 'lbs') : 'Any Weight' }} 
             </mat-option>

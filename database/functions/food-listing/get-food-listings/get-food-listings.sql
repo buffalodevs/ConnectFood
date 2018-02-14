@@ -6,11 +6,11 @@
 SELECT dropFunction('getFoodListings');
 CREATE OR REPLACE FUNCTION getFoodListings
 (
-    _appUserKey                 AppUser.appUserKey%TYPE,                            -- The App User Key of the current user issuing this query.
-    _foodListingKey             FoodListing.foodListingKey%TYPE     DEFAULT NULL,   -- Key identifier of a food listing to be retireved.
-    _claimInfoKey               ClaimInfo.claimInfoKey%TYPE         DEFAULT NULL,   -- The key identifier of a claim that is associated with a food listing to retrieved.
-    _deliveryInfoKey            DeliveryInfo.deliveryInfoKey%TYPE   DEFAULT NULL,   -- The key identifier of a delivery that is associated with a food listing to retrieve.
-    _filters                    JSON                                DEFAULT NULL    -- The filters to be applied to query.
+    _appUserKey             AppUser.appUserKey%TYPE,                            -- The App User Key of the current user issuing this query.
+    _foodListingKey         FoodListing.foodListingKey%TYPE     DEFAULT NULL,   -- Key identifier of a food listing to be retireved.
+    _claimInfoKey           ClaimInfo.claimInfoKey%TYPE         DEFAULT NULL,   -- The key identifier of a claim that is associated with a food listing to retrieved.
+    _deliveryInfoKey        DeliveryInfo.deliveryInfoKey%TYPE   DEFAULT NULL,   -- The key identifier of a delivery that is associated with a food listing to retrieve.
+    _filters                JSON                                DEFAULT NULL    -- The filters to be applied to query.
 )
 RETURNS TABLE
 (
@@ -18,18 +18,9 @@ RETURNS TABLE
     foodListing     JSON
 )
 AS $$
-    DECLARE _queryBase                      TEXT;
-    DECLARE _queryFilters                   TEXT;
-    DECLARE _queryGroupAndSort              TEXT;
-
-    -- Declarations associated with availability overlap time margins/buffers.
-    DECLARE _delivererInAvailabilityMatch   BOOLEAN;
-    DECLARE _availabilityRangeBufferTxt     TEXT;
-    DECLARE _estimateAvgMph                 INTEGER;
-    DECLARE _distanceGradientMiles          FLOAT;
-    DECLARE _distanceGradientMeters         INTEGER;
-    DECLARE _distanceGradientStepMiles      INTEGER;
-    DECLARE _overlapBufferMin               INTEGER;
+    DECLARE _queryBase          TEXT;
+    DECLARE _queryFilters       TEXT;
+    DECLARE _queryGroupAndSort  TEXT;
 BEGIN
 
     -- Make sure we do not have a NULL _filters input.
@@ -56,22 +47,33 @@ BEGIN
         INSERT INTO FiltFoodListing
         SELECT      FoodListing.foodListingKey
         FROM        FoodListing
-        INNER JOIN  FoodListingFoodTypeMap      ON  FoodListing.foodListingKey = FoodListingFoodTypeMap.foodListingKey
-        INNER JOIN  ContactInfo DonorContact    ON  FoodListing.donorAppUserKey = DonorContact.appUserKey
-        LEFT JOIN   ClaimInfo                   ON  FoodListing.foodListingKey = ClaimInfo.foodListingKey
-                                                -- Always exclude claimed food listings that have been unclaimed!
-                                                AND NOT EXISTS (
-                                                    SELECT  1
-                                                    FROM    UnclaimInfo
-                                                    WHERE   UnclaimInfo.claimInfoKey = ClaimInfo.claimInfoKey
-                                                )
-        LEFT JOIN   ContactInfo ReceiverContact ON  ReceiverContact.appUserKey = $1
-        LEFT JOIN   DeliveryInfo                ON  ClaimInfo.claimInfoKey = DeliveryInfo.claimInfoKey
-                                                AND NOT EXISTS (
-                                                    SELECT  1
-                                                    FROM    CancelledDeliveryInfo
-                                                    WHERE   CancelledDeliveryInfo.deliveryInfoKey = DeliveryInfo.deliveryInfoKey
-                                                )
+        INNER JOIN  FoodListingFoodTypeMap          ON  FoodListing.foodListingKey = FoodListingFoodTypeMap.foodListingKey
+        INNER JOIN  ContactInfo DonorContact        ON  FoodListing.donorAppUserKey = DonorContact.appUserKey
+        LEFT JOIN   ClaimInfo                       ON  FoodListing.foodListingKey = ClaimInfo.foodListingKey
+                                                    -- Always exclude claimed food listings that have been unclaimed!
+                                                    AND NOT EXISTS (
+                                                        SELECT  1
+                                                        FROM    UnclaimInfo
+                                                        WHERE   UnclaimInfo.claimInfoKey = ClaimInfo.claimInfoKey
+                                                    )
+        ' ||
+        CASE WHEN (     (_filters->>'foodListingsStatus') IS NOT NULL
+                    AND (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unclaimed Listings'::FoodListingsStatus )
+            THEN 'LEFT JOIN ContactInfo ReceiverContact ON ReceiverContact.appUserKey = $1'
+            ELSE 'LEFT JOIN ContactInfo ReceiverContact ON ClaimInfo.receiverAppUserKey = ReceiverContact.appUserKey'
+        END || '
+        LEFT JOIN   DeliveryInfo                    ON  ClaimInfo.claimInfoKey = DeliveryInfo.claimInfoKey
+                                                    AND NOT EXISTS (
+                                                        SELECT  1
+                                                        FROM    CancelledDeliveryInfo
+                                                        WHERE   CancelledDeliveryInfo.deliveryInfoKey = DeliveryInfo.deliveryInfoKey
+                                                    )
+        ' ||
+        CASE WHEN (     (_filters->>'foodListingsStatus') IS NOT NULL
+                    AND (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus )
+            THEN 'LEFT JOIN ContactInfo DelivererContact ON DelivererContact.appUserKey = $1'
+            ELSE 'LEFT JOIN ContactInfo DelivererContact ON DeliveryInfo.delivererAppUserKey = DelivererContact.appUserKey'
+        END || '
     ';
 
     _queryFilters := '
@@ -82,13 +84,15 @@ BEGIN
           AND (($5->>''foodTypes'') IS NULL                 OR FoodListingFoodTypeMap.foodType = ANY(jsonArrToPostgresTextArr($5->''foodTypes'')::FoodType[]))
           AND (($5->>''needsRefrigeration'') IS NULL        OR FoodListing.needsRefrigeration = ($5->>''needsRefrigeration'')::BOOLEAN)
           AND (($5->>''availableAfterDate'') IS NULL        OR FoodListing.availableUntilDate >= utcTextToTimestamp(($5->>''availableAfterDate'')::TEXT))
-          AND (($5->>''maxDistance'') IS NULL               OR ST_DWITHIN (
-                                                                ReceiverContact.gpsCoordinate,
-                                                                DonorContact.gpsCoordinate,
-                                                                ($5->>''maxDistance'')::INTEGER * 1609.34
-                                                            ))
           AND (($5->>''maxEstimatedWeight'') IS NULL        OR FoodListing.estimatedWeight <= ($5->>''maxEstimatedWeight'')::INTEGER)
           AND (($5->>''recommendedVehicleType'') IS NULL    OR FoodListing.recommendedVehicleType = ($5->>''recommendedVehicleType'')::VehicleType)
+          AND (($5->>''deliveryState'') IS NULL             OR 
+            (
+                ($5->>''deliveryState'')::DeliveryState = getDeliveryState( DeliveryInfo.scheduledStartTime,
+                                                                            DeliveryInfo.startTime,
+                                                                            DeliveryInfo.pickUpTime,
+                                                                            DeliveryInfo.dropOffTime)
+            ))
           AND (($5->>''foodListingsStatus'') IS NULL        OR
             (
                     (($5->>''foodListingsStatus'')::FoodListingsStatus <> ''Unclaimed Listings''::FoodListingsStatus        OR ClaimInfo.claimInfoKey IS NULL)
@@ -109,29 +113,48 @@ BEGIN
               WHERE     RemovedFoodListing.foodListingKey = FoodListing.foodListingKey
           )
     ';
+
+
+    IF ((_filters->>'maxDistance') IS NOT NULL)
+    THEN
+
+        _queryFilters := _queryFilters || '
+            AND ST_DWITHIN (
+                    ReceiverContact.gpsCoordinate,
+                    DonorContact.gpsCoordinate,
+                    CEIL(($5->>''maxDistance'')::INTEGER * 1609.34)
+                )
+        ';
+
+        IF ((_filters->>'FoodListingsStatus') IS NOT NULL AND (_filters->>'FoodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus)
+        THEN
+
+            _queryFilters := _queryFilters || '
+                AND ST_DWITHIN (
+                        DelivererContact.gpsCoordinate,
+                        DonorContact.gpsCoordinate,
+                        CEIL(($5->>''maxDistance'')::INTEGER * 1609.34)
+                    )
+                AND ST_DWITHIN (
+                        DelivererContact.gpsCoordinate,
+                        ReceiverContact.gpsCoordinate,
+                        CEIL(($5->>''maxDistance'')::INTEGER * 1609.34)
+                    )
+            ';
+
+        END IF;
+
+    END IF;
         
 
     -- Should we match by user's regular weekly availability?
-    /*
-        The following filters are broken down into (conservative) required time range overlaps based on distances:
-        1) 5 miles / 30 mph * 60 minutes_per_hour    ~ 10 (+5) minute overlap required
-        2) 10 miles / 30 mph * 60 minutes_per_hour   ~ 20 (+5) minute overlap required
-        3) 15 miles / 30 mph * 60 minutes_per_hour   ~ 30 (+5) minute overlap required
-        4) 20 miles / 30 mph * 60 minutes_per_hour   ~ 40 (+5) minute overlap required
-        5) 25 miles / 30 mph * 60 minutes_per_hour   ~ 55 (+5) minute overlap required
-        6) 30 miles / 30 mph * 60 minutes_per_hour   ~ 65 (+5) minute overlap required
-
-        NOTE: This might NOT scale well... we may need to create time range columns on AppUserAvailability with correct minute margins and index them
-                to make it scale. This would cause some denormalization though, and it would use 7x more space to store avaialbility times. Use this for now and
-                hope that left hand argument to range overlap operator uses index (index left, scan right).
-    */
-    IF ((_filters->>'matchRegularAvailability')::BOOLEAN = TRUE)
+    IF ((_filters->>'matchRegularAvailability')::BOOLEAN OR (_filters->>'matchAvailableNow')::BOOLEAN)
     THEN
 
-        _delivererInAvailabilityMatch := (      (_filters->>'foodListingsStatus') IS NOT NULL
-                                          AND   (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus);
-
-        _queryBase := _queryBase || CASE WHEN (_delivererInAvailabilityMatch)
+        
+        _queryBase := _queryBase ||
+        CASE WHEN (     (_filters->>'FoodListingsStatus') IS NOT NULL
+                   AND  (_filters->>'FoodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus)
             THEN '
                 INNER JOIN  AppUserAvailability DelivererAvailability   ON DelivererAvailability.appUserKey = $1
                 INNER JOIN  AppUserAvailability DonorAvailability       ON FoodListing.donorAppUserKey = DonorAvailability.appUserKey
@@ -143,65 +166,14 @@ BEGIN
             '
         END;
 
-        _queryFilters := _queryFilters || '
-            AND toUpcomingWeekday(LOWER(DonorAvailability.timeRange), (SELECT EXTRACT(DOW FROM CURRENT_DATE))::INTEGER) <= FoodListing.availableUntilDate
-            AND toUpcomingWeekday(LOWER(ReceiverAvailability.timeRange), (SELECT EXTRACT(DOW FROM CURRENT_DATE))::INTEGER) <= FoodListing.availableUntilDate ' ||
-            case WHEN (_delivererInAvailabilityMatch) THEN '
-                AND toUpcomingWeekday(LOWER(DelivererAvailability.timeRange), (SELECT EXTRACT(DOW FROM CURRENT_DATE))::INTEGER) <= FoodListing.availableUntilDate
-            '
-            ELSE ''
-            END || '
-            AND ((1 = 1) -- IMPORTANT since following OR statements are dynamically generated (prevents syntax error).
-        ';
+        _queryFilters := _queryFilters ||   genAvailabilityOverlapFilters (
+                                                (_filters->>'maxDistance')::INTEGER,
+                                                (_filters->>'FoodListingsStatus') IS NOT NULL AND (_filters->>'FoodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus,
+                                                (_filters->>'matchRegularAvailability')::BOOLEAN,
+                                                (_filters->>'matchAvailableNow')::BOOLEAN
+                                            );
 
-        -- Setup constants used to calculate Availability Range overlap margin/buffers.
-        _distanceGradientStepMiles := 5;
-        _overlapBufferMin := 5;
-        _estimateAvgMph := 30;
-
-        -- Generate Availability Range overlap conditions based on farther distance thresholds in increments of 5 mi.
-        FOR i IN 0 .. 5
-        LOOP
-
-            IF ((_filters->>'maxDistance') IS NULL OR (_filters->>'maxDistance')::INTEGER > (i * _distanceGradientStepMiles))
-            THEN
-
-                _distanceGradientMiles := ((i + 1) * _distanceGradientStepMiles);
-                _distanceGradientMeters := (_distanceGradientMiles * 1609.34);
-                _availabilityRangeBufferTxt := '(''' || (CEIL(_distanceGradientMiles / _estimateAvgMph * 60) + _overlapBufferMin) || ' minutes'')::INTERVAL';
-
-                _queryFilters := _queryFilters || '
-                    OR  (' ||
-                        CASE WHEN (_delivererInAvailabilityMatch) THEN '
-                                ST_DWITHIN(Deliverer.gpsCoordinate, DonorContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')
-                            AND ST_DWITHIN(DonorContact.gpsCoordinate, ReceiverContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')
-                            AND ST_DWITHIN(ReceiverContact.gpsCoordinate, DelivererContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')
-                            AND DelivererAvailability.timeRange && TSRANGE (LOWER(DonorAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
-                                                                            UPPER(DonorAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ')
-                            AND DonorAvailability.timeRange && TSRANGE (LOWER(ReceiverAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
-                                                                        UPPER(ReceiverAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ')
-                            AND ReceiverAvailability.timeRange && TSRANGE (LOWER(DelivererAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
-                                                                           UPPER(DelivererAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ')
-                        '
-                        ELSE '
-                                ST_DWITHIN(DonorContact.gpsCoordinate, ReceiverContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')
-                            AND DonorAvailability.timeRange && TSRANGE (LOWER(ReceiverAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
-                                                                        UPPER(ReceiverAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ')
-                        '
-                        END || '
-                        )
-                ';
-
-            ELSE EXIT; -- Jump out of FOR LOOP if our max disstance filter doesn't go beyond an incremental 5 mi distance threshold.
-            END IF;
-
-        END LOOP;
-
-        _queryFilters := _queryFilters || '
-            )
-        ';
-
-    END IF; -- END IF ((_filters->>'matchRegularAvailability')::BOOLEAN = TRUE)
+    END IF;
 
 
     -- Determine the grouping mechanism, sort order, offset, and limit.
@@ -347,6 +319,14 @@ $$ LANGUAGE plpgsql;
 
 -- Test the Stored Procedure here --
 SELECT * FROM getFoodListings(1, NULL, NULL, NULL, JSON_BUILD_OBJECT (
-    'matchRegularAvailability', TRUE,
-    'maxDistance',              10
+    'maxDistance',              10,
+    'maxEstimatedWeight',       null,
+    'recommendedVehicleType',   null,
+    'matchRegularAvailability', false,
+    'matchAvailableNow',        true,
+    'foodListingsStatus',       'Unscheduled Deliveries',
+    'retrievalAmount',          10,
+    'retrievalOffset',          0,
+    'foodTypes',                null,
+    'needsRefrigeration',       null
 ));

@@ -36,6 +36,7 @@ BEGIN
     -- If we are starting immediately, then set scheduled start time to now.
     IF (_startImmediately = TRUE)
     THEN
+        SET TIME ZONE 'UTC';
         _scheduledStartTime = CURRENT_TIMESTAMP;
     END IF;
 

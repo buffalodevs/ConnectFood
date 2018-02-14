@@ -157,10 +157,10 @@ export class DeliveryListingInfoComponent implements OnChanges {
      */
     public updateDeliveryState(deliveryState: DeliveryState): void {
 
-        this._showButtonFlags.set('progressSpinner', true);
+        this.showProgressSpinner = true;
 
         this._manageDeliveryService.updateDeliveryState(this.delivery.claimInfo.deliveryInfo.deliveryInfoKey, deliveryState)
-            .finally(() => { this._showButtonFlags.set('progressSpinner', false); })
+            .finally(() => { this.showProgressSpinner = false; })
             .subscribe(() => {
                 this.delivery.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState = deliveryState;
                 this.stateChangeComplete = true;

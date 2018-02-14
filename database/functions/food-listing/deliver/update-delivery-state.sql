@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION updateDeliveryState
      _deliveryInfoKey       DeliveryInfo.deliveryInfoKey%TYPE,    -- This is the key of the Delivery Food Listing element that we are updating the status of.
      _delivererAppUserKey   DeliveryInfo.delivererAppUserKey%TYPE, -- This is the key of the user who is delivering the Food Listing.
      _deliveryState         DeliveryState,
-     _stateUpdateTimestamp  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+     _stateUpdateTimestamp  TIMESTAMP DEFAULT NULL
 )
 -- Return data so that update notifications may be sent to concerned users (Donors and Receivers).
 RETURNS TABLE
@@ -18,6 +18,12 @@ RETURNS TABLE
 AS $$
     DECLARE _deliveryUpdateNotification JSON;
 BEGIN
+
+    IF (_stateUpdateTimestamp IS NULL)
+    THEN
+        SET TIME ZONE 'UTC';
+        _stateUpdateTimestamp := CURRENT_TIMESTAMP;
+    END IF;
 
     -- TODO: Ensure that delivery app user is associated with this delivery food listing (has rights to update)!
     -- TODO: Ensure that the delivery state is correct. There is one condition of a lack of correctness:
@@ -41,7 +47,7 @@ BEGIN
                                 WHEN 'Picked Up'::DeliveryState     THEN    NULL -- Going back a step.
                                 ELSE                                        dropOffTime
                             END
-    WHERE   DeliveryInfo.deliveryInfo = _deliveryInfoKey;    
+    WHERE   DeliveryInfo.deliveryInfoKey = _deliveryInfoKey;    
 
     RETURN QUERY
     SELECT  _deliveryInfoKey,

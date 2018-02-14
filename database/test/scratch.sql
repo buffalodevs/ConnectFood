@@ -79,4 +79,4 @@ DELETE FROM ContactInfo WHERE appUserKey NOT IN (1, 2, 4);
 DELETE FROM AppUser WHERE appUserKey NOT IN (1, 2, 4);
 */
 
-SELECT * FROM UnverifiedAppUser;
+SELECT * FROM DeliveryInfo;
