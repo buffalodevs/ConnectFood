@@ -24,10 +24,7 @@ AS $$
 BEGIN
 
     -- Make sure we do not have a NULL _filters input.
-    IF (_filters IS NULL)
-    THEN
-        _filters := JSON_BUILD_OBJECT();
-    END IF;
+    _filters := COALESCE(_filters, JSON_BUILD_OBJECT());
 
 -- ==================================== Dynamic Query Generation Phase ======================================= --
 -- =========================================================================================================== --
@@ -126,7 +123,7 @@ BEGIN
                 )
         ';
 
-        IF ((_filters->>'FoodListingsStatus') IS NOT NULL AND (_filters->>'FoodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus)
+        IF ((_filters->>'foodListingsStatus') IS NOT NULL AND (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus)
         THEN
 
             _queryFilters := _queryFilters || '
@@ -153,8 +150,8 @@ BEGIN
 
         
         _queryBase := _queryBase ||
-        CASE WHEN (     (_filters->>'FoodListingsStatus') IS NOT NULL
-                   AND  (_filters->>'FoodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus)
+        CASE WHEN (     (_filters->>'foodListingsStatus') IS NOT NULL
+                   AND  (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus)
             THEN '
                 INNER JOIN  AppUserAvailability DelivererAvailability   ON DelivererAvailability.appUserKey = $1
                 INNER JOIN  AppUserAvailability DonorAvailability       ON FoodListing.donorAppUserKey = DonorAvailability.appUserKey
@@ -168,7 +165,8 @@ BEGIN
 
         _queryFilters := _queryFilters ||   genAvailabilityOverlapFilters (
                                                 (_filters->>'maxDistance')::INTEGER,
-                                                (_filters->>'FoodListingsStatus') IS NOT NULL AND (_filters->>'FoodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus,
+                                                (    (_filters->>'foodListingsStatus') IS NOT NULL
+                                                 AND (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus),
                                                 (_filters->>'matchRegularAvailability')::BOOLEAN,
                                                 (_filters->>'matchAvailableNow')::BOOLEAN
                                             );

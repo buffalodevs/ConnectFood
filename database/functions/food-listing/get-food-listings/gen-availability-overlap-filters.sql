@@ -8,33 +8,22 @@ CREATE OR REPLACE FUNCTION genAvailabilityOverlapFilters
 )
 RETURNS TEXT
 AS $$
-    DECLARE _queryFilters                   TEXT;
+    DECLARE _generalAvailabilityFilters     TEXT;
+    DECLARE _specificAvailabilityFilters    TEXT;
     DECLARE _availabilityRangeBufferTxt     TEXT;
     DECLARE _estimateAvgMph                 INTEGER;
     DECLARE _distanceGradientMiles          FLOAT;
     DECLARE _distanceGradientMeters         INTEGER;
     DECLARE _distanceGradientStepMiles      INTEGER;
-    DECLARE _overlapBufferMin               INTEGER;
+    DECLARE _overlapBufferMinutes           INTEGER;
     DECLARE _nowRelativeToAvailabilityTimes TEXT;
 BEGIN
 
-    _queryFilters := '
-        AND toUpcomingWeekday(LOWER(DonorAvailability.timeRange), (SELECT EXTRACT(DOW FROM CURRENT_DATE))::INTEGER) <= FoodListing.availableUntilDate
-        AND toUpcomingWeekday(LOWER(ReceiverAvailability.timeRange), (SELECT EXTRACT(DOW FROM CURRENT_DATE))::INTEGER) <= FoodListing.availableUntilDate
-        AND (FALSE -- IMPORTANT since following OR statements are dynamically generated (prevents syntax error).
-    ';
-
     -- Setup constants used to calculate Availability Range overlap margin/buffers.
     _distanceGradientStepMiles := 5;
-    _overlapBufferMin := 5;
+    _overlapBufferMinutes := 5;
     _estimateAvgMph := 30;
-
-    IF (_matchAvailableNow)
-    THEN
-        SET TIME ZONE 'UTC'; -- Ensure we are using UTC time zone!
-        -- Get current time, but relative to App User Availability timestamps.
-        _nowRelativeToAvailabilityTimes := convertToAvailabilityTime(CURRENT_TIMESTAMP::TIMESTAMP);
-    END IF;
+    _generalAvailabilityFilters := '';
 
     /*
         The following filters are broken down into (conservative) required time range overlaps based on distances:
@@ -58,45 +47,35 @@ BEGIN
 
             _distanceGradientMiles := ((i + 1) * _distanceGradientStepMiles);
             _distanceGradientMeters := (_distanceGradientMiles * 1609.34);
-            _availabilityRangeBufferTxt := '(''' || (CEIL(_distanceGradientMiles / _estimateAvgMph * 60) + _overlapBufferMin) || ' minutes'')::INTERVAL';
+            _availabilityRangeBufferTxt := '(''' || (CEIL(_distanceGradientMiles / _estimateAvgMph * 60) + _overlapBufferMinutes) || ' minutes'')::INTERVAL';
+            _specificAvailabilityFilters := '';
 
-            _queryFilters := _queryFilters || '
-                OR  (
-                        ST_DWITHIN(DonorContact.gpsCoordinate, ReceiverContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')
-            ';
-
-            IF (_includeDeliverer)
-            THEN
-                _queryFilters := _queryFilters || '
-                    AND ST_DWITHIN(DelivererContact.gpsCoordinate, DonorContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')
-                    AND ST_DWITHIN(ReceiverContact.gpsCoordinate, DelivererContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')
-                ';
-            END IF;
-
-
+            -- Query filters for matching regular availability are defined here.
             IF (_matchRegularAvailability)
             THEN
 
-                _queryFilters := _queryFilters || '
+                _specificAvailabilityFilters := _specificAvailabilityFilters || '
                     AND DonorAvailability.timeRange && TSRANGE (LOWER(ReceiverAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
                                                                 UPPER(ReceiverAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ')
-                ';
-
-                IF (_includeDeliverer)
-                THEN
-                    _queryFilters := _queryFilters || '
-                        AND DelivererAvailability.timeRange && TSRANGE (LOWER(DonorAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
-                                                                        UPPER(DonorAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ')
-                        AND ReceiverAvailability.timeRange && TSRANGE (LOWER(DelivererAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
-                                                                        UPPER(DelivererAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ')
-                        AND toUpcomingWeekday(LOWER(DelivererAvailability.timeRange), (SELECT EXTRACT(DOW FROM CURRENT_DATE))::INTEGER) <= FoodListing.availableUntilDate
-                    ';
-                END IF;
+                ' ||
+                CASE WHEN (_includeDeliverer) THEN '
+                    AND DelivererAvailability.timeRange && TSRANGE (LOWER(DonorAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
+                                                                    UPPER(DonorAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ')
+                    AND ReceiverAvailability.timeRange && TSRANGE (LOWER(DelivererAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
+                                                                   UPPER(DelivererAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ')
+                    AND toUpcomingWeekday(LOWER(DelivererAvailability.timeRange), (SELECT EXTRACT(DOW FROM CURRENT_DATE))::INTEGER) <= FoodListing.availableUntilDate
+                '
+                ELSE '' END;
             
+            -- Query filters for matching listings that are available for delivery now are defined here.
             ELSIF (_matchAvailableNow)
             THEN
 
-                _queryFilters := _queryFilters || '
+                -- Get current time, but relative to App User Availability timestamps.
+                SET TIME ZONE 'UTC'; -- Ensure we are using UTC time zone!
+                _nowRelativeToAvailabilityTimes := convertToAvailabilityTime(CURRENT_TIMESTAMP::TIMESTAMP);
+
+                _specificAvailabilityFilters := _specificAvailabilityFilters || '
                     AND DonorAvailability.timeRange @> TSRANGE (''' || _nowRelativeToAvailabilityTimes || '''::TIMESTAMP - ' || _availabilityRangeBufferTxt || ',
                                                                 ''' || _nowRelativeToAvailabilityTimes || '''::TIMESTAMP + ' || _availabilityRangeBufferTxt || ')
                     AND ReceiverAvailability.timeRange @> TSRANGE (''' || _nowRelativeToAvailabilityTimes || '''::TIMESTAMP - ' || _availabilityRangeBufferTxt || ',
@@ -105,8 +84,17 @@ BEGIN
 
             END IF;
 
-            _queryFilters := _queryFilters || '
-                )
+            -- Query filters that are uniform to all types of availability matches are defined here.
+            _generalAvailabilityFilters := _generalAvailabilityFilters || '
+                OR  (
+                        ST_DWITHIN(DonorContact.gpsCoordinate, ReceiverContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')'
+                        || CASE WHEN (_includeDeliverer) THEN '
+                            AND ST_DWITHIN(DelivererContact.gpsCoordinate, DonorContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')
+                            AND ST_DWITHIN(ReceiverContact.gpsCoordinate, DelivererContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')
+                        '
+                        ELSE '' END
+                        || _specificAvailabilityFilters || '
+                    )
             ';
 
         ELSE EXIT; -- Jump out of FOR LOOP if our max disstance filter doesn't go beyond an incremental 5 mi distance threshold.
@@ -114,11 +102,13 @@ BEGIN
 
     END LOOP;
 
-    _queryFilters := _queryFilters || '
+    RETURN '
+        AND toUpcomingWeekday(LOWER(DonorAvailability.timeRange), (SELECT EXTRACT(DOW FROM CURRENT_DATE))::INTEGER) <= FoodListing.availableUntilDate
+        AND toUpcomingWeekday(LOWER(ReceiverAvailability.timeRange), (SELECT EXTRACT(DOW FROM CURRENT_DATE))::INTEGER) <= FoodListing.availableUntilDate
+        AND (FALSE -- IMPORTANT since following OR statements are dynamically generated (prevents syntax error).
+        ' || _generalAvailabilityFilters || '
         )
     ';
-
-    RETURN _queryFilters;
 
 END;
 $$ LANGUAGE plpgsql;
