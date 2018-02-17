@@ -83,7 +83,7 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
                 ||  property === 'imgUrls'
                 ||  property === 'donorInfo'
                 ||  property === 'claimInfo'
-                ||  property === 'donationAvailability')
+                ||  property === 'foodListingAvailability')
             { continue; }
 
             let validators: ValidatorFn[] = [ Validators.required ];

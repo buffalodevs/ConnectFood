@@ -21,7 +21,7 @@ const BASE_AVAILABILITY_DATE_YEAR: number = 2017;
  * @param absDateRanges The absolute date ranges that are to be converted.
  * @return The (relative) availability date ranges.
  */
-export function absToAvailabililityDateRanges(absDateRanges: DateRange[]): DateRange[] {
+export function absToRelativeDateRanges(absDateRanges: DateRange[]): DateRange[] {
 
     let availabilityDateRanges: DateRange[] = [];
 
@@ -32,10 +32,10 @@ export function absToAvailabililityDateRanges(absDateRanges: DateRange[]): DateR
 
         // Convert absolute dates to availability dates (relative to week of 11/12/2017).
         let availabilityDateRange: DateRange = new DateRange (
-            absDateToAvailabilityDate(absDateRanges[i].startTime),
-            absDateToAvailabilityDate(absDateRanges[i].endTime)
+            absDateToRelativeDate(absDateRanges[i].startTime),
+            absDateToRelativeDate(absDateRanges[i].endTime)
         );
-        availabilityDateRange = checkForAndFixAvailabilityWeekOverflow(availabilityDateRange);        
+        availabilityDateRange = checkForAndFixRelativeWeekOverflow(availabilityDateRange);        
 
         availabilityDateRanges.push(availabilityDateRange);
     }
@@ -49,7 +49,7 @@ export function absToAvailabililityDateRanges(absDateRanges: DateRange[]): DateR
  * @param absDate The absolute date to convert.
  * @return The (relative) availability date.
  */
-function absDateToAvailabilityDate(absDate: Date): Date {
+function absDateToRelativeDate(absDate: Date): Date {
 
     const availabilityDateStr: string = ( '' + BASE_AVAILABILITY_DATE_MONTH + '/' + (BASE_AVAILABILITY_DATE_DAY + absDate.getDay()) + '/' + BASE_AVAILABILITY_DATE_YEAR );
     const absTimeStr: string = DATE_FORMATTER.dateToWallClockString(absDate);
@@ -61,19 +61,19 @@ function absDateToAvailabilityDate(absDate: Date): Date {
  * Checks for overflow within a given availability date range. Since absolute dates (from the client) are converted to the nearest dates on/after 11/12/2017,
  * and client dates are also converted from local time on client to this server's time zone, there can be an overflow when a date which fell on a
  * Sunday is pushed to a Saturday (vice versa), we must check for this overflow and fix it by ensuring all end dates in generated ranges fall after start dates.
- * @param availabilityDateRange The availability date range to check and potentially fix (if a problem exists).
- * @return The checked (and potentially fixed) availability date ranges.
+ * @param relativeDateRange The relative (availability) date range to check and potentially fix (if a problem exists).
+ * @return The checked (and potentially adjusted) availability date ranges.
  */
-function checkForAndFixAvailabilityWeekOverflow(availabilityDateRange: DateRange): DateRange {
+function checkForAndFixRelativeWeekOverflow(relativeDateRange: DateRange): DateRange {
 
-    let fixedAvailabilityDateRange: DateRange = availabilityDateRange;
+    let fixedAvailabilityDateRange: DateRange = relativeDateRange;
 
     // If there was an overflow, then add 7 days to the end time (keep start time the same).
-    if (availabilityDateRange.checkForOrderErr() != null) {
+    if (relativeDateRange.checkForOrderErr() != null) {
 
         fixedAvailabilityDateRange = new DateRange (
-            availabilityDateRange.startTime,
-            moment(availabilityDateRange.endTime).add(7, 'days').toDate()
+            relativeDateRange.startTime,
+            moment(relativeDateRange.endTime).add(7, 'days').toDate()
         );
     }
 
@@ -82,19 +82,19 @@ function checkForAndFixAvailabilityWeekOverflow(availabilityDateRange: DateRange
 
 
 /**
- * Converts (relative) availability date ranges to absolutely positioned date ranges whose start and end time members fall on the same weekdays as the availaiblity date range
+ * Converts relative (availability) date ranges to absolutely positioned date ranges whose start and end time members fall on the same weekdays as the availaiblity date range
  * start and end time members. Also, the resulting time ranges will either contain the current time or fall on the closest aligned time after the current time.
- * @param availabilityDateRanges The (relative) availability date ranges that are to be converted.
+ * @param relativeDateRanges The (relative) availability date ranges that are to be converted.
  * @param utcOffsetMins The offset (minutes) of the client's time zone form UTC time zone.
  * @return The absolute date ranges.
  */
-export function availabilityToAbsDateRanges(availabilityDateRanges: DateRange[], utcOffsetMins: number): DateRange[] {
+export function relativeToAbsDateRanges(relativeDateRanges: DateRange[], utcOffsetMins: number): DateRange[] {
 
     let absDateRanges: DateRange[] = [];
 
-    for (let i: number = 0; i < availabilityDateRanges.length; i++) {
+    for (let i: number = 0; i < relativeDateRanges.length; i++) {
 
-        const genAbsDateRanges: DateRange[] = availabilityToAbsDateRange(availabilityDateRanges[i], utcOffsetMins);
+        const genAbsDateRanges: DateRange[] = relativeToAbsDateRange(relativeDateRanges[i], utcOffsetMins);
         absDateRanges = absDateRanges.concat(genAbsDateRanges);
     }
 
@@ -103,19 +103,19 @@ export function availabilityToAbsDateRanges(availabilityDateRanges: DateRange[],
 
 
 /**
- * Converts an availability date range to absolute positoned date range(s) that falls on the date nearest to today with a weekday that
+ * Converts a relative (availability) date range to absolute positoned date range(s) that falls on the date nearest to today with a weekday that
  * aligns with the availability dates weekday. Can generate up to 2 date ranges if the current time falls within a given availability range (will be split between
  * range portion that falls immediately after current time and the portion that falls before offset by one week).
- * @param availabilityDateRange The availability date range to convert.
+ * @param relativeDateRange The relative availability date range to convert.
  * @param utcOffsetMins The offset (minutes) of the client's time zone form UTC time zone.
  * @return The absolutely positioned date range(s) which corresponds with the availability date range input. The date ranges returned are garunteed to fall after the
  *         current time.
  */
-function availabilityToAbsDateRange(availabilityDateRange: DateRange, utcOffsetMins): DateRange[] {
+function relativeToAbsDateRange(relativeDateRange: DateRange, utcOffsetMins): DateRange[] {
 
     let absDateRange: DateRange = new DateRange (
-        DATE_FORMATTER.setDateToNearestWeekday(availabilityDateRange.startTime),
-        DATE_FORMATTER.setDateToNearestWeekday(availabilityDateRange.endTime)
+        DATE_FORMATTER.setDateToNearestWeekday(relativeDateRange.startTime),
+        DATE_FORMATTER.setDateToNearestWeekday(relativeDateRange.endTime)
     );
 
     return ensureDateRangeContainsOrAfterNow(absDateRange, utcOffsetMins);

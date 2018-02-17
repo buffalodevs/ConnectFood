@@ -54,14 +54,13 @@ AS $$
                                                                 ),
                                             'availability',     (
                                                                     SELECT  ARRAY_AGG (
-                                                                        -- @ts-sql class="TimeRangeStr" file="/shared/common-util/time-range.ts"
                                                                         JSON_BUILD_OBJECT (
-                                                                            '_startTime',    timestampToUtcText(LOWER(AppUserAvailability.timeRange)),
-                                                                            '_endTime',      timestampToUtcText(UPPER(AppUserAvailability.timeRange))
+                                                                            '_startTime',    timestampToUtcText(LOWER(AppUserAvailabilityMeta.metaTimeRange)),
+                                                                            '_endTime',      timestampToUtcText(UPPER(AppUserAvailabilityMeta.metaTimeRange))
                                                                         )
                                                                     )
-                                                                    FROM    AppUserAvailability
-                                                                    WHERE   AppUserAvailability.appUserKey = AppUser.appUserKey
+                                                                    FROM    AppUserAvailabilityMeta
+                                                                    WHERE   AppUserAvailabilityMeta.appUserKey = AppUser.appUserKey
                                                                 )
                                         ),
                 'verificationToken',    UnverifiedAppUser.verificationToken

@@ -35,6 +35,7 @@ import { handleGetDeliveries,
          handleUpdateDeliveryState } from './deliverer/deliverer-controller';
 import { handleLogClientData } from './logging/client-data-logger';
 import { bootstrapDatabase } from './database-util/database-bootstrap/database-bootstrap';
+import { scheduleJobs } from './cron/cron-schedule';
 
 
 // Configure paths to client JS files and public resource files (such as images).
@@ -106,6 +107,8 @@ app.get('*', function (request, response) {
 
 // Do any database initialization that is necessary before we start servicing requests.
 bootstrapDatabase().then(() => {
+
+    scheduleJobs();
 
     app.listen(app.get('port'), function() {
         // Log Message That Says When App is Up & Running.

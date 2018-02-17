@@ -1,6 +1,6 @@
-SELECT dropFunction('addOrUpdateContactInfo');
+SELECT dropFunction('addUpdateContactInfo');
 
-CREATE OR REPLACE FUNCTION addOrUpdateContactInfo
+CREATE OR REPLACE FUNCTION addUpdateContactInfo
 (
     _appUserKey     ContactInfo.AppUserKey%TYPE,
     _address        ContactInfo.address%TYPE        DEFAULT NULL,

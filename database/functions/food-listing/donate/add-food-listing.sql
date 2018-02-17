@@ -4,16 +4,17 @@
 SELECT dropFunction('addfoodlisting');
 CREATE OR REPLACE FUNCTION addFoodListing
 (
-    _donorAppUserKey        FoodListing.donorAppUserKey%TYPE,                       -- The Donor ID.
-    _foodTypes              FoodType[],                                             -- What Food Types is this?
-    _foodTitle              FoodListing.foodTitle%TYPE,                             -- The title (short description) of the Food Listing.
-    _needsRefrigeration     FoodListing.needsRefrigeration%TYPE,                    -- Is the food perishable?
-    _availableUntilDate     TEXT,                                                   -- The date when the donated food will no longer be available.
-    _estimatedWeight        FoodListing.estimatedWeight%TYPE        DEFAULT NULL,   -- The estimated weight of the Food Listing (in pounds).
-    _estimatedValue         FoodListing.estimatedValue%TYPE         DEFAULT NULL,   -- The estimated monetary value of the Food Listing (in $).
-    _foodDescription        FoodListing.foodDescription%TYPE        DEFAULT NULL,   -- A (long) description of the Food Listing.
-    _recommendedVehicleType VehicleType                             DEFAULT NULL,   -- Recommended vehicle to use for delivery.
-    _imgUrls                TEXT[]                                  DEFAULT NULL    -- URL(s) for the image(s) being stored/uploaded.
+    _donorAppUserKey            FoodListing.donorAppUserKey%TYPE,                       -- The Donor ID.
+    _foodTypes                  FoodType[],                                             -- What Food Types is this?
+    _foodTitle                  FoodListing.foodTitle%TYPE,                             -- The title (short description) of the Food Listing.
+    _needsRefrigeration         FoodListing.needsRefrigeration%TYPE,                    -- Is the food perishable?
+    _availableUntilDate         TEXT,                                                   -- The date when the donated food will no longer be available.
+    _estimatedWeight            FoodListing.estimatedWeight%TYPE        DEFAULT NULL,   -- The estimated weight of the Food Listing (in pounds).
+    _estimatedValue             FoodListing.estimatedValue%TYPE         DEFAULT NULL,   -- The estimated monetary value of the Food Listing (in $).
+    _foodDescription            FoodListing.foodDescription%TYPE        DEFAULT NULL,   -- A (long) description of the Food Listing.
+    _recommendedVehicleType     VehicleType                             DEFAULT NULL,   -- Recommended vehicle to use for delivery.
+    _imgUrls                    TEXT[]                                  DEFAULT NULL,   -- URL(s) for the image(s) being stored/uploaded.
+    _availabilityTimeRanges     JSON[]                                  DEFAULT NULL    -- (Absolute) Food Listing availability time ranges.
 )
 RETURNS FoodListing.foodListingKey%TYPE -- The food listing key of the new food listing (can be used as reference for edit).
 AS $$
@@ -31,6 +32,7 @@ BEGIN
         needsRefrigeration,
         availableUntilDate,
         estimatedWeight,
+        estimatedValue,
         foodDescription,
         recommendedVehicleType
     )
@@ -40,6 +42,7 @@ BEGIN
         _needsRefrigeration,
         _availableUntilTimestamp,
         _estimatedWeight,
+        _estimatedValue,
         _foodDescription,
         _recommendedVehicleType
     )
@@ -61,6 +64,9 @@ BEGIN
 
         _defaultPrimaryImg := FALSE;
     END LOOP;
+
+    -- NOTE: These add onto or overload the regular availabiilty times for the associated Donor App User.
+    PERFORM addUpdateFoodListingAvailability(_foodListingKey, _availabilityTimeRanges);
 
     RETURN _foodListingKey;
 

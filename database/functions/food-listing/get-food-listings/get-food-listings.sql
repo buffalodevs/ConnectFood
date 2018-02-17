@@ -54,8 +54,7 @@ BEGIN
                                                         WHERE   UnclaimInfo.claimInfoKey = ClaimInfo.claimInfoKey
                                                     )
         ' ||
-        CASE WHEN (     (_filters->>'foodListingsStatus') IS NOT NULL
-                    AND (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unclaimed Listings'::FoodListingsStatus )
+        CASE WHEN ( (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unclaimed Listings'::FoodListingsStatus )
             THEN 'LEFT JOIN ContactInfo ReceiverContact ON ReceiverContact.appUserKey = $1'
             ELSE 'LEFT JOIN ContactInfo ReceiverContact ON ClaimInfo.receiverAppUserKey = ReceiverContact.appUserKey'
         END || '
@@ -66,8 +65,7 @@ BEGIN
                                                         WHERE   CancelledDeliveryInfo.deliveryInfoKey = DeliveryInfo.deliveryInfoKey
                                                     )
         ' ||
-        CASE WHEN (     (_filters->>'foodListingsStatus') IS NOT NULL
-                    AND (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus )
+        CASE WHEN ( (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus )
             THEN 'LEFT JOIN ContactInfo DelivererContact ON DelivererContact.appUserKey = $1'
             ELSE 'LEFT JOIN ContactInfo DelivererContact ON DeliveryInfo.delivererAppUserKey = DelivererContact.appUserKey'
         END || '
@@ -121,25 +119,20 @@ BEGIN
                     DonorContact.gpsCoordinate,
                     CEIL(($5->>''maxDistance'')::INTEGER * 1609.34)
                 )
-        ';
-
-        IF ((_filters->>'foodListingsStatus') IS NOT NULL AND (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus)
-        THEN
-
-            _queryFilters := _queryFilters || '
-                AND ST_DWITHIN (
-                        DelivererContact.gpsCoordinate,
-                        DonorContact.gpsCoordinate,
-                        CEIL(($5->>''maxDistance'')::INTEGER * 1609.34)
-                    )
-                AND ST_DWITHIN (
-                        DelivererContact.gpsCoordinate,
-                        ReceiverContact.gpsCoordinate,
-                        CEIL(($5->>''maxDistance'')::INTEGER * 1609.34)
-                    )
-            ';
-
-        END IF;
+        ' ||
+        CASE WHEN ( (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus ) THEN '
+            AND ST_DWITHIN (
+                    DelivererContact.gpsCoordinate,
+                    DonorContact.gpsCoordinate,
+                    CEIL(($5->>''maxDistance'')::INTEGER * 1609.34)
+                )
+            AND ST_DWITHIN (
+                    DelivererContact.gpsCoordinate,
+                    ReceiverContact.gpsCoordinate,
+                    CEIL(($5->>''maxDistance'')::INTEGER * 1609.34)
+                )
+        '
+        ELSE '' END;
 
     END IF;
         
@@ -148,25 +141,33 @@ BEGIN
     IF ((_filters->>'matchRegularAvailability')::BOOLEAN OR (_filters->>'matchAvailableNow')::BOOLEAN)
     THEN
 
-        
-        _queryBase := _queryBase ||
-        CASE WHEN (     (_filters->>'foodListingsStatus') IS NOT NULL
-                   AND  (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus)
-            THEN '
-                INNER JOIN  AppUserAvailability DelivererAvailability   ON DelivererAvailability.appUserKey = $1
-                INNER JOIN  AppUserAvailability DonorAvailability       ON FoodListing.donorAppUserKey = DonorAvailability.appUserKey
-                INNER JOIN  AppUserAvailability ReceiverAvailability    ON ClaimInfo.receiverAppUserKey = ReceiverAvailability.appUserKey
-            '
-            ELSE '
-                INNER JOIN  AppUserAvailability DonorAvailability       ON FoodListing.donorAppUserKey = DonorAvailability.appUserKey
-                INNER JOIN  AppUserAvailability ReceiverAvailability    ON ReceiverAvailability.appUserKey = $1
-            '
+        -- No matter what Food Listings Status we are filtering on, we will always include Donor Availability in match.
+        _queryBase := _queryBase || '
+            LEFT JOIN FoodListingAvailability                               ON FoodListing.foodListingKey = FoodListingAvailability.foodListingKey
+            LEFT JOIN AppUserAvailabilityMeta   DonorAvailabilityMeta       ON FoodListing.donorAppUserKey = DonorAvailabilityMeta.appUserKey
+            LEFT JOIN AppUserAvailability       DonorAvailability           ON DonorAvailabilityMeta.appUserAvailabilityMetaKey
+                                                                             = DonorAvailability.appUserAvailabilityMetaKey
+        ' ||
+        -- If looking for unscheduled deliveries, then include Deliverer Availability and assume invoking user is Deliverer.
+        CASE WHEN ((_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus) THEN '
+            LEFT JOIN AppUserAvailabilityMeta   DelivererAvailabilityMeta   ON DelivererAvailabilityMeta.appUserKey = $1
+            LEFT JOIN AppUserAvailability       DelivererAvailability       ON DelivererAvailabilityMeta.appUserAvailabilityMetaKey
+                                                                             = DelivererAvailability.appUserAvailabilityMetaKey
+            LEFT JOIN AppUserAvailabilityMeta   ReceiverAvailabilityMeta    ON ClaimInfo.receiverAppUserKey = ReceiverAvailabilityMeta.appUserKey
+            LEFT JOIN AppUserAvailability       ReceiverAvailability        ON ReceiverAvailabilityMeta.appUserAvailabilityMetaKey
+                                                                             = ReceiverAvailability.appUserAvailabilityMetaKey
+        '
+        -- Otherwise, we are not looking for unscheduled deliveries, so exclude Deliverer and assume invoking user is Receiver.
+        ELSE '
+            LEFT JOIN AppUserAvailabilityMeta   ReceiverAvailabilityMeta    ON ReceiverAvailabilityMeta.appUserKey = $1
+            LEFT JOIN AppUserAvailability       ReceiverAvailability        ON ReceiverAvailabilityMeta.appUserAvailabilityMetaKey
+                                                                             = ReceiverAvailability.appUserAvailabilityMetaKey
+        '
         END;
 
         _queryFilters := _queryFilters ||   genAvailabilityOverlapFilters (
                                                 (_filters->>'maxDistance')::INTEGER,
-                                                (    (_filters->>'foodListingsStatus') IS NOT NULL
-                                                 AND (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus),
+                                                ((_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus),
                                                 (_filters->>'matchRegularAvailability')::BOOLEAN,
                                                 (_filters->>'matchAvailableNow')::BOOLEAN
                                             );
@@ -181,13 +182,13 @@ BEGIN
         -- Chose the sort order based on the purpose of the search (for receiver tab or cart).
         CASE ((_filters->>'foodListingsStatus')::FoodListingsStatus)
 
-            WHEN 'Unclaimed Listings'::FoodListingsStatus THEN  -- Receiver tab.
+            WHEN ('Unclaimed Listings'::FoodListingsStatus) THEN  -- Receiver tab.
                 'FoodListing.availableUntilDate ASC' -- For receiver tab, show donations that will expire eariliest first.
 
             ELSE  -- Cart.
                 CASE ((_filters->>'foodListingsStatus')::FoodListingsStatus)
-                    WHEN 'My Claimed Listings'::FoodListingsStatus THEN 'MAX(ClaimInfo.claimedDate) DESC'   -- For receiver cart, show most recent claims.
-                    ELSE                                                'FoodListing.donationDate DESC'     -- For donor cart, show most recent donations.
+                    WHEN ('My Claimed Listings'::FoodListingsStatus) THEN   'MAX(ClaimInfo.claimedDate) DESC'   -- For receiver cart, show most recent claims.
+                    ELSE                                                    'FoodListing.donationDate DESC'     -- For donor cart, show most recent donations.
                 END
 
         END || '
@@ -205,6 +206,7 @@ BEGIN
 -- ==================================== Dynamic Query Execution Phase ======================================== --
 -- =========================================================================================================== --
 
+    RAISE NOTICE '%', _filters;
     RAISE NOTICE '% % %', _queryBase, _queryFilters, _queryGroupAndSort;
 
     -- Insert our filtered Food Listing Key - Food Listing Types pairs into our temporary table.
@@ -275,7 +277,7 @@ BEGIN
                         'deliveryStateInfo',    JSON_BUILD_OBJECT (
                                                     'deliveryState',        getDeliveryState (
                                                                                 DeliveryInfo.scheduledStartTime,
-                                                                                    DeliveryInfo.startTime,
+                                                                                DeliveryInfo.startTime,
                                                                                 DeliveryInfo.pickUpTime,
                                                                                 DeliveryInfo.dropOffTime
                                                                             ),
@@ -317,12 +319,12 @@ $$ LANGUAGE plpgsql;
 
 -- Test the Stored Procedure here --
 SELECT * FROM getFoodListings(1, NULL, NULL, NULL, JSON_BUILD_OBJECT (
-    'maxDistance',              10,
+    'maxDistance',              null,
     'maxEstimatedWeight',       null,
     'recommendedVehicleType',   null,
     'matchRegularAvailability', false,
-    'matchAvailableNow',        true,
-    'foodListingsStatus',       'Unscheduled Deliveries',
+    'matchAvailableNow',        false,
+    'foodListingsStatus',       'My Donated Listings',
     'retrievalAmount',          10,
     'retrievalOffset',          0,
     'foodTypes',                null,

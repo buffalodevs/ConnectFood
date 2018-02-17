@@ -5,23 +5,23 @@ SELECT dropFunction ('updateAppUser');
  */
 CREATE OR REPLACE FUNCTION updateAppUser
 (
-    _appUserKey             AppUser.appUserKey%TYPE,
-    _email                  AppUser.email%TYPE                  DEFAULT NULL, 
-    _password               AppUserPassword.password%TYPE       DEFAULT NULL,
-    _lastName               AppUser.lastName%TYPE               DEFAULT NULL,
-    _firstName              AppUser.firstName%TYPE              DEFAULT NULL,
-    _address                ContactInfo.address%TYPE            DEFAULT NULL,
-    _latitude               NUMERIC(9, 6)                       DEFAULT NULL,
-    _longitude              NUMERIC(9, 6)                       DEFAULT NULL,
-    _utcOffsetMins          ContactInfo.utcOffsetMins%TYPE      DEFAULT NULL,
-    _city                   ContactInfo.city%TYPE               DEFAULT NULL,
-    _state                  ContactInfo.state%TYPE              DEFAULT NULL,
-    _zip                    ContactInfo.zip%TYPE                DEFAULT NULL,
-    _phone                  ContactInfo.phone%TYPE              DEFAULT NULL,
-    _appUserType            AppUser.appUserType%TYPE            DEFAULT NULL,
-    _availabilityTimeRanges JSON[]                              DEFAULT NULL,
-    _organizationName       Organization.name%TYPE              DEFAULT NULL,
-    _taxId                  Organization.taxId%TYPE             DEFAULT NULL
+    _appUserKey                 AppUser.appUserKey%TYPE,
+    _email                      AppUser.email%TYPE                  DEFAULT NULL, 
+    _password                   AppUserPassword.password%TYPE       DEFAULT NULL,
+    _lastName                   AppUser.lastName%TYPE               DEFAULT NULL,
+    _firstName                  AppUser.firstName%TYPE              DEFAULT NULL,
+    _address                    ContactInfo.address%TYPE            DEFAULT NULL,
+    _latitude                   NUMERIC(9, 6)                       DEFAULT NULL,
+    _longitude                  NUMERIC(9, 6)                       DEFAULT NULL,
+    _utcOffsetMins              ContactInfo.utcOffsetMins%TYPE      DEFAULT NULL,
+    _city                       ContactInfo.city%TYPE               DEFAULT NULL,
+    _state                      ContactInfo.state%TYPE              DEFAULT NULL,
+    _zip                        ContactInfo.zip%TYPE                DEFAULT NULL,
+    _phone                      ContactInfo.phone%TYPE              DEFAULT NULL,
+    _appUserType                AppUser.appUserType%TYPE            DEFAULT NULL,
+    _availabilityMetaTimeRanges JSON[]                              DEFAULT NULL,
+    _organizationName           Organization.name%TYPE              DEFAULT NULL,
+    _taxId                      Organization.taxId%TYPE             DEFAULT NULL
 )
 -- Returns the new App User's information.
 RETURNS TABLE
@@ -52,7 +52,7 @@ BEGIN
     WHERE   AppUser.appUserKey = _appUserKey;
 
     -- Update any ContactInfo fields related to AppUser being updated.
-    PERFORM addOrUpdateContactInfo(_appUserKey, _address, _latitude, _longitude, _utcOffsetMins, _city, _state, _zip, _phone);
+    PERFORM addUpdateContactInfo(_appUserKey, _address, _latitude, _longitude, _utcOffsetMins, _city, _state, _zip, _phone);
 
     -- Update any Organization fields related to AppUser being updated.
     UPDATE  Organization
@@ -67,9 +67,9 @@ BEGIN
         VALUES      (_appUserKey, _password);
     END IF;
 
-    IF (_availabilityTimeRanges IS NOT NULL)
+    IF (_availabilityMetaTimeRanges IS NOT NULL)
     THEN
-        PERFORM addOrUpdateAvailability(_appUserKey, _availabilityTimeRanges);
+        PERFORM addUpdateAppUserAvailability(_appUserKey, _availabilityMetaTimeRanges);
     END IF;
 
     RETURN QUERY

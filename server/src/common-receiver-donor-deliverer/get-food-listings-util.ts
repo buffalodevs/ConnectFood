@@ -28,6 +28,7 @@ export function sanitizeFilters(filters: FoodListingFilters): void {
     filters.foodTypes = sanitizeFoodTypes(filters.foodTypes);
     filters.matchRegularAvailability = sanitizeMatchRegularAvailability(filters);
     filters.needsRefrigeration = sanitizeNeedsRefrigeration(filters.needsRefrigeration, filters.notNeedsRefrigeration);
+    filters.maxDistance = sanitizeMaxDistance(filters.foodListingsStatus, filters.maxDistance);
 
     logger.debug(prettyjsonRender(filters));
 }
@@ -77,6 +78,27 @@ function sanitizeNeedsRefrigeration(needsRefrigeration: boolean, notNeedsRefrige
     // If exactly one filter is only active, then we apply original filter.
     return (notBoth && notNeither) ? needsRefrigeration
                                    : null;
+}
+
+
+/**
+ * Sanitizes/generates max distance argument.
+ * @param foodListingsStatus The status of listings that are to be retrieved.
+ * @param maxDistance The max distance filter provided by the user.
+ * @return The max distance argument.
+ */
+function sanitizeMaxDistance(foodListingsStatus: FoodListingsStatus, maxDistance: number): number {
+
+    // If in Donor or Receiver Cart, then ignore max distance filter.
+    if (foodListingsStatus === FoodListingsStatus.myDonatedListings || foodListingsStatus === FoodListingsStatus.myClaimedListings) {
+        return null;
+    }
+    
+    if (maxDistance == null) {
+        return 30;
+    }
+
+    return maxDistance;
 }
 
 

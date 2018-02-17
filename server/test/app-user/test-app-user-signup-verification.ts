@@ -1,6 +1,6 @@
 import { chai, server } from '../test-server';
 import { getAppUserVerificationData, removeTestAppUser } from './util/test-app-user-database-util';
-import { VALID_APP_USER, AppUser } from "./util/signup-test-data";
+import { VALID_APP_USER, AppUser } from "./util/app-user-sample-data";
 
 import { validateGenericFoodWebResponse } from '../util/test-util';
 import { simulateSignupAppUser } from './test-app-user-signup';

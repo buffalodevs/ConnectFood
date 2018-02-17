@@ -16,7 +16,6 @@ AS $$
     DECLARE _distanceGradientMeters         INTEGER;
     DECLARE _distanceGradientStepMiles      INTEGER;
     DECLARE _overlapBufferMinutes           INTEGER;
-    DECLARE _nowRelativeToAvailabilityTimes TEXT;
 BEGIN
 
     -- Setup constants used to calculate Availability Range overlap margin/buffers.
@@ -34,7 +33,7 @@ BEGIN
         5) 25 miles / 30 mph * 60 minutes_per_hour   ~ 55 (+5) minute overlap required
         6) 30 miles / 30 mph * 60 minutes_per_hour   ~ 65 (+5) minute overlap required
 
-        NOTE: This might NOT scale well... we may need to create time range columns on AppUserAvailability with correct minute margins and index them
+        TODO:   This likely will NOT scale well... we may need to create time range columns on AppUserAvailability with correct minute margins and index them
                 to make it scale. This would cause some denormalization though, and it would use 7x more space to store avaialbility times. Use this for now and
                 hope that left hand argument to range overlap operator uses index (index left, scan right).
     */
@@ -55,15 +54,24 @@ BEGIN
             THEN
 
                 _specificAvailabilityFilters := _specificAvailabilityFilters || '
-                    AND DonorAvailability.timeRange && TSRANGE (LOWER(ReceiverAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
-                                                                UPPER(ReceiverAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ')
+                    AND (
+                                DonorAvailability.timeRange && TSRANGE (LOWER(ReceiverAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
+                                                                        UPPER(ReceiverAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ')
+                            OR  ReceiverAvailability.timeRange && TSRANGE (LOWER(FoodListingAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
+                                                                           UPPER(FoodListingAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ') 
+                        )
                 ' ||
                 CASE WHEN (_includeDeliverer) THEN '
-                    AND DelivererAvailability.timeRange && TSRANGE (LOWER(DonorAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
-                                                                    UPPER(DonorAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ')
+                    AND (       
+                                DelivererAvailability.timeRange && TSRANGE (LOWER(DonorAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
+                                                                            UPPER(DonorAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ')
+                            OR  DelivererAvailability.timeRange && TSRANGE (LOWER(FoodListingAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
+                                                                            UPPER(FoodListingAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ') 
+                        )
                     AND ReceiverAvailability.timeRange && TSRANGE (LOWER(DelivererAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
                                                                    UPPER(DelivererAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ')
-                    AND toUpcomingWeekday(LOWER(DelivererAvailability.timeRange), (SELECT EXTRACT(DOW FROM CURRENT_DATE))::INTEGER) <= FoodListing.availableUntilDate
+                    AND DelivererAvailability.timeRange <= TSRANGE (FoodListing.availableUntilDate - ' || _availabilityRangeBufferTxt || ',
+                                                                    FoodListing.availableUntilDate + ' || _availabilityRangeBufferTxt || ')
                 '
                 ELSE '' END;
             
@@ -71,15 +79,11 @@ BEGIN
             ELSIF (_matchAvailableNow)
             THEN
 
-                -- Get current time, but relative to App User Availability timestamps.
-                SET TIME ZONE 'UTC'; -- Ensure we are using UTC time zone!
-                _nowRelativeToAvailabilityTimes := convertToAvailabilityTime(CURRENT_TIMESTAMP::TIMESTAMP);
-
                 _specificAvailabilityFilters := _specificAvailabilityFilters || '
-                    AND DonorAvailability.timeRange @> TSRANGE (''' || _nowRelativeToAvailabilityTimes || '''::TIMESTAMP - ' || _availabilityRangeBufferTxt || ',
-                                                                ''' || _nowRelativeToAvailabilityTimes || '''::TIMESTAMP + ' || _availabilityRangeBufferTxt || ')
-                    AND ReceiverAvailability.timeRange @> TSRANGE (''' || _nowRelativeToAvailabilityTimes || '''::TIMESTAMP - ' || _availabilityRangeBufferTxt || ',
-                                                                   ''' || _nowRelativeToAvailabilityTimes || '''::TIMESTAMP + ' || _availabilityRangeBufferTxt || ')
+                    AND DonorAvailability.timeRange @> TSRANGE (''' || CURRENT_TIMESTAMP || '''::TIMESTAMP - ' || _availabilityRangeBufferTxt || ',
+                                                                ''' || CURRENT_TIMESTAMP || '''::TIMESTAMP + ' || _availabilityRangeBufferTxt || ')
+                    AND ReceiverAvailability.timeRange @> TSRANGE (''' || CURRENT_TIMESTAMP || '''::TIMESTAMP - ' || _availabilityRangeBufferTxt || ',
+                                                                   ''' || CURRENT_TIMESTAMP || '''::TIMESTAMP + ' || _availabilityRangeBufferTxt || ')
                 ';
 
             END IF;
@@ -91,20 +95,22 @@ BEGIN
                         || CASE WHEN (_includeDeliverer) THEN '
                             AND ST_DWITHIN(DelivererContact.gpsCoordinate, DonorContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')
                             AND ST_DWITHIN(ReceiverContact.gpsCoordinate, DelivererContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')
+                            AND DonorAvailability.timeRange <= TSRANGE (FoodListing.availableUntilDate - ' || _availabilityRangeBufferTxt || ',
+                                                                        FoodListing.availableUntilDate + ' || _availabilityRangeBufferTxt || ')
+                            AND ReceiverAvailability.timeRange <= TSRANGE (FoodListing.availableUntilDate - ' || _availabilityRangeBufferTxt || ',
+                                                                           FoodListing.availableUntilDate + ' || _availabilityRangeBufferTxt || ')
                         '
                         ELSE '' END
                         || _specificAvailabilityFilters || '
                     )
             ';
 
-        ELSE EXIT; -- Jump out of FOR LOOP if our max disstance filter doesn't go beyond an incremental 5 mi distance threshold.
+        ELSE EXIT; -- Jump out of FOR LOOP if our max distance filter doesn't go beyond an incremental 5 mi distance threshold.
         END IF;
 
     END LOOP;
 
     RETURN '
-        AND toUpcomingWeekday(LOWER(DonorAvailability.timeRange), (SELECT EXTRACT(DOW FROM CURRENT_DATE))::INTEGER) <= FoodListing.availableUntilDate
-        AND toUpcomingWeekday(LOWER(ReceiverAvailability.timeRange), (SELECT EXTRACT(DOW FROM CURRENT_DATE))::INTEGER) <= FoodListing.availableUntilDate
         AND (FALSE -- IMPORTANT since following OR statements are dynamically generated (prevents syntax error).
         ' || _generalAvailabilityFilters || '
         )
@@ -114,4 +120,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-SELECT genAvailabilityOverlapFilters(10, TRUE, FALSE, TRUE);
+-- SELECT genAvailabilityOverlapFilters(10, TRUE, TRUE, FALSE);

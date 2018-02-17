@@ -6,13 +6,13 @@ CREATE TABLE IF NOT EXISTS AppUserAvailability
 );
 
 -- Many to one relationship between AppUserAvailability and AppUser respectively.
-ALTER TABLE AppUserAvailability ADD COLUMN IF NOT EXISTS appUserKey     INTEGER     NOT NULL REFERENCES AppUser (appUserKey);
+ALTER TABLE AppUserAvailability ADD COLUMN IF NOT EXISTS appUserAvailabilityMetaKey INTEGER     NOT NULL REFERENCES AppUserAvailabilityMeta (appUserAvailabilityMetaKey);
 
--- Holds times relative to the week of 11/12/2017 for regular availability (condensed weekday time combos in form of timestamps).
-ALTER TABLE AppUserAvailability ADD COLUMN IF NOT EXISTS timeRange      TSRANGE     NOT NULL;
+-- Holds absolute availability times (which are generated from AppUserAvailabilityMeta on a weekly basis).
+ALTER TABLE AppUserAvailability ADD COLUMN IF NOT EXISTS timeRange                  TSRANGE     NOT NULL;
 
 
-CREATE INDEX IF NOT EXISTS appUserAvailability_appUserKeyIdx    ON AppUserAvailability (appUserKey);
+CREATE INDEX IF NOT EXISTS appUserAvailability_appUserKeyIdx    ON AppUserAvailabilityMeta (appUserAvailabilityMetaKey);
 CREATE INDEX IF NOT EXISTS appUserAvailability_timeRangeIdx     ON AppUserAvailability USING gist (timeRange);
 
 
@@ -26,7 +26,7 @@ BEGIN
             upper(timeRange) IS NOT NULL
         );
     EXCEPTION
-        WHEN duplicate_object THEN RAISE NOTICE 'Skipping ADD CONSTRAINT since it already exists.';
+        WHEN duplicate_object THEN RAISE NOTICE 'Skipping ADD CONSTRAINT (appUserAvailability_timeRangeMembersNotNULL) on timeRange column since it already exists.';
     END;
 
 END$$;

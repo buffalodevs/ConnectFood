@@ -1,12 +1,9 @@
-import { chai, server, should, expect, logResponse } from '../test-server';
-import { validateGenericFoodWebResponse } from "./../util/test-util";
+import { chai, server, should, expect, logResponse, TEST_USER_EMAIL, TEST_USER_PASSWORD, TEST_USER_LOGIN_ROUTE } from '../test-server';
+import { validateGenericFoodWebResponse } from "../util/test-util";
 
 import { AppUser } from '../../../shared/src/app-user/app-user';
 import { AppUserErrorMsgs } from '../../../shared/src/app-user/message/app-user-error-msgs';
 import { LoginRequest, LoginResponse } from '../../../shared/src/app-user/message/login-message';
-
-
-const ROUTE: string = '/appUser/login';
 
 
 /**
@@ -17,9 +14,9 @@ const ROUTE: string = '/appUser/login';
  */
 describe('Login Test', () => {
 
-    it('Login should succeed when given correct email and password', testLogin.bind(this, 'marknemm@buffalo.edu', 'nemmer', true));
-    it('Login should fail when given incorrect password', testLogin.bind(this, 'marknemm@buffalo.edu', 'incorrect password', false));
-    it('Login should fail when given incorrect email', testLogin.bind(this, 'incorrectUsername@buffalo.edu', 'nemmer', false));
+    it('Login should succeed when given correct email and password', testLogin.bind(this, TEST_USER_EMAIL, TEST_USER_PASSWORD, true));
+    it('Login should fail when given incorrect password', testLogin.bind(this, TEST_USER_EMAIL, 'incorrect password', false));
+    it('Login should fail when given incorrect email', testLogin.bind(this, 'incorrectUsername@buffalo.edu', TEST_USER_PASSWORD, false));
 });
 
 
@@ -35,7 +32,7 @@ function testLogin(email: string, password: string, shouldSucceed: boolean, done
     const loginRequest: LoginRequest = new LoginRequest(email, password);
 
     chai.request(server)
-        .post(ROUTE)
+        .post(TEST_USER_LOGIN_ROUTE)
         .send(loginRequest)
         .end(validateLoginResponse.bind(this, done, shouldSucceed));
 }
@@ -47,14 +44,13 @@ function validateLoginResponse(done: MochaDone, shouldSucceed: boolean, err: any
     const expectedErrMsg: string = shouldSucceed ? null
                                                  : AppUserErrorMsgs.INCORRECT_LOGIN;
 
-    validateGenericFoodWebResponse(ROUTE, shouldSucceed, expectedErrMsg, null, err, response);
+    validateGenericFoodWebResponse(TEST_USER_LOGIN_ROUTE, shouldSucceed, expectedErrMsg, null, err, response);
 
     loginResponse.should.have.property('appUser');
     if (shouldSucceed) {
         expect(loginResponse.appUser).to.not.equal(null);
     }
     else {
-        loginResponse.should.have.property('appUser');
         expect(loginResponse.appUser).to.equal(null);
     }
 

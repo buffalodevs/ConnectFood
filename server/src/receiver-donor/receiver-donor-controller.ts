@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { logger, prettyjsonRender } from "./../logging/logger";
 
 import { SessionData } from "../common-util/session-data";
 import { addFoodListing } from './donor/add-food-listing';
@@ -23,6 +24,7 @@ export function handleGetFoodListings(request: Request, response: Response): voi
             response.send(new GetFoodListingsResponse(foodListings, true, 'Food Listings Successfully Retrieved'));
         })
         .catch((err: Error) => {
+            logger.error(prettyjsonRender(err));
             response.send(new GetFoodListingsResponse(null, false, err.message));
         });
 }
@@ -41,6 +43,7 @@ export function handleAddFoodListing(request: Request, response: Response): void
             response.send(new AddFoodListingResponse(foodListingKey, true, 'Food Listing Added Successfully'));
         })
         .catch((err: Error) => {
+            logger.error(prettyjsonRender(err));
             response.send(new AddFoodListingResponse(null, false, 'Food Listing Add Failed'));
         });
 }
@@ -59,6 +62,7 @@ export function handleRemoveFoodListing(request: Request, response: Response): v
             response.send(new FoodWebResponse(true, 'Food listing has been successfully removed.'));
         })
         .catch((err: Error) => {
+            logger.error(prettyjsonRender(err));
             response.send(new FoodWebResponse(false, err.message));
         });
 }
@@ -76,6 +80,7 @@ export function handleClaimFoodListing(request: Request, response: Response): vo
             response.send(new FoodWebResponse(true, 'Food listing has been successfully claimed.'));
         })
         .catch((err: Error) => {
+            logger.error(prettyjsonRender(err));
             response.send(new FoodWebResponse(false, err.message));
         });
 }
@@ -93,6 +98,7 @@ export function handleUnclaimFoodListing(request: Request, response: Response): 
             response.send(new FoodWebResponse(true, 'Food listing has been successfully unclaimed.'));
         })
         .catch((err: Error) => {
+            logger.error(prettyjsonRender(err));
             response.send(new FoodWebResponse(false, err.message));
         });
 }

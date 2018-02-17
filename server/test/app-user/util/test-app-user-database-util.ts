@@ -1,4 +1,5 @@
 import { should, expect } from '../../test-server';
+import { validateAppUser } from "./validate-app-user";
 
 import { SessionData } from '../../../src/common-util/session-data';
 import { query, QueryResult, connect, Client } from '../../../src/database-util/connection-pool';
@@ -35,31 +36,15 @@ async function validateAppUserDatabaseIntegrity(appUser: AppUser): Promise <numb
     let databaseNewAppUser: AppUser = databaseNewSessionData.appUser;
     databaseNewAppUser = new Deserializer().deserialize(databaseNewAppUser, AppUser);
 
-    expect(databaseNewAppUser.email).to.equal(appUser.email);
-    expect(databaseNewAppUser.firstName).to.equal(appUser.firstName);
-    expect(databaseNewAppUser.lastName).to.equal(appUser.lastName);
-    expect(databaseNewAppUser.appUserType).to.equal(appUser.appUserType);
-
-    expect(databaseNewAppUser.organization.name).to.equal(appUser.organization.name);
-    expect(databaseNewAppUser.organization.taxId).to.equal(appUser.organization.taxId);
-
-    expect(databaseNewAppUser.contactInfo.address).to.equal(appUser.contactInfo.address);
-    expect(databaseNewAppUser.contactInfo.city).to.equal(appUser.contactInfo.city);
-    expect(databaseNewAppUser.contactInfo.state).to.equal(appUser.contactInfo.state);
-    expect(databaseNewAppUser.contactInfo.zip).to.equal(appUser.contactInfo.zip);
-    expect(databaseNewAppUser.contactInfo.phone).to.equal(appUser.contactInfo.phone);
-    expect(databaseNewAppUser.contactInfo.utcOffsetMins).to.equal(appUser.contactInfo.utcOffsetMins);
-
-    expect(databaseNewAppUser.availability.length).to.equal(appUser.availability.length);
-    for (let i: number = 0; i < appUser.availability.length; i++) {
-        expect(databaseNewAppUser.availability[i].startTime.toISOString()).to.equal(appUser.availability[i].startTime.toISOString());
-        expect(databaseNewAppUser.availability[i].endTime.toISOString()).to.equal(appUser.availability[i].endTime.toISOString());
-    }
-
+    validateAppUser(appUser, databaseNewAppUser);
     return databaseNewSessionData.appUserKey;
 }
 
 
+/**
+ * Removes a test App User completely from the database.
+ * @param appUserKey The key ID of the App User to remove.
+ */
 export async function removeTestAppUser(appUserKey: number): Promise <void> {
 
     const dbClient: Client = await connect();

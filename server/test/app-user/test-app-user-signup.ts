@@ -1,6 +1,6 @@
 import { chai, server } from '../test-server';
 import { testAppUserDataIntegrity } from './util/test-app-user-database-util';
-import { VALID_APP_USER, INVALID_EMAIL_APP_USER, AppUser } from "./util/signup-test-data";
+import { VALID_APP_USER, INVALID_EMAIL_APP_USER, AppUser } from "./util/app-user-sample-data";
 
 import { AppUserErrorMsgs } from '../../../shared/src/app-user/message/app-user-error-msgs';
 import { SignupRequest } from '../../../shared/src/app-user/message/signup-message';

@@ -16,7 +16,7 @@ export { FoodListingsStatus }
 export class FoodListing {
 
     @deepDeserializable(Date)       public availableUntilDate: Date;
-    @deepDeserializable(DateRange)  public donationAvailability: DateRange[];
+    @deepDeserializable(DateRange)  public foodListingAvailability: DateRange[];
     @deepDeserializable(ClaimInfo)  public claimInfo: ClaimInfo;
 
 
@@ -67,16 +67,17 @@ export class FoodListing {
          */
         public donorInfo: AppUser = null,
         /**
-         * When food donation is available to be picked up.
+         * Absolute availability time ranges when food donation is available to be picked up.
+         * NOTE: This is an addition/overlaod of Donor App User's Regular Availability!
          */
-        donationAvailability: DateRange[] = null,
+        foodListingAvailability: DateRange[] = null,
         /**
          * Information pertaining to a claim on this Food Listing.
          */
         claimInfo: ClaimInfo = null
     ) {
         this.availableUntilDate = availableUntilDate;
-        this.donationAvailability = donationAvailability;
+        this.foodListingAvailability = foodListingAvailability;
         this.claimInfo = claimInfo;
     }
 }

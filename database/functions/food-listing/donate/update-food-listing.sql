@@ -5,17 +5,18 @@
 SELECT dropFunction('updateFoodListing');
 CREATE OR REPLACE FUNCTION updateFoodListing
 (
-    _foodListingKey         FoodListing.foodListingKey%TYPE,                        -- The key identifier of the Food Listing to update.
-    _donorAppUserKey        FoodListing.donorAppUserKey%TYPE,                       -- The Donor ID (used to check if user has rights to update Food Listing).
-    _foodTypes              FoodType[]                              DEFAULT NULL,   -- What Food Types is this?
-    _foodTitle              FoodListing.foodTitle%TYPE              DEFAULT NULL,   -- The title (short description) of the Food Listing.
-    _needsRefrigeration     FoodListing.needsRefrigeration%TYPE     DEFAULT NULL,   -- Is the food perishable?
-    _availableUntilDate     TEXT                                    DEFAULT NULL,   -- The date when the donated food will no longer be available.
-    _estimatedWeight        FoodListing.estimatedWeight%TYPE        DEFAULT NULL,   -- The total weight of the Food Listing (in pounds).
-    _estimatedValue         FoodListing.estimatedValue%TYPE         DEFAULT NULL,   -- The estimated value of the Food Listing (in $).
-    _foodDescription        FoodListing.foodDescription%TYPE        DEFAULT NULL,   -- A (long) description of the Food Listing.
-    _recommendedVehicleType VehicleType                             DEFAULT NULL,   -- Recommended vehicle to use for delivery.
-    _imgUrls                TEXT[]                                  DEFAULT NULL    -- URL(s) for the image being stored/uploaded.
+    _foodListingKey             FoodListing.foodListingKey%TYPE,                        -- The key identifier of the Food Listing to update.
+    _donorAppUserKey            FoodListing.donorAppUserKey%TYPE,                       -- The Donor ID (used to check if user has rights to update Food Listing).
+    _foodTypes                  FoodType[]                              DEFAULT NULL,   -- What Food Types is this?
+    _foodTitle                  FoodListing.foodTitle%TYPE              DEFAULT NULL,   -- The title (short description) of the Food Listing.
+    _needsRefrigeration         FoodListing.needsRefrigeration%TYPE     DEFAULT NULL,   -- Is the food perishable?
+    _availableUntilDate         TEXT                                    DEFAULT NULL,   -- The date when the donated food will no longer be available.
+    _estimatedWeight            FoodListing.estimatedWeight%TYPE        DEFAULT NULL,   -- The total weight of the Food Listing (in pounds).
+    _estimatedValue             FoodListing.estimatedValue%TYPE         DEFAULT NULL,   -- The estimated value of the Food Listing (in $).
+    _foodDescription            FoodListing.foodDescription%TYPE        DEFAULT NULL,   -- A (long) description of the Food Listing.
+    _recommendedVehicleType     VehicleType                             DEFAULT NULL,   -- Recommended vehicle to use for delivery.
+    _imgUrls                    TEXT[]                                  DEFAULT NULL,   -- URL(s) for the image being stored/uploaded.
+    _availabilityTimeRanges     JSON[]                                  DEFAULT NULL    -- (Absolute) Food Listing availability time ranges.
 )
 RETURNS VOID -- TODO: Return data pertaining to contacts of Receivers (Claimers) who are negatively effected by this update (for contacting them)!
 AS $$
@@ -54,6 +55,15 @@ BEGIN
             VALUES      (_foodListingKey, _foodTypes[i]);
         END LOOP;
 
+    END IF;
+
+    -- ============ Handle Food Listing Availability update ============== --
+    -- =================================================================== --
+
+    IF (_availabilityTimeRanges IS NOT NULL)
+    THEN
+        -- NOTE: These add onto or overload the regular availabiilty times for the associated Donor App User.
+        PERFORM addUpdateFoodListingAvailability(_foodListingKey, _availabilityTimeRanges);
     END IF;
 
 

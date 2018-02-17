@@ -1,15 +1,16 @@
 'use strict';
-import { Storage, Bucket, File, BucketConfig, WriteStreamOptions } from '@google-cloud/storage';
-import * as fs from 'fs';
 import * as _ from 'lodash';
+import * as fs from 'fs';
+import { Storage, Bucket, File, BucketConfig, WriteStreamOptions } from '@google-cloud/storage';
 
 import { query, QueryResult } from '../../database-util/connection-pool';
 import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
 import { logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 import { logger, prettyjsonRender } from '../../logging/logger';
+import { absToRelativeDateRanges } from "./../../common-util/date-time-util";
 
 import { DateFormatter } from '../../../../shared/src/date-time-util/date-formatter';
-import { FoodListing } from '../message/add-food-listing-message';
+import { FoodListing } from '../../../../shared/src/common-receiver-donor-deliverer/food-listing';
 
 require('dotenv');
 
@@ -41,16 +42,19 @@ export async function addFoodListing(foodListing: FoodListing, imgUploads: strin
     }
     
     // Construct prepared statement.
-    let queryArgs = [ donorAppUserKey,
-                      foodListing.foodTypes,
-                      foodListing.foodTitle,
-                      foodListing.needsRefrigeration,
-                      foodListing.availableUntilDate.toISOString(),
-                      foodListing.estimatedWeight,
-                      foodListing.estimatedValue,
-                      foodListing.foodDescription,
-                      foodListing.recommendedVehicleType,
-                      imageUrls ];
+    let queryArgs = [
+        donorAppUserKey,
+        foodListing.foodTypes,
+        foodListing.foodTitle,
+        foodListing.needsRefrigeration,
+        foodListing.availableUntilDate.toISOString(),
+        foodListing.estimatedWeight,
+        foodListing.estimatedValue,
+        foodListing.foodDescription,
+        foodListing.recommendedVehicleType,
+        imageUrls,
+        foodListing.foodListingAvailability
+    ];
     let queryString = addArgPlaceholdersToQueryStr('SELECT * FROM addFoodListing();', queryArgs);
     logSqlQueryExec(queryString, queryArgs);
 

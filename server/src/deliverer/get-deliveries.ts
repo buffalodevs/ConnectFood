@@ -4,7 +4,7 @@ import { logger, prettyjsonRender } from '../logging/logger';
 
 import { getDrivingDistTime, GPSCoordinate } from './../geocode/geocode';
 import { fillFullTripDrivingDistances } from './delivery-util/delivery-geocode-util';
-import { availabilityToAbsDateRanges } from '../common-util/date-time-util';
+import { relativeToAbsDateRanges } from '../common-util/date-time-util';
 
 import { FoodListing } from '../../../shared/src/common-receiver-donor-deliverer/food-listing';
 import { FoodListingFilters } from '../../../shared/src/common-receiver-donor-deliverer/food-listing-filters';
@@ -44,7 +44,7 @@ async function generateResultArray(queryResult: QueryResult, myGPSCoordinate: GP
 
     let foodListings: FoodListing[] = processGetFoodListingsResult(queryResult, (foodListing: FoodListing) => {
         
-        foodListing.claimInfo.possibleDeliveryTimes = availabilityToAbsDateRanges(foodListing.claimInfo.possibleDeliveryTimes, myUtcOffsetMins);
+        foodListing.claimInfo.possibleDeliveryTimes = relativeToAbsDateRanges(foodListing.claimInfo.possibleDeliveryTimes, myUtcOffsetMins);
         return foodListing;
     });
 

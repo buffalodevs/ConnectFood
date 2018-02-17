@@ -3,22 +3,22 @@ SELECT dropFunction('addAppUser');
 
 CREATE OR REPLACE FUNCTION addAppUser
 (
-    _email                  AppUser.email%TYPE, 
-    _password               AppUserPassword.password%TYPE,
-    _lastName               AppUser.lastName%TYPE,
-    _firstName              AppUser.firstName%TYPE,
-    _address                ContactInfo.address%TYPE,
-    _latitude               NUMERIC(9, 6),
-    _longitude              NUMERIC(9, 6),
-    _utcOffsetMins          ContactInfo.utcOffsetMins%TYPE,
-    _city                   ContactInfo.city%TYPE,
-    _state                  ContactInfo.state%TYPE,
-    _zip                    ContactInfo.zip%TYPE,
-    _phone                  ContactInfo.phone%TYPE,
-    _appUserType            AppUser.appUserType%TYPE,
-    _availabilityTimeRanges JSON[],
-    _organizationName       Organization.name%TYPE,
-    _taxId                  Organization.taxId%TYPE
+    _email                      AppUser.email%TYPE, 
+    _password                   AppUserPassword.password%TYPE,
+    _lastName                   AppUser.lastName%TYPE,
+    _firstName                  AppUser.firstName%TYPE,
+    _address                    ContactInfo.address%TYPE,
+    _latitude                   NUMERIC(9, 6),
+    _longitude                  NUMERIC(9, 6),
+    _utcOffsetMins              ContactInfo.utcOffsetMins%TYPE,
+    _city                       ContactInfo.city%TYPE,
+    _state                      ContactInfo.state%TYPE,
+    _zip                        ContactInfo.zip%TYPE,
+    _phone                      ContactInfo.phone%TYPE,
+    _appUserType                AppUser.appUserType%TYPE,
+    _availabilityMetaTimeRanges JSON[],
+    _organizationName           Organization.name%TYPE,
+    _taxId                      Organization.taxId%TYPE
 )
 -- Returns the new App User's information.
 RETURNS TABLE
@@ -52,10 +52,10 @@ BEGIN
     VALUES      (_appUserKey, _password);
 
     -- Add the new user's contact info.
-    PERFORM addOrUpdateContactInfo (_appUserKey, _address, _latitude, _longitude, _utcOffsetMins, _city, _state, _zip, _phone);
+    PERFORM addUpdateContactInfo (_appUserKey, _address, _latitude, _longitude, _utcOffsetMins, _city, _state, _zip, _phone);
 
     -- Add or update the new user's availability times (same work for both operations... does total refresh).
-    PERFORM addOrUpdateAvailability (_appUserKey, _availabilityTimeRanges);
+    PERFORM addUpdateAppUserAvailability (_appUserKey, _availabilityMetaTimeRanges);
 
     -- Add the new user's organization data if the user is and oragnization.
     IF (_organizationName IS NOT NULL)
