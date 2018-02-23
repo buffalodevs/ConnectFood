@@ -1,5 +1,6 @@
 @import '~@angular/material/theming';
 @import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
+@import "../../node_modules/font-awesome/css/font-awesome.css";
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 @include mat-core();
 
@@ -446,6 +447,10 @@ ngb-typeahead-window .dropdown-item.active, ngb-typeahead-window .dropdown-item:
 .modal-button-group {
     padding: 10px;
     text-align: right;
+}
+
+.cdk-overlay-container {
+    z-index: 4000;
 }
 
 .cdk-overlay-pane {

@@ -71,7 +71,7 @@ function logRequestViaWinston(route: string, requestType: 'GET' | 'POST' | 'PUT'
     logger.info('\nReceived ' + requestTypeClrStr + ' request via route: ' + styledRouteStr);
 
     if (!_.isEmpty(request)) {
-        logger.verbose('\n' + prettyjsonRender(request) + '\n');
+        logger.verbose('\n' + request + '\n');
     }
 }
 
@@ -122,7 +122,7 @@ function logResponseViaWinston(route: string, response: FoodWebResponse): void {
 
     logger.info('\nSending response via route ' + styledRouteStr + '\nAssociated server operation ' +
                 succeededFailedClrStr + ' with message: ' + messageClrStr);
-    logger.verbose('\n' + prettyjsonRender(response) + '\n');
+    logger.verbose('\n' + response + '\n');
 }
 
 

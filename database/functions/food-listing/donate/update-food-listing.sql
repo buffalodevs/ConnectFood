@@ -15,7 +15,7 @@ CREATE OR REPLACE FUNCTION updateFoodListing
     _estimatedValue             FoodListing.estimatedValue%TYPE         DEFAULT NULL,   -- The estimated value of the Food Listing (in $).
     _foodDescription            FoodListing.foodDescription%TYPE        DEFAULT NULL,   -- A (long) description of the Food Listing.
     _recommendedVehicleType     VehicleType                             DEFAULT NULL,   -- Recommended vehicle to use for delivery.
-    _imgUrls                    TEXT[]                                  DEFAULT NULL,   -- URL(s) for the image being stored/uploaded.
+    _imgData                    JSON[]                                  DEFAULT NULL,   -- URL(s) and crop data for images associated with Food Listing.
     _availabilityTimeRanges     JSON[]                                  DEFAULT NULL    -- (Absolute) Food Listing availability time ranges.
 )
 RETURNS VOID -- TODO: Return data pertaining to contacts of Receivers (Claimers) who are negatively effected by this update (for contacting them)!
@@ -41,20 +41,7 @@ BEGIN
 
     IF (_foodTypes IS NOT NULL)
     THEN
-
-        -- First delete all associated Food Types.
-        DELETE FROM FoodListingFoodTypeMap
-        WHERE       foodListingKey = _foodListingKey;
-
-        -- TODO: Get the removed Food Types in this update and notify App Users that have non-delivered claims that they were removed.
-
-        -- Then add Food Types provided in the update (includes any old Food Types that were not removed by the user).
-        FOR i IN array_lower(_foodTypes, 1) .. array_upper(_foodTypes, 1)
-        LOOP
-            INSERT INTO FoodListingFoodTypeMap (foodListingKey, foodType)
-            VALUES      (_foodListingKey, _foodTypes[i]);
-        END LOOP;
-
+        PERFORM addUpdateFoodListingFoodTypeMap(_foodListingKey, _foodTypes);
     END IF;
 
     -- ============ Handle Food Listing Availability update ============== --
@@ -64,6 +51,14 @@ BEGIN
     THEN
         -- NOTE: These add onto or overload the regular availabiilty times for the associated Donor App User.
         PERFORM addUpdateFoodListingAvailability(_foodListingKey, _availabilityTimeRanges);
+    END IF;
+
+    -- ============ Handle Food Listing Image update ============== --
+    -- ============================================================ --
+
+    IF (_imgCrops IS NOT NULL)
+    THEN
+        PERFORM addUpdateFoodListingImg(_foodListingKey, _imgData);
     END IF;
 
 

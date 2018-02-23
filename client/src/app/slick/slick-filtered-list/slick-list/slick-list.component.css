@@ -55,16 +55,15 @@
 }
 
 
-@media only screen and (max-width: 776px) {
+@media only screen and (max-width: 767px) {
 
     :host ::ng-deep .slick-list-item {
-        max-width: 320px;
+        max-width: 370px;
         margin-left: auto;
         margin-right: auto;
     }
     
     :host ::ng-deep .slick-list-item-body > div {
-        display: inline-block;
         width: auto;
         text-align: left;
     }

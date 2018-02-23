@@ -1,0 +1,58 @@
+.img-manager-container {
+    text-align: center;
+    margin: auto;
+    max-width: 100%;
+}
+
+.add-image-button, .del-image-button {
+    display: inline;
+    margin: 0px;
+    padding: 0px;
+    max-width: 50%;
+}
+
+button.mat-raised-button.mat-primary.add-image-button {
+    border-bottom-right-radius: 0%;
+    border-bottom-left-radius: 0%;
+    border-top-right-radius: 0%;
+}
+
+button.mat-raised-button.mat-primary.del-image-button {
+    border-bottom-right-radius: 0%;
+    border-bottom-left-radius: 0%;
+    border-top-left-radius: 0%;
+}
+
+:host ::ng-deep ngx-gallery {
+    max-width: 100%;
+}
+
+
+:host ::ng-deep .hide-gallery-image ngx-gallery-image {
+    display: none;
+}
+
+:host ::ng-deep .hide-arrows ngx-gallery-image ngx-gallery-arrows {
+    display: none;
+}
+
+.no-images-indicator {
+    border: 1px dashed gray;
+    text-align: center;
+    background-color: lightgray;
+    color: darkgray;
+    margin-top: 10px;
+    margin-bottom: 0px;
+    vertical-align: middle;
+    font-size: 30px;
+    display: table-cell;
+}
+
+
+@media screen and (max-width: 991px) {
+    
+    .img-manager-container {
+        text-align: center;
+        margin: auto;
+    }
+}

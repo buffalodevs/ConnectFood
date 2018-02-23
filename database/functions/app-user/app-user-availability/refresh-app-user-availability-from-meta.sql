@@ -9,8 +9,11 @@ SELECT dropFunction('refreshAppUserAvailabilityFromMeta');
 CREATE OR REPLACE FUNCTION refreshAppUserAvailabilityFromMeta()
 RETURNS VOID
 AS $$
-    DECLARE _currentDOW INTEGER DEFAULT EXTRACT(DOW FROM CURRENT_TIMESTAMP)::INTEGER;
+    DECLARE _currentDOW INTEGER DEFAULT NULL;
 BEGIN
+
+    SET TIME ZONE 'UTC';
+    _currentDOW := COALESCE(_currentDOW, EXTRACT(DOW FROM CURRENT_TIMESTAMP)::INTEGER);
 
     -- Generate absolute AppUserAvailability timestamp ranges for 3 weeks later (next 2 weeks should have already been generated).
     INSERT INTO AppUserAvailability (appUserAvailabilityMetaKey, timeRange)

@@ -33,12 +33,12 @@ export function handleGetFoodListings(request: Request, response: Response): voi
 export function handleAddFoodListing(request: Request, response: Response): void {
 
     response.setHeader('Content-Type', 'application/json');
-    
+
     let addFoodListingRequest: AddFoodListingRequest = request.body;
-    // The currently logged in user must be the Donor.
+    let imageUploads = <Express.Multer.File[]>request.files;
     let donorAppUserKey: number = SessionData.loadSessionData(request).appUserKey;
 
-    addFoodListing(addFoodListingRequest.foodListing, addFoodListingRequest.imgUploads, donorAppUserKey)
+    addFoodListing(addFoodListingRequest.foodListing, imageUploads, donorAppUserKey)
         .then((foodListingKey: number) => {
             response.send(new AddFoodListingResponse(foodListingKey, true, 'Food Listing Added Successfully'));
         })

@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, OnChanges, forwardRef, SimpleChange, SimpleChanges } from '@angular/core';
-import { FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormArray, Validators, FormBuilder } from '@angular/forms';
+import { FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormArray, Validators, FormBuilder, Validator, AbstractControl } from '@angular/forms';
 
 import { ValidationService } from '../../../common-util/services/validation.service';
 import { DateFormatterService } from '../../../common-util/services/date-formatter.service';
@@ -20,7 +20,7 @@ import { DateRange } from '../../../../../../shared/src/date-time-util/date-rang
         }
     ]
 })
-export class SlickDateTimeScheduleBuilderComponent extends AbstractModelDrivenComponent implements OnInit, OnChanges, ControlValueAccessor {
+export class SlickDateTimeScheduleBuilderComponent extends AbstractModelDrivenComponent implements OnInit, OnChanges, ControlValueAccessor, Validator {
     
     public readonly AVAILABILITY_RANGES_CTRL_NAME: string;
 
@@ -172,6 +172,25 @@ export class SlickDateTimeScheduleBuilderComponent extends AbstractModelDrivenCo
     public registerOnChange(onChange: (value: any) => void): void {
         this.onChange = onChange;
     }
+
+
+    /**
+     * Performs custom validation for this component/control based off of contained form's validation state.
+     */
+    public validate(c: AbstractControl): { [key: string]: any; } {
+
+        if (!this.form.valid) {
+
+            // Is the error directly with the contained form, or is it for some child control?
+            return (this.form.errors != null) ? this.form.errors
+                                              : { 'invalidTimeRange': 'Please complete or fix any invalid time ranges.' };
+        }
+
+        return null;
+    }
+
+
+    public registerOnValidatorChange?(fn: () => void): void {}
 
 
     /**

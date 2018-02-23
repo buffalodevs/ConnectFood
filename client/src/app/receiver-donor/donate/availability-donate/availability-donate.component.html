@@ -1,0 +1,22 @@
+<form [formGroup]="form">
+
+    <h1 class="form-title">Donation Availability</h1>
+    <hr><br>
+
+    <div>
+        <h4>Weekly Availability</h4>
+        <hr>
+
+        <slick-weekday-schedule-builder [displayOnly]="true" formControlName="appUserAvailability"></slick-weekday-schedule-builder>
+    </div>
+
+    <div>
+        <h4>Additional Availability</h4>
+        <hr>
+
+        <div style="padding-left: 15px">
+            <slick-date-time-schedule-builder formControlName="foodListingAvailability"></slick-date-time-schedule-builder>
+        </div>
+    </div>
+
+</form>

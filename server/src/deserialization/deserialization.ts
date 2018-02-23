@@ -16,10 +16,32 @@ export const DESERIALIZER: Deserializer = new Deserializer();
  */
 export function deserialize(request: Request, response: Response, next: NextFunction): void {
 
+    request = attemptDeserializeAddFoodListing(request);
+
     // If we have a message body (payload data) that is a registered deserializable object, then deserialize it.
     if (request.body != null && DESERIALIZER.isRegisteredDeserializable(request.body)) {
         request.body = DESERIALIZER.deserialize(request.body);
     }
 
     next(); // Call the next route handler.
+}
+
+
+/**
+ * If we are receiving a multipart/form-data request for addFoodListing, then we must do extra work after multer pre-processes request for us.
+ * multer will add a files array that contains all of our image file attachments. It will also generate the body of the request, which will contain the
+ * JSON serialized/stringified form data in a dataJSON member. We must completely deserialize this, then set it to the body.
+ * @param request The request to possibly do special deserialization for (if it is addFoodListingRequest with image file attachments).
+ * @return The deserialized request.
+ */
+function attemptDeserializeAddFoodListing(request: Request): Request {
+
+    
+    const isAddFoodListingReqWithImgs: boolean = ( request.url.indexOf('addFoodListing') >= 0 && request.headers['content-type'].indexOf('multipart/form-data') >= 0 );
+    
+    if (isAddFoodListingReqWithImgs) {
+        request.body = JSON.parse(request.body['dataJSON']);
+    }
+
+    return request;
 }

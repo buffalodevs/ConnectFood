@@ -1,0 +1,89 @@
+<div [formGroup]="form"> 
+
+    <!-- foodTitle -->
+    <div class="form-group">
+        <h4 for="foodTitle">Title</h4>
+        <mat-form-field class="input-group" floatPlaceholder="never">
+            <textarea #title matInput matTextareaAutosize id="foodTitle" placeholder="Donation Title"
+                        formControlName="foodTitle" [maxlength]="TITLE_MAX_LENGTH" [errorStateMatcher]="this" required></textarea>
+            <mat-hint align="end">{{ title.value.length }} / {{ TITLE_MAX_LENGTH }}</mat-hint>
+        </mat-form-field>
+    </div>
+
+    <div class="row">
+
+        <!-- estimatedValue -->
+        <div class="form-group col-md-6">
+            <h4 for="estimatedValue">Estimated Value</h4>
+            <mat-input-container floatPlaceholder="never">
+                <span matPrefix>$&nbsp;</span>
+                <input matInput id="estimatedValue" placeholder="0.00" formControlName="estimatedValue"
+                        [textMask]="validationService.MONEY_MASK_CONFIG" [errorStateMatcher]="this" required>
+            </mat-input-container>
+        </div>
+
+        <!-- estimatedWeight -->
+        <div class="form-group col-md-6">
+            <h4 for="estimatedWeight">Estimated Weight</h4>
+            <mat-input-container floatPlaceholder="never">
+                <input matInput id="estimatedWeight" placeholder="weight (lbs)" formControlName="estimatedWeight"
+                        type="number" min="0.5" step="0.5" [errorStateMatcher]="this" required>
+                <span matSuffix>lbs</span>
+            </mat-input-container>
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <!-- availableUntilDate -->
+        <div class="form-group col-md-6">
+            <h4 for="availableUntilDate">Available Until</h4>
+            <mat-input-container class="input-group" floatPlaceholder="never">
+                <input #availableUntilDate matInput id="availableUntilDate" [matDatepicker]="picker" placeholder="mm/dd/yyyy"
+                        formControlName="availableUntilDate" [errorStateMatcher]="this" required>
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker touchUi="true" #picker></mat-datepicker>
+            </mat-input-container>
+        </div>
+
+        <!-- needsRefrigeration -->
+        <div class="form-group col-md-6 field-margin-bottom">
+            <h4>Recommended Vehicle</h4>
+            <mat-input-container floatPlaceholder="never">
+                <mat-select placeholder="Vehicle Type (Size) *" [errorStateMatcher]="this" formControlName="recommendedVehicleType">
+                    <mat-option *ngFor="let vehicleType of vehicleTypes" [value]="vehicleType">
+                        {{ vehicleType }}
+                    </mat-option>
+                </mat-select>
+            </mat-input-container>
+        </div>
+
+    </div>
+
+    <!-- foodTypes -->
+    <div class="form-group food-types-container field-margin-bottom">
+        <h4>Food Types</h4>
+        <food-types formControlName="foodTypes" [initiallyChecked]="false" [required]="true" [activateValidation]="activateValidation"></food-types>
+    </div>
+
+    <!-- needsRefrigeration -->
+    <div class="form-group field-margin-bottom">
+        <h4 [style.margin-bottom.px]="18">Needs Refrigeration</h4>
+        <mat-radio-group #needsRefrigeration [ngClass]="{'warn-foreground': isInvalid(form.get('needsRefrigeration'))}"
+                            formControlName="needsRefrigeration" required>
+            <mat-radio-button name="needsRefrigeration" id="needsRefrigeration-yes" [value]="true">Yes</mat-radio-button>
+            <mat-radio-button name="needsRefrigeration" [value]="false">No</mat-radio-button>
+        </mat-radio-group>
+    </div>
+
+    <!-- foodDescription -->
+    <div class="form-group">
+        <h4 for="foodDescription">Description</h4>
+        <mat-input-container class="input-group" floatPlaceholder="never">
+            <textarea #description matInput matTextareaAutosize id="foodDescription" placeholder="Donation Description" formControlName="foodDescription">
+            </textarea>
+        </mat-input-container>
+    </div>
+
+</div>

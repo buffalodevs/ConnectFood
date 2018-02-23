@@ -242,8 +242,20 @@ BEGIN
                 'estimatedValue',           FoodListing.estimatedValue,
                 'recommendedVehicleType',   FoodListing.recommendedVehicleType,
                 'foodDescription',          FoodListing.foodDescription,
-                -- Grab all associated image URLs sorted by primary first, then the order that the images were added second.
-                'imgUrls',                  ( SELECT * FROM getFoodListingImgUrls(FoodListing.foodListingKey) ),
+                -- Grab all associated image URLs and crop data sorted by primary first, then the order that the images were added second.
+                'imgData',                  (
+                                                SELECT ARRAY (
+                                                    SELECT JSON_BUILD_OBJECT (
+                                                        'fullImgUrl',   FoodListingImg.fullImgUrl,
+                                                        'imgCrop',      FoodListingImg.imgCrop,
+                                                        'isPrimary',    FoodListingImg.isPrimary
+                                                    )
+                                                    FROM        FoodListingImg
+                                                    WHERE       FoodListingImg.foodListingKey = FoodListing.foodListingKey
+                                                    ORDER BY    FoodListingImg.isPrimary DESC,
+                                                                FoodListingImg.foodListingImgKey
+                                                )
+                                            ),
 
                 -- App user information of all user's associated with Food Listing (Donor, Receiver(s), & Deliverer(s)).
                 'donorInfo',                ( SELECT sessionData->'appUser' FROM getAppUserSessionData(DonorAppUser.appUserKey) ),

@@ -13,11 +13,9 @@ export class AddFoodListingRequest {
 
 
     public constructor (
-        foodListing: FoodListing = null,
-        public imgUploads: string[] = null
+        foodListing: FoodListing = null
     ) {
         this.foodListing = foodListing;
-        
     }
 }
 

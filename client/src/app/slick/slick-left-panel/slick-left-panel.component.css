@@ -12,12 +12,12 @@
     -moz-transition: opacity 0.5s;
     -ms-transition: opacity 0.5s;
     -o-transition: opacity 0.5s;
-    z-index: 60;
+    z-index: 3525;
 }
 
 #slick-left-panel {
     position: relative;
-    z-index: 70;
+    z-index: 3550;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -27,7 +27,7 @@
 
 #slick-left-panel-button-container {
     position: absolute;
-    z-index: 65;
+    z-index: 3500;
 }
 
 #slick-left-panel-button {
@@ -36,7 +36,6 @@
     padding: 0px;
     opacity: 1;
     display: none;
-    z-index: 65;
     border-top-right-radius: 10%;
     border-bottom-right-radius: 10%;
     border-top-left-radius: 0%;

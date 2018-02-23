@@ -4,9 +4,11 @@ import * as _ from 'lodash';
 
 import { DateFormatterService } from '../../../../common-util/services/date-formatter.service';
 import { ResponsiveService } from '../../../../common-util/services/responsive.service';
+import { DEFAULT_IMG_URL } from '../../../../common-util/directives/default-img.directive';
 
 import { FoodListing } from './../../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
 import { AppUser } from '../../../../../../../shared/src/app-user/app-user';
+import { ImgCropConstants } from '../../../../../../../shared/src/img/img-crop-constants';
 
 
 @Component({
@@ -16,6 +18,9 @@ import { AppUser } from '../../../../../../../shared/src/app-user/app-user';
 })
 export class FoodListingInfoComponent {
 
+    // Make this available to HTML Template.
+    public readonly IMG_CROP_CONSTANTS: ImgCropConstants = new ImgCropConstants();
+    public readonly DEFAULT_IMG_URL: string = DEFAULT_IMG_URL;
     public readonly FOOD_LISTING_USER_ACCESSORS: string[];
     public readonly FOOD_LISTING_USER_TITLES: string[];
 

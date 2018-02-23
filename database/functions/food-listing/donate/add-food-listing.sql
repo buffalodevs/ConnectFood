@@ -13,14 +13,12 @@ CREATE OR REPLACE FUNCTION addFoodListing
     _estimatedValue             FoodListing.estimatedValue%TYPE         DEFAULT NULL,   -- The estimated monetary value of the Food Listing (in $).
     _foodDescription            FoodListing.foodDescription%TYPE        DEFAULT NULL,   -- A (long) description of the Food Listing.
     _recommendedVehicleType     VehicleType                             DEFAULT NULL,   -- Recommended vehicle to use for delivery.
-    _imgUrls                    TEXT[]                                  DEFAULT NULL,   -- URL(s) for the image(s) being stored/uploaded.
+    _imgData                    JSON[]                                  DEFAULT NULL,   -- URL(s) and crop data for all images associated with Food Listing.
     _availabilityTimeRanges     JSON[]                                  DEFAULT NULL    -- (Absolute) Food Listing availability time ranges.
 )
 RETURNS FoodListing.foodListingKey%TYPE -- The food listing key of the new food listing (can be used as reference for edit).
 AS $$
     DECLARE _foodType                   FoodType;
-    DECLARE _imgUrl                     TEXT;
-    DECLARE _defaultPrimaryImg          BOOLEAN DEFAULT TRUE;
     DECLARE _availableUntilTimestamp    TIMESTAMP = utcTextToTimestamp(_availableUntilDate);
     DECLARE _foodListingKey             FoodListing.foodListingKey%TYPE;
 BEGIN
@@ -50,20 +48,10 @@ BEGIN
     INTO        _foodListingKey;
 
     -- Insert all the food types that are associated with the new food listing.
-    FOREACH _foodType IN ARRAY _foodTypes
-    LOOP
-        INSERT INTO FoodListingFoodTypeMap (foodListingKey, foodType)
-        VALUES      (_foodListingKey, _foodType);
-    END LOOP;
+    PERFORM addUpdateFoodListingFoodTypeMap(_foodListingKey, _foodTypes);
 
     -- Insert all the images that are associated with the new food listing.
-    FOREACH _imgUrl IN ARRAY _imgUrls
-    LOOP
-        INSERT INTO FoodListingImg (foodListingKey, imgUrl, isPrimary)
-        VALUES      (_foodListingKey, _imgUrl, _defaultPrimaryImg);
-
-        _defaultPrimaryImg := FALSE;
-    END LOOP;
+    PERFORM addUpdateFoodListingImg(_foodListingKey, _imgData);
 
     -- NOTE: These add onto or overload the regular availabiilty times for the associated Donor App User.
     PERFORM addUpdateFoodListingAvailability(_foodListingKey, _availabilityTimeRanges);

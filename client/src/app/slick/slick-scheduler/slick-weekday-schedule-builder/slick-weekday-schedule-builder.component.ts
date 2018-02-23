@@ -169,6 +169,9 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
     }
 
 
+    /**
+     * Performs custom validation for this component/control based off of contained form's validation state.
+     */
     public validate(c: AbstractControl): { [key: string]: any; } {
 
         if (!this.form.valid) {

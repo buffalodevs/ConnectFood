@@ -7,6 +7,7 @@ import { SlickListComponent } from '../../slick/slick-filtered-list/slick-list/s
 import { GetListingsService } from '../../slick/slick-filtered-list/slick-list/services/get-listings.service';
 import { ConsumableListingCacheService } from '../../slick/slick-filtered-list/slick-list/services/consumable-listing-cache.service';
 import { DateFormatterService } from '../../common-util/services/date-formatter.service';
+import { DEFAULT_IMG_URL } from '../../common-util/directives/default-img.directive';
 
 import { FoodListing } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
 import { FoodListingFilters } from "../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters";
@@ -19,9 +20,12 @@ import { FoodListingFilters } from "../../../../../shared/src/common-receiver-do
 })
 export class FoodListingsComponent extends SlickListComponent <FoodListing, FoodListingFilters> {
 
-    @Input() public header: string;
-    @Input() public isClaimedCart: boolean;
-    @Input() public isDonatedCart: boolean;
+    // Make this available to HTML Template.
+    public readonly DEFAULT_IMG_URL: string = DEFAULT_IMG_URL;
+
+    @Input() public header: string = 'Food Listings';
+    @Input() public isClaimedCart: boolean = false;
+    @Input() public isDonatedCart: boolean = false;
 
 
     public constructor (
@@ -33,10 +37,6 @@ export class FoodListingsComponent extends SlickListComponent <FoodListing, Food
         dialogService: MatDialog
     ) {
         super('/receiverDonor/getFoodListings', elementRef, getListingsService, consumableListingCacheService, router, dialogService);
-
-        this.header = 'Food Listings';
-        this.isClaimedCart = false;
-        this.isDonatedCart = false;
     }
 
 

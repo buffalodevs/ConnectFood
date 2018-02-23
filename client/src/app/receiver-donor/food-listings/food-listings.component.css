@@ -2,7 +2,22 @@
     max-width: 300px;
 }
 
+.show-phone {
+    display: none !important;
+}
+
+@media only screen and (max-width: 991px) {
+
+    .close-md-col {
+        width: auto;
+    }
+}
+
 @media only screen and (max-width: 767px) {
+
+    .show-phone {
+        display: initial !important;
+    }
 
     .hide-phone {
         display: none !important;

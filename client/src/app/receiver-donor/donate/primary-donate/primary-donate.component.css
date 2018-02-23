@@ -16,8 +16,16 @@ i:active {
     background-color: rgb(200, 255, 200);
 }
 
+#needsRefrigeration-yes {
+    margin-right: 20px;
+}
+
 .field-margin-bottom {
     margin-bottom: 30px;
+}
+
+.food-types-container {
+    max-width: 400px;
 }
 
 mat-form-field, mat-input-container {
@@ -38,29 +46,6 @@ mat-form-field, mat-input-container {
     vertical-align: top;
 }
 
-#donation-summary, #thankyou-text {
-    font-size: 18px;
-}
-
-:host ::ng-deep .mat-horizontal-content-container {
-    padding: 0px;
-}
-
-:host ::ng-deep .mat-horizontal-stepper-header-container {
-    height: 0px;
-    visibility: hidden;
-}
-
-:host ::ng-deep .mat-progress-spinner {
-    margin-top: 30px;
-    max-width: 500px !important;
-    max-height: 500px !important
-}
-
-.button-group {
-    float: right;
-}
-
 /* Custom mobile formatting */
 @media screen and (max-width: 1024px) {
 
@@ -72,21 +57,7 @@ mat-form-field, mat-input-container {
 
 @media screen and (max-width: 991px) {
     
-    #form-title {
+    .form-title {
         text-align: center;
-    }
-}
-
-@media screen and (max-width: 400px) {
-
-    .button-group {
-        float: none;
-    }
-
-    .button-group button {
-        width: 100%;
-        margin-left: 0px !important;
-        margin-bottom: 4px;
-        border-radius: 0px;
     }
 }

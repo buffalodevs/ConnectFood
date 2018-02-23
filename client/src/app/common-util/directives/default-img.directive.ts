@@ -1,6 +1,9 @@
 import { Directive, Input } from '@angular/core';
 
 
+export const DEFAULT_IMG_URL: string = './../assets/IconImg.png';
+
+
 /**
  * Defines default image behavior when an image is not provided or does not exist (resulting in handled error).
  */
@@ -13,8 +16,6 @@ import { Directive, Input } from '@angular/core';
 })
 export class DefaultImgDirective { 
 
-    private readonly _DEFAULT_IMG_URL: string = './../assets/IconImg.png';
-
     @Input() src: string;
 
 
@@ -22,7 +23,7 @@ export class DefaultImgDirective {
      * Activated whenever an error occurs, and assigns the default image in response.
      */
     public onError(): void {
-        this.src = this._DEFAULT_IMG_URL;
+        this.src = DEFAULT_IMG_URL;
     }
 
 
@@ -32,6 +33,6 @@ export class DefaultImgDirective {
      * @return The url of the image to be displayed. If src input is null, then the default is displayed. Otherwise, src is simply displayed.
      */
     public checkPath(src): string {
-        return (src != null) ? src : this._DEFAULT_IMG_URL;
+        return (src != null) ? src : DEFAULT_IMG_URL;
     }
 }

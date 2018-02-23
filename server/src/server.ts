@@ -13,6 +13,7 @@ require('dotenv').config({ path: global['rootDir'] + '.env' });
 
 // Our session middleware and controllers that will handle requests after this router hands off the data to them.
 import { Application } from 'express';
+import * as multer from 'multer';
 import { SessionData } from "./common-util/session-data";
 import { deserialize } from './deserialization/deserialization';
 import { logRequest, logResponse } from './logging/request-response-logger';
@@ -51,6 +52,7 @@ app.use(bodyParser.json( { limit: '500KB' } )); // Need larger size to support c
 app.use(express.static(global['clientBuildDir']));
 app.use(express.static(global['publicDir']));
 SessionData.sessionBootstrap(app);
+app.use(multer().any());
 app.use(deserialize);   // Automatically perform Custom Deserialization of all incomming data. 
 app.use(logRequest);    // Log all express requests.
 app.use(logResponse);   // Log all express responses.
@@ -88,7 +90,7 @@ app.post('/logging/logClientData',                      handleLogClientData);
 
 // Public Resource Route Handler (for local image hosting).
 app.get('/public/*', function(request, response) {
-    response.sendFile(path.resolve(global['rootDir'] + request.url));
+    response.sendFile(path.resolve(global['rootDir'] + decodeURI(request.url)));
 });
 
 

@@ -1,152 +1,44 @@
 <div id="donate-container" class="container" [slick-progress-spinner]="showProgressSpinner" spinnerStickyTopId="donate-container" spinnerBackdropColor="white">
 
-    <mat-horizontal-stepper #stepper>
+    <mat-horizontal-stepper [linear]="true" #stepper>
 
         <!-- Step 1: Donation -->
-        <mat-step>
+        <mat-step [stepControl]="form.get('primary')">
 
-            <h1 id="form-title">Donor Form</h1>
+            <h1 class="form-title">Donor Form</h1>
             <hr>
-
-            <form class="row" [formGroup]="form" (ngSubmit)="ifValidProceedToReview(form.value, form.valid, stepper)">
-
+            
+            <div class="row">
+            
                 <div class="col-md-12 col-lg-5 mobile-center field-margin-bottom">
-
-                    <div class="crop-container" [style.max-width.px]="cropperSettings.canvasWidth">
-
-                        <button mat-raised-button type="button" color="primary" class="button-md file-upload-button"
-                         [style.width.px]="cropperSettings.canvasWidth" (click)="hiddenFileInput.click()">Upload Image (Optional)</button>
-            
-                        <!-- This is an invisible file input triggerd by above button -->
-                        <div class="file-upload" style="display:none;">
-                            <input #hiddenFileInput id="custom-input" type="file" (change)="fileChangeListener($event, cropper)">
-                        </div>
-            
-                        <img-cropper #cropper [image]="this" [settings]="cropperSettings"></img-cropper>
-
-                    </div>
-
-                    <!-- Sample of actual result cropped image -->
-                    <div *ngIf="this.image != null" class="crop-sample-container" [style.width.px]="cropperSettings.canvasWidth">
-                        <h4>Crop Result</h4>
-                        <img [src]="this.image">
-                    </div>
-
+                    <slick-img-manager [formControl]="form.get('slickImgs')" [editMode]="true" [croppedWidth]="IMG_CROP_CONSTANTS.getDefCropWidth()"
+                     [croppedHeight]="IMG_CROP_CONSTANTS.getDefCropHeight()" [galleryHeight]="300"></slick-img-manager>
                 </div>
-
-                <div class="col-md-12 col-lg-7">
-
-                    <!-- foodTitle -->
-                    <div class="form-group">
-                        <h4 for="foodTitle">Title</h4>
-                        <mat-form-field class="input-group" floatPlaceholder="never">
-                            <textarea #title matInput matTextareaAutosize id="foodTitle" placeholder="Donation Title"
-                                      formControlName="foodTitle" [maxlength]="TITLE_MAX_LENGTH" [errorStateMatcher]="this" required></textarea>
-                            <mat-hint align="end">{{ title.value.length }} / {{ TITLE_MAX_LENGTH }}</mat-hint>
-                        </mat-form-field>
-                    </div>
-
-                    <div class="row">
-
-                        <!-- estimatedValue -->
-                        <div class="form-group col-md-6">
-                            <h4 for="estimatedValue">Estimated Value</h4>
-                            <mat-input-container floatPlaceholder="never">
-                                <span matPrefix>$&nbsp;</span>
-                                <input matInput id="estimatedValue" placeholder="0.00" formControlName="estimatedValue"
-                                       [textMask]="validationService.MONEY_MASK_CONFIG" [errorStateMatcher]="this" required>
-                            </mat-input-container>
-                        </div>
-
-                        <!-- estimatedWeight -->
-                        <div class="form-group col-md-6">
-                            <h4 for="estimatedWeight">Estimated Weight</h4>
-                            <mat-input-container floatPlaceholder="never">
-                                <input matInput id="estimatedWeight" placeholder="weight (lbs)" formControlName="estimatedWeight"
-                                       type="number" min="0.5" step="0.5" [errorStateMatcher]="this" required>
-                                <span matSuffix>lbs</span>
-                            </mat-input-container>
-                        </div>
-
-                    </div>
-
-                    <div class="row">
-
-                        <!-- availableUntilDate -->
-                        <div class="form-group col-md-6">
-                            <h4 for="availableUntilDate">Available Until</h4>
-                            <mat-input-container class="input-group" floatPlaceholder="never">
-                                <input #availableUntilDate matInput id="availableUntilDate" [matDatepicker]="picker" placeholder="mm/dd/yyyy"
-                                       formControlName="availableUntilDate" [errorStateMatcher]="this" required>
-                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                                <mat-datepicker touchUi="true" #picker></mat-datepicker>
-                            </mat-input-container>
-                        </div>
-
-                        <!-- needsRefrigeration -->
-                        <div class="form-group col-md-6 field-margin-bottom">
-                            <h4>Recommended Vehicle</h4>
-                            <mat-input-container floatPlaceholder="never">
-                                <mat-select placeholder="Vehicle Type (Size) *" [errorStateMatcher]="this" formControlName="recommendedVehicleType">
-                                    <mat-option *ngFor="let vehicleType of vehicleTypes" [value]="vehicleType">
-                                        {{ vehicleType }}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-input-container>
-                        </div>
-
-                    </div>
-
-                    <!-- foodTypes -->
-                    <div class="form-group food-types-container field-margin-bottom">
-                        <h4>Food Types</h4>
-                        <food-types formControlName="foodTypes" [initiallyChecked]="false" [required]="true" [activateValidation]="activateValidation"></food-types>
-                    </div>
-
-                    <!-- needsRefrigeration -->
-                    <div class="form-group field-margin-bottom">
-                        <h4 [style.margin-bottom.px]="18">Needs Refrigeration</h4>
-                        <mat-radio-group #needsRefrigeration [ngClass]="{'warn-foreground': isInvalid(control('needsRefrigeration'))}"
-                                            formControlName="needsRefrigeration" required>
-                            <mat-radio-button name="needsRefrigeration" id="needsRefrigeration-yes" [value]="true">Yes</mat-radio-button>
-                            <mat-radio-button name="needsRefrigeration" [value]="false">No</mat-radio-button>
-                        </mat-radio-group>
-                    </div>
-
-                    <!-- foodDescription -->
-                    <div class="form-group">
-                        <h4 for="foodDescription">Description</h4>
-                        <mat-input-container class="input-group" floatPlaceholder="never">
-                            <textarea #description matInput matTextareaAutosize id="foodDescription" placeholder="Donation Description" formControlName="foodDescription">
-                            </textarea>
-                        </mat-input-container>
-                    </div>
-
-                    <!-- This button does not actually submit data to the server, but rather moves to the confirmation display -->
-                    <div class="button-group">
-                        <button mat-raised-button type="submit" color="primary" class="button-md">Next</button>
-                    </div>
-
+            
+                <div class="col-md-12 col-lg-7" >
+                    <primary-donate #primaryDonate [activateValidation]="activatePrimaryValidation" [formGroup]="form.get('primary')"></primary-donate>
                 </div>
-            </form>
+            </div>
+
+            <!-- This button does not actually submit data to the server, but rather moves to the confirmation display -->
+            <div class="button-group">
+                <button mat-raised-button color="primary" class="button-md" type="button" matStepperNext (click)="setPrimaryValidationActive()">Next</button>
+            </div>
 
         </mat-step>
 
-        <!--<mat-step>
+        <mat-step [stepControl]="form.get('foodListingAvailability')">
 
-            <h1>Donation Availability</h1>
-            <hr>
-
-            <slick-date-time-schedule-builder></slick-date-time-schedule-builder>
+            <availabiliy-donate #availabilityDonate [activateValidation]="activateAvailabilityValidation" [availabilityControl]="form.get('foodListingAvailability')">
+            </availabiliy-donate>
 
             <div class="button-group">
-                <button mat-raised-button color="primary" class="button-md warn-button" type="button" (click)="editDonation(stepper)">Edit Donation</button>
-                <button mat-raised-button type="submit" color="primary" class="button-md">Next</button>
+                <button mat-raised-button color="primary" class="button-md warn-button" type="button" matStepperPrevious>Back</button>
+                <button mat-raised-button color="primary" class="button-md" type="button" matStepperNext (click)="setAvailabilityValidationActive()">Next</button>
             </div>
 
-        </mat-step>-->
+        </mat-step>
 
-        <!-- Step 2: Donation Review -->
         <mat-step>
 
             <h1>Donation Review</h1>
@@ -154,60 +46,56 @@
 
             <div id="donation-summary" class="row">
 
-                <div *ngIf="this.image != null" class="col-md-12 col-lg-5 mobile-center">
-
-                    <img [style.width.px]="cropperSettings.canvasWidth" [src]="this.image"
-                    [width]="cropperSettings.croppedWidth" [height]="cropperSettings.croppedHeight">
-
+                <div class="col-md-12 col-lg-5 mobile-center">
+                    <slick-img-manager [ngModel]="form.get('slickImgs').value" [defaultImgUrl]="DEFAULT_IMG_URL"
+                    [galleryHeight]="IMG_CROP_CONSTANTS.getDefCropImgGalleryHeight()" [galleryWidth]="IMG_CROP_CONSTANTS.getDefCropWidth()"></slick-img-manager>
                 </div>
 
                 <div class="col-lg-7">
 
                     <div class="form-group">
                         <h4>Title</h4>
-                        <div>{{ control('foodTitle').value }}</div>
+                        <div>{{ form.get('primary.foodTitle').value }}</div>
                     </div>
             
                     <div class="row">
                     
                         <div class="form-group col-md-6">
                             <h4>Available Until</h4>
-                            <div>{{ control('availableUntilDate').value | dateFormatter }}</div>
+                            <div>{{ form.get('primary.availableUntilDate').value | dateFormatter }}</div>
                         </div>
 
                         <div class="form-group col-md-6">
                             <h4>Estimated Weight</h4>
-                            <div>{{ control('estimatedWeight').value }} lbs</div>
+                            <div>{{ form.get('primary.estimatedWeight').value }} lbs</div>
                         </div>
 
                     </div>
             
                     <div class="form-group food-types-container">
                         <h4>Food Type(s)</h4>
-                        <food-types #foodTypesDisplay [displayOnly]="true" [initiallyChecked]="false" [ngModel]="control('foodTypes').value"></food-types>
+                        <food-types #foodTypesDisplay [displayOnly]="true" [initiallyChecked]="false" [ngModel]="form.get('primary.foodTypes').value"></food-types>
                     </div>
 
                     <div class="form-group">
                         <h4>Needs Refrigeration</h4>
-                        <i class="material-icons" *ngIf="control('needsRefrigeration').value" style="color:green">check</i>
-                        <i class="material-icons" *ngIf="!control('needsRefrigeration').value" style="color:red">clear</i>
-                        <span>{{ (control('needsRefrigeration').value === true) ? 'Yes' : 'No' }}</span>
+                        <i class="material-icons" *ngIf="form.get('primary.needsRefrigeration').value" style="color:green">check</i>
+                        <i class="material-icons" *ngIf="!form.get('primary.needsRefrigeration').value" style="color:red">clear</i>
+                        <span>{{ (form.get('primary.needsRefrigeration').value === true) ? 'Yes' : 'No' }}</span>
                     </div>
             
                     <div class="form-group">
                         <h4>Description</h4>
-                        <div *ngIf="!isFormControlEmpty(control('foodDescription'))">{{ control('foodDescription').value }}</div>
-                        <div *ngIf="isFormControlEmpty(control('foodDescription'))">-- None --</div>
-                    </div>
-
-                    <div class="button-group">
-                        <button mat-raised-button color="primary" class="button-md warn-button" type="button" (click)="editDonation(stepper)">Edit Donation</button>
-                        <button mat-raised-button color="primary" class="button-md" type="button"
-                            (click)="submitDonation(form.value, form.valid, stepper)" style="margin-left:20px;">Confirm Donation</button>
+                        <div *ngIf="!isFormControlEmpty(form.get('primary.foodDescription'))">{{ form.get('primary.foodDescription').value }}</div>
+                        <div *ngIf="isFormControlEmpty(form.get('primary.foodDescription'))">-- None --</div>
                     </div>
 
                 </div>
+            </div>
 
+            <div class="button-group">
+                <button mat-raised-button color="primary" class="button-md warn-button" type="button" matStepperPrevious>Back</button>
+                <button mat-raised-button color="primary" class="button-md" type="button" (click)="submitDonation(form.valid, stepper)">Confirm Donation</button>
             </div>
 
         </mat-step>
@@ -232,7 +120,7 @@
                     </p>
 
                     <div class="button-group">
-                        <button mat-raised-button color="primary" class="button-md" type="button" (click)="donateAgain(stepper, cropper)">Donate Again</button>
+                        <button mat-raised-button color="primary" class="button-md" type="button" (click)="donateAgain(stepper)">Donate Again</button>
                     </div>
 
                 </div>

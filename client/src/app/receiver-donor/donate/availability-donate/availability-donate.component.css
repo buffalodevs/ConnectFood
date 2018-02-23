@@ -1,0 +1,41 @@
+h4 {
+    font-weight: bold;
+}
+
+.field-margin-bottom {
+    margin-bottom: 30px;
+}
+
+mat-form-field, mat-input-container {
+    width: 100%;
+}
+
+.inline-error, mat-form-field, mat-input-container {
+    font-size: 20px;
+}
+
+:host ::ng-deep .mat-form-field-infix {
+    border: none;
+    cursor: text;
+}
+
+.inline-error {
+    line-height: 20px;
+    vertical-align: top;
+}
+
+/* Custom mobile formatting */
+@media screen and (max-width: 1024px) {
+
+    .mobile-center {
+        text-align: center;
+    }
+
+}
+
+@media screen and (max-width: 991px) {
+    
+    .form-title {
+        text-align: center;
+    }
+}

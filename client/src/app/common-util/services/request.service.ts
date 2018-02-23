@@ -37,17 +37,32 @@ export class RequestService {
      * then it will resend the request. If not, then it will fail with appropriate error flag and message.
      * @param url The destination URL for the request. Can be a relative URL.
      * @param body The body or payload of the request. This will be sent in JSON format.
+     * @param files The files that are to be attached to the request.
      */
-    public post(url: string, body: any): Observable <FoodWebResponse> {
+    public post(url: string, body: any, files?: File[]): Observable <FoodWebResponse> {
 
-        const options = {
-            headers: new HttpHeaders({
+        let formData: FormData = null;
+        let options = {};
+        
+        // If we are sending JSON data, then we will set headers to application/json.
+        if (files == null) {
+            options['headers'] = {
                 'Content-Type': 'application/json'
-            })
-        };
+            }
+        }
+        // If we are sending multi-part form data, then we will use FormData object for post (headers are set implicitly).
+        else {
+
+            formData = new FormData();
+            formData.append('dataJSON', JSON.stringify(body));
+            
+            for (let i: number = 0; i < files.length; i++) {
+                formData.append(i.toString(), files[i], files[i].name);
+            }
+        }
 
         this._requestResponseLogger.logRequest(url, 'POST', body);
-        const postObservable: Observable<FoodWebResponse> = this._http.post<FoodWebResponse>(url, body, options);
+        const postObservable: Observable<FoodWebResponse> = this._http.post<FoodWebResponse>(url, (formData == null) ? body : formData, options);
         
         return postObservable.mergeMap((foodWebResponse: FoodWebResponse) => {
             return this.handleResponse(url, postObservable, foodWebResponse);

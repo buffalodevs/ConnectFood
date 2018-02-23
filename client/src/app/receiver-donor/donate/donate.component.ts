@@ -1,43 +1,39 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, Validators, AbstractControl, ValidatorFn, FormControl, FormBuilder } from '@angular/forms';
-import { ImageCropperComponent, CropperSettings } from 'ng2-img-cropper';
-import { MatHorizontalStepper, ErrorStateMatcher } from '@angular/material';
+import { Component } from '@angular/core';
+import { FormGroup, Validators, FormControl, FormBuilder, AbstractControl } from '@angular/forms';
+import { MatHorizontalStepper } from '@angular/material';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
 import { AbstractModelDrivenComponent } from '../../common-util/components/abstract-model-driven-component';
 import { ValidationService } from '../../common-util/services/validation.service';
-import { AddFoodListingService } from "../food-listings/food-listing-services/add-food-listing.service";
-import { DateFormatterPipe } from "../../common-util/pipes/date-formatter.pipe"
+import { AddFoodListingService } from './donate-services/add-food-listing.service';
+import { DEFAULT_IMG_URL } from '../../common-util/directives/default-img.directive';
+import { SlickImg } from '../../slick/slick-img-manager/slick-img';
 
-import { Validation } from '../../../../../shared/src/validation/validation';
 import { FoodListing } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
-import { VEHICLE_TYPE_VALUES } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/vehicle-type';
+import { ImgCropConstants } from '../../../../../shared/src/img/img-crop-constants';
 
 
 @Component({
     selector: 'donate',
     templateUrl: 'donate.component.html',
-    styleUrls: ['donate.component.css'],
-    providers: [AddFoodListingService]
+    styleUrls: ['donate.component.css']
 })
-export class DonateComponent extends AbstractModelDrivenComponent implements OnInit, ErrorStateMatcher {
+export class DonateComponent extends AbstractModelDrivenComponent {
     
-    public readonly TITLE_MAX_LENGTH: number = 30;
+    public readonly IMG_CROP_CONSTANTS: ImgCropConstants = new ImgCropConstants();
+    public readonly DEFAULT_IMG_URL: string = DEFAULT_IMG_URL;
 
     /**
      * Want to force validators to process on submit. Non-text fields will only validate on submit too!
      */
-    public activateValidation: boolean = false;
-    public image: string = null;
-    public cropperSettings: CropperSettings = new CropperSettings();
+    public activatePrimaryValidation: boolean = false;
+    public activateAvailabilityValidation: boolean = false;
     public showProgressSpinner: boolean = false;
-    public vehicleTypes: string[] = VEHICLE_TYPE_VALUES;
 
 
     public constructor (
-        public dateFormatter: DateFormatterPipe,
         private _addFoodListingService: AddFoodListingService,
         private _logger: NGXLogger,
         validationService: ValidationService,
@@ -45,133 +41,27 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
     ) {
         super(validationService, formBuilder);
 
-        // If the window size goes below this threshold, then the cropper must be initialized below the optimal size of 300px.
-        const thresholdCropperWidth: number = 367;
-        this.cropperSettings.width = (window.innerWidth < thresholdCropperWidth ? 300 - (thresholdCropperWidth - window.innerWidth)
-                                                                                : 300);
-        this.cropperSettings.height = this.cropperSettings.width;
-        this.cropperSettings.croppedWidth = 300;
-        this.cropperSettings.croppedHeight = 300;
-        this.cropperSettings.canvasWidth = (this.cropperSettings.width + 20);
-        this.cropperSettings.canvasHeight = this.cropperSettings.height;
-        this.cropperSettings.noFileInput = true;
-        this.cropperSettings.fileType = 'image/jpeg';
-    }
-
-
-    public ngOnInit(): void {
-        this.refreshFormControls();
-    }
-
-
-    /**
-     * Completely refreshes all form controls by clearing all controls out and (re)adding them.
-     */
-    private refreshFormControls(): void {
-
-        this.form = new FormGroup({});
-
-        let foodListingUpload: FoodListing = new FoodListing();
-
-        // Fill the form group view model based off of the properties found in FoodListingUpload.
-        // This way, our view-model will always be in-sync with the shared object.
-        for (let property in foodListingUpload) {
-
-            if (    !foodListingUpload.hasOwnProperty(property)
-                // All of these members are not included in the form view-model!
-                ||  property === 'foodListingKey'
-                ||  property === 'imgUrls'
-                ||  property === 'donorInfo'
-                ||  property === 'claimInfo'
-                ||  property === 'foodListingAvailability')
-            { continue; }
-
-            let validators: ValidatorFn[] = [ Validators.required ];
-
-            // Add additional needed validators for email and password fields.
-            switch (property) {
-                case 'foodTitle':       validators.push(Validators.maxLength(this.TITLE_MAX_LENGTH));   break;
-                case 'foodDescription': validators = null;                                              break;
-            }
-
-            this.form.addControl(property, new FormControl(null, validators));
-        }
-    }
-
-
-    /**
-     * Triggered whenever a file (image) is changed.
-     * @param event The file change event.
-     */
-    public fileChangeListener(event: any, cropper: ImageCropperComponent): void {
-
-        let image: HTMLImageElement = new Image();
-        let file: File = event.target.files[0];
-        let myReader: FileReader = new FileReader();
-
-        myReader.onloadend = (loadEvent: any) => {
-            image.src = loadEvent.target.result;
-            cropper.setImage(image);
-        };
-     
-        myReader.readAsDataURL(file);
-    }
-
-
-    /**
-     * Custom check for error state of mat-input controls.
-     * NOTE: This is necessary since stepper will put form in submitted state and by default mat-input controls show error style when form has been submitted.
-     *       When resetting the form, there is no known way yet to reset the state of the stepper so the form is not marked as submitted.
-     *       This work around checks a validate flag that is set when the form is submitted and reset when the form should be reset for another donation.
-     * @param control The form field/control to check.
-     * @return true if it is invalid, false if it is valid.
-     */
-    public isErrorState(control: FormControl | null): boolean {
-        return control.errors != null && (control.touched || this.activateValidation);;
-    }
-
-
-    /**
-     * Checks if a given form field/control is invalid.
-     * @param validField The form field/control to check.
-     * @return true if it is invalid, false if it is valid.
-     */
-    public isInvalid(validField: AbstractControl): boolean {
-        return validField != null && validField.errors != null && (validField.touched || this.activateValidation);
-    }
-
-
-    /**
-     * Checks if a form control is empty. An empty form control is either null or has a length of 0.
-     * The form control's value must support the length property (strings and arrays for example) for this to work correctly.
-     * @param formControl The form control to check.
-     * @return true if the form control is empty, false if it is not empty.
-     */
-    public isFormControlEmpty(formControl: AbstractControl): boolean {
-        return (formControl.value == null || formControl.value.length === 0)
-    }
-
-
-    /**
-     * If the form is valid, then it will proceed to the confirmation display.
-     * @param stepper The horizontal stepper that will be invoked to proceed to confirmation display if form is valid.
-     */
-    public ifValidProceedToReview(value: FoodListing, valid: boolean, stepper: MatHorizontalStepper): void {
-
-        this.activateValidation = true;
-        if (valid)  stepper.next();
+        this.form = new FormGroup({
+            'slickImgs': new FormControl([]),
+            'primary': new FormGroup({}),
+            'foodListingAvailability': new FormControl([])
+        });
     }
 
 
     /**
      * Invoked whenever the donation is submitted (after final confirmation). Sends the new donation to the server.
-     * @param value The raw value of the donation form.
      * @param valid The valid state of the donation form.
      * @param stepper The stepper for this Donor Form.
      */
-    public submitDonation(value: FoodListing, valid: boolean, stepper: MatHorizontalStepper): void {
+    public submitDonation(valid: boolean, stepper: MatHorizontalStepper): void {
+
+        // Grab Food Listing and its associated availability.
+        const foodListing: FoodListing = this.form.get('primary').value;
+        foodListing.foodListingAvailability = this.form.get('foodListingAvailability').value;
+        const slickImgs: SlickImg[] = this.form.get('slickImgs').value;
         
-        let observer: Observable<number> = this._addFoodListingService.addFoodListing(value, this.image);
+        const observer: Observable<number> = this._addFoodListingService.addFoodListing(foodListing, slickImgs);
         this.showProgressSpinner = true;
         
         observer.finally(() => { this.showProgressSpinner = false; })
@@ -190,28 +80,58 @@ export class DonateComponent extends AbstractModelDrivenComponent implements OnI
     /**
      * Refreshes the Donation Form, allowing the user to donate another item.
      * @param stepper The contained stepper.
-     * @param cropper The contained image cropper.
      */
-    public donateAgain(stepper: MatHorizontalStepper, cropper: ImageCropperComponent): void {
+    public donateAgain(stepper: MatHorizontalStepper): void {
 
         // Return stepper to first tab.
         stepper.selectedIndex = 0;
 
         // Reset form and validation.
-        this.activateValidation = false;
+        this.activatePrimaryValidation = false;
+        this.activateAvailabilityValidation = false;
+        
         this.form.reset();
-
-        // Reset image cropper.
-        cropper.reset();
-        this.image = null;
     }
 
 
     /**
-     * Allows the user to return to edit a Donation just after submitting it.
+     * Checks if a form control is empty. An empty form control is either null or has a length of 0.
+     * The form control's value must support the length property (strings and arrays for example) for this to work correctly.
+     * @param formControl The form control to check.
+     * @return true if the form control is empty, false if it is not empty.
      */
-    public editDonation(stepper: MatHorizontalStepper): void {
-        this.activateValidation = false;
-        stepper.previous();
+    public isFormControlEmpty(formControl: AbstractControl): boolean {
+        return (formControl.value == null || formControl.value.length === 0)
+    }
+
+
+    /**
+     * Activates the validation of all members of the primary donate sub-form.
+     */
+    public setPrimaryValidationActive(): void {
+        this.activatePrimaryValidation = true;
+    }
+
+
+    /**
+     * Activates the validation of all members of the availability donate sub-form.
+     */
+    public setAvailabilityValidationActive(): void {
+        this.activateAvailabilityValidation = true;
+    }
+
+
+    /**
+     * Gets the height for the image manager (the contained image gallery requires a specific height, so we must calculate optimal height for small screen).
+     */
+    public getImgManagerMaxHeight(): number {
+
+        let deltaHeight = 40;
+
+        if (window.innerWidth < 367) {
+            deltaHeight -= (367 - window.innerWidth);
+        }
+
+        return this.IMG_CROP_CONSTANTS.getDefCropImgGalleryHeight() + deltaHeight;
     }
 }

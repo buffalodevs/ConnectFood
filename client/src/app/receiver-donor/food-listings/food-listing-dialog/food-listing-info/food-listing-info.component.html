@@ -4,7 +4,8 @@
     <slick-list-item [includeBorder]="false">
                     
         <ng-container slick-list-item-img>
-            <img DefaultImg [src]="( foodListing.imgUrls ? foodListing.imgUrls[0] : null )" alt="Image Not Available"/>
+            <slick-img-manager [imgData]="foodListing.imgData" [defaultImgUrl]="DEFAULT_IMG_URL"
+             [galleryHeight]="IMG_CROP_CONSTANTS.getDefCropImgGalleryHeight()" [galleryWidth]="IMG_CROP_CONSTANTS.getDefCropWidth()"></slick-img-manager>
         </ng-container>
         
         <div slick-list-item-body class="row">

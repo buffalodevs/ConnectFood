@@ -41,7 +41,7 @@ psql --set=sslmode=require -h $1 -p $2 -d $3 -U $4 \
  \
     -f ../../functions/date-time-util/timestamp-to-utc-text.sql \
     -f ../../functions/date-time-util/utc-text-to-timestamp.sql \
-    -f ../../functions/date-time-util/to-upcoming-weekday.sql \
+    -f ../../functions/date-time-util/to-weekday-of-week.sql \
  \
     -f ../../functions/app-user/app-user-verification/add-unverified-app-user.sql \
     -f ../../functions/app-user/app-user-verification/verify-app-user.sql \
@@ -68,11 +68,12 @@ psql --set=sslmode=require -h $1 -p $2 -d $3 -U $4 \
     -f ../../functions/food-listing/claim-unclaim/unclaim-food-listing.sql \
  \
     -f ../../functions/food-listing/donate/add-update-food-listing-availability.sql \
+    -f ../../functions/food-listing/donate/add-update-food-listing-food-type-map.sql \
+    -f ../../functions/food-listing/donate/add-update-food-listing-img.sql \
     -f ../../functions/food-listing/donate/add-food-listing.sql \
     -f ../../functions/food-listing/donate/update-food-listing.sql \
     -f ../../functions/food-listing/donate/remove-food-listing.sql \
  \
-    -f ../../functions/food-listing/get-food-listings/get-food-listing-img-urls.sql \
     -f ../../functions/food-listing/get-food-listings/gen-availability-overlap-filters.sql \
     -f ../../functions/food-listing/get-food-listings/get-food-listings.sql
 

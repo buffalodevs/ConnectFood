@@ -7,7 +7,7 @@ AS $$
     DECLARE _currentDOW INTEGER DEFAULT EXTRACT(DOW FROM CURRENT_TIMESTAMP)::INTEGER;
 BEGIN
 
-    RAISE NOTICE '%', rangeToWeekdayOfWeek(NEW.metaTimeRange, 0, _currentDOW);
+    SET TIME ZONE 'UTC';
 
     INSERT INTO AppUserAvailability (appUserAvailabilityMetaKey, timeRange)
     VALUES      (NEW.appUserAvailabilityMetaKey, rangeToWeekdayOfWeek(NEW.metaTimeRange, 0, _currentDOW)),

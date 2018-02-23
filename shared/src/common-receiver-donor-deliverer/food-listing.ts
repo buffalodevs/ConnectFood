@@ -1,4 +1,5 @@
 import { deserializable, deepDeserializable } from '../deserialization/deserializer';
+import { ImgData } from "./../img/img-data";
 import { AppUser } from '../app-user/app-user';
 import { DeliveryStateInfo } from '../common-receiver-donor-deliverer/delivery-state-info';
 import { ClaimInfo } from './claim-info';
@@ -18,6 +19,7 @@ export class FoodListing {
     @deepDeserializable(Date)       public availableUntilDate: Date;
     @deepDeserializable(DateRange)  public foodListingAvailability: DateRange[];
     @deepDeserializable(ClaimInfo)  public claimInfo: ClaimInfo;
+    @deepDeserializable(ImgData)    public imgData: ImgData[];
 
 
     public constructor (
@@ -46,10 +48,10 @@ export class FoodListing {
          */
         availableUntilDate: Date = null,
         /**
-         * The (optional) relative URLs of images associated with the Food Listing.
-         * NOTE: The first url in the array should be the image marked as the primary one. The rest are in the order they were uploaded.
+         * The (optional) image data associated with this Food Listing.
+         * NOTE: The first image is always the primary one.
          */
-        public imgUrls: string[] = null,
+        imgData: ImgData[] = null,
          /**
          * Optional estimated weight of Food Listing (in pounds).
          */
@@ -79,5 +81,33 @@ export class FoodListing {
         this.availableUntilDate = availableUntilDate;
         this.foodListingAvailability = foodListingAvailability;
         this.claimInfo = claimInfo;
+        this.imgData = imgData;
+    }
+
+
+    public hasReceiver(): boolean {
+        return ( this.claimInfo != null && this.claimInfo.claimInfoKey != null );
+    }
+
+
+    public hasDeliverer(): boolean {
+        return ( this.claimInfo != null && this.claimInfo.deliveryInfo != null && this.claimInfo.deliveryInfo.deliveryInfoKey != null);
+    }
+
+
+    public getDonorName(): string {
+        return this.donorInfo.organization.name;
+    }
+
+
+    public getReceiverName(): string {
+        return this.hasReceiver() ? this.claimInfo.receiverInfo.organization.name
+                                  : 'None';
+    }
+
+
+    public getDelivererName(): string {
+        return this.hasDeliverer() ? ( this.claimInfo.deliveryInfo.delivererInfo.firstName + ' ' + this.claimInfo.deliveryInfo.delivererInfo.lastName )
+                                   : 'None';
     }
 }

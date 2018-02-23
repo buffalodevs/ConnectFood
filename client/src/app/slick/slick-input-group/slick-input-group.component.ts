@@ -52,8 +52,8 @@ export class SlickInputGroupComponent extends FormGroup implements OnInit, OnCha
      */
     @Input() public activateValidation: boolean;
 
-    private _formValueSet: boolean;
-    private onChange: (value: any) => void;
+    private _formValueSet: boolean = false;
+    private onChange: (value: any) => void = () => {}; // If model not bound to from parent, simply swallow all changes here.
 
 
     public constructor (
@@ -61,9 +61,6 @@ export class SlickInputGroupComponent extends FormGroup implements OnInit, OnCha
         private concatPatternParser: ConcatPatternParserService
     ) {
         super({});
-        
-        this._formValueSet = false;
-        this.onChange = (value: any) => {}; // If model not bound to from parent, simply swallow all changes here.
     }
 
     
