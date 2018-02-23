@@ -9,7 +9,7 @@ export enum FoodType {
     cannedGood  = 'Canned Good',
     dessert     = 'Dessert',
     frozen      = 'Frozen',
-    grain       = 'Gran',
+    grain       = 'Grain',
     dairy       = 'Dairy',
     meat        = 'Meat',
     seaFood     = 'Sea Food',
