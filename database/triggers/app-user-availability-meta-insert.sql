@@ -4,10 +4,12 @@
 CREATE OR REPLACE FUNCTION insertAppUserAvailabilityFromMeta()
 RETURNS TRIGGER
 AS $$
-    DECLARE _currentDOW INTEGER DEFAULT EXTRACT(DOW FROM CURRENT_TIMESTAMP)::INTEGER;
+    DECLARE _currentDOW INTEGER;
 BEGIN
 
     SET TIME ZONE 'UTC';
+    _currentDOW := EXTRACT(DOW FROM CURRENT_TIMESTAMP)::INTEGER;
+    RAISE NOTICE '_currentDOW = %', _currentDOW;
 
     INSERT INTO AppUserAvailability (appUserAvailabilityMetaKey, timeRange)
     VALUES      (NEW.appUserAvailabilityMetaKey, rangeToWeekdayOfWeek(NEW.metaTimeRange, 0, _currentDOW)),

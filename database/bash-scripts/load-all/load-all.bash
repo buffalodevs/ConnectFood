@@ -1,7 +1,7 @@
 # Construct the database by (re)initializing all tables and functions.
 psql --set=sslmode=require -h $1 -p $2 -d $3 -U $4 \
  \
-    -f ../../extensions.sql \
+    -f ../../bootstrap.sql \
  \
     -f ../../tables/app-user/app-user-domain/app-user-type.sql \
     -f ../../tables/food-listing/food-listing-domain/food-listings-status.sql \

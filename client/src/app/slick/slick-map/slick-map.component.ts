@@ -74,18 +74,25 @@ export class SlickMapComponent implements OnChanges {
      */
     private calcCenterFromAddresses(addresses: ContactInfo[]): GPSCoordinate {
 
-        let latitudeSum: number = 0;
-        let longitudeSum: number = 0;
+        const gpsMinLatLng: GPSCoordinate = new GPSCoordinate(10000, 10000);
+        const gpsMaxLatLng: GPSCoordinate = new GPSCoordinate(-10000, -10000);
 
         for (let i: number = 0; i < addresses.length; i++) {
 
             if (addresses[i] != null) {
-                latitudeSum += addresses[i].gpsCoordinate.latitude;
-                longitudeSum += addresses[i].gpsCoordinate.longitude;
+
+                gpsMinLatLng.latitude = ( gpsMinLatLng.latitude > addresses[i].gpsCoordinate.latitude ) ? addresses[i].gpsCoordinate.latitude
+                                                                                                        : gpsMinLatLng.latitude;
+                gpsMinLatLng.longitude = ( gpsMinLatLng.longitude > addresses[i].gpsCoordinate.longitude ) ? addresses[i].gpsCoordinate.longitude
+                                                                                                           : gpsMinLatLng.longitude;
+                gpsMaxLatLng.latitude = ( gpsMaxLatLng.latitude < addresses[i].gpsCoordinate.latitude ) ? addresses[i].gpsCoordinate.latitude
+                                                                                                        : gpsMaxLatLng.latitude;
+                gpsMaxLatLng.longitude = ( gpsMaxLatLng.longitude < addresses[i].gpsCoordinate.longitude ) ? addresses[i].gpsCoordinate.longitude
+                                                                                                           : gpsMaxLatLng.longitude;
             }
         }
 
-        return new GPSCoordinate(latitudeSum / addresses.length, longitudeSum / addresses.length);
+        return new GPSCoordinate((gpsMaxLatLng.latitude + gpsMinLatLng.latitude) / 2, (gpsMaxLatLng.longitude + gpsMinLatLng.longitude) / 2);
     }
 
 

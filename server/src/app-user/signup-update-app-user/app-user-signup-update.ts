@@ -36,8 +36,6 @@ export async function signupOrUpdateAppUser(appUser: AppUser, password?: string,
     // Determine if we must hash a password, generate GPS Coordinate, and/or translate timzone of weekly availability times.
     const mustHashPass: boolean = (!isUpdate || password != null);
     const mustGenGPSCoordinate: boolean = (!isUpdate || (appUser.contactInfo != null && appUser.contactInfo.address != null));
-    const mustGenAppUserAvailability: boolean = (!isUpdate || (appUser.availability != null && appUser.availability != null));
-
 
     const hashPass: string = await ( mustHashPass ? hashPassword(password)
                                                   : null );
@@ -45,8 +43,8 @@ export async function signupOrUpdateAppUser(appUser: AppUser, password?: string,
     const gpsCoordinate: GPSCoordinate = await ( mustGenGPSCoordinate ? genGPSCoordinate(appUser.contactInfo)
                                                                       : null );
 
-    appUser.availability = mustGenAppUserAvailability ? absToRelativeDateRanges(appUser.availability)
-                                                      : null;
+    appUser.availability = ( appUser.availability != null ) ? absToRelativeDateRanges(appUser.availability)
+                                                            : null;
 
     const addOrUpdateResult: QueryResult = await addOrUpdateAppUserInSQL(appUser, hashPass, gpsCoordinate, appUserUpdateKey);
 

@@ -83,7 +83,7 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
                 'phone':            [null, [Validators.required, Validators.pattern(this.validationService.PHONE_REGEX)]]
             }),
 
-            'availability': [null, Validators.required]
+            'availability': [null]
         });
 
         // Generate validate mappings for each poriton of the signup form. Initialize all of them to false.

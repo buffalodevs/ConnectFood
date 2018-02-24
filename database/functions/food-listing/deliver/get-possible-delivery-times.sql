@@ -69,12 +69,15 @@ BEGIN
         LEFT JOIN   AppUserAvailability     DelivererAvailability       ON DelivererAvailabilityMeta.appUserAvailabilityMetaKey = DelivererAvailability.appUserAvailabilityMetaKey
                     -- Time overlap.
         WHERE       ClaimInfo.claimInfoKey = _claimInfoKey
-        AND       ReceiverAvailability.timeRange && DelivererAvailability.timeRange
-        AND       (
+        AND         ReceiverAvailability.timeRange && DelivererAvailability.timeRange
+        AND         (
                             DonorAvailability.timeRange && DelivererAvailability.timeRange
                         OR  FoodListingAvailability.timeRange && DelivererAvailability.timeRange
-                  )
-        AND       DonorAvailability.timeRange && ReceiverAvailability.timeRange
+                    )
+        AND         (
+                            DonorAvailability.timeRange && ReceiverAvailability.timeRange
+                        OR  FoodListingAvailability.timeRange && ReceiverAvailability.timeRange
+                    )
     ) AS timeRange
     ORDER BY startTime, endTime;
 
@@ -83,4 +86,4 @@ $$ LANGUAGE plpgsql;
 
 
 -- SELECT * FROM ClaimInfo ORDER BY claimInfoKey DESC;
--- SELECT * FROM getPossibleDeliveryTimes(1, 1);
+SELECT * FROM getPossibleDeliveryTimes(7, 2);

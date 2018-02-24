@@ -55,7 +55,7 @@ BEGIN
                                                     )
         ' ||
         CASE WHEN ( (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unclaimed Listings'::FoodListingsStatus )
-            THEN 'LEFT JOIN ContactInfo ReceiverContact ON ReceiverContact.appUserKey = $1'
+            THEN 'LEFT JOIN ContactInfo ReceiverContact ON ReceiverContact.appUserKey = $1' -- We are receiver looking for unclaimed listings
             ELSE 'LEFT JOIN ContactInfo ReceiverContact ON ClaimInfo.receiverAppUserKey = ReceiverContact.appUserKey'
         END || '
         LEFT JOIN   DeliveryInfo                    ON  ClaimInfo.claimInfoKey = DeliveryInfo.claimInfoKey
@@ -66,7 +66,7 @@ BEGIN
                                                     )
         ' ||
         CASE WHEN ( (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus )
-            THEN 'LEFT JOIN ContactInfo DelivererContact ON DelivererContact.appUserKey = $1'
+            THEN 'LEFT JOIN ContactInfo DelivererContact ON DelivererContact.appUserKey = $1' -- We are deliverer looking for unscheduled deliveries
             ELSE 'LEFT JOIN ContactInfo DelivererContact ON DeliveryInfo.delivererAppUserKey = DelivererContact.appUserKey'
         END || '
     ';
@@ -330,13 +330,13 @@ $$ LANGUAGE plpgsql;
 
 
 -- Test the Stored Procedure here --
-SELECT * FROM getFoodListings(1, NULL, NULL, NULL, JSON_BUILD_OBJECT (
-    'maxDistance',              null,
+SELECT * FROM getFoodListings(2, NULL, NULL, NULL, JSON_BUILD_OBJECT (
+    'maxDistance',              10,
     'maxEstimatedWeight',       null,
     'recommendedVehicleType',   null,
-    'matchRegularAvailability', false,
+    'matchRegularAvailability', true,
     'matchAvailableNow',        false,
-    'foodListingsStatus',       'My Donated Listings',
+    'foodListingsStatus',       'Unscheduled Deliveries',
     'retrievalAmount',          10,
     'retrievalOffset',          0,
     'foodTypes',                null,
