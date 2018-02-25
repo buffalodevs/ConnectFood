@@ -3,18 +3,18 @@
     <div class="crop-container" [style.max-width.px]="cropperSettings.canvasWidth" *ngIf="editMode">
 
         <!-- NOTE: We need to have button end tag and begin tag on same line so no space is added between inline button elements -->
-        <button mat-raised-button type="button" color="primary" class="button-md add-image-button"
+        <button #addImageButton mat-raised-button type="button" color="primary" class="button-md add-image-button"
             [style.width.px]="cropperSettings.canvasWidth / 2" (click)="hiddenFileInput.click()">Add Image
-        </button><button mat-raised-button type="button" color="primary" class="button-md del-image-button warn-button"
+        </button><button #delImageButton mat-raised-button type="button" color="primary" class="button-md del-image-button warn-button"
             [style.width.px]="cropperSettings.canvasWidth / 2" (click)="delImageListener()" [disabled]="slickImgs.length === 0">Del Image
         </button>
 
         <!-- This is an invisible file input triggerd by above button -->
         <div class="file-upload" style="display: none;">
-            <input #hiddenFileInput id="custom-input" type="file" (change)="addImageListener($event, hiddenFileInput)">
+            <input #hiddenFileInput id="custom-input" type="file" (change)="addImagesListener($event, hiddenFileInput)" multiple>
         </div>
 
-        <img-cropper #cropper [image]="slickImgs[activeImageIdx]?.imgData.imgCropBase64Upload" (onCrop)="imageCropped($event)" [settings]="cropperSettings" [ngClass]=""></img-cropper>
+        <img-cropper #cropper [image]="slickImgs[activeImageIdx]?.imgData.imgCropBase64Upload" (onCrop)="imageCropped($event)" [settings]="cropperSettings"></img-cropper>
 
     </div>
 
@@ -25,11 +25,15 @@
     </ng-container>
 
 
-    <ngx-gallery #gallery [options]="galleryOptions" [images]="slickImgs" (change)="imageSelectionChanged($event)" class="hide-arrows" *ngIf="editMode || slickImgs.length !== 0"
-        [ngClass]="{
-            'hide-gallery-image': editMode
-        }">
+    <!-- Only use gallery when we are not in edit mode -->
+    <ngx-gallery #gallery [options]="galleryOptions" [images]="slickImgs" (change)="changeImageSelection($event.index)" class="hide-arrows" *ngIf="!editMode && slickImgs.length !== 0">
     </ngx-gallery>
+
+    <div class="edit-sm-images" [style.height.px]="(galleryHeight * 0.3333) - 10" [style.width.px]="galleryWidth" *ngIf="editMode && slickImgs.length !== 0">
+        <ng-container *ngFor="let slickImg of slickImgs; let i = index">
+            <img [src]="slickImg.small" [style.max-width.px]="(galleryWidth * 0.3333) - 10" [style.max-height.px]="(galleryHeight * 0.3333) - 10" (click)="changeImageSelection(i)">
+        </ng-container>
+    </div>
 
 
     <img [src]="defaultImgUrl" *ngIf="!editMode && slickImgs.length === 0 && defaultImgUrl != null" [style.max-width.px]="galleryWidth" [style.max-height.px]="galleryHeight">

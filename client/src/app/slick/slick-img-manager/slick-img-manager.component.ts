@@ -4,6 +4,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ImageCropperComponent, CropperSettings, CropPosition } from 'ng2-img-cropper';
 import { NgxGalleryOptions, NgxGalleryComponent } from 'ngx-gallery';
 import { SlickImg, ImgData, ImgCrop } from './slick-img';
+import { DomSanitizer } from '@angular/platform-browser';
 
 
 @Component({
@@ -36,6 +37,8 @@ export class SlickImgManagerComponent implements ControlValueAccessor, OnInit, O
 
     @ViewChild('cropper') public cropper: ImageCropperComponent;
     @ViewChild('gallery') public gallery: NgxGalleryComponent;
+    @ViewChild('addImageButton') public addImageButton: HTMLButtonElement;
+    @ViewChild('delImageButton') public delImageButton: HTMLButtonElement;
 
     public slickImgs: SlickImg[] = [];
     public showProgressSpinner: boolean = false;
@@ -44,7 +47,9 @@ export class SlickImgManagerComponent implements ControlValueAccessor, OnInit, O
     private onChange: (slickImgs: SlickImg[]) => void = () => {}; // If model not bound to from parent, simply swallow all changes here.
 
 
-    public constructor() {}
+    public constructor (
+        private _sanitizer: DomSanitizer
+    ) {}
 
 
     public ngOnInit(): void {
@@ -83,7 +88,8 @@ export class SlickImgManagerComponent implements ControlValueAccessor, OnInit, O
                 thumbnailsSwipe: true,
                 thumbnailsColumns: this.thumbnailsColumns,
                 thumbnailsPercent: ( 100 / this.thumbnailsColumns ),
-                thumbnailsMoveSize: this.thumbnailsColumns
+                thumbnailsMoveSize: this.thumbnailsColumns,
+                lazyLoading: true
             }];
         }
 
@@ -93,7 +99,7 @@ export class SlickImgManagerComponent implements ControlValueAccessor, OnInit, O
         }
 
         this.refreshGalleryImages(this.slickImgs);
-        this.refreshActiveIdx();
+        this.changeImageSelection(0);
     }
 
 
@@ -134,82 +140,62 @@ export class SlickImgManagerComponent implements ControlValueAccessor, OnInit, O
 
 
     /**
-     * Refreshes the active gallery image index to 0.
-     */
-    public refreshActiveIdx(): void {
-
-        // Make sure that we reset the selected image to index 0.
-        if (this.slickImgs.length !== 0) {
-
-            this.imageSelectionChanged({
-                index: 0,
-                image: this.slickImgs[0]
-            });
-
-            // TODO: Crop the images displayed in image gallery.
-
-            // const galleryBackgroundImgWidth: number= this.calcGalleryBackgroundImgWidth(this.imgCrops[0]);
-            // const galleryBackgroundImgHeight: number = this.calcGalleryBackgroundImgHeight(this.imgCrops[0]);
-            
-            // background-position: 0 -50px;
-            // background-size: 300px 100px;
-        }
-        this.activeImageIdx = 0;
-    }
-
-
-    private calcGalleryBackgroundImgWidth(imgCrop: ImgCrop): number {
-
-        const imgDisplayToCropProp: number = ( this.galleryWidth / imgCrop.width );
-        return ( imgCrop.width * imgDisplayToCropProp );
-    }
-
-
-    private calcGalleryBackgroundImgHeight(imgCrop: ImgCrop): number {
-
-        const imgDisplayToCropProp: number = ( this.galleryHeight / imgCrop.height );
-        return ( imgCrop.height * imgDisplayToCropProp );
-    }
-
-
-    /**
      * Triggered whenever an image file is added.
+     * NOTE: Will be recursively called if multiple images are updated at once.
      * @param event The image file add event.
+     * @param fileInput A reference to the file input (so we can reset its value when finished to allow duplicate upload and potentially save memory).
+     * @param fileIdx The index of the image file that shall be worked with (default is 0).
+     *                NOTE: should only be internally set when recursively called.
      */
-    public addImageListener(event: any, fileInput: HTMLInputElement): void {
+    public addImagesListener(event: any, fileInput: HTMLInputElement, fileIdx: number = 0): void {
 
-        // When adding an image is selected, user can hit cancel in file selector.
-        if (event.target.files[0] == null) return;
-
-        // Ensure we locally store this so we refer to correct index in onloadend cb below!
-        // IMPORTANT: We must update the instance activeImageIdx value in the cb below in order to avoid a race condition with the cropper (cannot update here)!!!
-        const activeImageIdxUpdt: number = this.slickImgs.length;
-
+        // If we have no files to add, then simply jump out immediately.
+        if (event.target.files.length === 0 || event.target.files[0] == null) return;
+        this.setAddDelButtonsEnabled(false);
+        
         // Use reader to convert file image format to renderable HTML Image format.
         const myReader: FileReader = new FileReader();
         myReader.onloadend = (loadEvent: any) => {
 
             // Generate not Food Listing Image object and set its imageFile member.
-            this.slickImgs.push(new SlickImg());
-            this.slickImgs[activeImageIdxUpdt].imgFile = event.target.files[0];
+            const newSlickImg = new SlickImg();
+            newSlickImg.imgFile = event.target.files[fileIdx];
+            
+            // Set gallery image data. In edit mode, since we are not displaying medium and big gallery images, we will set these to dummy values (cannot be null).
+            newSlickImg.small = loadEvent.target.result;
+            newSlickImg.medium = loadEvent.target.result;
+            newSlickImg.big = loadEvent.target.result;
 
-            const image: HTMLImageElement = new Image();
-            image.src = loadEvent.target.result;
+            // NOTE: Important to add to array after done setting internal gallery image (small, medium, big) data so change detection occurs.
+            this.slickImgs.push(newSlickImg);
+            // Update selected image to the latest one added.
+            this.changeImageSelection(this.slickImgs.length - 1);
 
-            this.slickImgs[activeImageIdxUpdt].small = image.src;
-            this.slickImgs[activeImageIdxUpdt].medium = image.src;
-            this.slickImgs[activeImageIdxUpdt].big = image.src;
+            // If we have more files to recursively analyze and display.
+            if (fileIdx < event.target.files.length - 1) {
 
-            this.activeImageIdx = activeImageIdxUpdt;
-            this.cropper.cropPosition = null;
-            this.cropper.setImage(image);
+                setTimeout(() => this.addImagesListener(event, fileInput, ++fileIdx), 1);
+            }
+            // Else, we have reached end of files to recursively analyze and add, so notify parent component of change and cleanup.
+            else {
 
-            fileInput.value = null; // Allow user to input same file twice.
+                fileInput.value = null; // Allow user to input same file twice and clear out memory used by input.
+                this.setAddDelButtonsEnabled(true);
+                this.onChange(this.slickImgs);
+            }
         };
-        myReader.readAsDataURL(event.target.files[0]);
+        myReader.readAsDataURL(event.target.files[fileIdx]);
+    }
 
-        // Notify parent of added image.
-        this.onChange(this.slickImgs);
+
+    /**
+     * Sets the enabled status of the add and delete buttons.
+     * @param enable The enable status (true for enabled, false for disabled).
+     */
+    private setAddDelButtonsEnabled(enable: boolean): void {
+
+        if (this.addImageButton != null)    this.addImageButton.disabled = !enable;
+        if (this.delImageButton != null)    this.delImageButton.disabled = !enable;
     }
 
 
@@ -226,43 +212,43 @@ export class SlickImgManagerComponent implements ControlValueAccessor, OnInit, O
                                                                                                                           : 0
                                                                                             : this.activeImageIdx;
 
-        this.imageSelectionChanged({
-            index: activeImageIdxUpdt,
-            image: this.slickImgs[activeImageIdxUpdt]
-        });
+        this.changeImageSelection(activeImageIdxUpdt);
     }
 
 
     /**
      * Invoked whenever there is a change in image selection (by selecting gallery thumbnail image).
-     * @param change The change that has occured.
+     * @param index The index of the new image to select.
      */
-    public imageSelectionChanged(change: { index: number, image: SlickImg }): void {
+    public changeImageSelection(index: number): void {
 
-        if (this.editMode) {
+        if (this.editMode && this.cropper) {
 
-            if (this.slickImgs[change.index] != null && this.slickImgs[change.index].big != null) {
-
-                // Set the cropper image.
-                const image: HTMLImageElement = new Image();
-                image.src = <string>(this.slickImgs[change.index].big);
-                this.cropper.setImage(image);
-
-                // Set the crop bounds for the new cropper image.
-                const selImgCrop: ImgCrop = this.slickImgs[change.index].imgData.imgCrop;
-                this.cropper.cropPosition = new CropPosition (
-                    selImgCrop.left + 0.001, // NOTE: Added 0.001 forces crop bound to update (if left to original cropLeft, then won't update).
-                    selImgCrop.top + 0.001,
-                    selImgCrop.width,
-                    selImgCrop.height
-                );
+            // If we have an image to set in our Slick Img data arr.
+            if (this.slickImgs.length > index) {
+                
+                const htmlImage: HTMLImageElement = new Image();
+                htmlImage.src = this.slickImgs[index].big;
+                this.cropper.setImage(htmlImage);
+    
+                // Only set cropper position if our slick image data has already been cropped (else we are selecting a new image).
+                const selImgCrop: ImgCrop = this.slickImgs[index].imgData.imgCrop;
+                if (selImgCrop.width != null) {
+                    this.cropper.cropPosition = new CropPosition (
+                        selImgCrop.left + 0.001, // NOTE: Added 0.001 forces crop bound to update (if left to original cropLeft, then won't update).
+                        selImgCrop.top + 0.001,
+                        selImgCrop.width,
+                        selImgCrop.height
+                    );
+                }
             }
-            else {
+            // Else if the cropper has an image, then clear it.
+            else if (this.cropper.image != null) {
                 this.cropper.reset();
             }
         }
 
-        this.activeImageIdx = change.index;
+        this.activeImageIdx = index;
     }
 
 
@@ -278,10 +264,9 @@ export class SlickImgManagerComponent implements ControlValueAccessor, OnInit, O
         const slickImgUpdt: SlickImg = this.slickImgs[this.activeImageIdx];
         slickImgUpdt.small = this.slickImgs[this.activeImageIdx].imgData.imgCropBase64Upload.image;
         slickImgUpdt.medium = this.slickImgs[this.activeImageIdx].imgData.imgCropBase64Upload.image;
-        slickImgUpdt.big = this.slickImgs[this.activeImageIdx].big;
 
         // Update gallery images (NOTE: We need to refresh array reference in order to enforce change detection).
-        this.gallery.currentOptions.startIndex = this.activeImageIdx;
+        //this.gallery.currentOptions.startIndex = this.activeImageIdx;
         this.slickImgs = this.slickImgs.slice(0, this.activeImageIdx)
                                        .concat(slickImgUpdt)
                                        .concat(this.slickImgs.slice(this.activeImageIdx + 1));
@@ -300,7 +285,7 @@ export class SlickImgManagerComponent implements ControlValueAccessor, OnInit, O
         { return; }
 
         this.refreshGalleryImages(this.slickImgs);
-        this.refreshActiveIdx();
+        this.changeImageSelection(0);
     }
 
 

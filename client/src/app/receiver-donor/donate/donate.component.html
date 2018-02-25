@@ -46,7 +46,8 @@
 
             <div id="donation-summary" class="row">
 
-                <div class="col-md-12 col-lg-5 mobile-center">
+                <!-- IMPORTANT: lazy load the (gallery version) display of images since change detection combined witn ngx-gallery and base64 images generates TERRIBLE performance -->
+                <div class="col-md-12 col-lg-5 mobile-center" *ngIf="stepper.selectedIndex === 2">
                     <slick-img-manager [ngModel]="form.get('slickImgs').value" [defaultImgUrl]="DEFAULT_IMG_URL"
                     [galleryHeight]="IMG_CROP_CONSTANTS.getDefCropImgGalleryHeight()" [galleryWidth]="IMG_CROP_CONSTANTS.getDefCropWidth()"></slick-img-manager>
                 </div>

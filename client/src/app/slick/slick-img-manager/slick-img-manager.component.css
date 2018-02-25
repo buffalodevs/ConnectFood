@@ -1,6 +1,4 @@
 .img-manager-container {
-    text-align: center;
-    margin: auto;
     max-width: 100%;
 }
 
@@ -46,6 +44,20 @@ button.mat-raised-button.mat-primary.del-image-button {
     vertical-align: middle;
     font-size: 30px;
     display: table-cell;
+}
+
+
+.edit-sm-images {
+    overflow-y: auto;
+    max-width: 100%;
+}
+
+
+.edit-sm-images img {
+    width: 100%;
+    cursor: pointer;
+    cursor: hand;
+    /* max-width set in template based on component inputs */
 }
 
 
