@@ -1,12 +1,12 @@
 .time-range-container {
     position: relative;
+    display: inline-block;
     margin-right: 5px;
     margin-bottom: 5px;
     background-color: rgb(247, 247, 239);
     border: 1px solid lightgray;
     padding-top: 15px;
     padding-bottom: 15px;
-    text-align: center;
 }
 
 .edit-time-range-container {
@@ -16,7 +16,6 @@
 }
 
 .display-time-range-container {
-    display: inline-block;
     padding-left: 7px;
     padding-right: 7px;
 }
@@ -56,6 +55,11 @@
     color: white;
     border: none;
     outline: none;
+    width: 25px;
+    height: 25px;
+    line-height: 25px;
+    padding-left: 1px;
+    padding-right: 0px;
 }
 
 .add-span {

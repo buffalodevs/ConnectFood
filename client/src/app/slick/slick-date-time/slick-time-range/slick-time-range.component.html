@@ -1,34 +1,46 @@
-<div id="wrapper" [formGroup]="form">
+<div class="date-time-range-wrapper" [formGroup]="form">
 
-    <ng-container *ngIf="includeDate">
+    <div class="start-date-time-wrapper date-time-wrapper">
 
-        <mat-input-container class="input-group time-range-date" floatPlaceholder="never" *ngIf="!displayOnly">
-            <input matInput id="start-date" [matDatepicker]="startDatePicker" placeholder="mm/dd/yyyy" formControlName="startDate">
-            <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
-            <mat-datepicker touchUi="true" #startDatePicker></mat-datepicker>
-        </mat-input-container>
-        <span *ngIf="displayOnly"><b>{{ dateFormatter.dateToMonthDayYearString(control('startDate').value) }}</b>,</span>
+        <b style="white-space: nowrap;">Start Time:</b>
+        <div style="white-space: nowrap;">
+            <ng-container *ngIf="includeDate">
 
-    </ng-container>
+                <mat-input-container class="input-group time-range-date" floatPlaceholder="never" *ngIf="!displayOnly">
+                    <input matInput id="start-date" [matDatepicker]="startDatePicker" placeholder="mm/dd/yyyy" formControlName="startDate">
+                    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker touchUi="true" #startDatePicker></mat-datepicker>
+                </mat-input-container>
+                <span *ngIf="displayOnly">{{ dateFormatter.dateToMonthDayYearString(control('startDate').value) }},</span>
 
-    <slick-time [activateValidation]="activateValidation" formControlName="startTimeStr" *ngIf="!displayOnly"></slick-time>
-    <span *ngIf="displayOnly"><b>{{ control('startTimeStr').value }}</b></span>
+            </ng-container>
 
-    <span id="to-separator">to</span>
+            <slick-time [activateValidation]="activateValidation" formControlName="startTimeStr" *ngIf="!displayOnly"></slick-time>
+            <span *ngIf="displayOnly">{{ control('startTimeStr').value }}</span>
+        </div>
 
-    <ng-container *ngIf="includeDate">
+    </div>
 
-        <mat-input-container class="input-group time-range-date" floatPlaceholder="never" *ngIf="includeDate && !displayOnly">
-            <input matInput id="end-date" [matDatepicker]="endDatePicker" placeholder="mm/dd/yyyy" formControlName="endDate">
-            <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
-            <mat-datepicker touchUi="true" #endDatePicker></mat-datepicker>
-        </mat-input-container>
-        <span *ngIf="displayOnly"><b>{{ dateFormatter.dateToMonthDayYearString(control('endDate').value) }}</b>,</span>
+    <div class="date-time-wrapper">
 
-    </ng-container>
+        <b style="white-space: nowrap;">End Time:</b>
+        <div style="white-space: nowrap;">
+            <ng-container *ngIf="includeDate">
 
-    <slick-time [activateValidation]="activateValidation" formControlName="endTimeStr" *ngIf="!displayOnly"></slick-time>
-    <span *ngIf="displayOnly"><b>{{ control('endTimeStr').value }}</b></span>
+                <mat-input-container class="input-group time-range-date" floatPlaceholder="never" *ngIf="includeDate && !displayOnly">
+                    <input matInput id="end-date" [matDatepicker]="endDatePicker" placeholder="mm/dd/yyyy" formControlName="endDate">
+                    <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker touchUi="true" #endDatePicker></mat-datepicker>
+                </mat-input-container>
+                <span *ngIf="displayOnly">{{ dateFormatter.dateToMonthDayYearString(control('endDate').value) }},</span>
+
+            </ng-container>
+
+            <slick-time [activateValidation]="activateValidation" formControlName="endTimeStr" *ngIf="!displayOnly"></slick-time>
+            <span *ngIf="displayOnly">{{ control('endTimeStr').value }}</span>
+        </div>
+
+    </div>
 
     <div id="err-msg" class="warn-foreground" *ngIf="hasError('.') != null">
         <span>{{ errorMsgFor('.') }}</span>
