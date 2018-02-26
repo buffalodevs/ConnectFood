@@ -7,6 +7,7 @@ import { CommonUtilModule } from '../../../common-util/common-util.module';
 import { SlickInputGroupModule } from '../../slick-input-group/slick-input-group.module';
 import { SlickTimeComponent } from './slick-time.component';
 import { SlickTypeaheadModule } from '../../slick-type-ahead/slick-type-ahead.module';
+import { SlickDatePickerModule } from '../slick-date-picker/slick-date-picker.module';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { SlickTypeaheadModule } from '../../slick-type-ahead/slick-type-ahead.mo
         MatInputModule,
         CommonUtilModule,
         SlickInputGroupModule,
-        SlickTypeaheadModule
+        SlickTypeaheadModule,
+        SlickDatePickerModule
     ],
     exports: [
         SlickTimeComponent

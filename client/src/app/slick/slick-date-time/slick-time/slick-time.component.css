@@ -1,10 +1,20 @@
 mat-input-container {
     max-width: 30px;
-    width:100%;
+    width: 100%;
 }
 
 mat-input-container, :host ::ng-deep input {
     text-align: center;
+}
+
+.date-mat-input-container {
+    max-width: 150px;
+    text-align: left;
+    margin-right: 20px;
+}
+
+.date-mat-input-container mat-input-container, :host ::ng-deep .date-mat-input-container input {
+    text-align: left;
 }
 
 .time-form {

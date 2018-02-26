@@ -3,42 +3,26 @@
     <div class="start-date-time-wrapper date-time-wrapper">
 
         <b style="white-space: nowrap;">Start Time:</b>
-        <div style="white-space: nowrap;">
-            <ng-container *ngIf="includeDate">
 
-                <mat-input-container class="input-group time-range-date" floatPlaceholder="never" *ngIf="!displayOnly">
-                    <input matInput id="start-date" [matDatepicker]="startDatePicker" placeholder="mm/dd/yyyy" formControlName="startDate">
-                    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
-                    <mat-datepicker touchUi="true" #startDatePicker></mat-datepicker>
-                </mat-input-container>
-                <span *ngIf="displayOnly">{{ dateFormatter.dateToMonthDayYearString(control('startDate').value) }},</span>
+        <slick-time [activateValidation]="activateValidation" formControlName="startDate" [includeDate]="includeDate" *ngIf="!displayOnly"></slick-time>
 
-            </ng-container>
-
-            <slick-time [activateValidation]="activateValidation" formControlName="startTimeStr" *ngIf="!displayOnly"></slick-time>
-            <span *ngIf="displayOnly">{{ control('startTimeStr').value }}</span>
-        </div>
+        <ng-container *ngIf="displayOnly">
+            <span *ngIf="includeDate" style="white-space: nowrap;">{{ dateFormatter.dateToMonthDayYearString(control('startDate').value) }},</span>
+            <span style="white-space: nowrap;">{{ dateFormatter.dateToWallClockString(control('startDate').value) }}</span>
+        </ng-container>
 
     </div>
 
     <div class="date-time-wrapper">
 
         <b style="white-space: nowrap;">End Time:</b>
-        <div style="white-space: nowrap;">
-            <ng-container *ngIf="includeDate">
 
-                <mat-input-container class="input-group time-range-date" floatPlaceholder="never" *ngIf="includeDate && !displayOnly">
-                    <input matInput id="end-date" [matDatepicker]="endDatePicker" placeholder="mm/dd/yyyy" formControlName="endDate">
-                    <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
-                    <mat-datepicker touchUi="true" #endDatePicker></mat-datepicker>
-                </mat-input-container>
-                <span *ngIf="displayOnly">{{ dateFormatter.dateToMonthDayYearString(control('endDate').value) }},</span>
-
-            </ng-container>
-
-            <slick-time [activateValidation]="activateValidation" formControlName="endTimeStr" *ngIf="!displayOnly"></slick-time>
-            <span *ngIf="displayOnly">{{ control('endTimeStr').value }}</span>
-        </div>
+        <slick-time [activateValidation]="activateValidation" formControlName="endDate" [includeDate]="includeDate" *ngIf="!displayOnly"></slick-time>
+        
+        <ng-container *ngIf="displayOnly">
+            <span *ngIf="includeDate" style="white-space: nowrap;">{{ dateFormatter.dateToMonthDayYearString(control('endDate').value) }},</span>
+            <span style="white-space: nowrap;">{{ dateFormatter.dateToWallClockString(control('endDate').value) }}</span>
+        </ng-container>
 
     </div>
 

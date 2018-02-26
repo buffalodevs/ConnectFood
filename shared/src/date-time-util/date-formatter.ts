@@ -71,7 +71,7 @@ export class DateFormatter {
      */
     public dateToWallClockString(date: Date, discardSeconds: boolean = true): string {
 
-        let wallClockString: string = '';
+        let wallClockString: string = null;
 
         if (date != null) {
             

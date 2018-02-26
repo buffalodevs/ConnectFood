@@ -21,9 +21,9 @@ import { DateRange } from '../../../../../../shared/src/date-time-util/date-rang
             multi: true
         },
         {
-        provide: NG_VALIDATORS,
-        useExisting: forwardRef(() => SlickWeekdayScheduleBuilderComponent),
-        multi: true,
+            provide: NG_VALIDATORS,
+            useExisting: forwardRef(() => SlickWeekdayScheduleBuilderComponent),
+            multi: true,
         },
         WeekdaySplitService
     ]

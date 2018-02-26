@@ -77,9 +77,7 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
         this.form = this._formBuilder.group({
             'startDate':    [ null, Validators.required ],
             'endDate':      [ null, Validators.required ],
-            'startTimeStr': [ null, timeCtrlValidators ],
-            'endTimeStr':   [ null, timeCtrlValidators ]
-        }, { validator: this.validationService.timeOrder(this.includeDate) });
+        }, { validator: this.validationService.timeOrder() });
         this.writeValue(null);
     }
 
@@ -89,20 +87,6 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
         // Make sure we validate the contained form when validate is marked as true.
         if (changes.activateValidation && changes.activateValidation.currentValue && this.form) {
             this.validationService.markAllAsTouched(this.form);
-        }
-
-        // Ensure we update form validator to include or not include date form controls.
-        if (changes.includeDate && this.form) {
-            
-            this.form.setValidators(this.validationService.timeOrder(this.includeDate));
-
-            // If we are changing to not include the date, then we must default start and end date to today if they do not already have values.
-            if (!this.includeDate) {
-                
-                const currentDate: Date = new Date();
-                if (this.form.get('startDate').value == null)   this.form.get('startDate').setValue(currentDate);
-                if (this.form.get('endDate').value == null)     this.form.get('endDate').setValue(currentDate);
-            }
         }
     }
 
@@ -126,14 +110,10 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
         if (!this.form.valid)   return undefined;
 
         // Extract start and end time strings from form.
-        let startDate: Date = this.includeDate ? this.form.get('startDate').value
-                                               : new Date();
-        let endDate: Date = this.includeDate ? this.form.get('endDate').value
-                                             : new Date();
-        let startTimeStr: string = this.form.get('startTimeStr').value;
-        let endTimeStr: string = this.form.get('endTimeStr').value;
+        const startDate: Date = this.form.get('startDate').value;
+        const endDate: Date = this.form.get('endDate').value;
 
-        return this.genTimeRangeFromFormVals(startDate, endDate, startTimeStr, endTimeStr);
+        return this.genTimeRangeFromFormVals(startDate, endDate);
     }
 
 
@@ -141,17 +121,12 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
      * Generates a time range based off of given date-time values extracted from this component's contained form.
      * @param startDate The start date.
      * @param endDate The end date.
-     * @param startTimeStr The start time string.
-     * @param endTimeStr The end time string.
      * @return The generated time range. If any provided values are empty, malformed, or not ordered correctly, then null is returned.
      */
-    private genTimeRangeFromFormVals(startDate: Date, endDate: Date, startTimeStr: string, endTimeStr: string): DateRange {
-
-        const startDateStr: string = this.dateFormatter.dateToMonthDayYearString(startDate);
-        const endDateStr: string = this.dateFormatter.dateToMonthDayYearString(endDate);
+    private genTimeRangeFromFormVals(startDate: Date, endDate: Date): DateRange {
 
         // Generate the time range and check for any format/order error(s).
-        let timeRange = new DateRange(new Date(startDateStr + ' ' + startTimeStr), new Date(endDateStr + ' ' + endTimeStr));
+        let timeRange = new DateRange(startDate, endDate);
 
         // If the date strings are not in correct format or temporal order.
         if (timeRange.checkForErr() != null) {
@@ -170,22 +145,15 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
      */
     public writeValue(timeRange: DateRange): void {
 
-        const defaultDate: Date =  this.includeDate ? null
-                                                    : new Date();
-
-        let formValue = {
-            startDate: defaultDate,
-            endDate: defaultDate,
-            startTimeStr: null,
-            endTimeStr: null
+        const formValue = {
+            startDate: null,
+            endDate: null
         }
 
         if (timeRange != null) {
 
             formValue.startDate = timeRange.startTime;
             formValue.endDate = timeRange.endTime;
-            formValue.startTimeStr = this.dateFormatter.dateToWallClockString(timeRange.startTime);
-            formValue.endTimeStr = this.dateFormatter.dateToWallClockString(timeRange.endTime);
         }
 
         this.form.setValue(formValue);

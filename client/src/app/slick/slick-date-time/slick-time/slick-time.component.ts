@@ -1,5 +1,5 @@
-import { Component, Input, OnInit, AfterViewInit, ViewChild, forwardRef } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators, ValidatorFn, FormBuilder } from '@angular/forms';
+import { Component, Input, OnInit, AfterViewInit, ViewChild, forwardRef, SimpleChanges } from '@angular/core';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators, ValidatorFn, FormBuilder, FormGroup } from '@angular/forms';
 
 import { AbstractModelDrivenComponent } from '../../../common-util/components/abstract-model-driven-component';
 import { SlickTimeValidationService } from './slick-time-validation.service';
@@ -26,17 +26,15 @@ export class SlickTimeComponent extends AbstractModelDrivenComponent implements 
 
     public readonly GROUP_VALIDATORS: ValidatorFn[][];
 
-    @Input() public activateValidation: boolean;
+    @Input() public activateValidation: boolean = false;
+    @Input() public includeDate: boolean = false;
 
-    /**
-     * View model for contained input control.
-     */
-    public timeControl: FormControl;
+
     /**
      * A callback function provided by a parent component (via directive such as ngModel).
      * ControlValueAccessor interface's registerOnChange method is used to register this callback.
      */
-    private onChange: (value: string) => void;
+    private onChange: (value: Date) => void = () => {};
 
 
     public constructor (
@@ -54,15 +52,39 @@ export class SlickTimeComponent extends AbstractModelDrivenComponent implements 
             [ Validators.required, Validators.pattern(this.validationService.AM_OR_PM_REGEX) ]
         ];
 
-        this.activateValidation = false;
-        this.onChange = (value: any) => {}; // If no change listener given later, then all change will be swallowed here!
-        this.timeControl = new FormControl();
+        const timeCtrlValidators: ValidatorFn[] = [ Validators.required, Validators.pattern(this.validationService.TIME_REGEX) ];
+
+        this.form = this._formBuilder.group({
+            'timeStr': [ null, timeCtrlValidators ]
+        });
+        this.form.valueChanges.subscribe(this.listenForChange.bind(this));
     }
 
 
     public ngOnInit(): void {
+        this.updtIncludeDate();
+    }
 
-        this.timeControl.valueChanges.subscribe(this.listenForChange.bind(this));
+
+    public ngValueChanges(changes: SimpleChanges): void {
+
+        if (changes.includeDate) {
+            this.updtIncludeDate();
+        }
+    }
+
+
+    /**
+     * Updates the inclusion of a date field. If the date field
+     */
+    private updtIncludeDate(): void {
+
+        if (this.includeDate && !this.form.contains('date')) {
+            this.form.addControl('date', new FormControl(null, Validators.required));
+        }
+        else if (!this.includeDate && this.form.contains('date')) {
+            this.form.removeControl('date');
+        }
     }
 
 
@@ -70,8 +92,9 @@ export class SlickTimeComponent extends AbstractModelDrivenComponent implements 
      * Writes a value to the underlying input control.
      * @param value The new value to write.
      */
-    public writeValue(value: string): void {
-        this.timeControl.setValue(value);
+    public writeValue(value: Date): void {
+        if (this.includeDate) this.form.get('date').setValue(value);
+        this.form.get('timeStr').setValue(this.dateFormatter.dateToWallClockString(value));
     }
 
 
@@ -80,23 +103,28 @@ export class SlickTimeComponent extends AbstractModelDrivenComponent implements 
      * Associated with ngModel or formControl directives.
      * @param onChange The change listener function.
      */
-    public registerOnChange(onChange: (value: string) => void): void {
+    public registerOnChange(onChange: (value: Date) => void): void {
         this.onChange = onChange;
     }
 
 
     /**
      * Listens for the input value to update.
-     * @param value The updated value of the input.
      */
-    private listenForChange(value: string): void {
+    private listenForChange(): void {
 
-        // First, check if the time form contains a valid (wall clock formatted) time. If not, then give null to change listener!
-        value = this.dateFormatter.isWallClockFormat(value) ? value
-                                                            : null;
+        let valueUpdt: Date = null;
+
+        // If the form date and timeStr controls are valid, then grab value.
+        if (this.form.valid) {
+
+            valueUpdt = this.includeDate ? this.form.get('date').value
+                                         : new Date();
+            valueUpdt = this.dateFormatter.setWallClockTimeForDate(valueUpdt, this.form.get('timeStr').value);
+        }
 
         // Notify parent component's listener of change.
-        this.onChange(value);
+        this.onChange(valueUpdt);
     }
 
 

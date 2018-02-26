@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, OnChanges, forwardRef, SimpleChange, SimpleChanges } from '@angular/core';
-import { FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormArray, Validators, FormBuilder, Validator, AbstractControl } from '@angular/forms';
+import { FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACCESSOR, FormArray, Validators, FormBuilder, Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
 
 import { ValidationService } from '../../../common-util/services/validation.service';
 import { DateFormatterService } from '../../../common-util/services/date-formatter.service';
@@ -17,7 +17,12 @@ import { DateRange } from '../../../../../../shared/src/date-time-util/date-rang
             provide: NG_VALUE_ACCESSOR,
             useExisting: forwardRef(() => SlickDateTimeScheduleBuilderComponent),
             multi: true
-        }
+        },
+        {
+            provide: NG_VALIDATORS,
+            useExisting: forwardRef(() => SlickDateTimeScheduleBuilderComponent),
+            multi: true,
+        },
     ]
 })
 export class SlickDateTimeScheduleBuilderComponent extends AbstractModelDrivenComponent implements OnInit, OnChanges, ControlValueAccessor, Validator {

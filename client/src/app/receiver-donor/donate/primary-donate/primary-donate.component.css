@@ -32,8 +32,8 @@ mat-form-field, mat-input-container {
     width: 100%;
 }
 
-.inline-error, mat-form-field, mat-input-container {
-    font-size: 20px;
+.inline-error, mat-form-field, :host ::ng-deep mat-input-container {
+    font-size: 18px;
 }
 
 :host ::ng-deep .mat-form-field-infix {

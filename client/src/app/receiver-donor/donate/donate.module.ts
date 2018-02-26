@@ -7,6 +7,7 @@ import { MatInputModule, MatButtonModule, MatStepperModule, MatRadioModule, MatC
 
 import { CommonUtilModule } from '../../common-util/common-util.module';
 import { SlickDatePickerModule } from '../../slick/slick-date-time/slick-date-picker/slick-date-picker.module';
+import { SlickTimeModule } from '../../slick/slick-date-time/slick-time/slick-time.module';
 import { CommonFoodListingDomainsModule } from '../../domain/common-food-listing-domains.module';
 import { SlickDateTimeScheduleBuilderModule } from '../../slick/slick-scheduler/slick-date-time-schedule-builder/slick-date-time-schedule-builder.module';
 import { SlickWeekdayScheduleBuilderModule } from '../../slick/slick-scheduler/slick-weekday-schedule-builder/slick-weekday-schedule-builder.module';
@@ -50,6 +51,7 @@ const donateRoute: Routes = [
         CommonUtilModule,
         SlickImgManagerModule,
         SlickDatePickerModule,
+        SlickTimeModule,
         SlickWeekdayScheduleBuilderModule,
         SlickDateTimeScheduleBuilderModule,
         CommonFoodListingDomainsModule

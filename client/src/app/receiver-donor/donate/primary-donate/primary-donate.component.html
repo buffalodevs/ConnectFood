@@ -39,12 +39,7 @@
         <!-- availableUntilDate -->
         <div class="form-group col-md-6">
             <h4 for="availableUntilDate">Available Until</h4>
-            <mat-input-container class="input-group" floatPlaceholder="never">
-                <input #availableUntilDate matInput id="availableUntilDate" [matDatepicker]="picker" placeholder="mm/dd/yyyy"
-                        formControlName="availableUntilDate" [errorStateMatcher]="this" required>
-                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker touchUi="true" #picker></mat-datepicker>
-            </mat-input-container>
+            <slick-time [includeDate]="true" formControlName="availableUntilDate"></slick-time>
         </div>
 
         <!-- needsRefrigeration -->
