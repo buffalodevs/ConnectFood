@@ -7,8 +7,8 @@
         <slick-time [activateValidation]="activateValidation" formControlName="startDate" [includeDate]="includeDate" *ngIf="!displayOnly"></slick-time>
 
         <ng-container *ngIf="displayOnly">
-            <span *ngIf="includeDate" style="white-space: nowrap;">{{ dateFormatter.dateToMonthDayYearString(control('startDate').value) }},</span>
-            <span style="white-space: nowrap;">{{ dateFormatter.dateToWallClockString(control('startDate').value) }}</span>
+            <span *ngIf="includeDate" style="white-space: nowrap;">{{ dateFormatter.dateToMonthDayYearString(form.get('startDate').value) }},</span>
+            <span style="white-space: nowrap;">{{ dateFormatter.dateToWallClockString(form.get('startDate').value) }}</span>
         </ng-container>
 
     </div>
@@ -20,8 +20,8 @@
         <slick-time [activateValidation]="activateValidation" formControlName="endDate" [includeDate]="includeDate" *ngIf="!displayOnly"></slick-time>
         
         <ng-container *ngIf="displayOnly">
-            <span *ngIf="includeDate" style="white-space: nowrap;">{{ dateFormatter.dateToMonthDayYearString(control('endDate').value) }},</span>
-            <span style="white-space: nowrap;">{{ dateFormatter.dateToWallClockString(control('endDate').value) }}</span>
+            <span *ngIf="includeDate" style="white-space: nowrap;">{{ dateFormatter.dateToMonthDayYearString(form.get('endDate').value) }},</span>
+            <span style="white-space: nowrap;">{{ dateFormatter.dateToWallClockString(form.get('endDate').value) }}</span>
         </ng-container>
 
     </div>

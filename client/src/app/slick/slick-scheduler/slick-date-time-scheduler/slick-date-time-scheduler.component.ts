@@ -24,10 +24,6 @@ import { DateRange } from '../../../../../../shared/src/date-time-util/date-rang
 })
 export class SlickDateTimeSchedulerComponent extends AbstractModelDrivenComponent implements OnInit, OnChanges, ControlValueAccessor {
     
-    /**
-     * When this value is set or changes to true, then the contained form will be forced to validate its controls and show any related errors.
-     */
-    @Input() public activateValidation: boolean;
     @Input() public possibleScheduleTimeRanges: DateRange[];
 
     /**
@@ -66,10 +62,7 @@ export class SlickDateTimeSchedulerComponent extends AbstractModelDrivenComponen
 
     public ngOnChanges(changes: SimpleChanges): void {
         
-        // Make sure we validate the contained form when validate is marked as true.
-        if (changes.activateValidation && changes.activateValidation.currentValue) {
-            this.validationService.markAllAsTouched(this.form);
-        }
+        super.ngOnChanges(changes);
         
         // Adjust the column splits based on the value of possibleScheduleTimeRanges (number of weekdays we have data for).
         if (changes.possibleScheduleTimeRanges) {

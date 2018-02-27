@@ -42,10 +42,6 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
     @Input() public displayOnly: boolean;
     @Input() public allowAdd: boolean;
     @Input() public allowRemove: boolean;
-    /**
-     * When this value is set or changes to true, then the contained form will be forced to validate its controls and show any related errors.
-     */
-    @Input() public activateValidation: boolean;
 
     /**
      * If set by parent component via model binding (implicitly calls registerOnChange method),
@@ -86,6 +82,8 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
 
 
     public ngOnChanges(changes: SimpleChanges): void {
+
+        super.ngOnChanges(changes);
         
         // Make sure we validate the contained form when validate is marked as true.
         if (changes.activateValidation && changes.activateValidation.currentValue) {
@@ -129,7 +127,7 @@ export class SlickWeekdayScheduleBuilderComponent extends AbstractModelDrivenCom
      */
     private canAddNewAvailabilityRange(weekday: string): boolean {
 
-        let weekdaysFormArr: FormArray = <FormArray>this.control(weekday);
+        let weekdaysFormArr: FormArray = <FormArray>this.form.get(weekday);
         let lastAvailabilityRangeValid: boolean = ( weekdaysFormArr.length === 0 || weekdaysFormArr.at(weekdaysFormArr.length - 1).value != null );
 
         return ( this.allowAdd && lastAvailabilityRangeValid && !this.displayOnly );

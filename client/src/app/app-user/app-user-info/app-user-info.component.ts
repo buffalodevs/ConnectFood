@@ -128,17 +128,17 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
     /**
      * Sets many fields in the App User Info form to be (un)editable and focuses the form control used for editing.
      * @param editFormControlIds A list of the ids of the form controls that will be used for editing.
-     * @param editing Default is true. The edit state to be set.
+     * @param editing Default is true. The edit state to be set.`
      */
     private setManyEditable(editFormControlIds: string[], editing: boolean = true): void {
 
         for (let i: number = 0; i < editFormControlIds.length; i++) {
 
             // Reset the validation state of the fields involved in the edit.
-            this.control(editFormControlIds[i]).markAsUntouched();                
+            this.form.get(editFormControlIds[i]).markAsUntouched();                
 
             // Set the form control value to the session data value for consistency.
-            this.control(editFormControlIds[i]).setValue(_.get(this._sessionDataService.getAppUserSessionData(), editFormControlIds[i]));
+            this.form.get(editFormControlIds[i]).setValue(_.get(this._sessionDataService.getAppUserSessionData(), editFormControlIds[i]));
 
             this._editData.get(editFormControlIds[i]).editing = editing;
         }
@@ -159,9 +159,9 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
      */
     private savePassword(currentPasswordName: string, newPasswordName: string, confirmPasswordName: string): void {
 
-        let currentPassword: AbstractControl = this.control(currentPasswordName);
-        let newPassword: AbstractControl = this.control(newPasswordName);
-        let confirmPassword: AbstractControl = this.control(confirmPasswordName);
+        let currentPassword: AbstractControl = this.form.get(currentPasswordName);
+        let newPassword: AbstractControl = this.form.get(newPasswordName);
+        let confirmPassword: AbstractControl = this.form.get(confirmPasswordName);
 
         // First validate the password fields before saving the password.
         if (currentPassword.valid && newPassword.valid && confirmPassword.valid) {
@@ -193,7 +193,7 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
         if (newPassword === null) {
             for (let i: number = 0; i < saveFormControlNames.length; i++) {
 
-                let saveFormControl: AbstractControl = this.control(saveFormControlNames[i]);
+                let saveFormControl: AbstractControl = this.form.get(saveFormControlNames[i]);
 
                 if (!saveFormControl.valid) {
                     return; // Invalid control, force out now!
@@ -230,18 +230,18 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
         if (response.success) {
             // Update all involved form controls based off of reply from server.
             for (let i: number = 0; i < saveFormControlNames.length; i++) {
-                this.control(saveFormControlNames[i]).setErrors(null);
+                this.form.get(saveFormControlNames[i]).setErrors(null);
                 this.setEditable(saveFormControlNames[i], false);
             }
         }
         else if (response.message === AppUserErrorMsgs.DUPLICATE_EMAIL) {
-            this.validationService.addError(this.control(saveFormControlNames[0]), 'duplicateEmail', response.message);
+            this.validationService.addError(this.form.get(saveFormControlNames[0]), 'duplicateEmail', response.message);
         }
         else if (response.message === AppUserErrorMsgs.INVALID_ADDRESS) {
-            this.validationService.addError(this.control(saveFormControlNames[0]), 'invalidAddress', response.message);
+            this.validationService.addError(this.form.get(saveFormControlNames[0]), 'invalidAddress', response.message);
         }
         else if (response.message === AppUserErrorMsgs.INCORRECT_CURRENT_PASSWORD) {
-            this.validationService.addError(this.control(saveFormControlNames[0]), 'incorrectPassword', response.message);
+            this.validationService.addError(this.form.get(saveFormControlNames[0]), 'incorrectPassword', response.message);
         }
     }
 }

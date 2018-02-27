@@ -184,17 +184,20 @@ export class ValidationService extends Validation {
     /**
      * Marks all members of the given from group or array as touched, and all of its ancestors too.
      * @param group The form group or array to mark as touched.
+     * @param touchFlag Default is true for mark as touched. Set to false to mark as untouched.
      */
-    public markAllAsTouched(group: FormGroup | FormArray): void {
+    public markAllAsTouched(group: FormGroup | FormArray, touchFlag: boolean = true): void {
 
-        group.markAsTouched()
+        touchFlag ? group.markAsTouched()
+                  : group.markAsUntouched();
 
         for (let i in group.controls) {
             if (group.controls[i] instanceof FormControl) {
-                (<FormControl>group.controls[i]).markAsTouched();
+                touchFlag ? (<FormControl>group.controls[i]).markAsTouched()
+                          : (<FormControl>group.controls[i]).markAsUntouched();
             }
             else {
-                this.markAllAsTouched(group.controls[i]);
+                this.markAllAsTouched(group.controls[i], touchFlag);
             }
         }
     }

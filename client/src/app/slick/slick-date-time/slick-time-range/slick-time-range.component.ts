@@ -24,10 +24,6 @@ import { DateRange, DateRangeErr } from '../../../../../../shared/src/date-time-
 })
 export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implements OnInit, OnChanges, ControlValueAccessor {
 
-    /**
-     * When this value is set or changes to true, then the contained form will be forced to validate its controls and show any related errors.
-     */
-    @Input() public activateValidation: boolean;
     @Input() public displayOnly: boolean;
     @Input() public includeDate: boolean;
 
@@ -83,6 +79,8 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
 
 
     public ngOnChanges(changes: SimpleChanges): void {
+
+        super.ngOnChanges(changes);
         
         // Make sure we validate the contained form when validate is marked as true.
         if (changes.activateValidation && changes.activateValidation.currentValue && this.form) {

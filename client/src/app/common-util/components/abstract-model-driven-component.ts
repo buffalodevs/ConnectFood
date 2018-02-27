@@ -1,10 +1,13 @@
 import { FormGroup, AbstractControl, FormArray, ValidatorFn, FormBuilder } from "@angular/forms";
+import { Input, OnChanges, SimpleChanges } from "@angular/core";
 import * as _ from "lodash";
 
 import { ValidationService } from "../services/validation.service";
 
 
-export abstract class AbstractModelDrivenComponent {
+export abstract class AbstractModelDrivenComponent implements OnChanges {
+
+    @Input() public activateValidation: boolean = false;
 
     /**
      * The base or primary form for the component.
@@ -21,6 +24,15 @@ export abstract class AbstractModelDrivenComponent {
     ) {}
 
 
+    public ngOnChanges(changes: SimpleChanges): void {
+
+        if (changes.activateValidation && this.form != null) {
+            this.activateValidation ? this.form.markAsTouched()
+                                    : this.form.markAsUntouched();
+        }
+    }
+
+
     public genFormGroupFromObject(obj: any, uniformValidators?: ValidatorFn[], specificValidators: { [key: string]: ValidatorFn[] } = {}): FormGroup {
 
         // IMPORTANT: Initialize empty uniformValidators argument to an empty array so we can easly integrate in further functionality.
@@ -32,6 +44,14 @@ export abstract class AbstractModelDrivenComponent {
     }
 
 
+    /**
+     * Generates a form group based on a given obj. Each member of obj that is a (non-array) primative value is transformed into a FormControl.
+     * Each member that is an object is transformed into a sub form group. Each memeber that is an array is transformed into a FormArray.
+     * @param obj The obj to generate the form group from.
+     * @param uniformValidators The validators to apply to all generated FormGroup members.
+     * @param specificValidators An object mapping of specific validators for specific FormGroup keys (also keys of object). Utilizes '.' notation.
+     * @param baseControlPath Ignore, used for recursive call when generating sub-form groups.
+     */
     private genFormGroup(obj: any, uniformValidators: ValidatorFn[], specificValidators: { [key: string]: ValidatorFn[] }, baseControlPath: string = ''): FormGroup {
 
         let formGroup: FormGroup = new FormGroup({});
@@ -175,16 +195,6 @@ export abstract class AbstractModelDrivenComponent {
 
 
     /**
-     * Gets a control using a given control path based in the base form object.
-     * @param controlPath The path to the control relative to the base form object.
-     * @return The control.
-     */
-    public control(controlPath: string): AbstractControl {
-        return this.form.get(controlPath);
-    }
-
-
-    /**
      * Determines if a given control has any error(s).
      * @param controlPath The path of the control relative to the base form.
      * @param errorCode An optional error code to check for if a specific error is being examined. Default is null for any error.
@@ -193,7 +203,7 @@ export abstract class AbstractModelDrivenComponent {
     public hasError(controlPath: string, errorCode?: string): boolean {
 
         let control: AbstractControl = (controlPath === '.') ? this.form
-                                                             : this.control(controlPath);
+                                                             : this.form.get(controlPath);
 
         return ( control.errors != null && (errorCode == null || control.hasError(errorCode)));
     }
@@ -207,7 +217,7 @@ export abstract class AbstractModelDrivenComponent {
     public errorMsgFor(controlPath: string): string {
 
         let control: AbstractControl = (controlPath === '.') ? this.form
-                                                             : this.control(controlPath);
+                                                             : this.form.get(controlPath);
 
         return this.validationService.errorMsgFor(control, controlPath);
     }

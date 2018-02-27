@@ -11,7 +11,7 @@
                 <h4>Email Address:</h4>
 
                 <span *ngIf="!getEditDataFor('email').editing" class="link-content" (click)="setEditable('email')" title="edit">
-                    {{ control('email').value }}<i class="material-icons">&#xe254;</i>
+                    {{ form.get('email').value }}<i class="material-icons">&#xe254;</i>
                 </span>
 
                 <form [formGroup]="form" (ngSubmit)="save('email')" [slick-progress-spinner]="getEditDataFor('email').showProgressSpinner" *ngIf="getEditDataFor('email').editing">
@@ -33,7 +33,7 @@
                 <h4>Organization Name:</h4>
 
                 <span *ngIf="!getEditDataFor('organization.name').editing" class="link-content" (click)="setEditable('organization.name')" title="edit">
-                    {{ control('organization.name').value}}<i class="material-icons">&#xe254;</i>
+                    {{ form.get('organization.name').value}}<i class="material-icons">&#xe254;</i>
                 </span>
 
                 <form formGroupName="organization" (ngSubmit)="save('organization.name')"
@@ -61,7 +61,7 @@
                 <h4>{{ IS_ORGANIZATION ? 'Admin Name' : 'Name' }}:</h4>
 
                 <span *ngIf="!getEditDataFor('firstName').editing" class="link-content" (click)="setManyEditable(['firstName', 'lastName'])" title="edit">
-                    {{ control('firstName').value }} {{ control('lastName').value }}<i class="material-icons">&#xe254;</i>
+                    {{ form.get('firstName').value }} {{ form.get('lastName').value }}<i class="material-icons">&#xe254;</i>
                 </span>
 
                 <form [formGroup]="form" (ngSubmit)="saveMany(['firstName', 'lastName'])"
@@ -92,7 +92,7 @@
 
                 <div class="form-group" *ngIf="!getEditDataFor('organization.taxId').editing">
                     <span class="link-content" (click)="setEditable('organization.taxId')" title="edit">
-                        {{ control('organization.taxId').value }}<i class="material-icons">&#xe254;</i>
+                        {{ form.get('organization.taxId').value }}<i class="material-icons">&#xe254;</i>
                     </span>
                 </div>
 
@@ -125,9 +125,9 @@
 
             <div class="form-group" *ngIf="!getEditDataFor('contactInfo.address').editing">
                 <span class="link-content" (click)="setManyEditable(['contactInfo.address', 'contactInfo.city', 'contactInfo.state', 'contactInfo.zip'])" title="edit">
-                    {{ control('contactInfo.address').value }}<br>
-                    {{ control('contactInfo.city').value }}, {{ control('contactInfo.state').value }}
-                    {{ control('contactInfo.zip').value }}<i class="material-icons">&#xe254;</i>
+                    {{ form.get('contactInfo.address').value }}<br>
+                    {{ form.get('contactInfo.city').value }}, {{ form.get('contactInfo.state').value }}
+                    {{ form.get('contactInfo.zip').value }}<i class="material-icons">&#xe254;</i>
                 </span>
             </div>
 
@@ -173,7 +173,7 @@
 
                 <div class="form-group" *ngIf="!getEditDataFor('contactInfo.phone').editing">
                     <span class="link-content" (click)="setEditable('contactInfo.phone')" title="edit">
-                        {{ control('contactInfo.phone').value }}<i class="material-icons">&#xe254;</i>
+                        {{ form.get('contactInfo.phone').value }}<i class="material-icons">&#xe254;</i>
                     </span>
                 </div>
 

@@ -14,7 +14,7 @@ import { SessionDataService } from '../../../common-util/services/session-data.s
 
 import { Validation } from '../../../../../../shared/src/validation/validation';
 import { FoodListing } from '../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
-import { VEHICLE_TYPE_VALUES } from '../../../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/vehicle-type';
+import { VEHICLE_TYPE_VALUES, VehicleType } from '../../../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/vehicle-type';
 
 
 @Component({
@@ -26,10 +26,6 @@ export class PrimaryDonateComponent extends AbstractModelDrivenComponent impleme
     
     public readonly TITLE_MAX_LENGTH: number = 30;
 
-    /**
-     * Want to force validators to process on submit. Non-text fields will only validate on submit too!
-     */
-    @Input() public activateValidation: boolean = false;
     @Input() public formGroup: FormGroup;
 
     public vehicleTypes: string[] = VEHICLE_TYPE_VALUES;
@@ -63,15 +59,16 @@ export class PrimaryDonateComponent extends AbstractModelDrivenComponent impleme
                 ||  property === 'imgData')
             { continue; }
 
+            let initValue: any = null;
             let validators: ValidatorFn[] = [ Validators.required ];
 
             // Add additional needed validators for email and password fields.
             switch (property) {
-                case 'foodTitle':       validators.push(Validators.maxLength(this.TITLE_MAX_LENGTH));   break;
-                case 'foodDescription': validators = null;                                              break;
+                case 'foodTitle':               validators.push(Validators.maxLength(this.TITLE_MAX_LENGTH));   break;
+                case 'foodDescription':         validators = null;                                              break;
             }
 
-            this.form.addControl(property, new FormControl(null, validators));
+            this.form.addControl(property, new FormControl(initValue, validators));
         }
     }
 

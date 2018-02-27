@@ -101,6 +101,11 @@ export class FoodTypesComponent implements OnInit, OnChanges, ControlValueAccess
         if (changes.maxNumColumns || changes.maxElementsPerColumn || changes.condensedDisplay) {
             this.generateColumns();
         }
+
+        if (changes.activateValidation && this.foodTypesForm != null) {
+            this.activateValidation ? this.foodTypesForm.markAsTouched()
+                                    : this.foodTypesForm.markAsUntouched();
+        }
     }
 
 

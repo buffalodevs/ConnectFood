@@ -74,10 +74,9 @@ export class SlickInputGroupComponent extends FormGroup implements OnInit, OnCha
 
 
     public ngOnChanges(changes: SimpleChanges): void {
-        
-        // Make sure we validate the contained form when validate is marked as true.
-        if (changes.activateValidation && changes.activateValidation.currentValue) {
-            this.validationService.markAllAsTouched(this);
+
+        if (changes.activateValidation) {
+            this.validationService.markAllAsTouched(this, this.activateValidation);
         }
     }
 
@@ -205,10 +204,7 @@ export class SlickInputGroupComponent extends FormGroup implements OnInit, OnCha
 
 
     /**
-     * 
      * @param onTouched 
      */
-    public registerOnTouched(onTouched: string): void {
-        // TODO - not really necessary...
-    }
+    public registerOnTouched(onTouched: string): void {}
 }

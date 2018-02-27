@@ -26,7 +26,7 @@
         <div class="form-group col-md-6">
             <h4 for="estimatedWeight">Estimated Weight</h4>
             <mat-input-container floatPlaceholder="never">
-                <input matInput id="estimatedWeight" placeholder="weight (lbs)" formControlName="estimatedWeight"
+                <input matInput id="estimatedWeight" placeholder="weight" formControlName="estimatedWeight"
                         type="number" min="0.5" step="0.5" [errorStateMatcher]="this" required>
                 <span matSuffix>lbs</span>
             </mat-input-container>
@@ -39,14 +39,14 @@
         <!-- availableUntilDate -->
         <div class="form-group col-md-6">
             <h4 for="availableUntilDate">Available Until</h4>
-            <slick-time [includeDate]="true" formControlName="availableUntilDate"></slick-time>
+            <slick-time formControlName="availableUntilDate" [includeDate]="true" [activateValidation]="activateValidation" [errorStateMatcher]="this"></slick-time>
         </div>
 
         <!-- needsRefrigeration -->
         <div class="form-group col-md-6 field-margin-bottom">
-            <h4>Recommended Vehicle</h4>
+            <h4>Vehicle Type</h4>
             <mat-input-container floatPlaceholder="never">
-                <mat-select placeholder="Vehicle Type (Size) *" [errorStateMatcher]="this" formControlName="recommendedVehicleType">
+                <mat-select placeholder="Recommended Size *" [errorStateMatcher]="this" formControlName="recommendedVehicleType">
                     <mat-option *ngFor="let vehicleType of vehicleTypes" [value]="vehicleType">
                         {{ vehicleType }}
                     </mat-option>

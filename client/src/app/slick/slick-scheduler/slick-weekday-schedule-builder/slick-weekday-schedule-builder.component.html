@@ -11,11 +11,12 @@
                 </mat-expansion-panel-header>
 
 
-                <div *ngFor="let availabilityRange of control(weekday)['controls']; let i = index"
+                <div *ngFor="let availabilityRange of form.get(weekday)['controls']; let i = index"
                     class="time-range-container" [ngClass]="{  'display-time-range-container': displayOnly,
                                                                'edit-time-range-container': !displayOnly }">
 
-                    <slick-time-range [activateValidation]="activateValidation" [displayOnly]="displayOnly" [formControlName]="i"></slick-time-range>
+                    <slick-time-range [activateValidation]="activateValidation" [displayOnly]="displayOnly" [formControlName]="i"
+                     [activateValidation]="activateValidation"></slick-time-range>
                     <button (click)="removeAvailabilityRange(weekday, i)" type="button" class="remove-button" *ngIf="allowRemove && !displayOnly">&times;</button>
 
                 </div>

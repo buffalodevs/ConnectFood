@@ -1,5 +1,6 @@
-import { Component, Input, OnInit, AfterViewInit, ViewChild, forwardRef, SimpleChanges } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators, ValidatorFn, FormBuilder, FormGroup } from '@angular/forms';
+import { Component, Input, OnInit, AfterViewInit, ViewChild, forwardRef, SimpleChanges, OnChanges } from '@angular/core';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators, ValidatorFn, FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
+import { ErrorStateMatcher } from '@angular/material';
 
 import { AbstractModelDrivenComponent } from '../../../common-util/components/abstract-model-driven-component';
 import { SlickTimeValidationService } from './slick-time-validation.service';
@@ -22,12 +23,12 @@ import { DateFormatter } from '../../../../../../shared/src/date-time-util/date-
         SlickTimeValidationService
     ]
 })
-export class SlickTimeComponent extends AbstractModelDrivenComponent implements OnInit, ControlValueAccessor {
+export class SlickTimeComponent extends AbstractModelDrivenComponent implements OnInit, OnChanges, ControlValueAccessor {
 
     public readonly GROUP_VALIDATORS: ValidatorFn[][];
 
-    @Input() public activateValidation: boolean = false;
     @Input() public includeDate: boolean = false;
+    @Input() public errorStateMatcher: ErrorStateMatcher = null;
 
 
     /**
@@ -66,8 +67,10 @@ export class SlickTimeComponent extends AbstractModelDrivenComponent implements 
     }
 
 
-    public ngValueChanges(changes: SimpleChanges): void {
+    public ngOnChanges(changes: SimpleChanges): void {
 
+        super.ngOnChanges(changes);
+        
         if (changes.includeDate) {
             this.updtIncludeDate();
         }

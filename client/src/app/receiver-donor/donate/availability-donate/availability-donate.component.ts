@@ -19,10 +19,6 @@ import { Validation } from '../../../../../../shared/src/validation/validation';
 })
 export class AvailabilityDonateComponent extends AbstractModelDrivenComponent implements OnInit, ErrorStateMatcher {
     
-    /**
-     * Want to force validators to process on submit. Non-text fields will only validate on submit too!
-     */
-    @Input() public activateValidation: boolean = false;
     @Input() private availabilityControl: FormControl;
 
 

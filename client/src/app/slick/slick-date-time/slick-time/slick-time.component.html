@@ -1,7 +1,7 @@
 <form [formGroup]="form">
 
     <mat-input-container class="input-group date-mat-input-container" floatPlaceholder="never" *ngIf="includeDate">
-        <input matInput id="start-date" [matDatepicker]="startDatePicker" placeholder="mm/dd/yyyy" formControlName="date">
+        <input matInput id="start-date" [matDatepicker]="startDatePicker" placeholder="mm/dd/yyyy" formControlName="date" [errorStateMatcher]="errorStateMatcher">
         <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
         <mat-datepicker touchUi="true" #startDatePicker></mat-datepicker>
     </mat-input-container>
@@ -13,19 +13,20 @@
         <span class="time-form">
 
             <mat-input-container floatPlaceholder="never">
-                <input matInput placeholder="hh" formControlName="hh" [InputFilter]="validationService.DYNAMIC_HH_REG_EXP">
+                <input matInput placeholder="hh" formControlName="hh" [InputFilter]="validationService.DYNAMIC_HH_REG_EXP" [errorStateMatcher]="errorStateMatcher">
             </mat-input-container>
 
             <span>:</span>
 
             <mat-input-container floatPlaceholder="never">
                 <input matInput placeholder="mm" formControlName="mm" [InputFilter]="validationService.DYNAMIC_MM_REG_EXP"
-                    (blur)="validationService.ensureMinutes2Digits(timeForm.get('mm'))">
+                    (blur)="validationService.ensureMinutes2Digits(timeForm.get('mm'))" [errorStateMatcher]="errorStateMatcher">
             </mat-input-container>
 
             <mat-input-container class="am-pm" floatPlaceholder="never">
                 <input #amPmInput matInput placeholder="Am" formControlName="am" [InputFilter]="['Am', 'Pm']"
-                    [ngbTypeahead]="typeaheadService.genOptionsFilter(amPmInput, ['Am', 'Pm'])" container="body" [placement]="typeaheadService.PLACEMENT">
+                    [ngbTypeahead]="typeaheadService.genOptionsFilter(amPmInput, ['Am', 'Pm'])" container="body"
+                    [placement]="typeaheadService.PLACEMENT" [errorStateMatcher]="errorStateMatcher">
             </mat-input-container>
 
         </span>

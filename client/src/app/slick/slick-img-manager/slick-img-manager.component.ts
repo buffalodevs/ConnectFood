@@ -174,7 +174,9 @@ export class SlickImgManagerComponent implements ControlValueAccessor, OnInit, O
             // If we have more files to recursively analyze and display.
             if (fileIdx < event.target.files.length - 1) {
 
-                setTimeout(() => this.addImagesListener(event, fileInput, ++fileIdx), 1);
+                // We set timeout for 100ms here b/c image cropper is doing something asynchronously internally that it doesn't expose.
+                // 100ms should give it aneough time... hopefully
+                setTimeout(() => this.addImagesListener(event, fileInput, ++fileIdx), 100);
             }
             // Else, we have reached end of files to recursively analyze and add, so notify parent component of change and cleanup.
             else {

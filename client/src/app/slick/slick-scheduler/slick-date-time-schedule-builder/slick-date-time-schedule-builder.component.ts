@@ -41,10 +41,6 @@ export class SlickDateTimeScheduleBuilderComponent extends AbstractModelDrivenCo
     @Input() public displayOnly: boolean;
     @Input() public allowAdd: boolean;
     @Input() public allowRemove: boolean;
-    /**
-     * When this value is set or changes to true, then the contained form will be forced to validate its controls and show any related errors.
-     */
-    @Input() public activateValidation: boolean;
 
     /**
      * If set by parent component via model binding (implicitly calls registerOnChange method),
@@ -86,6 +82,8 @@ export class SlickDateTimeScheduleBuilderComponent extends AbstractModelDrivenCo
 
 
     public ngOnChanges(changes: SimpleChanges): void {
+
+        super.ngOnChanges(changes);
         
         // Make sure we validate the contained form when validate is marked as true.
         if (changes.activateValidation && changes.activateValidation.currentValue) {
@@ -100,7 +98,7 @@ export class SlickDateTimeScheduleBuilderComponent extends AbstractModelDrivenCo
     public addAvailabilityRange(): void {
         
         if (!this.allowAdd)  throw new Error('Attempting to add availability range when allowAdd is: ' + this.allowAdd);
-        (<FormArray>this.control(this.AVAILABILITY_RANGES_CTRL_NAME)).push(new FormControl(null, Validators.required));
+        (<FormArray>this.form.get(this.AVAILABILITY_RANGES_CTRL_NAME)).push(new FormControl(null, Validators.required));
     }
 
 
@@ -111,7 +109,7 @@ export class SlickDateTimeScheduleBuilderComponent extends AbstractModelDrivenCo
     public removeAvailabilityRange(index: number): void {
 
         if (!this.allowRemove)  throw new Error('Attempting to remove availability range when allowRemove is: ' + this.allowRemove);
-        (<FormArray>this.control(this.AVAILABILITY_RANGES_CTRL_NAME)).removeAt(index);
+        (<FormArray>this.form.get(this.AVAILABILITY_RANGES_CTRL_NAME)).removeAt(index);
     }
 
 
@@ -121,7 +119,7 @@ export class SlickDateTimeScheduleBuilderComponent extends AbstractModelDrivenCo
      */
     public canAddNewAvailabilityRange(): boolean {
 
-        const availabilityFormArr: FormArray = <FormArray>this.control(this.AVAILABILITY_RANGES_CTRL_NAME);
+        const availabilityFormArr: FormArray = <FormArray>this.form.get(this.AVAILABILITY_RANGES_CTRL_NAME);
         const lastAvailabilityRangeValid: boolean = ( availabilityFormArr.length === 0 || availabilityFormArr.at(availabilityFormArr.length - 1).value != null );
 
         return ( this.allowAdd && lastAvailabilityRangeValid && !this.displayOnly );
@@ -149,6 +147,10 @@ export class SlickDateTimeScheduleBuilderComponent extends AbstractModelDrivenCo
     public writeValue(value: DateRange[]): void {
 
         this.clearAvailabilityRanges();
+
+        // We cannot set null value for FormArray. We must convert it to empty array.
+        value = (value != null) ? value
+                                : [];
         
         let avaialbilityFormArr: FormArray = <FormArray>this.form.get(this.AVAILABILITY_RANGES_CTRL_NAME);
         avaialbilityFormArr.setValue(value);

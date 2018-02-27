@@ -28,17 +28,7 @@ export class AddFoodListingService {
     public addFoodListing(foodListingUpload: FoodListing, slickImgs: SlickImg[]): Observable <number> {
 
         // Extract image files and associated (crop) data from the Slick Image data.
-        const imgFiles: File[] = [];
-        foodListingUpload.imgData = [];
-        for (let i: number = 0; i < slickImgs.length; i++) {
-
-            // Grab full size image represented by file.
-            imgFiles.push(slickImgs[i].imgFile);
-
-            // Grab all other data associated with image file (contains unset url fields, crop boundaries that have been set, and base64 cropped image string).
-            foodListingUpload.imgData.push(slickImgs[i].imgData);
-        }
-
+        const imgFiles: File[] = this.prepareImgData(foodListingUpload, slickImgs);
         const body: AddFoodListingRequest = new AddFoodListingRequest(foodListingUpload);
         const observer: Observable <AddFoodListingResponse> = <Observable <AddFoodListingResponse>>this._requestService.post('/receiverDonor/donor/addFoodListing', body, imgFiles);
 
@@ -50,5 +40,31 @@ export class AddFoodListingService {
             
             throw new Error(addFoodListingResponse.message);
         });
+    }
+
+
+    /**
+     * Prepares image data for upload.
+     * @param foodListingUpload The Food Listing to upload. INTERNALLY MODIFIED.
+     * @param slickImgs The Slick Images from the SlickImgComponent.
+     * @return The image files of the full sized images to upload.
+     */
+    private prepareImgData(foodListingUpload: FoodListing, slickImgs: SlickImg[]): File[] {
+
+        const imgFiles: File[] = [];
+        foodListingUpload.imgData = [];
+
+        if (slickImgs != null) {
+            for (let i: number = 0; i < slickImgs.length; i++) {
+
+                // Grab full size image represented by file.
+                imgFiles.push(slickImgs[i].imgFile);
+
+                // Grab all other data associated with image file (contains unset url fields, crop boundaries that have been set, and base64 cropped image string).
+                foodListingUpload.imgData.push(slickImgs[i].imgData);
+            }
+        }
+
+        return imgFiles;
     }
 }

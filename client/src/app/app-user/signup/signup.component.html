@@ -2,7 +2,7 @@
 
     <mat-horizontal-stepper #stepper [linear]="true">
 
-        <mat-step [stepControl]="control('primary.appUserType')" [formGroup]="control('primary')" label="User Type">
+        <mat-step [stepControl]="form.get('primary.appUserType')" [formGroup]="form.get('primary')" label="User Type">
 
             <h3 class="center-text">What Type of User Are You</h3>
             <hr>
@@ -15,13 +15,13 @@
 
             </mat-radio-group>
 
-            <button #appUserTypeNext *ngIf="control('primary.appUserType').value != null"
+            <button #appUserTypeNext *ngIf="form.get('primary.appUserType').value != null"
                 mat-raised-button color="primary" class="button-md" matStepperNext>Next</button>
 
         </mat-step>
 
         
-        <mat-step [stepControl]="control('primary')" [formGroup]="control('primary')" label="Primary Info">
+        <mat-step [stepControl]="form.get('primary')" [formGroup]="form.get('primary')" label="Primary Info">
 
             <!-- Next, get the user's primary information -->
             <h3 class="center-text">Identification and Password</h3>
@@ -84,7 +84,7 @@
 
         </mat-step>
 
-        <mat-step [stepControl]="control('contactInfo')" [formGroup]="control('contactInfo')" label="Address & Phone">
+        <mat-step [stepControl]="form.get('contactInfo')" [formGroup]="form.get('contactInfo')" label="Address & Phone">
 
             <!-- Then, get the user's contact information -->
             <h3 class="center-text">Address and Phone</h3>
