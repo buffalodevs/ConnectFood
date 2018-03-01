@@ -7,19 +7,30 @@ SELECT dropFunction ('rangeToWeekdayOfWeek');
  */
 CREATE OR REPLACE FUNCTION timestampToWeekdayOfWeek
 (
-    _timestampToMap TIMESTAMP,          -- The timestamp that is to be mapped.
+    _timestampToMap TIMESTAMPTZ,        -- The timestamp that is to be mapped.
+    _origTimezone   TEXT,               -- The original timezone of the timestamp to map (important so that daylight savings may be accounted for).
     _weekOffset     INTEGER DEFAULT 0,  -- Optional Week offset used to map to a different week than current one (can be negative for past week or positive for futrue week).
     _currentDOW     INTEGER DEFAULT EXTRACT(DOW FROM CURRENT_TIMESTAMP)::INTEGER -- Optional, can be input to improve efficiency on bulk operations.
 )
-RETURNS TIMESTAMP
+RETURNS TIMESTAMPTZ
 AS $$
+    DECLARE _result TIMESTAMPTZ;
+BEGIN
 
-    SELECT CURRENT_DATE + INTERVAL '1' DAY * ( ((EXTRACT(DOW FROM _timestampToMap)::INTEGER - _currentDOW) % 7) + (_weekOffset * 7) )
-                        + INTERVAL '1' HOUR * DATE_PART('hour', _timestampToMap)
-                        + INTERVAL '1' MINUTE * DATE_PART('minute', _timestampToMap)
-                        + INTERVAL '1' SECOND * DATE_PART('second', _timestampToMap);
+    -- Perform time addition in original client timezone to take into account potential daylight savings boundary crossing.
+    EXECUTE 'SET TIME ZONE ''' || _origTimezone || '''';
+    
+    _result := (CURRENT_DATE::TIMESTAMP + INTERVAL '1' DAY * ( ((EXTRACT(DOW FROM _timestampToMap::TIMESTAMP)::INTEGER - _currentDOW) % 7) + (_weekOffset * 7) )
+                                        + INTERVAL '1' HOUR * DATE_PART('hour', _timestampToMap)
+                                        + INTERVAL '1' MINUTE * DATE_PART('minute', _timestampToMap)
+                                        + INTERVAL '1' SECOND * DATE_PART('second', _timestampToMap));
 
-$$ LANGUAGE sql;
+    -- Return back to UTC for rest of session.
+    SET TIME ZONE 'UTC';
+    RETURN _result;
+
+END;
+$$ LANGUAGE plpgsql;
 
 
 /**
@@ -27,16 +38,17 @@ $$ LANGUAGE sql;
  */
 CREATE OR REPLACE FUNCTION rangeToWeekdayOfWeek
 (
-    _rangeToMap TSRANGE,            -- The time-range that is to be mapped.
-    _weekOffset INTEGER DEFAULT 0,  -- Optional Week offset used to map to a different week than current one (can be negative for past week or positive for futrue week).
-    _currentDOW INTEGER DEFAULT EXTRACT(DOW FROM CURRENT_TIMESTAMP)::INTEGER -- Optional, can be input to improve efficiency on bulk operations.
+    _rangeToMap     TSTZRANGE,          -- The time-range that is to be mapped.
+    _origTimezone   TEXT,               -- The original timezone of the timestamp to map (important so that daylight savings may be accounted for).
+    _weekOffset     INTEGER DEFAULT 0,  -- Optional Week offset used to map to a different week than current one (can be negative for past week or positive for futrue week).
+    _currentDOW     INTEGER DEFAULT EXTRACT(DOW FROM CURRENT_TIMESTAMP)::INTEGER -- Optional, can be input to improve efficiency on bulk operations.
 )
-RETURNS TSRANGE
+RETURNS TSTZRANGE
 AS $$
 
-    SELECT TSRANGE (
-        timestampToWeekdayOfWeek(LOWER(_rangeToMap), _weekOffset, _currentDOW),
-        timestampToWeekdayOfWeek(UPPER(_rangeToMap), _weekOffset + (
+    SELECT TSTZRANGE (
+        timestampToWeekdayOfWeek(LOWER(_rangeToMap), _origTimezone, _weekOffset, _currentDOW),
+        timestampToWeekdayOfWeek(UPPER(_rangeToMap), _origTimezone, _weekOffset + (
                 -- Must account for when range extends between 2 weeks (LOWER is Saturday & UPPER is Sunday).
                 CASE WHEN (     EXTRACT(DOW FROM LOWER(_rangeToMap)) = 6
                             AND EXTRACT(DOW FROM UPPER(_rangeToMap)) = 0 )
@@ -50,6 +62,21 @@ AS $$
 $$ LANGUAGE sql;
 
 
--- SELECT timestampToWeekdayOfWeek(TO_TIMESTAMP('2017-11-18 17:00', 'yyyy-mm-dd HH24:MI')::TIMESTAMP);
--- SELECT timestampToWeekdayOfWeek(TO_TIMESTAMP('2017-11-19 00:00', 'yyyy-mm-dd HH24:MI')::TIMESTAMP);
--- SELECT rangeToWeekdayOfWeek(TSRANGE(TO_TIMESTAMP('2017-11-18 17:00', 'yyyy-mm-dd HH24:MI')::TIMESTAMP, TO_TIMESTAMP('2017-11-19 00:00', 'yyyy-mm-dd HH24:MI')::TIMESTAMP, '[]'));
+DO $$
+BEGIN
+
+    -- RAISE NOTICE '%', timestampToWeekdayOfWeek(TO_TIMESTAMP('11/12/2017 6:00', 'mm/dd/yyyy HH24:MI'), 'America/New_York', 4);
+    -- RAISE NOTICE '%', timestampToWeekdayOfWeek(TO_TIMESTAMP('11/12/2017 23:00', 'mm/dd/yyyy HH24:MI'), 'America/New_York', 4);
+
+    -- RAISE NOTICE '%', timestampToWeekdayOfWeek(TO_TIMESTAMP('11/12/2017 6:00', 'mm/dd/yyyy HH24:MI'), 'America/New_York', 1);
+    -- RAISE NOTICE '%', timestampToWeekdayOfWeek(TO_TIMESTAMP('11/12/2017 23:00', 'mm/dd/yyyy HH24:MI'), 'America/New_York', 1);
+
+    RAISE NOTICE '%', rangeToWeekdayOfWeek(TSTZRANGE(TO_TIMESTAMP('11/12/2017 6:00', 'mm/dd/yyyy HH24:MI')::TIMESTAMP, TO_TIMESTAMP('11/12/2017 23:00', 'mm/dd/yyyy HH24:MI')::TIMESTAMP, '[]'), 'America/New_York', 4);
+    RAISE NOTICE '%', rangeToWeekdayOfWeek(TSTZRANGE(TO_TIMESTAMP('11/12/2017 6:00', 'mm/dd/yyyy HH24:MI')::TIMESTAMP, TO_TIMESTAMP('11/12/2017 23:00', 'mm/dd/yyyy HH24:MI')::TIMESTAMP, '[]'), 'America/New_York', 0);
+
+    -- RAISE NOTICE '%', TO_TIMESTAMP('11/12/2017 6:00', 'mm/dd/yyyy HH24:MI');
+    -- RAISE NOTICE '%', utcTextToTimestamp(timestampToUtcText(TO_TIMESTAMP('11/12/2017 6:00', 'mm/dd/yyyy HH24:MI')::TIMESTAMP));
+    -- RAISE NOTICE '%', TO_TIMESTAMP('11/12/2017 23:00', 'mm/dd/yyyy HH24:MI');
+    -- RAISE NOTICE '%', utcTextToTimestamp(timestampToUtcText(TO_TIMESTAMP('11/12/2017 23:00', 'mm/dd/yyyy HH24:MI')::TIMESTAMP));
+
+END$$;

@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION updateDeliveryState
      _deliveryInfoKey       DeliveryInfo.deliveryInfoKey%TYPE,    -- This is the key of the Delivery Food Listing element that we are updating the status of.
      _delivererAppUserKey   DeliveryInfo.delivererAppUserKey%TYPE, -- This is the key of the user who is delivering the Food Listing.
      _deliveryState         DeliveryState,
-     _stateUpdateTimestamp  TIMESTAMP DEFAULT NULL
+     _stateUpdateTimestamp  TIMESTAMPTZ DEFAULT NULL
 )
 -- Return data so that update notifications may be sent to concerned users (Donors and Receivers).
 RETURNS TABLE

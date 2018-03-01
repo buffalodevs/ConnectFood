@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION addUpdateContactInfo
     _address        ContactInfo.address%TYPE        DEFAULT NULL,
     _latitude       NUMERIC(9, 6)                   DEFAULT NULL,
     _longitude      NUMERIC(9, 6)                   DEFAULT NULL,
-    _utcOffsetMins  ContactInfo.utcOffsetMins%TYPE  DEFAULT NULL,
+    _timezone       ContactInfo.timezone%TYPE       DEFAULT NULL,
     _city           ContactInfo.city%TYPE           DEFAULT NULL,
     _state          ContactInfo.state%TYPE          DEFAULT NULL,
     _zip            ContactInfo.zip%TYPE            DEFAULT NULL,
@@ -44,7 +44,7 @@ BEGIN
             state,
             zip,
             phone,
-            utcOffsetMins
+            timezone
         )
         VALUES
         (
@@ -55,7 +55,7 @@ BEGIN
             _state,
             _zip,
             _phone,
-            _utcOffsetMins
+            _timezone
         )
         RETURNING   ContactInfo.contactInfoKey
         INTO        _contactInfoKey;
@@ -69,8 +69,8 @@ BEGIN
                     state           = COALESCE(_state, state),
                     zip             = COALESCE(_zip, zip),
                     phone           = COALESCE(_phone, phone),
-                    utcOffsetMins   = COALESCE(_utcOffsetMins, utcOffsetMins)
-        WHERE       appUserKey = _appUserKey
+                    timezone        = COALESCE(_timezone, timezone)
+        WHERE       appUserKey      = _appUserKey
         RETURNING   contactInfoKey
         INTO        _contactInfoKey;
 

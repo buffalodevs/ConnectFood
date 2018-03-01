@@ -18,7 +18,7 @@ ALTER TABLE RemovedFoodListing ADD COLUMN IF NOT EXISTS removalReason       TEXT
 ALTER TABLE RemovedFoodListing ADD COLUMN IF NOT EXISTS foodRejected        BOOLEAN     NOT NULL DEFAULT FALSE;
 
 -- Timestamp of the removal.
-ALTER TABLE RemovedFoodListing ADD COLUMN IF NOT EXISTS removalTime         TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE RemovedFoodListing ADD COLUMN IF NOT EXISTS removalTime         TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
 
 -- Add more columns here --

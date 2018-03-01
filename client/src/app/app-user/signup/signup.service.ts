@@ -21,9 +21,6 @@ export class SignupService {
     
     public signup(appUserSignup: AppUser, password: string): Observable<FoodWebResponse> {
 
-        // Make sure we grab time zone offset so we can generate date-time strings correctly on the server (in user's local timezone).
-        appUserSignup.contactInfo.utcOffsetMins = (new Date()).getTimezoneOffset();
-
         let body: SignupRequest = new SignupRequest(appUserSignup, password);
         let observer: Observable<FoodWebResponse> = this.requestService.post('/appUser/signup', body);
         

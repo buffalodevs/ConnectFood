@@ -5,18 +5,24 @@ SELECT dropFunction ('addUpdateFoodListingAvailability');
  */
 CREATE OR REPLACE FUNCTION addUpdateFoodListingAvailability
 (
-    _foodListingKey             FoodListingAvailability.foodListingKey%TYPE,
+    _foodListingKey             FoodListingAvailabilityMap.foodListingKey%TYPE,
     _availabilityTimeRanges     JSON[]
 )
 RETURNS VOID
 AS $$
-    DECLARE _startTime  TIMESTAMP;
-    DECLARE _endTime    TIMESTAMP;
-    DECLARE _timeRange  FoodListingAvailability.timeRange%TYPE;
+    DECLARE _availabilityKey Availability.availabilityKey%TYPE;
 BEGIN
 
     -- First delete all current availability entries for the given Food Listing.
-    DELETE FROM FoodListingAvailability
+    DELETE FROM Availability
+    WHERE       EXISTS (
+                    SELECT  1
+                    FROM    FoodListingAvailabilityMap
+                    WHERE   FoodListingAvailabilityMap.availabilityKey = Availability.availabilityKey
+                      AND   FoodListingAvailabilityMap.foodListingKey = _foodListingKey
+                );
+
+    DELETE FROM FoodListingAvailabilityMap
     WHERE       foodListingKey = _foodListingKey;
 
 
@@ -25,13 +31,10 @@ BEGIN
     FOR i IN COALESCE(ARRAY_LOWER(_availabilityTimeRanges, 1), 1) .. COALESCE(ARRAY_UPPER(_availabilityTimeRanges, 1), 0)
     LOOP
 
-        -- Convert time in TEXT format to time in TIMESTAMP format.
-        _startTime := utcTextToTimestamp(_availabilityTimeRanges[i]->>'_startTime');
-        _endTime := utcTextToTimestamp(_availabilityTimeRanges[i]->>'_endTime');
-        _timeRange := TSRANGE(_startTime, _endTime, '[]');
+        _availabilityKey := addAvailability(_availabilityTimeRanges[i]);
 
-        INSERT INTO FoodListingAvailability (foodListingKey, timeRange)
-        VALUES      (_foodListingKey, _timeRange);
+        INSERT INTO FoodListingAvailabilityMap (foodListingKey, availabilityKey)
+        VALUES      (_foodListingKey, _availabilityKey);
 
     END LOOP;
     

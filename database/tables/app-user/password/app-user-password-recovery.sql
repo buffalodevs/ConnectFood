@@ -7,4 +7,4 @@ CREATE TABLE IF NOT EXISTS AppUserPasswordRecovery
 
 ALTER TABLE AppUserPasswordRecovery ADD COLUMN IF NOT EXISTS passwordRecoveryToken    CHAR(20)    NOT NULL;
 -- Cleanup entries that are expired (over 3 days old).
-ALTER TABLE AppUserPasswordRecovery ADD COLUMN IF NOT EXISTS expireDate               TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP + INTERVAL '1' HOUR;
+ALTER TABLE AppUserPasswordRecovery ADD COLUMN IF NOT EXISTS expireDate               TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP + INTERVAL '1' HOUR;

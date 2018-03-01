@@ -22,62 +22,37 @@ BEGIN
         SELECT  timestampToUtcText (
                     GREATEST (
                         LOWER(ReceiverAvailability.timeRange),
-                        -- Only include (Regaular) Donor Availability if it aligns with Receiver & Deliverer availability
-                        CASE WHEN (     DonorAvailability.timeRange && DelivererAvailability.timeRange
-                                    AND DonorAvailability.timeRange && ReceiverAvailability.timeRange )
-                            THEN LOWER(DonorAvailability.timeRange)
-                            ELSE TO_TIMESTAMP(0)::TIMESTAMP -- Won't possibly be the greatest.
-                        END,
-                        -- Only include (Specific) Food Listing Availability if it aligns with Receiver & Deliverer availability
-                        CASE WHEN (     FoodListingAvailability.timeRange && DelivererAvailability.timeRange
-                                    AND FoodListingAvailability.timeRange && ReceiverAvailability.timeRange)
-                            THEN LOWER(FoodListingAvailability.timeRange)
-                            ELSE TO_TIMESTAMP(0)::TIMESTAMP -- Won't possibly be greatest.
-                        END,
+                        LOWER(DonorAvailability.timeRange),
                         LOWER(DelivererAvailability.timeRange)
                     )
                 ) AS startTime,
                 timestampToUtcText (
                     LEAST (
                         UPPER(ReceiverAvailability.timeRange),
-                        -- Only include (Regaular) Donor Availability if it aligns with Receiver & Deliverer availability
-                        CASE WHEN (     DonorAvailability.timeRange && DelivererAvailability.timeRange
-                                    AND DonorAvailability.timeRange && ReceiverAvailability.timeRange )
-                            THEN UPPER(DonorAvailability.timeRange)
-                            ELSE (CURRENT_TIMESTAMP + INTERVAL '10' year)::TIMESTAMP -- Won't possibly be the least.
-                        END,
-                        -- Only include (Specific) Food Listing Availability if it aligns with Receiver & Deliverer availability
-                        CASE WHEN (     FoodListingAvailability.timeRange && DelivererAvailability.timeRange
-                                    AND FoodListingAvailability.timeRange && ReceiverAvailability.timeRange)
-                            THEN UPPER(FoodListingAvailability.timeRange)
-                            ELSE (CURRENT_TIMESTAMP + INTERVAL '10' year)::TIMESTAMP -- Won't possibly be the least.
-                        END,
+                        UPPER(DonorAvailability.timeRange),
                         UPPER(DelivererAvailability.timeRange)
                     )
                 ) AS endTime
         FROM        ClaimInfo
-        INNER JOIN  FoodListing                                         ON ClaimInfo.foodListingKey = FoodListing.foodListingKey
-        INNER JOIN  AppUser DonorAppUser                                ON FoodListing.donorAppUserKey = DonorAppUser.appUserKey
-        INNER JOIN  AppUser ReceiverAppUser                             ON ClaimInfo.receiverAppUserKey = ReceiverAppUser.appUserKey
-        INNER JOIN  AppUser DelivererAppUser                            ON DelivererAppUser.appUserKey = _delivererAppUserKey
-        LEFT JOIN   FoodListingAvailability                             ON FoodListing.foodListingKey = FoodListingAvailability.foodListingKey
-        LEFT JOIN   AppUserAvailabilityMeta DonorAvailabilityMeta       ON DonorAppUser.appUserKey = DonorAvailabilityMeta.appUserKey
-        LEFT JOIN   AppUserAvailability     DonorAvailability           ON DonorAvailabilityMeta.appUserAvailabilityMetaKey = DonorAvailability.appUserAvailabilityMetaKey
-        LEFT JOIN   AppUserAvailabilityMeta ReceiverAvailabilityMeta    ON ReceiverAppUser.appUserKey = ReceiverAvailabilityMeta.appUserKey
-        LEFT JOIN   AppUserAvailability     ReceiverAvailability        ON ReceiverAvailabilityMeta.appUserAvailabilityMetaKey = ReceiverAvailability.appUserAvailabilityMetaKey
-        LEFT JOIN   AppUserAvailabilityMeta DelivererAvailabilityMeta   ON DelivererAppUser.appUserKey = DelivererAvailabilityMeta.appUserKey
-        LEFT JOIN   AppUserAvailability     DelivererAvailability       ON DelivererAvailabilityMeta.appUserAvailabilityMetaKey = DelivererAvailability.appUserAvailabilityMetaKey
+        INNER JOIN  FoodListing                                         ON  ClaimInfo.foodListingKey = FoodListing.foodListingKey
+        INNER JOIN  AppUser DonorAppUser                                ON  FoodListing.donorAppUserKey = DonorAppUser.appUserKey
+        INNER JOIN  AppUser ReceiverAppUser                             ON  ClaimInfo.receiverAppUserKey = ReceiverAppUser.appUserKey
+        INNER JOIN  AppUser DelivererAppUser                            ON  DelivererAppUser.appUserKey = _delivererAppUserKey
+        LEFT JOIN   AppUserAvailabilityMap  DonorAvailabilityMap        ON  DonorAppUser.appUserKey = DonorAvailabilityMap.appUserKey
+        LEFT JOIN   FoodListingAvailabilityMap                          ON  FoodListing.foodListingKey = FoodListingAvailabilityMap.foodListingKey
+        LEFT JOIN   Availability            DonorAvailability           ON  DonorAvailabilityMap.availabilityKey = DonorAvailability.availabilityKey
+                                                                        OR  FoodListingAvailabilityMap.availabilityKey = DonorAvailability.availabilityKey
+        LEFT JOIN   AppUserAvailabilityMap  ReceiverAvailabilityMap     ON  ReceiverAppUser.appUserKey = ReceiverAvailabilityMap.appUserKey
+        LEFT JOIN   ClaimAvailabilityMap                                ON  ClaimInfo.claimInfoKey = ClaimAvailabilityMap.claimInfoKey
+        LEFT JOIN   Availability            ReceiverAvailability        ON  ReceiverAvailabilityMap.availabilityKey = ReceiverAvailability.availabilityKey
+                                                                        OR  ClaimAvailabilityMap.availabilityKey = ReceiverAvailability.availabilityKey
+        LEFT JOIN   AppUserAvailabilityMap  DelivererAvailabilityMap    ON  DelivererAppUser.appUserKey = DelivererAvailabilityMap.appUserKey
+        LEFT JOIN   Availability            DelivererAvailability       ON  DelivererAvailabilityMap.availabilityKey = DelivererAvailability.availabilityKey
                     -- Time overlap.
         WHERE       ClaimInfo.claimInfoKey = _claimInfoKey
-        AND         ReceiverAvailability.timeRange && DelivererAvailability.timeRange
-        AND         (
-                            DonorAvailability.timeRange && DelivererAvailability.timeRange
-                        OR  FoodListingAvailability.timeRange && DelivererAvailability.timeRange
-                    )
-        AND         (
-                            DonorAvailability.timeRange && ReceiverAvailability.timeRange
-                        OR  FoodListingAvailability.timeRange && ReceiverAvailability.timeRange
-                    )
+          AND       DelivererAvailability.timeRange && DonorAvailability.timeRange
+          AND       DonorAvailability.timeRange && ReceiverAvailability.timeRange
+          AND       ReceiverAvailability.timeRange && DelivererAvailability.timeRange
     ) AS timeRange
     ORDER BY startTime, endTime;
 
@@ -86,4 +61,5 @@ $$ LANGUAGE plpgsql;
 
 
 -- SELECT * FROM ClaimInfo ORDER BY claimInfoKey DESC;
-SELECT * FROM getPossibleDeliveryTimes(7, 2);
+-- SELECT * FROM AppUser;
+-- SELECT * FROM getPossibleDeliveryTimes(2, 64);

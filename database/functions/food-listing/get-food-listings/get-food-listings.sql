@@ -6,11 +6,12 @@
 SELECT dropFunction('getFoodListings');
 CREATE OR REPLACE FUNCTION getFoodListings
 (
-    _appUserKey             AppUser.appUserKey%TYPE,                            -- The App User Key of the current user issuing this query.
-    _foodListingKey         FoodListing.foodListingKey%TYPE     DEFAULT NULL,   -- Key identifier of a food listing to be retireved.
-    _claimInfoKey           ClaimInfo.claimInfoKey%TYPE         DEFAULT NULL,   -- The key identifier of a claim that is associated with a food listing to retrieved.
-    _deliveryInfoKey        DeliveryInfo.deliveryInfoKey%TYPE   DEFAULT NULL,   -- The key identifier of a delivery that is associated with a food listing to retrieve.
-    _filters                JSON                                DEFAULT NULL    -- The filters to be applied to query.
+    _appUserKey         AppUser.appUserKey%TYPE,                            -- The App User Key of the current user issuing this query.
+    _appUserType        AppUserType,                                        -- The type of the current user issuing this query.
+    _foodListingKey     FoodListing.foodListingKey%TYPE     DEFAULT NULL,   -- Key identifier of a food listing to be retireved.
+    _claimInfoKey       ClaimInfo.claimInfoKey%TYPE         DEFAULT NULL,   -- The key identifier of a claim that is associated with a food listing to retrieved.
+    _deliveryInfoKey    DeliveryInfo.deliveryInfoKey%TYPE   DEFAULT NULL,   -- The key identifier of a delivery that is associated with a food listing to retrieve.
+    _filters            JSON                                DEFAULT NULL    -- The filters to be applied to query.
 )
 RETURNS TABLE
 (
@@ -18,13 +19,20 @@ RETURNS TABLE
     foodListing     JSON
 )
 AS $$
-    DECLARE _queryBase          TEXT;
-    DECLARE _queryFilters       TEXT;
-    DECLARE _queryGroupAndSort  TEXT;
+    DECLARE _queryBase              TEXT;
+    DECLARE _queryFilters           TEXT;
+    DECLARE _queryGroupAndSort      TEXT;
+    DECLARE _foodListingFiltersKey  FoodListingFilters.foodListingFiltersKey%TYPE;
 BEGIN
+
+-- ==================================== Initialize & Record Filters ========================================== --
+-- =========================================================================================================== --
 
     -- Make sure we do not have a NULL _filters input.
     _filters := COALESCE(_filters, JSON_BUILD_OBJECT());
+    _foodListingFiltersKey := addFoodListingFilters(_appUserKey, _filters);
+
+
 
 -- ==================================== Dynamic Query Generation Phase ======================================= --
 -- =========================================================================================================== --
@@ -54,7 +62,7 @@ BEGIN
                                                         WHERE   UnclaimInfo.claimInfoKey = ClaimInfo.claimInfoKey
                                                     )
         ' ||
-        CASE WHEN ( (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unclaimed Listings'::FoodListingsStatus )
+        CASE WHEN (_appUserType = 'Receiver'::AppUserType)
             THEN 'LEFT JOIN ContactInfo ReceiverContact ON ReceiverContact.appUserKey = $1' -- We are receiver looking for unclaimed listings
             ELSE 'LEFT JOIN ContactInfo ReceiverContact ON ClaimInfo.receiverAppUserKey = ReceiverContact.appUserKey'
         END || '
@@ -65,7 +73,7 @@ BEGIN
                                                         WHERE   CancelledDeliveryInfo.deliveryInfoKey = DeliveryInfo.deliveryInfoKey
                                                     )
         ' ||
-        CASE WHEN ( (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus )
+        CASE WHEN (_appUserType = 'Deliverer'::AppUserType)
             THEN 'LEFT JOIN ContactInfo DelivererContact ON DelivererContact.appUserKey = $1' -- We are deliverer looking for unscheduled deliveries
             ELSE 'LEFT JOIN ContactInfo DelivererContact ON DeliveryInfo.delivererAppUserKey = DelivererContact.appUserKey'
         END || '
@@ -120,7 +128,7 @@ BEGIN
                     CEIL(($5->>''maxDistance'')::INTEGER * 1609.34)
                 )
         ' ||
-        CASE WHEN ( (_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus ) THEN '
+        CASE WHEN (_appUserType = 'Deliverer'::AppUserType) THEN '
             AND ST_DWITHIN (
                     DelivererContact.gpsCoordinate,
                     DonorContact.gpsCoordinate,
@@ -143,25 +151,31 @@ BEGIN
 
         -- No matter what Food Listings Status we are filtering on, we will always include Donor Availability in match.
         _queryBase := _queryBase || '
-            LEFT JOIN FoodListingAvailability                               ON FoodListing.foodListingKey = FoodListingAvailability.foodListingKey
-            LEFT JOIN AppUserAvailabilityMeta   DonorAvailabilityMeta       ON FoodListing.donorAppUserKey = DonorAvailabilityMeta.appUserKey
-            LEFT JOIN AppUserAvailability       DonorAvailability           ON DonorAvailabilityMeta.appUserAvailabilityMetaKey
-                                                                             = DonorAvailability.appUserAvailabilityMetaKey
+            LEFT JOIN FoodListingAvailabilityMap                            ON  FoodListing.foodListingKey = FoodListingAvailabilityMap.foodListingKey
+            LEFT JOIN AppUserAvailabilityMap    DonorAvailabilityMap        ON  FoodListing.donorAppUserKey = DonorAvailabilityMap.appUserKey
+            LEFT JOIN Availability              DonorAvailability           ON  FoodListingAvailabilityMap.availabilityKey = DonorAvailability.availabilityKey
+                                                                            OR  DonorAvailabilityMap.availabilityKey = DonorAvailability.availabilityKey
+            
+            -- Grab receivers/deliverers filters so we can get any specific availability they entered to use in addition to their regular (weekly) availability.
+            LEFT JOIN FoodListingFiltersAvailability                        ON  FoodListingFiltersAvailability.appUserKey = $1
+                                                                            AND FoodListingFiltersAvailability.foodListingFiltersKey = $6
         ' ||
         -- If looking for unscheduled deliveries, then include Deliverer Availability and assume invoking user is Deliverer.
-        CASE WHEN ((_filters->>'foodListingsStatus')::FoodListingsStatus = 'Unscheduled Deliveries'::FoodListingsStatus) THEN '
-            LEFT JOIN AppUserAvailabilityMeta   DelivererAvailabilityMeta   ON DelivererAvailabilityMeta.appUserKey = $1
-            LEFT JOIN AppUserAvailability       DelivererAvailability       ON DelivererAvailabilityMeta.appUserAvailabilityMetaKey
-                                                                             = DelivererAvailability.appUserAvailabilityMetaKey
-            LEFT JOIN AppUserAvailabilityMeta   ReceiverAvailabilityMeta    ON ClaimInfo.receiverAppUserKey = ReceiverAvailabilityMeta.appUserKey
-            LEFT JOIN AppUserAvailability       ReceiverAvailability        ON ReceiverAvailabilityMeta.appUserAvailabilityMetaKey
-                                                                             = ReceiverAvailability.appUserAvailabilityMetaKey
+        CASE WHEN (_appUserType = 'Deliverer'::AppUserType) THEN '
+            LEFT JOIN AppUserAvailabilityMap    DelivererAvailabilityMap    ON  DelivererAvailabilityMap.appUserKey = $1
+            LEFT JOIN Availability              DelivererAvailability       ON  DelivererAvailabilityMap.availabilityKey = DelivererAvailability.availabilityKey
+                                                                            OR  FoodListingFiltersAvailability.availabilityKey = DelivererAvailability.availabilityKey
+
+            LEFT JOIN ClaimAvailabilityMap                                  ON  ClaimInfo.claimInfoKey = ClaimAvailabilityMap.claimInfoKey
+            LEFT JOIN AppUserAvailabilityMap    ReceiverAvailabilityMap     ON  ClaimInfo.receiverAppUserKey = ReceiverAvailabilityMap.appUserKey
+            LEFT JOIN Availability              ReceiverAvailability        ON  ClaimAvailabilityMap.availabilityKey = ReceiverAvailability.availabilityKey
+                                                                            OR  ReceiverAvailabilityMap.availabilityKey = ReceiverAvailability.availabilityKey
         '
         -- Otherwise, we are not looking for unscheduled deliveries, so exclude Deliverer and assume invoking user is Receiver.
         ELSE '
-            LEFT JOIN AppUserAvailabilityMeta   ReceiverAvailabilityMeta    ON ReceiverAvailabilityMeta.appUserKey = $1
-            LEFT JOIN AppUserAvailability       ReceiverAvailability        ON ReceiverAvailabilityMeta.appUserAvailabilityMetaKey
-                                                                             = ReceiverAvailability.appUserAvailabilityMetaKey
+            LEFT JOIN AppUserAvailabilityMap    ReceiverAvailabilityMap     ON  ReceiverAvailabilityMap.appUserKey = $1
+            LEFT JOIN Availability              ReceiverAvailability        ON  ReceiverAvailabilityMap.availabilityKey = ReceiverAvailability.availabilityKey
+                                                                            OR  FoodListingFiltersAvailability.availabilityKey = ReceiverAvailability.availabilityKey
         '
         END;
 
@@ -180,16 +194,15 @@ BEGIN
         GROUP BY FoodListing.foodListingKey
         ORDER BY ' ||
         -- Chose the sort order based on the purpose of the search (for receiver tab or cart).
-        CASE ((_filters->>'foodListingsStatus')::FoodListingsStatus)
+        CASE WHEN ((_filters->>'foodListingsStatus')::FoodListingsStatus IN ('Unclaimed Listings'::FoodListingsStatus, 'Unscheduled Deliveries'::FoodListingsStatus)) THEN
+            'FoodListing.availableUntilDate ASC' -- For receive/deliver tab, show donations that will expire earliest first.
 
-            WHEN ('Unclaimed Listings'::FoodListingsStatus) THEN  -- Receiver tab.
-                'FoodListing.availableUntilDate ASC' -- For receiver tab, show donations that will expire eariliest first.
-
-            ELSE  -- Cart.
-                CASE ((_filters->>'foodListingsStatus')::FoodListingsStatus)
-                    WHEN ('My Claimed Listings'::FoodListingsStatus) THEN   'MAX(ClaimInfo.claimedDate) DESC'   -- For receiver cart, show most recent claims.
-                    ELSE                                                    'FoodListing.donationDate DESC'     -- For donor cart, show most recent donations.
-                END
+        ELSE  -- Cart.
+            CASE (_appUserType)
+                WHEN ('Receiver'::AppUserType)  THEN    'MAX(ClaimInfo.claimedDate) DESC'       -- For receiver cart, show most recent claims.
+                WHEN ('Deliverer'::AppUserType) THEN    'MAX(DeliveryInfo.scheduledStartTime)'  -- For deliverer cart, show earliest scheduled deliveries.
+                ELSE                                    'MAX(FoodListing.donationDate) DESC'    -- For donor cart, show most recent donations.
+            END
 
         END || '
             OFFSET CASE WHEN (($5->>''retrievalOffset'') IS NOT NULL)
@@ -206,7 +219,7 @@ BEGIN
 -- ==================================== Dynamic Query Execution Phase ======================================== --
 -- =========================================================================================================== --
 
-    RAISE NOTICE '%', _filters;
+    -- RAISE NOTICE '%', _filters;
     RAISE NOTICE '% % %', _queryBase, _queryFilters, _queryGroupAndSort;
 
     -- Insert our filtered Food Listing Key - Food Listing Types pairs into our temporary table.
@@ -215,7 +228,8 @@ BEGIN
             _foodListingKey,
             _claimInfoKey,
             _deliveryInfoKey,
-            _filters;
+            _filters,
+            _foodListingFiltersKey;
     
 
 -- ==================================== Final Return Phase ======================================= --
@@ -330,15 +344,13 @@ $$ LANGUAGE plpgsql;
 
 
 -- Test the Stored Procedure here --
-SELECT * FROM getFoodListings(2, NULL, NULL, NULL, JSON_BUILD_OBJECT (
-    'maxDistance',              10,
-    'maxEstimatedWeight',       null,
-    'recommendedVehicleType',   null,
-    'matchRegularAvailability', true,
-    'matchAvailableNow',        false,
-    'foodListingsStatus',       'Unscheduled Deliveries',
-    'retrievalAmount',          10,
-    'retrievalOffset',          0,
-    'foodTypes',                null,
-    'needsRefrigeration',       null
-));
+-- SELECT * FROM getFoodListings(64, 'Deliverer', NULL, NULL, NULL, JSON_BUILD_OBJECT (
+--     'maxDistance',              10,
+--     'matchRegularAvailability', true,
+--     'foodListingsStatus',       'Unscheduled Deliveries',
+--     'retrievalAmount',          10,
+--     'retrievalOffset',          0,
+--     'foodTypes',                null,
+--     'needsRefrigeration',       null,
+--     'availableAfterDate',       '2018-03-01T17:18:36.109Z'
+-- ));

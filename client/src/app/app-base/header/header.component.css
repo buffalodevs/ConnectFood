@@ -104,9 +104,4 @@ nav {
 	#logo {
 		visibility: hidden;
 	}
-    
-    #banner {
-		visibility: hidden;
-		position: absolute;
-	}
 }

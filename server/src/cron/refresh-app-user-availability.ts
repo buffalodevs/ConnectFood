@@ -5,10 +5,10 @@ import { logger } from "../logging/logger";
 /**
  * Refresh all availability times for each App User by invoking the refreshAvailabilityTimesFromMeta() SQL function.
  */
-export async function refreshAppUserAvailabilityFromMeta(): Promise <void> {
+export async function refreshAppUserAvailability(): Promise <void> {
 
     try {
-        await query('SELECT refreshAppUserAvailabilityFromMeta();');
+        await query('SELECT refreshAppUserAvailability();');
         logger.info('Refreshed App User Availability times');
     }
     catch (err) {

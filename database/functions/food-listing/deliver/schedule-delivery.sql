@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION scheduleDelivery
     _claimInfoKey           ClaimInfo.claimInfoKey%TYPE,            -- This is the key of the Claimed Food Listing that is to be delivered.
     _delivererAppUserKey    DeliveryInfo.delivererAppUserKey%TYPE,  -- This is the key of the user who is delivering the Food Listing.
     _startImmediately       BOOLEAN,                                -- TRUE if the deliverer will start delivery immediately, FALSE if scheduled for future.
-    _scheduledStartTime     TIMESTAMP DEFAULT NULL                  -- The time that the deliverer has scheduled to start the delivery.
+    _scheduledStartTime     TIMESTAMPTZ DEFAULT NULL                -- The time that the deliverer has scheduled to start the delivery.
                                                                     -- Leave default only if _startImmediately is set TRUE. Otherwise, give explicite value!
 )
 RETURNS TABLE -- Returns the new Delivery that has been scheduled/started.

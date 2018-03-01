@@ -6,7 +6,6 @@ import { logger, prettyjsonRender } from "../../logging/logger";
 
 import { SessionData, AppUser } from '../../common-util/session-data';
 import { hashPassword } from '../common-app-user/password-util';
-import { absToRelativeDateRanges } from '../../common-util/date-time-util';
 import { DESERIALIZER } from '../../deserialization/deserialization';
 
 import { GPSCoordinate, getGPSCoordinate } from '../../../../shared/src/geocode/geocode';
@@ -42,9 +41,6 @@ export async function signupOrUpdateAppUser(appUser: AppUser, password?: string,
 
     const gpsCoordinate: GPSCoordinate = await ( mustGenGPSCoordinate ? genGPSCoordinate(appUser.contactInfo)
                                                                       : null );
-
-    appUser.availability = ( appUser.availability != null ) ? absToRelativeDateRanges(appUser.availability)
-                                                            : null;
 
     const addOrUpdateResult: QueryResult = await addOrUpdateAppUserInSQL(appUser, hashPass, gpsCoordinate, appUserUpdateKey);
 
@@ -92,7 +88,7 @@ async function addOrUpdateAppUserInSQL(appUser: AppUser, hashedPassword?: string
                                   appUser.contactInfo.address,
                                   (gpsCoordinate != null ? gpsCoordinate.latitude : null),
                                   (gpsCoordinate != null ? gpsCoordinate.longitude : null),
-                                  appUser.contactInfo.utcOffsetMins,
+                                  appUser.contactInfo.timezone,
                                   appUser.contactInfo.city,
                                   appUser.contactInfo.state,
                                   appUser.contactInfo.zip,

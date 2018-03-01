@@ -31,11 +31,6 @@ export class AppUserUpdateService {
         let body: UpdateAppUserRequest = new UpdateAppUserRequest(appUserUpdate, newPassword, currentPassword);
         let observer: Observable <UpdateAppUserResponse> = <Observable <UpdateAppUserResponse>>this._requestService.post('/appUser/updateAppUser', body);
 
-        // If we are updating the address of the user, then we must also update their timezone offset (since when moving they can move across timezones).
-        if (appUserUpdate.contactInfo.address != null) {
-            appUserUpdate.contactInfo.utcOffsetMins = (new Date()).getTimezoneOffset();
-        }
-
         return observer.map((appUserUpdateResponse: UpdateAppUserResponse): FoodWebResponse => {
 
             // Immediately update client session data on success!

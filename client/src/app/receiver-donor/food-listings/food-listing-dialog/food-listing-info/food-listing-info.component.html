@@ -37,7 +37,11 @@
                     </mat-expansion-panel-header>
 
                     <div class="space-bottom">
-                        <b>Available Until:</b> {{ dateFormatter.dateToMonthDayYearString(foodListing.availableUntilDate) }}
+                        <b>Available Until</b>
+                        <span>
+                            {{ dateFormatter.dateToMonthDayYearString(foodListing.availableUntilDate) }},
+                            {{ dateFormatter.dateToWallClockString(foodListing.availableUntilDate) }}
+                        </span>
                     </div>
 
                     <div class="space-bottom">

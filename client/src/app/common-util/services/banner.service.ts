@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 export class BannerService {
 
     public imgUrl: string;
-    public heightPx: number;
+    public maxHeightPx: number;
 
 
     public constructor() {
@@ -22,6 +22,6 @@ export class BannerService {
      */
     public reset(): void {
         this.imgUrl = null;
-        this.heightPx = 680;
+        this.maxHeightPx = 680;
     }
 }

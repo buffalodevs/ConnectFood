@@ -8,6 +8,7 @@ import { DESERIALIZER } from "../deserialization/deserialization";
 import { FoodListing } from "../../../shared/src/common-receiver-donor-deliverer/food-listing";
 import { FoodListingFilters, FoodType, FoodListingsStatus } from "../../../shared/src/common-receiver-donor-deliverer/food-listing-filters";
 import { Validation } from "../../../shared/src/validation/validation";
+import { AppUserType } from "../../../shared/src/app-user/app-user";
 
 export { QueryResult };
 
@@ -60,7 +61,7 @@ function sanitizeMatchRegularAvailability(filters: FoodListingFilters): boolean 
     { return false; }
 
     // Else, we want to match by some availability criteria if not in a cart. If no availability criteria is set, then force match regular availability.
-    return filters.matchRegularAvailability || ( !filters.matchAvailableNow && !filters.matchSpecifiedAvailability );
+    return ( filters.matchRegularAvailability || !filters.matchAvailableNow );
 }
 
 
@@ -111,9 +112,12 @@ function sanitizeMaxDistance(foodListingsStatus: FoodListingsStatus, maxDistance
  */
 export async function queryGetFoodListings(filters: FoodListingFilters, myAppUserKey: number): Promise <QueryResult> {
 
+    let appUserType: AppUserType = deriveAppUserType(filters.foodListingsStatus);
+
     // Build our prepared statement.    
     let queryArgs: any[] = [
         myAppUserKey,
+        appUserType,
         filters.foodListingKey,
         filters.claimInfoKey,
         filters.deliveryInfoKey,
@@ -125,6 +129,27 @@ export async function queryGetFoodListings(filters: FoodListingFilters, myAppUse
     const queryResult: QueryResult = await query(queryString, queryArgs);   
     logSqlQueryResult(queryResult.rows);
     return queryResult;
+}
+
+
+/**
+ * Derives the App User Type based off of given Food Listings Status in filters.
+ * NOTE: We do not use the App User's assigned type here since a Donor can fill the roll of a Receiver and vice versa. The user's chosen type only reflects their
+ *       primary motivation for using the app.
+ * @param foodListingsStatus The status of the Food Listings that should be pulled back.
+ * @return The derived App User Type.
+ */
+function deriveAppUserType(foodListingsStatus: FoodListingsStatus): AppUserType {
+
+    if (foodListingsStatus === FoodListingsStatus.unclaimedListings || foodListingsStatus === FoodListingsStatus.myClaimedListings) {
+        return AppUserType.Receiver;
+    }
+    
+    if (foodListingsStatus === FoodListingsStatus.myDonatedListings) {
+        return AppUserType.Donor;
+    }
+
+    return AppUserType.Deliverer;
 }
 
 

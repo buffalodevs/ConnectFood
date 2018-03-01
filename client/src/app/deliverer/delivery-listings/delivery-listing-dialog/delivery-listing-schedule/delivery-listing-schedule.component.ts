@@ -16,7 +16,7 @@ import { DeliveryState } from '../../../../../../../shared/src/common-receiver-d
 })
 export class DeliveryListingScheduleComponent {
 
-    @Input() public delivery: FoodListing;
+    @Input() public foodListing: FoodListing;
     
     @Output() public removeListing: EventEmitter <void>;
     @Output() public close: EventEmitter <void>;
@@ -45,13 +45,13 @@ export class DeliveryListingScheduleComponent {
 
         this.showProgressSpinner = true;
 
-        this._scheduleDeliveryService.scheduleDelivery(this.delivery.claimInfo.claimInfoKey, false, value)
+        this._scheduleDeliveryService.scheduleDelivery(this.foodListing.claimInfo.claimInfoKey, false, value)
             .finally(() => {
                 this.schedulingComplete = true;
                 this.showProgressSpinner = false;
             })
             .subscribe(() => {
-                this.delivery.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState = DeliveryState.scheduled;
+                this.foodListing.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState = DeliveryState.scheduled;
                 this.removeListing.emit();
             },
             (err: Error) => {

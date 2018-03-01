@@ -16,7 +16,7 @@ ALTER TABLE CancelledDeliveryInfo ADD COLUMN IF NOT EXISTS cancelledByAppUserKey
 ALTER TABLE CancelledDeliveryInfo ADD COLUMN IF NOT EXISTS cancelReason             TEXT        NOT NULL;
 
 -- Timestapm of the cancellation.
-ALTER TABLE CancelledDeliveryInfo ADD COLUMN IF NOT EXISTS cancelTime               TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE CancelledDeliveryInfo ADD COLUMN IF NOT EXISTS cancelTime               TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
 
 -- Add more columns here --

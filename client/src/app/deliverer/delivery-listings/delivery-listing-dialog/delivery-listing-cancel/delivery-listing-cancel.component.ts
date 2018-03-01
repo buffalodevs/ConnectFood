@@ -16,7 +16,7 @@ import { DeliveryState } from '../../../../../../../shared/src/common-receiver-d
 })
 export class DeliveryListingCancelComponent {
 
-    @Input() public delivery: FoodListing;
+    @Input() public foodListing: FoodListing;
 
     @Output() public removeListing: EventEmitter <void>;
     @Output() public close: EventEmitter <void>;
@@ -58,7 +58,7 @@ export class DeliveryListingCancelComponent {
         const cancelReason: string = this.form.get('cancelReason').value;
         const foodRejected: boolean = this.form.get('foodRejected').value;
 
-        this.cancelDeliveryService.cancelDelivery(this.delivery.claimInfo.deliveryInfo.deliveryInfoKey, cancelReason, foodRejected)
+        this.cancelDeliveryService.cancelDelivery(this.foodListing.claimInfo.deliveryInfo.deliveryInfoKey, cancelReason, foodRejected)
             .finally(() => {
                 this.cancelComplete = true;
                 this.showProgressSpinner = false;

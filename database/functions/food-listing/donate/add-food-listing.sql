@@ -19,7 +19,7 @@ CREATE OR REPLACE FUNCTION addFoodListing
 RETURNS FoodListing.foodListingKey%TYPE -- The food listing key of the new food listing (can be used as reference for edit).
 AS $$
     DECLARE _foodType                   FoodType;
-    DECLARE _availableUntilTimestamp    TIMESTAMP = utcTextToTimestamp(_availableUntilDate);
+    DECLARE _availableUntilTimestamp    TIMESTAMPTZ = utcTextToTimestamp(_availableUntilDate);
     DECLARE _foodListingKey             FoodListing.foodListingKey%TYPE;
 BEGIN
     

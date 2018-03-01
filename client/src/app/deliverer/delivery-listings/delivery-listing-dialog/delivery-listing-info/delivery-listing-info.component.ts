@@ -23,7 +23,7 @@ export class DeliveryListingInfoComponent implements OnChanges {
      * Set to true if the Delivery Listings are for a Delivery Cart. Default is false.
      */
     @Input() public isCart: boolean;
-    @Input() public delivery: FoodListing;
+    @Input() public foodListing: FoodListing;
 
     /**
      * Emitted whenever the 'Schedule Delivery' button is selected.
@@ -46,6 +46,7 @@ export class DeliveryListingInfoComponent implements OnChanges {
     public constructor (
         public sessionDataService: SessionDataService,
         public deliveryUtilService: DeliveryUtilService, // Referenced in HTML template
+        public dateFormatter: DateFormatterService,
         private _manageDeliveryService: ManageDeliveryService,
         private _scheduleDeliveryService: ScheduleDeliveryService,
         private _dateFormatter: DateFormatterService
@@ -70,12 +71,12 @@ export class DeliveryListingInfoComponent implements OnChanges {
     public ngOnChanges(changes: SimpleChanges): void {
         
         // Show the start button if the delivery state is before onRouteToDonor.
-        if (changes.delivery.currentValue != null) {
+        if (changes.foodListing.currentValue != null) {
 
-            const delivery: FoodListing = changes.delivery.currentValue;
-            const deliveryState: DeliveryState = delivery.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState;
+            const foodListing: FoodListing = changes.foodListing.currentValue;
+            const deliveryState: DeliveryState = foodListing.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState;
 
-            this._showButtonFlags.set('startButton', this.shouldShowStartButton(delivery));
+            this._showButtonFlags.set('startButton', this.shouldShowStartButton(foodListing));
             this._showButtonFlags.set('pickedUpButton', ( deliveryState === DeliveryState.started ));
             this._showButtonFlags.set('droppedOffButton', ( deliveryState === DeliveryState.pickedUp ));
             this._showButtonFlags.set('cancelButton', ( this.isCart && this.deliveryUtilService.compareDeliveryStates(deliveryState, DeliveryState.droppedOff) < 0 ));
@@ -84,15 +85,15 @@ export class DeliveryListingInfoComponent implements OnChanges {
 
 
     /**
-     * Determines whether or not to show the start button for starting delivery.
-     * @param delivery The Delivery dialog data used to determine if the start button should be shown.
+     * Determines whether or not to show the start button for starting foodListing.
+     * @param foodListing The food listing used to determine if the start button should be shown.
      * @return true if it should be shown, false if not.
      */
-    private shouldShowStartButton(delivery: FoodListing): boolean {
+    private shouldShowStartButton(foodListing: FoodListing): boolean {
 
-        const deliveryState: DeliveryState = delivery.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState;
+        const deliveryState: DeliveryState = foodListing.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState;
 
-        return this.deliveryUtilService.isPossibleDeliveryTimeNow(delivery)
+        return this.deliveryUtilService.isPossibleDeliveryTimeNow(foodListing)
             && this.deliveryUtilService.compareDeliveryStates(deliveryState, DeliveryState.started) < 0;
     }
 
@@ -120,10 +121,10 @@ export class DeliveryListingInfoComponent implements OnChanges {
 
             this.showProgressSpinner = true;
 
-            this._scheduleDeliveryService.scheduleDelivery(this.delivery.claimInfo.claimInfoKey, true)
+            this._scheduleDeliveryService.scheduleDelivery(this.foodListing.claimInfo.claimInfoKey, true)
                 .finally(() => { this.showProgressSpinner = false; })
                 .subscribe(() => {
-                    this.delivery.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState = DeliveryState.started;
+                    this.foodListing.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState = DeliveryState.started;
                     if (!this.isCart) this.removeListing.emit();
                     this.startComplete = true;
                 },
@@ -159,10 +160,10 @@ export class DeliveryListingInfoComponent implements OnChanges {
 
         this.showProgressSpinner = true;
 
-        this._manageDeliveryService.updateDeliveryState(this.delivery.claimInfo.deliveryInfo.deliveryInfoKey, deliveryState)
+        this._manageDeliveryService.updateDeliveryState(this.foodListing.claimInfo.deliveryInfo.deliveryInfoKey, deliveryState)
             .finally(() => { this.showProgressSpinner = false; })
             .subscribe(() => {
-                this.delivery.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState = deliveryState;
+                this.foodListing.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState = deliveryState;
                 this.stateChangeComplete = true;
             },
             (err: Error) => {
@@ -178,7 +179,7 @@ export class DeliveryListingInfoComponent implements OnChanges {
      */
     public getReadableScheduledStartTime(): string {
 
-        const scheduledStartTime: Date = this.delivery.claimInfo.deliveryInfo.deliveryStateInfo.scheduledStartTime;
+        const scheduledStartTime: Date = this.foodListing.claimInfo.deliveryInfo.deliveryStateInfo.scheduledStartTime;
 
         return (scheduledStartTime != null) ? ( this._dateFormatter.dateToMonthDayYearString(scheduledStartTime) + ' at ' +
                                                 this._dateFormatter.dateToWallClockString(scheduledStartTime) )

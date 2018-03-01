@@ -6,9 +6,9 @@
         <ng-container slick-list-item-img>
 
             <slick-map #SlickMapComponent
-                [addresses]="[ sessionDataService.getAppUserSessionData().contactInfo, delivery.donorInfo.contactInfo, delivery.claimInfo.receiverInfo.contactInfo ]"
-                [addressNames]="[ 'Me', delivery.donorInfo.organization.name, delivery.claimInfo.receiverInfo.organization.name ]"
-                [diameterMi]="deliveryUtilService.calcMaxMapDiameterFromDelivery(delivery)">
+                [addresses]="[ sessionDataService.getAppUserSessionData().contactInfo, foodListing.donorInfo.contactInfo, foodListing.claimInfo.receiverInfo.contactInfo ]"
+                [addressNames]="[ 'Me', foodListing.donorInfo.organization.name, foodListing.claimInfo.receiverInfo.organization.name ]"
+                [diameterMi]="deliveryUtilService.calcMaxMapDiameterFromDelivery(foodListing)">
             </slick-map>
 
         </ng-container>
@@ -24,12 +24,12 @@
 
                     <div>
                         <b>Total Drive Distance:</b>
-                        <div class="inline-block">{{ deliveryUtilService.calcTotalDrivingDistance(delivery) }} miles</div>
+                        <div class="inline-block">{{ deliveryUtilService.calcTotalDrivingDistance(foodListing) }} miles</div>
                     </div>
             
                     <div>
                         <b>Total Drive Time:</b>
-                        <div class="inline-block">{{ deliveryUtilService.calcTotalDrivingTime(delivery) }} minutes</div>
+                        <div class="inline-block">{{ deliveryUtilService.calcTotalDrivingTime(foodListing) }} minutes</div>
                     </div>
             
                     <div class="space-bottom">
@@ -37,16 +37,24 @@
                     </div>
 
                     <div>
+                        <b>Available Until</b>
+                        <span>
+                            {{ dateFormatter.dateToMonthDayYearString(foodListing.availableUntilDate) }},
+                            {{ dateFormatter.dateToWallClockString(foodListing.availableUntilDate) }}
+                        </span>
+                    </div>
+
+                    <div>
                         <b>Estimated Weight:</b>
-                        <div class="inline-block">{{ delivery.estimatedWeight }} lbs</div>
+                        <div class="inline-block">{{ foodListing.estimatedWeight }} lbs</div>
                     </div>
 
                     <div>
                         <b>Delivery State:</b>
-                        <div class="inline-block">{{ deliveryUtilService.getReadableDeliveryState(delivery.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState) }}</div>
+                        <div class="inline-block">{{ deliveryUtilService.getReadableDeliveryState(foodListing.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState) }}</div>
                     </div>
 
-                    <div *ngIf="delivery.claimInfo.deliveryInfo.deliveryStateInfo.scheduledStartTime != null">
+                    <div *ngIf="foodListing.claimInfo.deliveryInfo.deliveryStateInfo.scheduledStartTime != null">
                         <b>Scheduled Start Time:</b>
                         <div class="inline-block">{{ getReadableScheduledStartTime() }}</div>
                     </div>
@@ -61,13 +69,13 @@
                         <mat-panel-title>Donor Contact</mat-panel-title>
                     </mat-expansion-panel-header>
                     
-                    <span class="inline-block">{{ delivery.donorInfo.organization.name }}</span><br>
-                    <span>{{ delivery.donorInfo.contactInfo.address }}</span><br>
+                    <span class="inline-block">{{ foodListing.donorInfo.organization.name }}</span><br>
+                    <span>{{ foodListing.donorInfo.contactInfo.address }}</span><br>
                     <span class="space-bottom">
-                        {{ delivery.donorInfo.contactInfo.city }}, {{ delivery.donorInfo.contactInfo.state }} {{ delivery.donorInfo.contactInfo.zip }}
+                        {{ foodListing.donorInfo.contactInfo.city }}, {{ foodListing.donorInfo.contactInfo.state }} {{ foodListing.donorInfo.contactInfo.zip }}
                     </span><br><br>
-                    <a href="tel:{{delivery.donorInfo.contactInfo.phone}}" class="link-content no-word-wrap">{{ delivery.donorInfo.contactInfo.phone }}</a><br>
-                    <a href="mailto:{{ delivery.donorInfo.email }}" class="inline-block link-content">{{ delivery.donorInfo.email }}</a>
+                    <a href="tel:{{foodListing.donorInfo.contactInfo.phone}}" class="link-content no-word-wrap">{{ foodListing.donorInfo.contactInfo.phone }}</a><br>
+                    <a href="mailto:{{ foodListing.donorInfo.email }}" class="inline-block link-content">{{ foodListing.donorInfo.email }}</a>
 
                 </mat-expansion-panel>
             </div>
@@ -79,16 +87,16 @@
                         <mat-panel-title>Receiver Contact</mat-panel-title>
                     </mat-expansion-panel-header>
 
-                    <span class="inline-block">{{ delivery.claimInfo.receiverInfo.organization.name }}</span><br>
-                    <span>{{ delivery.claimInfo.receiverInfo.contactInfo.address }}</span><br>
+                    <span class="inline-block">{{ foodListing.claimInfo.receiverInfo.organization.name }}</span><br>
+                    <span>{{ foodListing.claimInfo.receiverInfo.contactInfo.address }}</span><br>
                     <span>
-                        {{ delivery.claimInfo.receiverInfo.contactInfo.city }}, {{ delivery.claimInfo.receiverInfo.contactInfo.state }}
-                        {{ delivery.claimInfo.receiverInfo.contactInfo.zip }}
+                        {{ foodListing.claimInfo.receiverInfo.contactInfo.city }}, {{ foodListing.claimInfo.receiverInfo.contactInfo.state }}
+                        {{ foodListing.claimInfo.receiverInfo.contactInfo.zip }}
                     </span><br><br>
-                    <a href="tel:{{delivery.claimInfo.receiverInfo.contactInfo.phone}}" class="link-content no-word-wrap">
-                        {{ delivery.claimInfo.receiverInfo.contactInfo.phone }}
+                    <a href="tel:{{foodListing.claimInfo.receiverInfo.contactInfo.phone}}" class="link-content no-word-wrap">
+                        {{ foodListing.claimInfo.receiverInfo.contactInfo.phone }}
                     </a><br>
-                    <a href="mailto:{{ delivery.claimInfo.receiverInfo.email }}" class="inline-block link-content">{{ delivery.claimInfo.receiverInfo.email }}</a>
+                    <a href="mailto:{{ foodListing.claimInfo.receiverInfo.email }}" class="inline-block link-content">{{ foodListing.claimInfo.receiverInfo.email }}</a>
 
                 </mat-expansion-panel>
             </div>
@@ -129,7 +137,7 @@
 
 <ng-container *ngIf="stateChangeComplete">
     
-    <p>The delivery status has been updated to: <b>{{ deliveryUtilService.getReadableDeliveryState(delivery.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState) }}</b>.</p>
+    <p>The delivery status has been updated to: <b>{{ deliveryUtilService.getReadableDeliveryState(foodListing.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState) }}</b>.</p>
     <p>Both the Donor and Receiver will automatically be notified concerning the delivery status change.</p>
 
     <div class="modal-button-group">

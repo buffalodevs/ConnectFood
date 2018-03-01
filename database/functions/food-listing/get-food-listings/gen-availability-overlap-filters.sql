@@ -33,7 +33,7 @@ BEGIN
         5) 25 miles / 30 mph * 60 minutes_per_hour   ~ 55 (+5) minute overlap required
         6) 30 miles / 30 mph * 60 minutes_per_hour   ~ 65 (+5) minute overlap required
 
-        TODO:   This likely will NOT scale well... we may need to create time range columns on AppUserAvailability with correct minute margins and index them
+        TODO:   This likely will NOT scale well... we may need to create time range columns on Availability with correct minute margins and index them
                 to make it scale. This would cause some denormalization though, and it would use 7x more space to store avaialbility times. Use this for now and
                 hope that left hand argument to range overlap operator uses index (index left, scan right).
     */
@@ -55,26 +55,17 @@ BEGIN
 
                 -- Ensure Receiver availability overlaps Donor or Food Listing availability.
                 _specificAvailabilityFilters := _specificAvailabilityFilters || '
-                    AND (
-                                DonorAvailability.timeRange && TSRANGE (LOWER(ReceiverAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
-                                                                        UPPER(ReceiverAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ', ''[]'')
-                            OR  ReceiverAvailability.timeRange && TSRANGE (LOWER(FoodListingAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
-                                                                           UPPER(FoodListingAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ', ''[]'')
-                        )
+                    AND DonorAvailability.timeRange && TSTZRANGE (LOWER(ReceiverAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
+                                                                  UPPER(ReceiverAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ', ''[]'')
                 ' ||
                 -- Ensure Deliverer availability overlaps Donor or Food Liisting availability, overlaps Receiver availability, and falls bfore Food Listing expiration.
                 CASE WHEN (_includeDeliverer) THEN '
-                    -- 
-                    AND (       
-                                DelivererAvailability.timeRange && TSRANGE (LOWER(DonorAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
-                                                                            UPPER(DonorAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ', ''[]'')
-                            OR  DelivererAvailability.timeRange && TSRANGE (LOWER(FoodListingAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
-                                                                            UPPER(FoodListingAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ', ''[]'') 
-                        )
-                    AND ReceiverAvailability.timeRange && TSRANGE (LOWER(DelivererAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
-                                                                   UPPER(DelivererAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ', ''[]'')
-                    AND DelivererAvailability.timeRange <= TSRANGE (FoodListing.availableUntilDate - ' || _availabilityRangeBufferTxt || ',
-                                                                    FoodListing.availableUntilDate + ' || _availabilityRangeBufferTxt || ', ''[]'')
+                    AND DonorAvailability.timeRange && TSTZRANGE (LOWER(DelivererAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
+                                                                  UPPER(DelivererAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ', ''[]'')
+                    AND ReceiverAvailability.timeRange && TSTZRANGE (LOWER(DelivererAvailability.timeRange) + ' || _availabilityRangeBufferTxt || ',
+                                                                     UPPER(DelivererAvailability.timeRange) - ' || _availabilityRangeBufferTxt || ', ''[]'')
+                    AND DelivererAvailability.timeRange <= TSTZRANGE (FoodListing.availableUntilDate - ' || _availabilityRangeBufferTxt || ',
+                                                                      FoodListing.availableUntilDate + ' || _availabilityRangeBufferTxt || ', ''[]'')
                 '
                 ELSE '' END;
             
@@ -84,14 +75,10 @@ BEGIN
 
                 -- Ensure Donor/FoodListing and Receiver availability ranges contain the current time.
                 _specificAvailabilityFilters := _specificAvailabilityFilters || '
-                    AND (
-                                DonorAvailability.timeRange @> TSRANGE (''' || CURRENT_TIMESTAMP || '''::TIMESTAMP - ' || _availabilityRangeBufferTxt || ',
-                                                                        ''' || CURRENT_TIMESTAMP || '''::TIMESTAMP + ' || _availabilityRangeBufferTxt || ', ''[]'')
-                            OR  FoodListingAvailability.timeRange @> TSRANGE (''' || CURRENT_TIMESTAMP || '''::TIMESTAMP - ' || _availabilityRangeBufferTxt || ',
-                                                                              ''' || CURRENT_TIMESTAMP || '''::TIMESTAMP + ' || _availabilityRangeBufferTxt || ', ''[]'')
-                        )
-                    AND ReceiverAvailability.timeRange @> TSRANGE (''' || CURRENT_TIMESTAMP || '''::TIMESTAMP - ' || _availabilityRangeBufferTxt || ',
-                                                                   ''' || CURRENT_TIMESTAMP || '''::TIMESTAMP + ' || _availabilityRangeBufferTxt || ', ''[]'')
+                    AND DonorAvailability.timeRange @> TSTZRANGE (''' || CURRENT_TIMESTAMP || '''::TIMESTAMP - ' || _availabilityRangeBufferTxt || ',
+                                                                  ''' || CURRENT_TIMESTAMP || '''::TIMESTAMP + ' || _availabilityRangeBufferTxt || ', ''[]'')
+                    AND ReceiverAvailability.timeRange @> TSTZRANGE (''' || CURRENT_TIMESTAMP || '''::TIMESTAMP - ' || _availabilityRangeBufferTxt || ',
+                                                                     ''' || CURRENT_TIMESTAMP || '''::TIMESTAMP + ' || _availabilityRangeBufferTxt || ', ''[]'')
                 ';
 
             END IF;
@@ -100,14 +87,10 @@ BEGIN
             _generalAvailabilityFilters := _generalAvailabilityFilters || '
                 OR  (
                         ST_DWITHIN(DonorContact.gpsCoordinate, ReceiverContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')
-                        AND (
-                                    DonorAvailability.timeRange <= TSRANGE (FoodListing.availableUntilDate - ' || _availabilityRangeBufferTxt || ',
-                                                                            FoodListing.availableUntilDate + ' || _availabilityRangeBufferTxt || ', ''[]'')
-                                OR  FoodListingAvailability.timeRange <= TSRANGE (FoodListing.availableUntilDate - ' || _availabilityRangeBufferTxt || ',
-                                                                                  FoodListing.availableUntilDate + ' || _availabilityRangeBufferTxt || ', ''[]'')
-                            )
-                        AND ReceiverAvailability.timeRange <= TSRANGE (FoodListing.availableUntilDate - ' || _availabilityRangeBufferTxt || ',
-                                                                       FoodListing.availableUntilDate + ' || _availabilityRangeBufferTxt || ', ''[]'')'
+                        AND DonorAvailability.timeRange <= TSTZRANGE (FoodListing.availableUntilDate - ' || _availabilityRangeBufferTxt || ',
+                                                                      FoodListing.availableUntilDate + ' || _availabilityRangeBufferTxt || ', ''[]'')
+                        AND ReceiverAvailability.timeRange <= TSTZRANGE (FoodListing.availableUntilDate - ' || _availabilityRangeBufferTxt || ',
+                                                                         FoodListing.availableUntilDate + ' || _availabilityRangeBufferTxt || ', ''[]'')'
                         || CASE WHEN (_includeDeliverer) THEN '
                             AND ST_DWITHIN(DelivererContact.gpsCoordinate, DonorContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')
                             AND ST_DWITHIN(ReceiverContact.gpsCoordinate, DelivererContact.gpsCoordinate, ' || FLOOR(_distanceGradientMeters) || ')

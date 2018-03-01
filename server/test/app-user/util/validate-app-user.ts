@@ -22,7 +22,7 @@ export function validateAppUser(toValidate: AppUser, validateAgainst: AppUser): 
     expect(toValidate.contactInfo.state).to.equal(validateAgainst.contactInfo.state);
     expect(toValidate.contactInfo.zip).to.equal(validateAgainst.contactInfo.zip);
     expect(toValidate.contactInfo.phone).to.equal(validateAgainst.contactInfo.phone);
-    expect(toValidate.contactInfo.utcOffsetMins).to.equal(validateAgainst.contactInfo.utcOffsetMins);
+    expect(toValidate.contactInfo.timezone).to.equal(validateAgainst.contactInfo.timezone);
 
     expect(toValidate.availability).to.have.length(validateAgainst.availability.length);
     for (let i: number = 0; i < validateAgainst.availability.length; i++) {

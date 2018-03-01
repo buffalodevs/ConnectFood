@@ -5,16 +5,15 @@ CREATE TABLE IF NOT EXISTS ContactInfo
     contactInfoKey SERIAL PRIMARY KEY
 );
 
-ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS appUserKey         INTEGER         NOT NULL UNIQUE REFERENCES AppUser (appUserKey);
+ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS appUserKey     INTEGER         NOT NULL UNIQUE REFERENCES AppUser (appUserKey);
 
-ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS address            VARCHAR(128)    NOT NULL;
-ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS city               VARCHAR(60)     NOT NULL;
-ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS state              CHAR(2)         NOT NULL;
-ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS zip                INTEGER         NOT NULL;
-ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS gpsCoordinate      GEOGRAPHY       NOT NULL;
-ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS utcOffsetMins      SMALLINT        NOT NULL;
-
-ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS phone              CHAR(14)        NOT NULL;
+ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS address        VARCHAR(128)    NOT NULL;
+ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS city           VARCHAR(60)     NOT NULL;
+ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS state          CHAR(2)         NOT NULL;
+ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS zip            INTEGER         NOT NULL;
+ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS gpsCoordinate  GEOGRAPHY       NOT NULL;
+ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS timezone       TEXT            NOT NULL;
+ALTER TABLE ContactInfo ADD COLUMN IF NOT EXISTS phone          CHAR(14)        NOT NULL;
 
 
 -- Index for quick street address lookup.

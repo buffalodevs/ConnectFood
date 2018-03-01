@@ -9,4 +9,4 @@ CREATE TABLE IF NOT EXISTS AppUserPassword
 -- This could potentially be useful in cases where account is claimed to have been stolen.
 ALTER TABLE AppUserPassword ADD COLUMN IF NOT EXISTS appUserKey     INTEGER     NOT NULL REFERENCES AppUser (appUserKey);
 ALTER TABLE AppUserPassword ADD COLUMN IF NOT EXISTS password       CHAR(60)    NOT NULL;
-ALTER TABLE AppUserPassword ADD COLUMN IF NOT EXISTS createDate     TIMESTAMP   DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE AppUserPassword ADD COLUMN IF NOT EXISTS createDate     TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP;

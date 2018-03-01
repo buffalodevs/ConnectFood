@@ -53,7 +53,10 @@
 
                         <div class="space-bottom">
                             <div><b>Available Until</b></div>
-                            <span>{{ dateFormatter.dateToMonthDayYearString(foodListing.availableUntilDate) }}</span>
+                            <span>
+                                {{ dateFormatter.dateToMonthDayYearString(foodListing.availableUntilDate) }},
+                                {{ dateFormatter.dateToWallClockString(foodListing.availableUntilDate) }}
+                            </span>
                         </div>
                 
                     </div>

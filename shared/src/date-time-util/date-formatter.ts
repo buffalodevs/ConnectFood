@@ -1,4 +1,4 @@
-import * as moment from "moment";
+import * as moment from "moment-timezone";
 import { Validation } from "../validation/validation";
 import * as _ from "lodash";
 
@@ -316,18 +316,18 @@ export class DateFormatter {
     /**
      * Checks if a given date is before today.
      * @param date The date to check.
-     * @param utcOffsetMins The (optionsal) offset (in minutes) of the time zone that we are to use when comparing the dates.
-     *                      Default is this computer's time zone.
+     * @param timezone The (optionsal) timezone that we are to use when comparing the dates.
+     *                 Default is this computer's time zone.
      * @return true if the given date is before today, false if not.
      */
-    public isDateOnOrBeforeToday(date: Date, utcOffsetMins: number = date.getTimezoneOffset()): boolean {
+    public isDateOnOrBeforeToday(date: Date, timezone: string = Intl.DateTimeFormat().resolvedOptions().timeZone): boolean {
 
-        // Get the current time in the timezone specified by utcOffsetMins.
+        // Get the current time in the timezone specified by timezone.
         let now: Date = new Date();
-        now = moment(now).subtract(now.getTimezoneOffset(), 'minutes').add(utcOffsetMins, 'minutes').toDate();
+        now = moment(now).tz(timezone).toDate();
 
-        // Transition the input comparison date to the correct time zone.
-        date = moment(date).subtract(date.getTimezoneOffset(), 'minutes').add(utcOffsetMins, 'minutes').toDate();
+        // Transition the input comparison date to the correct timezone.
+        date = moment(date).tz(timezone).toDate();
 
         return ( date < now || (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDay() === now.getDay()) );
     }

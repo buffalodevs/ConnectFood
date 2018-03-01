@@ -10,7 +10,7 @@ export class ContactInfo {
         public state: string = null,
         public zip: number = null,
         public gpsCoordinate: GPSCoordinate = new GPSCoordinate(),
-        public utcOffsetMins: number = null,
+        public timezone: string = Intl.DateTimeFormat().resolvedOptions().timeZone,
         public phone: string = null,
         public drivingDistance?: number,
         public drivingTime?: number

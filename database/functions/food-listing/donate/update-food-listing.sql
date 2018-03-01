@@ -20,7 +20,7 @@ CREATE OR REPLACE FUNCTION updateFoodListing
 )
 RETURNS VOID -- TODO: Return data pertaining to contacts of Receivers (Claimers) who are negatively effected by this update (for contacting them)!
 AS $$
-    DECLARE _availableUntilTimeStamp TIMESTAMP;
+    DECLARE _availableUntilTimeStamp TIMESTAMPTZ;
 BEGIN
 
     -- ============ Ensure user is authorized to update Food Listing ============ --

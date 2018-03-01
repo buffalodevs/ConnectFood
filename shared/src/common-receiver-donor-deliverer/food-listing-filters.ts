@@ -1,4 +1,5 @@
 import { deserializable, deepDeserializable } from "../deserialization/deserializer";
+import { DateRange } from "./../date-time-util/date-range";
 import { SlickListFilters } from "../slick-list/slick-list-filters/slick-list-filters";
 import { DeliveryState } from "./delivery-state-info";
 import { FoodType } from "./food-listing-domain/food-type";
@@ -72,17 +73,17 @@ export class FoodListingFilters implements SlickListFilters {
 
     /**
      * Determines whether or not we should only pull back deliveries for Donors and Receivers whose availablility times match the logged in deliverer's regular times.
-     * NOTE: If not set true, and matchSpecifiedAvailability is also false, then only Deliveries that are available for Delivery now will be pulled back.
      */
     public matchRegularAvailability: boolean = true;
 
     /**
-     * Determines whether or not we should only pull back Food Listings whose availability times match specified absolute input availability times.
+     * If present, brings back Food Listings whose availability not only matches user's availability, but also matches these given specificAvailabilityTimes.
      */
-    public matchSpecifiedAvailability: boolean = false;
+    public specificAvailabilityTimes: DateRange[] = null;
 
     /**
      * Determines whether or not we should only pull back Food Listings that are available now for delivery.
+     * NOTE: This will override matchRegularAvailability and any provided specificAvailabilityTimes.
      */
     public matchAvailableNow: boolean = false;
 

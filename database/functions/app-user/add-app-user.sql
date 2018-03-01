@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION addAppUser
     _address                    ContactInfo.address%TYPE,
     _latitude                   NUMERIC(9, 6),
     _longitude                  NUMERIC(9, 6),
-    _utcOffsetMins              ContactInfo.utcOffsetMins%TYPE,
+    _timezone                   ContactInfo.timezone%TYPE,
     _city                       ContactInfo.city%TYPE,
     _state                      ContactInfo.state%TYPE,
     _zip                        ContactInfo.zip%TYPE,
@@ -52,10 +52,10 @@ BEGIN
     VALUES      (_appUserKey, _password);
 
     -- Add the new user's contact info.
-    PERFORM addUpdateContactInfo (_appUserKey, _address, _latitude, _longitude, _utcOffsetMins, _city, _state, _zip, _phone);
+    PERFORM addUpdateContactInfo (_appUserKey, _address, _latitude, _longitude, _timezone, _city, _state, _zip, _phone);
 
     -- Add or update the new user's availability times (same work for both operations... does total refresh).
-    PERFORM addUpdateAppUserAvailability (_appUserKey, _availabilityMetaTimeRanges);
+    PERFORM addUpdateAppUserAvailability (_appUserKey, _availabilityMetaTimeRanges, _timezone);
 
     -- Add the new user's organization data if the user is and oragnization.
     IF (_organizationName IS NOT NULL)

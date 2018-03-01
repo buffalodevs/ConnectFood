@@ -15,10 +15,10 @@ ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS foodDescription            TEXT
 ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS needsRefrigeration         BOOLEAN         NOT NULL;
 
 -- The date on which the Food Listing was initially donated.
-ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS donationDate               TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS donationDate               TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
 -- The date on which the Food Listing becomes no longer available.
-ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS availableUntilDate         TIMESTAMP       NOT NULL;
+ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS availableUntilDate         TIMESTAMPTZ     NOT NULL;
 
 -- Contains the total weight of the entire Food Listing in pounds.
 ALTER TABLE FoodListing ADD COLUMN IF NOT EXISTS estimatedWeight            NUMERIC(6, 2)   DEFAULT NULL;

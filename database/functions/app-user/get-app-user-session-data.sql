@@ -45,7 +45,7 @@ AS $$
                                                                                             'latitude',     ST_Y(ContactInfo.gpsCoordinate::GEOMETRY),
                                                                                             'longitude',    ST_X(ContactInfo.gpsCoordinate::GEOMETRY)
                                                                                         ),
-                                                                    'utcOffsetMins',    ContactInfo.utcOffsetMins,
+                                                                    'timezone',         ContactInfo.timezone,
                                                                     'phone',            ContactInfo.phone
                                                                 ),
                                             'organization',     JSON_BUILD_OBJECT (
@@ -53,14 +53,18 @@ AS $$
                                                                     'taxId',    Organization.taxId
                                                                 ),
                                             'availability',     (
-                                                                    SELECT  ARRAY_AGG (
-                                                                        JSON_BUILD_OBJECT (
-                                                                            '_startTime',    timestampToUtcText(LOWER(AppUserAvailabilityMeta.metaTimeRange)),
-                                                                            '_endTime',      timestampToUtcText(UPPER(AppUserAvailabilityMeta.metaTimeRange))
+                                                                    ARRAY (
+                                                                        SELECT JSON_BUILD_OBJECT (
+                                                                            '_startTime',    timestampToUtcText(LOWER(Availability.timeRange)),
+                                                                            '_endTime',      timestampToUtcText(UPPER(Availability.timeRange))
                                                                         )
+                                                                        FROM        AppUserAvailabilityMap
+                                                                        INNER JOIN  Availability ON AppUserAvailabilityMap.availabilityKey = Availability.availabilityKey
+                                                                        WHERE       AppUserAvailabilityMap.appUserKey = AppUser.appUserKey
+                                                                        -- Ensure we only grab single week worth of dates for the user (prevent duplicate time ranges).
+                                                                        AND         LOWER(Availability.timeRange) < (CURRENT_DATE + (7 - EXTRACT(DOW FROM CURRENT_DATE)::INTEGER))
+                                                                        ORDER BY    Availability.timeRange
                                                                     )
-                                                                    FROM    AppUserAvailabilityMeta
-                                                                    WHERE   AppUserAvailabilityMeta.appUserKey = AppUser.appUserKey
                                                                 )
                                         ),
                 'verificationToken',    UnverifiedAppUser.verificationToken

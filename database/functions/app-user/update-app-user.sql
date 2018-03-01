@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION updateAppUser
     _address                    ContactInfo.address%TYPE            DEFAULT NULL,
     _latitude                   NUMERIC(9, 6)                       DEFAULT NULL,
     _longitude                  NUMERIC(9, 6)                       DEFAULT NULL,
-    _utcOffsetMins              ContactInfo.utcOffsetMins%TYPE      DEFAULT NULL,
+    _timezone                   ContactInfo.timezone%TYPE           DEFAULT NULL,
     _city                       ContactInfo.city%TYPE               DEFAULT NULL,
     _state                      ContactInfo.state%TYPE              DEFAULT NULL,
     _zip                        ContactInfo.zip%TYPE                DEFAULT NULL,
@@ -52,7 +52,7 @@ BEGIN
     WHERE   AppUser.appUserKey = _appUserKey;
 
     -- Update any ContactInfo fields related to AppUser being updated.
-    PERFORM addUpdateContactInfo(_appUserKey, _address, _latitude, _longitude, _utcOffsetMins, _city, _state, _zip, _phone);
+    PERFORM addUpdateContactInfo(_appUserKey, _address, _latitude, _longitude, _timezone, _city, _state, _zip, _phone);
 
     -- Update any Organization fields related to AppUser being updated.
     UPDATE  Organization
@@ -69,7 +69,7 @@ BEGIN
 
     IF (_availabilityMetaTimeRanges IS NOT NULL)
     THEN
-        PERFORM addUpdateAppUserAvailability(_appUserKey, _availabilityMetaTimeRanges);
+        PERFORM addUpdateAppUserAvailability(_appUserKey, _availabilityMetaTimeRanges, _timezone);
     END IF;
 
     RETURN QUERY

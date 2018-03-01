@@ -12,16 +12,16 @@
 <div class="modal-body">
 
     <delivery-listing-info *ngIf="isDialogState('DeliveryInfo')"
-        [delivery]="dialogData.selectedListing" [isCart]="dialogData.isCart" (close)="dialogRef.close()"
+        [foodListing]="dialogData.selectedListing" [isCart]="dialogData.isCart" (close)="dialogRef.close()"
         (toSchedule)="toSchedule()" (toCancelReason)="toCancelReason()" (removeListing)="removeSelectedListing.emit()">
     </delivery-listing-info>
 
     <delivery-listing-schedule *ngIf="isDialogState('Schedule')"
-        [delivery]="dialogData.selectedListing" (removeListing)="removeSelectedListing.emit()" (close)="dialogRef.close()">
+        [foodListing]="dialogData.selectedListing" (removeListing)="removeSelectedListing.emit()" (close)="dialogRef.close()">
     </delivery-listing-schedule>
 
     <delivery-listing-cancel *ngIf="isDialogState('CancelReason')"
-        [delivery]="dialogData.selectedListing" (removeListing)="removeSelectedListing.emit()" (close)="dialogRef.close()">
+        [foodListing]="dialogData.selectedListing" (removeListing)="removeSelectedListing.emit()" (close)="dialogRef.close()">
     </delivery-listing-cancel>
         
 </div>

@@ -5,7 +5,7 @@ SELECT dropFunction ('addUpdateFoodListingFoodTypeMap');
  */
 CREATE OR REPLACE FUNCTION addUpdateFoodListingFoodTypeMap
 (
-    _foodListingKey FoodListingAvailability.foodListingKey%TYPE,
+    _foodListingKey FoodListing.foodListingKey%TYPE,
     _foodTypes      FoodType[]
 )
 RETURNS VOID

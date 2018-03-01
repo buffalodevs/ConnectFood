@@ -7,4 +7,4 @@ CREATE TABLE IF NOT EXISTS UnverifiedAppUser
 
 ALTER TABLE UnverifiedAppUser ADD COLUMN IF NOT EXISTS verificationToken    CHAR(20)    NOT NULL;
 -- Cleanup entries that are expired (over 3 days old).
-ALTER TABLE UnverifiedAppUser ADD COLUMN IF NOT EXISTS expireDate           TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP + INTERVAL '3' DAY;
+ALTER TABLE UnverifiedAppUser ADD COLUMN IF NOT EXISTS expireDate           TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP + INTERVAL '3' DAY;

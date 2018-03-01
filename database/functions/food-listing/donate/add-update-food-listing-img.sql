@@ -5,7 +5,7 @@ SELECT dropFunction ('addUpdateFoodListingImg');
  */
 CREATE OR REPLACE FUNCTION addUpdateFoodListingImg
 (
-    _foodListingKey FoodListingAvailability.foodListingKey%TYPE,
+    _foodListingKey FoodListing.foodListingKey%TYPE,
     _imgData        JSON[]
 )
 RETURNS VOID

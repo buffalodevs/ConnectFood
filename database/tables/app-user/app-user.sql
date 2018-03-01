@@ -12,11 +12,11 @@ ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS lastName               VARCHAR(60) 
 ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS firstName              VARCHAR(60)     NOT NULL;
 
 -- Date that the AppUser was created.
-ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS createDate             TIMESTAMP       DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS createDate             TIMESTAMPTZ     DEFAULT CURRENT_TIMESTAMP;
 
 -- Next three entries relate to disabling a user for violation of terms of use.
 ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS disabled               BOOLEAN         DEFAULT FALSE;
-ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS disabledDate           TIMESTAMP       DEFAULT NULL;
+ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS disabledDate           TIMESTAMPTZ     DEFAULT NULL;
 ALTER TABLE AppUser ADD COLUMN IF NOT EXISTS disabledReason         TEXT            DEFAULT NULL;
 
 -- Determine AppUser's primary function.

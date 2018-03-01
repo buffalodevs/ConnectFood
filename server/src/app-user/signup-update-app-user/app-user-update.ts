@@ -28,15 +28,15 @@ export async function updateAppUser(appUserUpdate: AppUser, newPassword: string,
         fillAddressUpdateInfo(appUserUpdate, appUserSessionData.appUser);
 
         // Make sure that whenever an address is updated we also update the timezone information (could go out of sync if user moves to another timezone)!
-        if (appUserUpdate.contactInfo.utcOffsetMins == null) {
-            logger.error('Attempting to update user address data without also providing an updated utcOffsetMins value.')
+        if (appUserUpdate.contactInfo.timezone == null) {
+            logger.error('Attempting to update user address data without also providing an updated timezone value.')
             throw new Error('An unexpected error has occured.');
         }
     }
 
     // Check if this is an app user availability update, and fill in utc offset information so proper UTC times can be calculated.
     if (appUserUpdate.availability != null) {
-        appUserUpdate.contactInfo.utcOffsetMins = appUserSessionData.appUser.contactInfo.utcOffsetMins;
+        appUserUpdate.contactInfo.timezone = appUserSessionData.appUser.contactInfo.timezone;
     }
     
     return signupOrUpdateAppUser(appUserUpdate, newPassword, appUserSessionData.appUserKey);

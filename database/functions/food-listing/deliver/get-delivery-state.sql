@@ -4,10 +4,10 @@
 SELECT dropFunction('getDeliveryState');
 CREATE OR REPLACE FUNCTION getDeliveryState
 (
-    _scheduledStartTime TIMESTAMP,
-    _startTime          TIMESTAMP,
-    _pickUpTime         TIMESTAMP,
-    _dropOffTime        TIMESTAMP
+    _scheduledStartTime TIMESTAMPTZ,
+    _startTime          TIMESTAMPTZ,
+    _pickUpTime         TIMESTAMPTZ,
+    _dropOffTime        TIMESTAMPTZ
 )
 RETURNS DeliveryState -- The delivery state.
 AS $$
