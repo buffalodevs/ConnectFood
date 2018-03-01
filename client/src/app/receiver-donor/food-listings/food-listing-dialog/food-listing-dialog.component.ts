@@ -23,19 +23,16 @@ enum FoodListingDialogState {
     templateUrl: './food-listing-dialog.component.html',
     styleUrls: ['./food-listing-dialog.component.css']
 })
-export class FoodListingDialogComponent extends SlickListDialog {
+export class FoodListingDialogComponent implements SlickListDialog {
 
-    private _foodListingDialogState: FoodListingDialogState;
-
+    private _foodListingDialogState: FoodListingDialogState = FoodListingDialogState.FoodListingInfo;
+    public removeSelectedListing: EventEmitter<void> = new EventEmitter <void>();
 
     public constructor (
         public dialogRef: MatDialogRef <FoodListingDialogComponent>,
         @Inject(MAT_DIALOG_DATA)
         public dialogData: FoodListingDialogData
-    ) {
-        super();
-        this._foodListingDialogState = FoodListingDialogState.FoodListingInfo;
-    }
+    ) {}
 
 
     /**

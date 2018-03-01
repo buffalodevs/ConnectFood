@@ -27,8 +27,8 @@ export abstract class AbstractModelDrivenComponent implements OnChanges {
     public ngOnChanges(changes: SimpleChanges): void {
 
         if (changes.activateValidation && this.form != null) {
-            this.activateValidation ? this.form.markAsTouched()
-                                    : this.form.markAsUntouched();
+            this.activateValidation ? this.validationService.markAllAsTouched(this.form)
+                                    : this.validationService.markAllAsTouched(this.form, false);
         }
     }
 

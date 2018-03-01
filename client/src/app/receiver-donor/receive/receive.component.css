@@ -1,0 +1,11 @@
+.specific-availability-container {
+    max-width: 200px;
+    border-bottom: 1px solid gray;
+    text-overflow: ellipsis;
+    padding-top: 5px;
+}
+
+.specific-availability-time {
+    white-space: nowrap;
+    overflow: hidden;
+}

@@ -24,7 +24,7 @@ enum DeliveryDialogState {
     templateUrl: './delivery-listing-dialog.component.html',
     styleUrls: ['./delivery-listing-dialog.component.css']
 })
-export class DeliveryListingDialogComponent extends SlickListDialog {
+export class DeliveryListingDialogComponent implements SlickListDialog {
 
     private _dialogRef: MatDialogRef <DeliveryListingDialogComponent>;
     get dialogRef(): MatDialogRef <DeliveryListingDialogComponent> {
@@ -38,13 +38,13 @@ export class DeliveryListingDialogComponent extends SlickListDialog {
 
     private _deliveryDialogState: DeliveryDialogState;
 
+    public removeSelectedListing: EventEmitter<void> = new EventEmitter <void>();
+
 
     public constructor (
         dialogRef: MatDialogRef <DeliveryListingDialogComponent>,
         @Inject(MAT_DIALOG_DATA) dialogData: DeliveryListingDialogData
     ) {
-        super();
-
         this._dialogRef = dialogRef;
         this._dialogData = dialogData;
         this._deliveryDialogState = DeliveryDialogState.DeliveryInfo;

@@ -1,0 +1,20 @@
+<div class="modal-header">
+
+    <h3 class="modal-header-text">Additional Availability</h3>
+
+    <!-- Close button (Cancel Close) -->
+    <button type="button" class="modal-close" aria-label="Close" (click)="dialogRef.close()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+
+</div>
+
+<div class="modal-body">
+
+    <slick-date-time-schedule-builder [formControl]="specificAvailabilityTimesControl" [activateValidation]="activateValidation"></slick-date-time-schedule-builder>
+
+    <div class="modal-button-group">
+        <button mat-raised-button color="primary" class="button-md" (click)="submit()">Submit</button>
+    </div>
+
+</div>

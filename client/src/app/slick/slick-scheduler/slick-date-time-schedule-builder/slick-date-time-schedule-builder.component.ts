@@ -153,7 +153,9 @@ export class SlickDateTimeScheduleBuilderComponent extends AbstractModelDrivenCo
                                 : [];
         
         let avaialbilityFormArr: FormArray = <FormArray>this.form.get(this.AVAILABILITY_RANGES_CTRL_NAME);
-        avaialbilityFormArr.setValue(value);
+        for (let i: number = 0; i < value.length; i++) {
+            avaialbilityFormArr.push(new FormControl(value[i]));
+        }
     }
 
 

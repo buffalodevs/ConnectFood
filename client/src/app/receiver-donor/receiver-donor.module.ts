@@ -7,12 +7,14 @@ import { MatInputModule, MatButtonModule, MatStepperModule, MatRadioModule, MatC
 
 import { CommonUtilModule } from '../common-util/common-util.module';
 import { SlickDatePickerModule } from '../slick/slick-date-time/slick-date-picker/slick-date-picker.module';
+import { SlickDateTimeScheduleBuilderModule } from '../slick/slick-scheduler/slick-date-time-schedule-builder/slick-date-time-schedule-builder.module';
 import { SlickExpansionPanelModule } from '../slick/slick-expansion-panel/slick-expansion-panel.module';
 import { SlickFilteredListModule } from '../slick/slick-filtered-list/slick-filtered-list.module';
 import { SlickImgManagerModule } from '../slick/slick-img-manager/slick-img-manager.module';
 import { CommonFoodListingDomainsModule } from '../domain/common-food-listing-domains.module';
 import { DonateModule } from './donate/donate.module';
 
+import { SpecificAvailabilityDialogComponent } from './food-listings-filters/specifc-availability-dialog/specific-availability-dialog.component';
 import { FoodListingFiltersComponent } from './food-listings-filters/food-listing-filters.component';
 import { FoodListingDialogComponent } from './food-listings/food-listing-dialog/food-listing-dialog.component';
 import { FoodListingInfoComponent } from './food-listings/food-listing-dialog/food-listing-info/food-listing-info.component';
@@ -44,6 +46,7 @@ const receiverDonorRoutes: Routes = [
 
 @NgModule({
     declarations: [
+        SpecificAvailabilityDialogComponent,
         FoodListingFiltersComponent,
         FoodListingDialogComponent,
         FoodListingInfoComponent,
@@ -69,6 +72,7 @@ const receiverDonorRoutes: Routes = [
         CommonUtilModule,
         DonateModule,
         SlickDatePickerModule,
+        SlickDateTimeScheduleBuilderModule,
         SlickExpansionPanelModule,
         SlickFilteredListModule,
         SlickImgManagerModule,
@@ -78,6 +82,7 @@ const receiverDonorRoutes: Routes = [
         ManageFoodListingService
     ],
     entryComponents: [
+        SpecificAvailabilityDialogComponent,
         FoodListingDialogComponent
     ]
 })

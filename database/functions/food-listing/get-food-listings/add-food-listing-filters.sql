@@ -22,11 +22,11 @@ BEGIN
     RETURNING   FoodListingFilters.foodListingFiltersKey
     INTO        _foodListingFiltersKey;
 
-    _specificAvailabilityRanges := _filters->>'specificAvailabilityTimes';
+    _specificAvailabilityRanges := jsonArrToPostgresTextArr(_filters->'specificAvailabilityTimes');
     FOR i IN COALESCE(ARRAY_LOWER(_specificAvailabilityRanges, 1), 1) .. COALESCE(ARRAY_UPPER(_specificAvailabilityRanges, 1), 0)
     LOOP
 
-        _availabilityKey := addAvailability(_availabilityMetaTimeRanges[i]);
+        _availabilityKey := addAvailability(_specificAvailabilityRanges[i]);
 
         INSERT INTO FoodListingFiltersAvailability (foodListingFiltersKey, appUserKey, availabilityKey)
         VALUES      (_foodListingFiltersKey, _appUserKey, _availabilityKey);

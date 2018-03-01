@@ -11,23 +11,18 @@ import { FoodListingFilters } from '../../../../../shared/src/common-receiver-do
 })
 export class FoodListingFiltersComponent extends FormGroup implements OnInit {
 
-    public readonly MAX_DISTANCES: number[];
+    public readonly MAX_DISTANCES: number[] = MAX_DISTANCE_VALUES;
 
-    @Input() public header: string;
-    @Input() private defaultAvailableAfterDateNow: boolean;
+    @Input() public header: string = 'Filters';
+    @Input() private defaultAvailableAfterDateNow: boolean = true;
     /**
      * Additional filter controls and associated names.
      */
-    @Input() private additionalFilters: Map<string, AbstractControl>;
+    @Input() private additionalFilters: Map<string, AbstractControl> = null;
 
 
     public constructor() {
         super({});
-
-        this.MAX_DISTANCES = MAX_DISTANCE_VALUES;
-
-        this.header = 'Filters';
-        this.defaultAvailableAfterDateNow = true;
     }
 
 

@@ -6,11 +6,22 @@
             <ng-container bottom>
                 
                 <br>
-                <h5>Match Availability:</h5>
-                <div class="form-group">
-                    <mat-checkbox formControlName="matchRegularAvailability" title="Check this to match your regular weekly availability with the donor's availability.">
-                        Regular Availability
-                    </mat-checkbox><br>
+                <button mat-raised-button color="primary" class="button-sm" (click)="specifyAvailability()"
+                    title="Click here to search for Donations with specific availability times.">Specify Availability</button>
+                <br>
+
+                <div *ngFor="let specificAvailability of (additionalFilters.get('specificAvailabilityTimes').value != null)
+                                                            ? additionalFilters.get('specificAvailabilityTimes').value : []" class="specific-availability-container">
+                    <div class="specific-availability-time">
+                        <b>Start:</b>
+                        {{ dateFormatter.dateToMonthDayYearString(specificAvailability.startTime) }},
+                        {{ dateFormatter.dateToWallClockString(specificAvailability.startTime) }}
+                    </div>
+                    <div class="specific-availability-time">
+                        <b>End:</b>
+                        {{ dateFormatter.dateToMonthDayYearString(specificAvailability.endTime) }},
+                        {{ dateFormatter.dateToWallClockString(specificAvailability.endTime) }}
+                    </div>
                 </div>
 
             </ng-container>

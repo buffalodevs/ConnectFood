@@ -16,12 +16,7 @@ export class SlickListDialogData <LISTING_T> {
 /**
  * Defines dialog events that the Slick List component can listen on.
  */
-export abstract class SlickListDialog {
+export interface SlickListDialog {
 
-    public removeSelectedListing: EventEmitter <void>;
-
-
-    protected constructor () {
-        this.removeSelectedListing = new EventEmitter <void>();
-    }
+    removeSelectedListing: EventEmitter <void>;
 }
