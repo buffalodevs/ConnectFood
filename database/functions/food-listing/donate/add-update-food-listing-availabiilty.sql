@@ -13,7 +13,7 @@ AS $$
     DECLARE _availabilityKey Availability.availabilityKey%TYPE;
 BEGIN
 
-    -- First delete all current availability entries for the given Food Listing.
+    -- First delete all current availability entries for the given Food Listing (should cascade to mappings).
     DELETE FROM Availability
     WHERE       EXISTS (
                     SELECT  1
@@ -21,9 +21,6 @@ BEGIN
                     WHERE   FoodListingAvailabilityMap.availabilityKey = Availability.availabilityKey
                       AND   FoodListingAvailabilityMap.foodListingKey = _foodListingKey
                 );
-
-    DELETE FROM FoodListingAvailabilityMap
-    WHERE       foodListingKey = _foodListingKey;
 
 
     -- Insert specific availability times for the listing/donation.

@@ -5,11 +5,13 @@ import { SessionData } from "../common-util/session-data";
 import { addFoodListing } from './donor/add-food-listing';
 import { removeFoodListing } from "./donor/remove-food-listing";
 import { getFoodListings } from './get-food-listings';
-import { claimFoodListing, unclaimFoodListing } from './receiver/claim-unclaim-food-listing';
+import { claimFoodListing } from './receiver/claim-food-listing';
+import { unclaimFoodListing } from './receiver/unclaim-food-listing';
 
 import { AddFoodListingRequest, AddFoodListingResponse } from '../../../shared/src/receiver-donor/message/add-food-listing-message'
 import { GetFoodListingsRequest, GetFoodListingsResponse, FoodListing } from '../../../shared/src/common-receiver-donor-deliverer/message/get-food-listings-message';
-import { ManageFoodListingRequest } from '../../../shared/src/receiver-donor/message/manage-food-listing-message';
+import { ClaimFoodListingRequest } from '../../../shared/src/receiver-donor/message/claim-food-listing-message';
+import { UnclaimRemoveFoodListingRequest } from '../../../shared/src/receiver-donor/message/unclaim-remove-food-listing-message';
 import { FoodWebResponse } from "../../../shared/src/message-protocol/food-web-response";
 
 
@@ -53,7 +55,7 @@ export function handleRemoveFoodListing(request: Request, response: Response): v
 
     response.setHeader('Content-Type', 'application/json');
 
-    let removeFoodListingRequest: ManageFoodListingRequest = request.body;
+    let removeFoodListingRequest: UnclaimRemoveFoodListingRequest = request.body;
     // Need so we can verify that currently logged in user must be the original Donor (have authority to remove Food Listing).
     let donorSessionData: SessionData = SessionData.loadSessionData(request);
 
@@ -72,10 +74,10 @@ export function handleClaimFoodListing(request: Request, response: Response): vo
 
     response.setHeader('Content-Type', 'application/json');
 
-    let claimFoodListingRequest: ManageFoodListingRequest = request.body;
+    let claimFoodListingRequest: ClaimFoodListingRequest = request.body;
     let receiverSessionData: SessionData = SessionData.loadSessionData(request);
 
-    claimFoodListing(claimFoodListingRequest.foodListingKey, receiverSessionData)
+    claimFoodListing(claimFoodListingRequest.foodListingKey, claimFoodListingRequest.claimAvailabilityTimes, receiverSessionData)
         .then(() => {
             response.send(new FoodWebResponse(true, 'Food listing has been successfully claimed.'));
         })
@@ -90,7 +92,7 @@ export function handleUnclaimFoodListing(request: Request, response: Response): 
 
     response.setHeader('Content-Type', 'application/json');
 
-    let unclaimFoodListingRequest: ManageFoodListingRequest = request.body;
+    let unclaimFoodListingRequest: UnclaimRemoveFoodListingRequest = request.body;
     let receiverSessionData: SessionData = SessionData.loadSessionData(request);
 
     unclaimFoodListing(unclaimFoodListingRequest.foodListingKey, receiverSessionData, unclaimFoodListingRequest.reason)

@@ -15,6 +15,10 @@ import { FoodListing } from './../../../../../../../shared/src/common-receiver-d
 export class FoodListingClaimComponent {
 
     @Input() public foodListing: FoodListing;
+    /**
+     * If the Receiver has added specific availability times to their search when they perform a claim, then we must add those to the claim specific availability.
+     */
+    @Input() public specificAvailabilityTimes: Date[];
 
     /**
      * Emitted whenever the dialog should close.
@@ -47,7 +51,7 @@ export class FoodListingClaimComponent {
      */
     public claimSelectedFoodListing(): void {
         
-        let observer: Observable <void> = this._manageFoodListingService.claimFoodListing(this.foodListing.foodListingKey);
+        let observer: Observable <void> = this._manageFoodListingService.claimFoodListing(this.foodListing.foodListingKey, this.specificAvailabilityTimes);
         this.showProgressSpinner = true;
         
         // Listen for result.

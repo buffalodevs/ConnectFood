@@ -1,7 +1,7 @@
 /**
- * The expected request for the (un)claim/remove food listings operation. Should be sent from the client to the server.
+ * The expected request for the unclaim/remove food listings operation. Should be sent from the client to the server.
  */
-export class ManageFoodListingRequest {
+export class UnclaimRemoveFoodListingRequest {
 
     public constructor (
         /**

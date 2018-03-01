@@ -16,7 +16,7 @@
         (toClaim)="toClaim()" (toUnclaim)="toUnclaim()" (toRemove)="toRemove()">
     </food-listing-info>
 
-    <food-listing-claim *ngIf="isDialogState('Claim')"
+    <food-listing-claim *ngIf="isDialogState('Claim')" [specificAvailabilityTimes]="dialogData.currentFilters.specificAvailabilityTimes"
         [foodListing]="dialogData.selectedListing" (removeListing)="removeSelectedListing.emit()" (close)="dialogRef.close()">
     </food-listing-claim>
 

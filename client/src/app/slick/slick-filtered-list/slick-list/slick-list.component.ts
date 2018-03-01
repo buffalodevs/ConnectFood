@@ -243,11 +243,11 @@ export abstract class SlickListComponent <LIST_T, FILT_T extends SlickListFilter
      * @param dialogConfig The optional configuration for the dialog. If not provided, then an internal configuration is used.
      *                     NOTE: the selectedListing member of the configuration data will be set internally (hence selected listing data is automatically provided to dialog)!
      */
-    public selectListing(_selectedListIndex: number, dialogType: ComponentType <SlickListDialog>, dialogConfig?: MatDialogConfig <SlickListDialogData <LIST_T>>): void;
+    public selectListing(_selectedListIndex: number, dialogType: ComponentType <SlickListDialog>, dialogConfig?: MatDialogConfig <SlickListDialogData <LIST_T, FILT_T>>): void;
 
 
     public selectListing(_selectedListIndex: number, hrefOrDialogType?: string | ComponentType <SlickListDialog>,
-                         idOrDialogConfig?: number | string | MatDialogConfig <SlickListDialogData <LIST_T>>): void
+                         idOrDialogConfig?: number | string | MatDialogConfig <SlickListDialogData <LIST_T, FILT_T>>): void
     {
         this._selectedListIndex = _selectedListIndex;
 
@@ -261,7 +261,7 @@ export abstract class SlickListComponent <LIST_T, FILT_T extends SlickListFilter
             }
             // Else we wish to display the dialog and we have one set, then open it.
             else {
-                this.openDialog(selectedListing, <ComponentType<SlickListDialog>> hrefOrDialogType, <MatDialogConfig <SlickListDialogData <LIST_T>>> idOrDialogConfig);
+                this.openDialog(selectedListing, <ComponentType<SlickListDialog>> hrefOrDialogType, <MatDialogConfig <SlickListDialogData <LIST_T, FILT_T>>> idOrDialogConfig);
             }
         }
     }
@@ -285,14 +285,15 @@ export abstract class SlickListComponent <LIST_T, FILT_T extends SlickListFilter
      * @param dialogType The type of the dialog to open.
      * @param dialogConfig The configuration for the dialog (also contains selected listing data and any other data provided by caller).
      */
-    protected openDialog(selectedListing: LIST_T, dialogType: ComponentType <SlickListDialog>, dialogConfig?: MatDialogConfig <SlickListDialogData <LIST_T>>): void {
+    protected openDialog(selectedListing: LIST_T, dialogType: ComponentType <SlickListDialog>, dialogConfig?: MatDialogConfig <SlickListDialogData <LIST_T, FILT_T>>): void {
 
         // First, ensure that we have a dialog config (either given one or generate one).
-        dialogConfig = (dialogConfig == null) ? new MatDialogConfig<SlickListDialogData<LIST_T>>()
+        dialogConfig = (dialogConfig == null) ? new MatDialogConfig<SlickListDialogData<LIST_T, FILT_T>>()
                                               : dialogConfig;
 
         // Then, add selected data to dialog config.
         dialogConfig.data.selectedListing = selectedListing;
+        dialogConfig.data.currentFilters = this._getListingsService.getPreviousFilters();
         dialogConfig.hasBackdrop = true;
 
         // Add css class names for custom styling.

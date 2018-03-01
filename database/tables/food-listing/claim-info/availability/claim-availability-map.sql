@@ -6,10 +6,10 @@ CREATE TABLE IF NOT EXISTS ClaimAvailabilityMap
 );
 
 -- Many to one relationship between Availability and FoodListing respectively.
-ALTER TABLE ClaimAvailabilityMap ADD COLUMN IF NOT EXISTS claimInfoKey     INTEGER NOT NULL REFERENCES ClaimInfo (claimInfoKey);
+ALTER TABLE ClaimAvailabilityMap ADD COLUMN IF NOT EXISTS claimInfoKey     INTEGER NOT NULL REFERENCES ClaimInfo (claimInfoKey) ON DELETE CASCADE;
 
 -- Holds an absolute time range during which the listing will be available for pickup.
-ALTER TABLE ClaimAvailabilityMap ADD COLUMN IF NOT EXISTS availabilityKey  INTEGER NOT NULL REFERENCES Availability (availabilityKey);
+ALTER TABLE ClaimAvailabilityMap ADD COLUMN IF NOT EXISTS availabilityKey  INTEGER NOT NULL REFERENCES Availability (availabilityKey) ON DELETE CASCADE;
 
 
 CREATE INDEX IF NOT EXISTS claimAvailabilityMap_claimInfoKeyIdx     ON ClaimAvailabilityMap (claimInfoKey);

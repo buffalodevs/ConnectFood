@@ -5,7 +5,8 @@ import 'rxjs/add/operator/map';
 
 import { RequestService } from "../../../common-util/services/request.service";
 
-import { ManageFoodListingRequest } from "./../../../../../../shared/src/receiver-donor/message/manage-food-listing-message";
+import { ClaimFoodListingRequest } from "./../../../../../../shared/src/receiver-donor/message/claim-food-listing-message";
+import { UnclaimRemoveFoodListingRequest } from "./../../../../../../shared/src/receiver-donor/message/unclaim-remove-food-listing-message";
 
 
 /**
@@ -24,8 +25,9 @@ export class ManageFoodListingService {
      * @param foodListingKey The key (identifier) for the Food Listing that is to be claimed.
      * @return An observable that has no payload (simply resolves on success).
      */
-    public claimFoodListing(foodListingKey: number): Observable <void> {
-        return this.manageFoodListing(foodListingKey, '/receiverDonor/receiver/claimFoodListing');
+    public claimFoodListing(foodListingKey: number, specificAvailabilityTimes: Date[]): Observable <void> {
+        return this.requestService.post('/receiverDonor/receiver/claimFoodListing', new ClaimFoodListingRequest(foodListingKey, specificAvailabilityTimes))
+                                  .map(this.requestService.genericResponseMap);
     }
 
 
@@ -36,7 +38,7 @@ export class ManageFoodListingService {
      * @return An observable that has no payload (simply resolves on success).
      */
     public unclaimFoodListing(foodListingKey: number, unclaimReason: string): Observable <void> {
-        return this.manageFoodListing(foodListingKey, '/receiverDonor/receiver/unclaimFoodListing', unclaimReason);
+        return this.unclaimRemoveFoodListing(foodListingKey, '/receiverDonor/receiver/unclaimFoodListing', unclaimReason);
     }
 
 
@@ -47,7 +49,7 @@ export class ManageFoodListingService {
      * @return An observable that has no payload (simply resolves on success).
      */
     public removeFoodListing(foodListingKey: number, removalReason: string): Observable <void> {
-        return this.manageFoodListing(foodListingKey, 'receiverDonor/donor/removeFoodListing', removalReason);
+        return this.unclaimRemoveFoodListing(foodListingKey, 'receiverDonor/donor/removeFoodListing', removalReason);
     }
 
 
@@ -59,9 +61,9 @@ export class ManageFoodListingService {
      * @return An observable that on success resolves to nothing.
      *         If failure, then error is thrown.
      */
-    private manageFoodListing(foodListingKey: number, controllerRoute: string, reason?: string): Observable <void> {
+    private unclaimRemoveFoodListing(foodListingKey: number, controllerRoute: string, reason?: string): Observable <void> {
 
-        return this.requestService.post(controllerRoute, new ManageFoodListingRequest(foodListingKey, reason))
+        return this.requestService.post(controllerRoute, new UnclaimRemoveFoodListingRequest(foodListingKey, reason))
                                   .map(this.requestService.genericResponseMap);
     }
 }
