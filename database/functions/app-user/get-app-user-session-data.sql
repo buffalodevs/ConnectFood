@@ -52,6 +52,10 @@ AS $$
                                                                     'name',     Organization.name,
                                                                     'taxId',    Organization.taxId
                                                                 ),
+                                            'delivererInfo',    JSON_BUILD_OBJECT (
+                                                                    'driversLicenseState',  DelivererInfo.driversLicenseState,
+                                                                    'driversLicenseID',     DelivererInfo.driversLicenseID
+                                                                ),
                                             'availability',     (
                                                                     ARRAY (
                                                                         SELECT JSON_BUILD_OBJECT (
@@ -73,6 +77,7 @@ AS $$
     INNER JOIN AppUserPassword      ON AppUser.appUserKey = AppUserPassword.appUserKey
     INNER JOIN ContactInfo          ON AppUser.appUserKey = ContactInfo.appUserKey
     LEFT JOIN  Organization         ON AppUser.appUserKey = Organization.appUserKey
+    LEFT JOIN  DelivererInfo        ON AppUser.appUserKey = DelivererInfo.appUserKey
     LEFT JOIN  UnverifiedAppUser    ON AppUser.appUserKey = UnverifiedAppUser.appUserKey
     WHERE (_appUserKey IS NULL       OR AppUser.appUserKey = _appUserKey)
       AND (_email IS NULL            OR AppUser.email = _email)

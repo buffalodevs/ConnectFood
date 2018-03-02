@@ -6,22 +6,24 @@ SELECT dropFunction ('updateAppUser');
 CREATE OR REPLACE FUNCTION updateAppUser
 (
     _appUserKey                 AppUser.appUserKey%TYPE,
-    _email                      AppUser.email%TYPE                  DEFAULT NULL, 
-    _password                   AppUserPassword.password%TYPE       DEFAULT NULL,
-    _lastName                   AppUser.lastName%TYPE               DEFAULT NULL,
-    _firstName                  AppUser.firstName%TYPE              DEFAULT NULL,
-    _address                    ContactInfo.address%TYPE            DEFAULT NULL,
-    _latitude                   NUMERIC(9, 6)                       DEFAULT NULL,
-    _longitude                  NUMERIC(9, 6)                       DEFAULT NULL,
-    _timezone                   ContactInfo.timezone%TYPE           DEFAULT NULL,
-    _city                       ContactInfo.city%TYPE               DEFAULT NULL,
-    _state                      ContactInfo.state%TYPE              DEFAULT NULL,
-    _zip                        ContactInfo.zip%TYPE                DEFAULT NULL,
-    _phone                      ContactInfo.phone%TYPE              DEFAULT NULL,
-    _appUserType                AppUser.appUserType%TYPE            DEFAULT NULL,
-    _availabilityMetaTimeRanges JSON[]                              DEFAULT NULL,
-    _organizationName           Organization.name%TYPE              DEFAULT NULL,
-    _taxId                      Organization.taxId%TYPE             DEFAULT NULL
+    _email                      AppUser.email%TYPE                      DEFAULT NULL, 
+    _password                   AppUserPassword.password%TYPE           DEFAULT NULL,
+    _lastName                   AppUser.lastName%TYPE                   DEFAULT NULL,
+    _firstName                  AppUser.firstName%TYPE                  DEFAULT NULL,
+    _address                    ContactInfo.address%TYPE                DEFAULT NULL,
+    _latitude                   NUMERIC(9, 6)                           DEFAULT NULL,
+    _longitude                  NUMERIC(9, 6)                           DEFAULT NULL,
+    _timezone                   ContactInfo.timezone%TYPE               DEFAULT NULL,
+    _city                       ContactInfo.city%TYPE                   DEFAULT NULL,
+    _state                      ContactInfo.state%TYPE                  DEFAULT NULL,
+    _zip                        ContactInfo.zip%TYPE                    DEFAULT NULL,
+    _phone                      ContactInfo.phone%TYPE                  DEFAULT NULL,
+    _appUserType                AppUser.appUserType%TYPE                DEFAULT NULL,
+    _availabilityMetaTimeRanges JSON[]                                  DEFAULT NULL,
+    _organizationName           Organization.name%TYPE                  DEFAULT NULL,
+    _taxId                      Organization.taxId%TYPE                 DEFAULT NULL,
+    _driversLicenseState        DelivererInfo.driversLicenseState%TYPE  DEFAULT NULL,
+    _driversLicenseID           DelivererInfo.driversLicenseID%TYPE     DEFAULT NULL
 )
 -- Returns the new App User's information.
 RETURNS TABLE
@@ -59,6 +61,12 @@ BEGIN
     SET     name = COALESCE(_organizationName, name),
             taxId = COALESCE(_taxId, taxId)
     WHERE   Organization.appUserKey = _appUserKey;
+
+    -- Update any Deliverer fields related to AppUser being updated.
+    UPDATE  DelivererInfo
+    SET     driversLicenseState = COALESCE(_driversLicenseState, driversLicenseState),
+            driversLicenseID = COALESCE(_driversLicenseID, driversLicenseID)
+    WHERE   DelivererInfo.appUserKey = _appUserKey;
 
     -- Update password related to AppUser being updated. We keep track of all old passwords, so this is an insert!
     IF (_password IS NOT NULL)

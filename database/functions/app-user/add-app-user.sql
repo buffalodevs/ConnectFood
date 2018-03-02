@@ -18,7 +18,9 @@ CREATE OR REPLACE FUNCTION addAppUser
     _appUserType                AppUser.appUserType%TYPE,
     _availabilityMetaTimeRanges JSON[],
     _organizationName           Organization.name%TYPE,
-    _taxId                      Organization.taxId%TYPE
+    _taxId                      Organization.taxId%TYPE,
+    _driversLicenseState        DelivererInfo.driversLicenseState%TYPE,
+    _driversLicenseID           DelivererInfo.driversLicenseID%TYPE
 )
 -- Returns the new App User's information.
 RETURNS TABLE
@@ -58,10 +60,13 @@ BEGIN
     PERFORM addUpdateAppUserAvailability (_appUserKey, _availabilityMetaTimeRanges, _timezone);
 
     -- Add the new user's organization data if the user is and oragnization.
-    IF (_organizationName IS NOT NULL)
+    IF (_appUserType = 'Donor'::AppUserType OR _appUserType = 'Receiver'::AppUserType)
     THEN
         INSERT INTO Organization (appUserKey, name, taxId)
         VALUES      (_appUserKey, _organizationName, _taxId);
+    ELSE
+        INSERT INTO DelivererInfo (appUserKey, driversLicenseState, driversLicenseID)
+        VALUES      (_appUserKey, _driversLicenseState, _driversLicenseID);
     END IF;
 
     -- Add the new user to table of unverified app users (needs email verification).

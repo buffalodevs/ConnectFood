@@ -65,22 +65,24 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
         this.form = this._formBuilder.group({
 
             'primary': this._formBuilder.group({
-                'appUserType':      [null, Validators.required],
-                'email':            [null, [Validators.required, Validators.pattern(this.validationService.EMAIL_REGEX)]],
-                'organizationName': [null, Validators.required],
-                'taxId':            [null, [Validators.required, Validators.pattern(this.validationService.TAX_ID_REGEX)]],
-                'firstName':        [null, Validators.required],
-                'lastName':         [null, Validators.required],
-                'password':         [null, [Validators.required, Validators.pattern(this.validationService.PASSWORD_REGEX)]],
-                'confirmPassword':  [null, [Validators.required, Validators.pattern(this.validationService.PASSWORD_REGEX)]]
+                'appUserType':          [null, Validators.required],
+                'email':                [null, [Validators.required, Validators.pattern(this.validationService.EMAIL_REGEX)]],
+                'organizationName':     [null, Validators.required],
+                'taxId':                [null, [Validators.required, Validators.pattern(this.validationService.TAX_ID_REGEX)]],
+                'driversLicenseState':  [null, [Validators.required, Validators.minLength(2), Validators.maxLength(2)]],
+                'driversLicenseID':     [null, [Validators.required, Validators.pattern(this.validationService.DRIVERS_LICENSE_ID_REGEX)]],
+                'firstName':            [null, Validators.required],
+                'lastName':             [null, Validators.required],
+                'password':             [null, [Validators.required, Validators.pattern(this.validationService.PASSWORD_REGEX)]],
+                'confirmPassword':      [null, [Validators.required, Validators.pattern(this.validationService.PASSWORD_REGEX)]]
             }, { validator: this.validationService.confirmPasswordEqual() }),
 
             'contactInfo': this._formBuilder.group({
-                'address':          [null, Validators.required],
-                'city':             [null, Validators.required],
-                'state':            [null, [Validators.required, Validators.minLength(2), Validators.maxLength(2)]],
-                'zip':              [null, [Validators.required, Validators.pattern(this.validationService.ZIP_REGEX)]],
-                'phone':            [null, [Validators.required, Validators.pattern(this.validationService.PHONE_REGEX)]]
+                'address':              [null, Validators.required],
+                'city':                 [null, Validators.required],
+                'state':                [null, [Validators.required, Validators.minLength(2), Validators.maxLength(2)]],
+                'zip':                  [null, [Validators.required, Validators.pattern(this.validationService.ZIP_REGEX)]],
+                'phone':                [null, [Validators.required, Validators.pattern(this.validationService.PHONE_REGEX)]]
             }),
 
             'availability': [null]
@@ -126,16 +128,24 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
 
         let organizationNameControl: FormControl = <FormControl>this.form.get('primary.organizationName');
         let taxIdControl: FormControl = <FormControl>this.form.get('primary.taxId');
+        let driversLicenseStateControl: FormControl = <FormControl>this.form.get('primary.driversLicenseState');
+        let driversLicenseIDControl: FormControl = <FormControl>this.form.get('primary.driversLicenseID');
 
+        // Shut off validation for deliverer fields and turn on validation for organization fields.
         if (this.isOrganization()) {
             this.adminPreStr = 'Admin';
             this.validationService.setValidatorsAndRefresh(organizationNameControl, [Validators.required]);
             this.validationService.setValidatorsAndRefresh(taxIdControl, [Validators.required]);
+            this.validationService.setValidatorsAndRefresh(driversLicenseStateControl, null);
+            this.validationService.setValidatorsAndRefresh(driversLicenseIDControl, null);
         }
+        // Shut off validation for organization fields and turn on validation for deliverer fields.
         else {
             this.adminPreStr = '';
             this.validationService.setValidatorsAndRefresh(organizationNameControl, null);
             this.validationService.setValidatorsAndRefresh(taxIdControl, null);
+            this.validationService.setValidatorsAndRefresh(driversLicenseStateControl, [Validators.required]);
+            this.validationService.setValidatorsAndRefresh(driversLicenseIDControl, [Validators.required]);
         }
     }
 
@@ -166,11 +176,12 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
         // Copy form values to AppUser object.
         ObjectManipulation.shallowCopy(value.primary, appUser, null, true);
         ObjectManipulation.shallowCopy(value.primary, appUser.organization, null, true);
+        ObjectManipulation.shallowCopy(value.primary, appUser.delivererInfo, null, true);
         appUser.organization.name = value.primary.organizationName;
         ObjectManipulation.shallowCopy(value.contactInfo, appUser.contactInfo, null, true);
         appUser.availability = value.availability;
 
-        let observer: Observable <FoodWebResponse> = this._signupService.signup(appUser, password);
+        const observer: Observable <FoodWebResponse> = this._signupService.signup(appUser, password);
         this.showProgressSpinner = true;
 
         observer.finally(() => { this.showProgressSpinner = false; })

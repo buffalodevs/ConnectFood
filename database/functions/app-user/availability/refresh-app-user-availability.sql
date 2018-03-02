@@ -9,11 +9,7 @@ SELECT dropFunction('refreshAppUserAvailability');
 CREATE OR REPLACE FUNCTION refreshAppUserAvailability()
 RETURNS VOID
 AS $$
-    DECLARE _currentDOW INTEGER DEFAULT NULL;
 BEGIN
-
-    SET TIME ZONE 'UTC';
-    _currentDOW := COALESCE(_currentDOW, EXTRACT(DOW FROM CURRENT_TIMESTAMP)::INTEGER);
 
     -- Generate absolute Availability timestamp ranges for 2 weeks away (current week and next week should have already been generated).
     UPDATE  Availability
@@ -25,8 +21,7 @@ BEGIN
                                 INNER JOIN  AppUserAvailabilityMap ON ContactInfo.appUserkey = AppUserAvailabilityMap.appUserKey
                                 WHERE       AppUserAvailabilityMap.availabilityKey = Availability.availabilityKey
                             ),
-                            2,
-                            _currentDOW
+                            2
                         )
     -- Only want to update the availability range that falls in previous week (so want min availability time range for user).
     WHERE   LOWER(Availability.timeRange) IN (

@@ -37,9 +37,18 @@
                             <mat-error *ngIf="hasError('primary.email')">{{ errorMsgFor('primary.email') }}</mat-error>
                         </mat-input-container>
 
-                        <mat-input-container class="form-group" *ngIf="isOrganization()">
-                            <input matInput placeholder="Organization Name" name="organizationName" formControlName="organizationName">
-                        </mat-input-container>
+                        <ng-container *ngIf="isOrganization()">
+
+                            <mat-input-container class="form-group">
+                                <input matInput placeholder="Organization Name" name="organizationName" formControlName="organizationName">
+                            </mat-input-container>
+
+                            <mat-input-container class="form-group">
+                                <input matInput placeholder="Organization Tax ID" [textMask]="{ mask: appUserConstants.TAX_ID_MASK, placeholderChar: '\u2000' }"
+                                        formControlName="taxId">
+                            </mat-input-container>
+
+                        </ng-container>
 
                         <div class="row">
 
@@ -52,17 +61,27 @@
                             </mat-input-container>
 
                         </div>
+
+                        <ng-container *ngIf="!isOrganization()">
+
+                            <mat-input-container class="form-group">
+                                <input #driversLicenseStateInput matInput placeholder="Drivers License State"
+                                 formControlName="driversLicenseState" [InputFilter]="appUserConstants.STATE_LIST"
+                                 [ngbTypeahead]="typeaheadService.genOptionsFilter(driversLicenseStateInput, appUserConstants.STATE_LIST)" container="body">
+                            </mat-input-container>
+
+                            <mat-input-container class="form-group">
+                                <input matInput placeholder="Drivers License ID" formControlName="driversLicenseID"
+                                 [textMask]="{ mask: appUserConstants.DRIVERS_LICENSE_ID_MASK, placeholderChar: '\u2000' }">
+                            </mat-input-container>
+
+                        </ng-container>
                     
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="limit-width">
-
-                        <mat-input-container class="form-group" *ngIf="isOrganization()">
-                            <input matInput placeholder="Organization Tax ID" [textMask]="{ mask: appUserConstants.TAX_ID_MASK, placeholderChar: '\u2000' }"
-                                   formControlName="taxId">
-                        </mat-input-container>
 
                         <mat-input-container class="form-group">
                             <input matInput placeholder="Password" type="password" formControlName="password" autocomplete="new-password">
@@ -106,7 +125,7 @@
                             </mat-input-container>
 
                             <mat-input-container class="form-group col-md-3">
-                                <input #stateInput matInput placeholder="state" name="state" formControlName="state"
+                                <input #stateInput matInput placeholder="state" name="state" formControlName="state" [InputFilter]="appUserConstants.STATE_LIST"
                                  [ngbTypeahead]="typeaheadService.genOptionsFilter(stateInput, appUserConstants.STATE_LIST)" container="body">
                             </mat-input-container>
 

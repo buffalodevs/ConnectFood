@@ -64,6 +64,11 @@ export class Validation {
      */
     public readonly TAX_ID_REGEX: RegExp = /^\d{2}\-\d{7}$/;
 
+    /**
+     * Regular expression used for verifying Drivers License ID format.
+     */
+    public readonly DRIVERS_LICENSE_ID_REGEX: RegExp = /^\d{3} \d{3} \d{3}$/;
+
 
     public constructor() {}
 
@@ -174,6 +179,16 @@ export class Validation {
 
 
     /**
+     * Checks if a drivers license ID string is in the correct format (### ### ###).
+     * @param driversLicenseID The drivers license ID string to check.
+     * @return true if it is, false if not.
+     */
+    public driversLicenseIDValidator(driversLicenseID: string): boolean {
+        return this.DRIVERS_LICENSE_ID_REGEX.test(driversLicenseID);
+    }
+
+
+    /**
      * Validates given app user information and password.
      * @param appUser The app user to validate.
      * @param password The password to validate.
@@ -206,6 +221,10 @@ export class Validation {
 
         if (appUser.organization != null && appUser.organization.taxId != null && !this.taxIdValidator(appUser.organization.taxId)) {
             return new Error(AppUserErrorMsgs.INVALID_TAX_ID);
+        }
+
+        if (appUser.delivererInfo != null && appUser.delivererInfo.driversLicenseID != null && !this.driversLicenseIDValidator(appUser.delivererInfo.driversLicenseID)) {
+            return new Error(AppUserErrorMsgs.INVALID_DRIVERS_LICENSE_ID);
         }
 
         return null;

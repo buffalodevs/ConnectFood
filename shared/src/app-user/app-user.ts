@@ -3,6 +3,7 @@ import { AppUserType } from './app-user-domain/app-user-type';
 import { deserializable, deepDeserializable } from '../deserialization/deserializer';
 import { ContactInfo, GPSCoordinate } from './contact-info';
 import { Organization } from './organization';
+import { DelivererInfo } from './deliverer-info';
 
 export { DateRange, AppUserType, ContactInfo, GPSCoordinate, Organization };
 
@@ -24,6 +25,7 @@ export class AppUser {
         public firstName: string = null,
         public contactInfo: ContactInfo = new ContactInfo(),
         public organization: Organization = new Organization(),
+        public delivererInfo: DelivererInfo = new DelivererInfo(),
         availability: DateRange[] = null
     ) {
         this.availability = availability;

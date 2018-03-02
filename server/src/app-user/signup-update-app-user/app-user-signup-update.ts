@@ -81,22 +81,24 @@ async function addOrUpdateAppUserInSQL(appUser: AppUser, hashedPassword?: string
                                        : 'SELECT * FROM addAppUser()';
 
     // Generate query args based off of either signing up or updating App User.
-    let queryArgs: Array<any> = [ appUser.email,
-                                  hashedPassword,
-                                  appUser.lastName,
-                                  appUser.firstName, 
-                                  appUser.contactInfo.address,
-                                  (gpsCoordinate != null ? gpsCoordinate.latitude : null),
-                                  (gpsCoordinate != null ? gpsCoordinate.longitude : null),
-                                  appUser.contactInfo.timezone,
-                                  appUser.contactInfo.city,
-                                  appUser.contactInfo.state,
-                                  appUser.contactInfo.zip,
-                                  appUser.contactInfo.phone,
-                                  appUser.appUserType,
-                                  appUser.availability,
-                                  appUser.organization.name,
-                                  appUser.organization.taxId ];
+    let queryArgs: any[] = [ appUser.email,
+                             hashedPassword,
+                             appUser.lastName,
+                             appUser.firstName, 
+                             appUser.contactInfo.address,
+                             (gpsCoordinate != null ? gpsCoordinate.latitude : null),
+                             (gpsCoordinate != null ? gpsCoordinate.longitude : null),
+                             appUser.contactInfo.timezone,
+                             appUser.contactInfo.city,
+                             appUser.contactInfo.state,
+                             appUser.contactInfo.zip,
+                             appUser.contactInfo.phone,
+                             appUser.appUserType,
+                             appUser.availability,
+                             appUser.organization.name,
+                             appUser.organization.taxId,
+                             appUser.delivererInfo.driversLicenseState,
+                             appUser.delivererInfo.driversLicenseID ];
     // If an update, then we will need additional appUserKey argument at beginning of list.
     if (isUpdate) queryArgs.unshift(appUserUpdateKey);
             

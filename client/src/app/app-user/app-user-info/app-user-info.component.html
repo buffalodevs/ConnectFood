@@ -28,7 +28,41 @@
 
             </div>
 
-            <div class="form-group" *ngIf="IS_ORGANIZATION">
+            <div class="form-group">
+
+                <h4>{{ IS_ORGANIZATION ? 'Admin Name' : 'Name' }}:</h4>
+
+                <span *ngIf="!getEditDataFor('firstName').editing" class="link-content" (click)="setManyEditable(['firstName', 'lastName'])" title="edit">
+                    {{ form.get('firstName').value }} {{ form.get('lastName').value }}<i class="material-icons">&#xe254;</i>
+                </span>
+
+                <form [formGroup]="form" (ngSubmit)="saveMany(['firstName', 'lastName'])"
+                    [slick-progress-spinner]="getEditDataFor('firstName').showProgressSpinner" *ngIf="getEditDataFor('firstName').editing">
+
+                    <div class="row">
+
+                        <mat-input-container floatPlaceholder="never" class="col-md-6">
+                            <input matInput id="firstName" placeholder="First Name" formControlName="firstName">
+                        </mat-input-container>
+
+                        <mat-input-container floatPlaceholder="never" class="col-md-6">
+                            <input matInput id="lastName" placeholder="Last Name" formControlName="lastName">
+                        </mat-input-container>
+
+                    </div>
+
+                    <button #saveName mat-raised-button color="primary" class="button-sm" type="submit">Save</button>
+                    <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setManyEditable(['firstName', 'lastName'], false)">Cancel</button>
+
+                </form>
+
+            </div>
+
+        </div><!-- col 1 -->
+
+        <div class="col-md-6" *ngIf="IS_ORGANIZATION">
+
+            <div class="form-group">
 
                 <h4>Organization Name:</h4>
 
@@ -52,41 +86,7 @@
 
             </div>
 
-        </div><!-- col 2 -->
-
-        <div class="col-md-6">
-
             <div class="form-group">
-
-                <h4>{{ IS_ORGANIZATION ? 'Admin Name' : 'Name' }}:</h4>
-
-                <span *ngIf="!getEditDataFor('firstName').editing" class="link-content" (click)="setManyEditable(['firstName', 'lastName'])" title="edit">
-                    {{ form.get('firstName').value }} {{ form.get('lastName').value }}<i class="material-icons">&#xe254;</i>
-                </span>
-
-                <form [formGroup]="form" (ngSubmit)="saveMany(['firstName', 'lastName'])"
-                 [slick-progress-spinner]="getEditDataFor('firstName').showProgressSpinner" *ngIf="getEditDataFor('firstName').editing">
-
-                    <div class="row">
-
-                        <mat-input-container floatPlaceholder="never" class="col-md-6">
-                            <input matInput id="firstName" placeholder="First Name" formControlName="firstName">
-                        </mat-input-container>
-
-                        <mat-input-container floatPlaceholder="never" class="col-md-6">
-                            <input matInput id="lastName" placeholder="Last Name" formControlName="lastName">
-                        </mat-input-container>
-
-                    </div>
-
-                    <button #saveName mat-raised-button color="primary" class="button-sm" type="submit">Save</button>
-                    <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setManyEditable(['firstName', 'lastName'], false)">Cancel</button>
-
-                </form>
-
-            </div>
-
-            <div class="form-group" *ngIf="IS_ORGANIZATION">
 
                 <h4>Organization Tax Id:</h4>
 
@@ -111,7 +111,66 @@
 
             </div>
 
-        </div><!-- col 1 -->
+        </div><!-- Col 2 (Organization) -->
+
+        <div class="col-md-6" *ngIf="!IS_ORGANIZATION">
+
+            <div class="form-group">
+
+                <h4>Drivers Liscence State:</h4>
+
+                <span *ngIf="!getEditDataFor('delivererInfo.driversLicenseState').editing" class="link-content"
+                    (click)="setEditable('delivererInfo.driversLicenseState')" title="edit">
+                    {{ form.get('delivererInfo.driversLicenseState').value}}<i class="material-icons">&#xe254;</i>
+                </span>
+
+                <form formGroupName="delivererInfo" (ngSubmit)="save('delivererInfo.driversLicenseState')"
+                    [slick-progress-spinner]="getEditDataFor('delivererInfo.driversLicenseState').showProgressSpinner"
+                    *ngIf="getEditDataFor('delivererInfo.driversLicenseState').editing">
+
+                    <mat-input-container floatPlaceholder="never">
+                        <input #driversLicenseStateInput matInput placeholder="Drivers License State"
+                            formControlName="driversLicenseState" [InputFilter]="appUserConstants.STATE_LIST"
+                            [ngbTypeahead]="typeaheadService.genOptionsFilter(driversLicenseStateInput, appUserConstants.STATE_LIST)" container="body">
+                    </mat-input-container>
+
+                    <button mat-raised-button color="primary" class="button-sm" type="submit">Save</button>
+                    <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('delivererInfo.driversLicenseState', false)">
+                        Cancel
+                    </button>
+
+                </form>
+
+            </div>
+
+            <div class="form-group">
+
+                <h4>Drivers Liscence ID:</h4>
+
+                <span *ngIf="!getEditDataFor('delivererInfo.driversLicenseID').editing" class="link-content"
+                    (click)="setEditable('delivererInfo.driversLicenseID')" title="edit">
+                    {{ form.get('delivererInfo.driversLicenseID').value}}<i class="material-icons">&#xe254;</i>
+                </span>
+
+                <form formGroupName="delivererInfo" (ngSubmit)="save('delivererInfo.driversLicenseID')"
+                    [slick-progress-spinner]="getEditDataFor('delivererInfo.driversLicenseID').showProgressSpinner"
+                    *ngIf="getEditDataFor('delivererInfo.driversLicenseID').editing">
+
+                    <mat-input-container floatPlaceholder="never">
+                        <input matInput placeholder="Drivers License ID" formControlName="driversLicenseID"
+                            [textMask]="{ mask: appUserConstants.DRIVERS_LICENSE_ID_MASK, placeholderChar: '\u2000' }">
+                    </mat-input-container>
+
+                    <button mat-raised-button color="primary" class="button-sm" type="submit">Save</button>
+                    <button mat-raised-button color="primary" class="button-sm warn-button" type="button" (click)="setEditable('delivererInfo.driversLicenseID', false)">
+                        Cancel
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div><!-- col 2 (Deliverer) -->
 
     </div><br><br><!-- row -->
 
