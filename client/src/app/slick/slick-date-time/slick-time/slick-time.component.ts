@@ -124,7 +124,7 @@ export class SlickTimeComponent extends AbstractModelDrivenComponent implements 
         if (this.form.valid) {
 
             valueUpdt = this.includeDate ? this.form.get('date').value
-                                         : new Date(new Date().toLocaleDateString());
+                                         : new Date();
             valueUpdt = this.dateFormatter.setWallClockTimeForDate(valueUpdt, this.form.get('timeStr').value);
 
             this._logger.error('Date to string: ' + valueUpdt.toString());

@@ -138,6 +138,7 @@ export class DateFormatter {
     /**
      * Sets the wall clock time for a given date based on a given wall clock time string (hh:mm ['AM' | 'PM']).
      * @param date The date to set the time of.
+     *             NOTE: Internally modified.
      * @param time The time string of format: /^([1-9]|1[0-2]):[0-5]\d(\s?)[AaPp][Mm]$/.
      * @return The input date with its time set. If an invalid time string is provided, then null is returned!
      */
@@ -145,11 +146,10 @@ export class DateFormatter {
 
         if (!this.isWallClockFormat(time))  return null;
 
-        let timeDate: Date = new Date(date.valueOf());
-        let wallClockTime: WallClockTime = this.parseWallClockTime(time);
+        const wallClockTime: WallClockTime = this.parseWallClockTime(time);
+        date.setHours(wallClockTime.getMillitaryHours(), wallClockTime.minutes, 0, 0);
 
-        timeDate.setHours(wallClockTime.getMillitaryHours(), wallClockTime.minutes, 0, 0);        
-        return timeDate;
+        return date;
     }
 
 
