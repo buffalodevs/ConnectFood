@@ -128,6 +128,8 @@ export class SlickTimeComponent extends AbstractModelDrivenComponent implements 
             valueUpdt = this.dateFormatter.setWallClockTimeForDate(valueUpdt, this.form.get('timeStr').value);
 
             this._logger.error('Date to string: ' + valueUpdt.toString());
+            this._logger.error('Date to local date string: ' + valueUpdt.toLocaleDateString());
+            this._logger.error('Client timezone: ' + Intl.DateTimeFormat().resolvedOptions().timeZone + ' (' + valueUpdt.getTimezoneOffset() + ')');
             this._logger.error('Date to JSON: ' + JSON.stringify(valueUpdt));
         }
 
