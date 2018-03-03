@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Component, Input, OnInit, AfterViewInit, ViewChild, forwardRef, SimpleChanges, OnChanges } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators, ValidatorFn, FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material';
@@ -128,6 +129,7 @@ export class SlickTimeComponent extends AbstractModelDrivenComponent implements 
             valueUpdt = this.dateFormatter.setWallClockTimeForDate(valueUpdt, this.form.get('timeStr').value);
 
             this._logger.error('New Date object: ' + new Date());
+            this._logger.error('Moment format: ' + moment().format());
             this._logger.error('New Date with str construct: ' + new Date(new Date().toLocaleDateString() + ' 12:00 AM'));
             this._logger.error('Date to string: ' + valueUpdt.toString());
             this._logger.error('Date to local date string: ' + valueUpdt.toLocaleDateString());
