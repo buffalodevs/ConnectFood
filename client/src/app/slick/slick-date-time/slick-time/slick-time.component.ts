@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, AfterViewInit, ViewChild, forwardRef, SimpleChanges, OnChanges } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators, ValidatorFn, FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material';
+import { NGXLogger } from 'ngx-logger';
 
 import { AbstractModelDrivenComponent } from '../../../common-util/components/abstract-model-driven-component';
 import { SlickTimeValidationService } from './slick-time-validation.service';
@@ -42,6 +43,7 @@ export class SlickTimeComponent extends AbstractModelDrivenComponent implements 
         public validationService: SlickTimeValidationService,
         public typeaheadService: SlickTypeaheadService,
         public dateFormatter: DateFormatterService,
+        private _logger: NGXLogger,
         formBuilder: FormBuilder
     ) {
         super(validationService, formBuilder);
@@ -122,8 +124,11 @@ export class SlickTimeComponent extends AbstractModelDrivenComponent implements 
         if (this.form.valid) {
 
             valueUpdt = this.includeDate ? this.form.get('date').value
-                                         : new Date();
+                                         : new Date(new Date().toLocaleDateString());
             valueUpdt = this.dateFormatter.setWallClockTimeForDate(valueUpdt, this.form.get('timeStr').value);
+
+            this._logger.error('Date to string: ' + valueUpdt.toString());
+            this._logger.error('Date to JSON: ' + JSON.stringify(valueUpdt));
         }
 
         // Notify parent component's listener of change.
