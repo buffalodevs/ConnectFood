@@ -28,6 +28,7 @@ import { FoodListingCartComponent } from './food-listing-cart/food-listing-cart.
 import { RoutePreprocessService } from '../common-util/services/route-preprocess.service';
 import { FoodTypesService } from '../domain/food-types/food-types.service';
 import { ManageFoodListingService } from './food-listings/food-listing-services/manage-food-listing.service';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 
 const receiverDonorRoutes: Routes = [
@@ -76,6 +77,7 @@ const receiverDonorRoutes: Routes = [
         SlickExpansionPanelModule,
         SlickFilteredListModule,
         SlickImgManagerModule,
+        NoopAnimationsModule,
         CommonFoodListingDomainsModule
     ],
     providers: [
