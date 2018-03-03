@@ -1,4 +1,4 @@
-import moment from 'moment';
+import * as moment from 'moment';
 import { Component, Input, OnInit, AfterViewInit, ViewChild, forwardRef, SimpleChanges, OnChanges } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators, ValidatorFn, FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material';
