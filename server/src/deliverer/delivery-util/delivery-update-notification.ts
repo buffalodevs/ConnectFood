@@ -1,13 +1,15 @@
 import * as moment from 'moment';
+import * as striptags from 'striptags'
 
 import { SessionData, AppUser } from "../../common-util/session-data";
 import { DeliveryUpdateNotificationData } from './delivery-update-notification-data';
 import { DriveDistTime, GPSCoordinate, getRouteSegmentDrivingDistTimes, getEstimatedArrivalTimes } from "../../geocode/geocode";
-import { EmailConfig, sendEmail } from "../../email/email";
+import { EmailConfig, sendEmail } from "../../email-sms/email";
 
 import { DeliveryUtil, DeliveryState } from "../../../../shared/src/deliverer/delivery-util";
 import { AppUserType } from '../../../../shared/src/app-user/app-user';
 import { DateFormatter } from "../../../../shared/src/date-time-util/date-formatter";
+import { sendSMS } from '../../email-sms/sms';
 
 export { DeliveryUpdateNotificationData }
 
@@ -39,11 +41,10 @@ export async function notifyReceiverAndDonorOfDeliveryUpdate(delivererSessionDat
  *                             NOTE: Can be null if the deliverer has already picked up the delivery at the donor.
  * @return A promise that resolves to nothing on success.
  */
-function notifyDonorOfDeliveryUpdate(delivererSessionData: SessionData, deliveryUpdateNotificationData: DeliveryUpdateNotificationData,
-                                     estimatedArrivalTime: string): Promise <void>
+async function notifyDonorOfDeliveryUpdate(delivererSessionData: SessionData, deliveryUpdateNotificationData: DeliveryUpdateNotificationData,
+                                           estimatedArrivalTime: string): Promise <void>
 {
-    return generateAndSendEmail(delivererSessionData, deliveryUpdateNotificationData, AppUserType.Donor, estimatedArrivalTime);
-    // TODO: Chain to promise and send text message.
+    await generateAndSendEmailAndSMS(delivererSessionData, deliveryUpdateNotificationData, AppUserType.Donor, estimatedArrivalTime);
 }
 
 
@@ -54,11 +55,10 @@ function notifyDonorOfDeliveryUpdate(delivererSessionData: SessionData, delivery
  * @param estimatedArrivalTime The estimated time for the Deliverer to arrive at the Donor.
  * @return A promise that resolves to nothing on success.
  */
-function notifyReceiverOfDeliveryUpdate(delivererSessionData: SessionData, deliveryUpdateNotificationData: DeliveryUpdateNotificationData,
+async function notifyReceiverOfDeliveryUpdate(delivererSessionData: SessionData, deliveryUpdateNotificationData: DeliveryUpdateNotificationData,
                                         estimatedArrivalTime: string): Promise <void>
 {
-    return generateAndSendEmail(delivererSessionData, deliveryUpdateNotificationData, AppUserType.Receiver, estimatedArrivalTime);
-    // TODO: Chain to promise and send text message.
+    await generateAndSendEmailAndSMS(delivererSessionData, deliveryUpdateNotificationData, AppUserType.Receiver, estimatedArrivalTime);
 }
 
 
@@ -70,8 +70,8 @@ function notifyReceiverOfDeliveryUpdate(delivererSessionData: SessionData, deliv
  * @param estimatedArrivalTime The estimated time for the Deliverer to arrive at the Donor or Receiver.
  *                             NOTE: Can be null for Donor if delivery has already been picked up.
  */
-function generateAndSendEmail(delivererSessionData: SessionData, deliveryUpdateNotificationData: DeliveryUpdateNotificationData,
-                              appUserType: AppUserType, estimatedArrivalTime: string): Promise <void>
+async function generateAndSendEmailAndSMS(delivererSessionData: SessionData, deliveryUpdateNotificationData: DeliveryUpdateNotificationData,
+                                          appUserType: AppUserType, estimatedArrivalTime: string): Promise <void>
 {
     const htmlBodyMid: string = generateHTMLBodyMid(delivererSessionData, deliveryUpdateNotificationData, appUserType, estimatedArrivalTime);
 
@@ -88,12 +88,15 @@ function generateAndSendEmail(delivererSessionData: SessionData, deliveryUpdateN
         ( generateHTMLBodyStart(delivererSessionData, deliveryUpdateNotificationData) + htmlBodyMid )
     );
 
-    // Send the email with our generated mail configuration.
-    return sendEmail(emailConfig)
-        .catch((err: Error) => {
-            throw new Error('Failed to email notification of delivery update to concerned donor and receiver');
-        });
-} 
+    // Send the email with our generated mail configuration. Also, send SMS (text) message without HTML tags.
+    try {
+        await sendEmail(emailConfig);
+        await sendSMS(emailConfig.contentHTMLStr, targetUser.contactInfo.phone, true);
+    }
+    catch (err) {
+        throw new Error('Failed to Email/SMS notification of delivery update to concerned donor and receiver');
+    }
+}
 
 
 /**

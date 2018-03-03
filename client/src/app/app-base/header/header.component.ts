@@ -36,7 +36,7 @@ export class HeaderComponent {
     }
 
 
-    private showLogin(): void {
+    public showLogin(): void {
         LoginComponent.display(this._dialog); 
     }
 }

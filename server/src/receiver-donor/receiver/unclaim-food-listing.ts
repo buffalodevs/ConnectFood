@@ -4,7 +4,7 @@ import { logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
 import { addArgPlaceholdersToQueryStr } from '../../database-util/prepared-statement-util';
 import { logger, prettyjsonRender } from '../../logging/logger';
 import { SessionData } from '../../common-util/session-data';
-import { UnclaimNotificationData, notifyDelivererOfLostDelivery, notifyDonorOfLostDelivery } from '../receiver-donor-util/unclaim-notification';
+import { UnclaimNotificationData, notifyDelivererOfLostDelivery, notifyDonorOfLostClaim } from '../receiver-donor-util/unclaim-notification';
 
 
 export async function unclaimFoodListing(foodListingKey: number, receiverSessionData: SessionData, unclaimReason: string): Promise <void> {
@@ -42,13 +42,15 @@ async function execUnclaimQuery(queryString: string, queryArgs: any[], receiverS
 async function handleUnclaimQueryResult(receiverSessionData: SessionData, result: QueryResult): Promise <void> {
     
     let unclaimNotificationData: UnclaimNotificationData = result.rows[0].unclaimnotificationdata;
+    let notificationPromises: Promise <any>[] = [];
 
-    // Next, if the removal resulted in total unclaiming of food that had a scheduled delivery, then notify deliverer and donor as well.
+    // Notify Donor that the Receiver has unclaimed the Food Listing Donation.
+    notificationPromises.push(notifyDonorOfLostClaim(unclaimNotificationData));
+
+    // Next, if the removal resulted in total unclaiming of food that had a scheduled delivery, then notify deliverer as well.
     if (unclaimNotificationData.delivererSessionData != null) {
-        
-        await Promise.all([
-            notifyDelivererOfLostDelivery(receiverSessionData, 'receiver', unclaimNotificationData),
-            notifyDonorOfLostDelivery(unclaimNotificationData),
-        ]);
+        notificationPromises.push(notifyDelivererOfLostDelivery(receiverSessionData, 'receiver', unclaimNotificationData));
     }
+
+    await Promise.all(notificationPromises);
 }

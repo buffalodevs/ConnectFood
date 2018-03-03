@@ -1,9 +1,12 @@
+import * as striptags from "striptags";
+
 import { SessionData } from "../../common-util/session-data";
 import { UnclaimNotificationData } from './unclaim-notification-data';
-import { sendEmail, EmailConfig } from "../../email/email";
+import { sendEmail, EmailConfig } from "../../email-sms/email";
 import { logger, prettyjsonRender } from '../../logging/logger';
 
 import { AppUserType, AppUser } from "../../../../shared/src/app-user/app-user";
+import { sendSMS } from "../../email-sms/sms";
 
 export { UnclaimNotificationData };
 
@@ -13,7 +16,7 @@ export { UnclaimNotificationData };
  * @param donorSessionData Data concerning the donor who submitted the remove/unclaim operation.
  * @param unclaimNotificationData Data required to notify all affected parties of the remove/unclaim operation.
  */
-export function notifyReceiverOfUnclaim(unclaimNotificationData: UnclaimNotificationData): Promise <void> {
+export async function notifyReceiverOfUnclaim(unclaimNotificationData: UnclaimNotificationData): Promise <void> {
     
     const receiverEmail: string = unclaimNotificationData.receiverSessionData.appUser.email;
     const receiverOrganization: string = unclaimNotificationData.receiverSessionData.appUser.organization.name;
@@ -37,6 +40,8 @@ export function notifyReceiverOfUnclaim(unclaimNotificationData: UnclaimNotifica
         </p>
     `
 
+    let smsContents: string = 'We regret to inform you that your claimed food titled "' + foodTitle + '" has been removed by its donor'
+
     let emailConfig: EmailConfig = new EmailConfig (
         ( 'Update of Claimed Food Titled: ' + foodTitle ),
         receiverOrganization,
@@ -45,8 +50,13 @@ export function notifyReceiverOfUnclaim(unclaimNotificationData: UnclaimNotifica
         htmlContents
     )
 
-    return sendEmail(emailConfig)
-        .catch((err: Error) => { logger.error(prettyjsonRender(err)); });
+    try {
+        await sendEmail(emailConfig);
+        await sendSMS(emailConfig.contentHTMLStr, unclaimNotificationData.receiverSessionData.appUser.contactInfo.phone, true);
+    }
+    catch (err) {
+        logger.error(prettyjsonRender(err));
+    }
 }
 
 
@@ -54,14 +64,14 @@ export function notifyReceiverOfUnclaim(unclaimNotificationData: UnclaimNotifica
  * Notifies an affected donor of a lost delivery due to the unclaiming of the related Food Listing.
  * @param unclaimNotificationData Data required to notify all affected parties of the lost delivery as a result of an unclaim operation.
  */
-export function notifyDonorOfLostDelivery(unclaimNotificationData: UnclaimNotificationData): Promise <void> {
+export async function notifyDonorOfLostClaim(unclaimNotificationData: UnclaimNotificationData): Promise <void> {
 
     const donorEmail: string = unclaimNotificationData.donorSessionData.appUser.email;
     const donorOrganization: string = unclaimNotificationData.donorSessionData.appUser.organization.name;
     const receiverOrganization: string = unclaimNotificationData.receiverSessionData.appUser.organization.name;
     const foodTitle: string = unclaimNotificationData.foodTitle;
-    const delivererAppUser: AppUser = unclaimNotificationData.delivererSessionData.appUser;
-    const delivererName: string = ( delivererAppUser.firstName + ' ' + delivererAppUser.lastName );
+    
+    const hadDeliverer: boolean = ( unclaimNotificationData.delivererSessionData != null );
 
     let htmlContents: string = `
         <p>
@@ -74,17 +84,27 @@ export function notifyDonorOfLostDelivery(unclaimNotificationData: UnclaimNotifi
         </p>
 
         ` + genUnclaimReasonHTML(unclaimNotificationData.unclaimReason) + `
+    `;
 
-        <p>
-            Therefore, the corresponding delivery has been cancelled. The deliverer
-            named <b>` + delivererName + `</b> has also been notified about the cancellation.
-        </p>
+    if (hadDeliverer) {
 
+        const delivererAppUser: AppUser = unclaimNotificationData.delivererSessionData.appUser;
+        const delivererName: string = ( delivererAppUser.firstName + ' ' + delivererAppUser.lastName );
+
+        htmlContents += `
+            <p>
+                Therefore, the corresponding delivery has been cancelled. The deliverer
+                named <b>` + delivererName + `</b> has also been notified about the cancellation.
+            </p>
+        `;
+    }
+
+    htmlContents += `
         <p>
             We are sorry for any inconvenience that this has caused you.<br>
             Please wait patiently for another receiver to claim your donation.
         </p>
-    `
+    `;
 
     let emailConfig: EmailConfig = new EmailConfig (
         ( 'Update of Claimed Food Titled: ' + foodTitle ),
@@ -94,8 +114,13 @@ export function notifyDonorOfLostDelivery(unclaimNotificationData: UnclaimNotifi
         htmlContents
     )
 
-    return sendEmail(emailConfig)
-        .catch((err: Error) => { logger.error(prettyjsonRender(err)); });
+    try {
+        await sendEmail(emailConfig);
+        await sendSMS(emailConfig.contentHTMLStr, unclaimNotificationData.donorSessionData.appUser.contactInfo.phone, true);
+    }
+    catch (err) {
+        logger.error(prettyjsonRender(err));
+    }
 }
 
 
@@ -105,7 +130,7 @@ export function notifyDonorOfLostDelivery(unclaimNotificationData: UnclaimNotifi
  * @param sourceAppUserType The type of the user (receiver or donor) who submitted the remove/unclaim operation.
  * @param unclaimNotificationData Data required to notify all affected parties of the remove/unclaim operation.
  */
-export function notifyDelivererOfLostDelivery(sourceSessionData: SessionData, sourceAppUserType: string, unclaimNotificationData: UnclaimNotificationData): Promise <void> {
+export async function notifyDelivererOfLostDelivery(sourceSessionData: SessionData, sourceAppUserType: string, unclaimNotificationData: UnclaimNotificationData): Promise <void> {
     
     const delivererEmail: string = unclaimNotificationData.delivererSessionData.appUser.email;
     const delivererName: string = ( unclaimNotificationData.delivererSessionData.appUser.firstName + ' ' +
@@ -140,8 +165,13 @@ export function notifyDelivererOfLostDelivery(sourceSessionData: SessionData, so
         htmlContents
     )
 
-    return sendEmail(emailConfig)
-        .catch((err: Error) => { logger.error(prettyjsonRender(err)); });
+    try {
+        await sendEmail(emailConfig);
+        await sendSMS(emailConfig.contentHTMLStr, unclaimNotificationData.delivererSessionData.appUser.contactInfo.phone, true);
+    }
+    catch (err) {
+        logger.error(prettyjsonRender(err));
+    }
 }
 
 

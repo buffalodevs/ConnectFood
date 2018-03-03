@@ -2,8 +2,9 @@ import { QueryResult, query } from "../../database-util/connection-pool";
 import { addArgPlaceholdersToQueryStr } from "../../database-util/prepared-statement-util";
 import { logSqlQueryExec } from "../../logging/sql-logger";
 import { logger, prettyjsonRender } from "../../logging/logger";
-import { EmailConfig, sendEmail } from "../../email/email";
+import { EmailConfig, sendEmail } from "../../email-sms/email";
 import { SessionData, AppUser } from "../../common-util/session-data";
+import { sendSMS } from "../../email-sms/sms";
 
 
 
@@ -11,7 +12,7 @@ import { SessionData, AppUser } from "../../common-util/session-data";
  * Sends a singup verification email to the new user that has signed up.
  * @param sessionData The session data of the new user that we are sending the verification email to.
  */
-export async function sendVerificationEmail(sessionData: SessionData) : Promise<void> {
+export async function sendVerificationEmailAndSMS(sessionData: SessionData) : Promise<void> {
 
     const verificationLink = process.env.FOOD_WEB_SERVER_HOST_ADDRESS + '/appUser/verify?appUserKey='
                            + sessionData.appUserKey + '&verificationToken=' + sessionData.verificationToken;
@@ -25,7 +26,7 @@ export async function sendVerificationEmail(sessionData: SessionData) : Promise<
             Welcome to Food Web!
             Please click <a href ="` + verificationLink + `">here</a> to verify your account with us.
         </p>
-    `
+    `;
         
     const emailConfig: EmailConfig = new EmailConfig (
         'Verify Your Food Web Account',
@@ -35,8 +36,12 @@ export async function sendVerificationEmail(sessionData: SessionData) : Promise<
         htmlStr
     );
 
+    const plainTextStr: string = 'Welcom to Food Web! We hope that you can take full advantage of the services we provide. '
+                               + 'Before you can perform any tasks on Food Web, we will need you to follow our signup verification link that was sent to your email.';
+
     try {
         await sendEmail(emailConfig);
+        await sendSMS(plainTextStr, sessionData.appUser.contactInfo.phone);
     }
     catch (err) {
         logger.error(prettyjsonRender(err));

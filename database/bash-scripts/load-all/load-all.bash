@@ -14,6 +14,7 @@ psql --set=sslmode=require -h $1 -p $2 -d $3 -U $4 \
     -f ../../tables/app-user/app-user.sql \
     -f ../../tables/app-user/contact-info.sql \
     -f ../../tables/app-user/organization.sql \
+    -f ../../tables/app-user/deliverer-info.sql \
     -f ../../tables/app-user/password/app-user-password.sql \
     -f ../../tables/app-user/password/app-user-password-recovery.sql \
     -f ../../tables/app-user/availability/app-user-availability.sql \
@@ -66,6 +67,7 @@ psql --set=sslmode=require -h $1 -p $2 -d $3 -U $4 \
     -f ../../functions/food-listing/deliver/cancel-delivery.sql \
  \
     -f ../../functions/food-listing/claim-unclaim/get-unclaim-notification-data.sql \
+    -f ../../functions/food-listing/claim-unclaim/add-update-claim-availability.sql \
     -f ../../functions/food-listing/claim-unclaim/claim-food-listing.sql \
     -f ../../functions/food-listing/claim-unclaim/unclaim-food-listing.sql \
  \
