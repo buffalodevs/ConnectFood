@@ -3,7 +3,7 @@ import { SessionData, AppUser } from '../../common-util/session-data';
 import { signupOrUpdateAppUser } from './app-user-signup-update';
 
 import { AppUserType } from '../../../../shared/src/app-user/app-user';
-import { sendVerificationEmail } from './app-user-signup-verification';
+import { sendVerificationEmailAndSMS } from './app-user-signup-verification';
 
 
 /**
@@ -15,6 +15,6 @@ import { sendVerificationEmail } from './app-user-signup-verification';
 export async function signup(appUser: AppUser, password: string): Promise<SessionData> {
 
     const sessionData: SessionData = await signupOrUpdateAppUser(appUser, password);
-    await sendVerificationEmail(sessionData);
+    await sendVerificationEmailAndSMS(sessionData);
     return sessionData;
 }
