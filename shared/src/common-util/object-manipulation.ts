@@ -1,27 +1,27 @@
+// Polyfill for Object.keys.
+if (!Object.keys) {
+    Object.keys = (obj: {}) => {
+
+        let keys: string[] = [];
+
+        for (let property in obj) {
+            if (obj.hasOwnProperty(property)) {
+                keys.push(property);
+            }
+        }
+
+        return keys;
+    }
+}
+
+
 /**
  * Pure static class that contains utility methods for object manipulation.
  */
 export class ObjectManipulation {
 
     // Private since pure static class.
-    private constructor() {
-
-        // Polyfill for Object.keys.
-        /*if (!Object.keys) {
-            Object.keys = (obj: {}) => {
-
-                let keys: string[] = [];
-
-                for (let property in obj) {
-                    if (obj.hasOwnProperty(property)) {
-                        keys.push(property);
-                    }
-                }
-
-                return keys;
-            }
-        }*/
-    }
+    private constructor() {}
 
 
     /**

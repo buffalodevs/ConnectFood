@@ -12,3 +12,6 @@ read -p "Press enter to exit the shell..."
 
 # Remove dump file from file system.
 rm ./heroku.dump
+
+# Restart Heroku again to ensure changes are synced up in an atomic manner.
+heroku restart --app connect-food

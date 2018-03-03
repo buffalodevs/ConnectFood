@@ -3,6 +3,14 @@ import { Validation } from "../validation/validation";
 import * as _ from "lodash";
 
 
+/**
+ * Make sure that when Date objects get stringified (to JSON format), that they are converted to standard ISO strings.
+ */
+Date.prototype.toJSON = function(): string {
+    return moment(this).toISOString();
+}
+
+
 class WallClockTime {
 
     public constructor (
