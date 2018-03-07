@@ -9,9 +9,14 @@
         <div class="collapse navbar-collapse" [ngbCollapse]="!isExpanded">
             <ul class="navbar-nav mr-auto">
                 <button mat-button class='nav-link' (click)="isExpanded = false" [routerLink]="['/home']"><li class="nav-item">Home</li></button>
-                <button mat-button class='nav-link' (click)="isExpanded = false" [routerLink]="['/donate']"><li class="nav-item">Donate</li></button>
-                <button mat-button class='nav-link' (click)="isExpanded = false" [routerLink]="['/receive']"><li class="nav-item">Receive</li></button>
-                <button mat-button class='nav-link' (click)="isExpanded = false" [routerLink]="['/deliver']"><li class="nav-item">Deliver</li></button>
+                <ng-container *ngIf="sessionDataService.sessionDataAvailable()">
+                    <button mat-button class='nav-link' (click)="isExpanded = false" [routerLink]="['/donate']"
+                     *ngIf="sessionDataService.getAppUserSessionData().appUserType === AppUserType.Donor"><li class="nav-item">Donate</li></button>
+                    <button mat-button class='nav-link' (click)="isExpanded = false" [routerLink]="['/receive']"
+                     *ngIf="sessionDataService.getAppUserSessionData().appUserType === AppUserType.Receiver"><li class="nav-item">Receive</li></button>
+                    <button mat-button class='nav-link' (click)="isExpanded = false" [routerLink]="['/deliver']"
+                     *ngIf="sessionDataService.getAppUserSessionData().appUserType === AppUserType.Deliverer"><li class="nav-item">Deliver</li></button>
+                </ng-container>
             </ul>
 
             <ul class="navbar-nav navbar-right">
@@ -21,10 +26,12 @@
                 <button mat-button *ngIf="!sessionDataService.sessionDataAvailable()" class='nav-link' (click)="isExpanded = false" [routerLink]="['/signup']">
                     <li class="nav-item">Signup</li>
                 </button>
-                <button mat-button *ngIf="sessionDataService.sessionDataAvailable()" class='nav-link' (click)="isExpanded = false" [routerLink]="['/deliveryCart']">
+                <button mat-button *ngIf="sessionDataService.sessionDataAvailable() && sessionDataService.getAppUserSessionData().appUserType === AppUserType.Deliverer"
+                 class='nav-link' (click)="isExpanded = false" [routerLink]="['/deliveryCart']">
                     <li class="nav-item">Delivery Cart</li>
                 </button>
-                <button mat-button *ngIf="sessionDataService.sessionDataAvailable()" class='nav-link' (click)="isExpanded = false" [routerLink]="['/foodListingCart']">
+                <button mat-button *ngIf="sessionDataService.sessionDataAvailable() && sessionDataService.getAppUserSessionData().appUserType !== AppUserType.Deliverer"
+                 class='nav-link' (click)="isExpanded = false" [routerLink]="['/foodListingCart']">
                     <li class="nav-item">Food Cart</li>
                 </button>
                 <button mat-button *ngIf="sessionDataService.sessionDataAvailable()" class='nav-link' (click)="isExpanded = false" [routerLink]="['/appUserInfo']">

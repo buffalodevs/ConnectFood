@@ -8,6 +8,7 @@ import { BannerService } from '../../common-util/services/banner.service';
 import { SessionDataService } from '../../common-util/services/session-data.service';
 import { LoginComponent } from '../../app-user/login/login.component';
 import { LogoutService } from '../../app-user/logout/logout.service';
+import { AppUserType } from '../../../../../shared/src/app-user/app-user';
 
 
 @Component({
@@ -18,7 +19,8 @@ import { LogoutService } from '../../app-user/logout/logout.service';
 })
 export class HeaderComponent {
 
-    public isExpanded: boolean;
+    public AppUserType = AppUserType;
+    public isExpanded: boolean = false;
     
 
     public constructor (
@@ -33,6 +35,7 @@ export class HeaderComponent {
                 // Reset banner on each re-route!
                 bannerService.reset();
             });
+            sessionDataService.getAppUserSessionData()
     }
 
 
