@@ -149,7 +149,8 @@ function deriveAppUserType(foodListingsStatus: FoodListingsStatus): AppUserType 
         return AppUserType.Donor;
     }
 
-    return AppUserType.Deliverer;
+    return ( foodListingsStatus != null ) ? AppUserType.Deliverer
+                                          : null;
 }
 
 

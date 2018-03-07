@@ -30,7 +30,11 @@ BEGIN
 
     -- Make sure we do not have a NULL _filters input.
     _filters := COALESCE(_filters, JSON_BUILD_OBJECT());
-    _foodListingFiltersKey := addFoodListingFilters(_appUserKey, _filters);
+
+    IF (_appUserKey IS NOT NULL)
+    THEN
+        _foodListingFiltersKey := addFoodListingFilters(_appUserKey, _filters);
+    END IF;
 
 
 
@@ -83,6 +87,11 @@ BEGIN
         WHERE ($2 IS NULL                                   OR FoodListing.foodListingKey = $2)
           AND ($3 IS NULL                                   OR ClaimInfo.claimInfoKey = $3)
           AND ($4 IS NULL                                   OR DeliveryInfo.deliveryInfoKey = $4)
+          AND (($5->>''scheduledDeliveryBefore'') IS NULL   OR 
+            (
+                    DeliveryInfo.scheduledStartTime > CURRENT_TIMESTAMP
+                AND DeliveryInfo.scheduledStartTime <= utcTextToTimestamp(($5->>''scheduledDeliveryBefore'')::TEXT)
+            ))
           -- We will translate the list of food type descriptions into integer keys for lookup efficiency.
           AND (($5->>''foodTypes'') IS NULL                 OR FoodListingFoodTypeMap.foodType = ANY(jsonArrToPostgresTextArr($5->''foodTypes'')::FoodType[]))
           AND (($5->>''needsRefrigeration'') IS NULL        OR FoodListing.needsRefrigeration = ($5->>''needsRefrigeration'')::BOOLEAN)
@@ -145,7 +154,7 @@ BEGIN
     END IF;
         
 
-    -- Should we match by user's regular weekly availability?
+    -- Should we match by some availability criteria?
     IF ((_filters->>'matchRegularAvailability')::BOOLEAN OR (_filters->>'matchAvailableNow')::BOOLEAN)
     THEN
 
@@ -211,7 +220,7 @@ BEGIN
             END
             LIMIT CASE WHEN (($5->''retrievalAmount'') IS NOT NULL)
                 THEN ($5->>''retrievalAmount'')::INTEGER
-                ELSE 1000
+                ELSE NULL
             END
         ';
 

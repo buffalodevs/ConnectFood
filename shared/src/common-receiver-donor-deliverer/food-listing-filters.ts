@@ -102,6 +102,12 @@ export class FoodListingFilters implements SlickListFilters {
      */
     public foodListingsStatus: FoodListingsStatus = null;
 
+    /**
+     * Determines that we should only bring back Food Listing that are scheduled for delivery on or before the contained date.
+     */
+    @deepDeserializable(Date)
+    public scheduledDeliveryBefore: Date = null;
+
 
     public constructor() {}
 }

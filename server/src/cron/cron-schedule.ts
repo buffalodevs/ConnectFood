@@ -2,9 +2,7 @@ import * as schedule from 'node-schedule';
 import * as moment from 'moment';
 import { refreshAppUserAvailability } from './refresh-app-user-availability';
 import { logger, prettyjsonRender } from '../logging/logger';
-
-
-
+import { extractAndSendDeliveryReminders, DELIVERY_REMINDER_INTERVAL_HOURS } from './send-delivery-reminders';
 
 
 /**
@@ -12,9 +10,15 @@ import { logger, prettyjsonRender } from '../logging/logger';
  */
 export function scheduleJobs(): void {
 
-    // Scheduled for 12:30 AM (UTC) Sunday. NOTE: We give 30 minute buffer for inaccuracies in time between server and database.
-    const job: schedule.Job = schedule.scheduleJob('Refresh User Availability', genCronStrSundayMidnightUTC(30), refreshAppUserAvailability);
+    let job: schedule.Job = null;
+
+    // Scheduled for 12:30 AM (UTC) Sunday. NOTE: We give 30 minute buffer for inaccuracies in time between server and database (Ensure UTC DOW is definitely Sunday).
+    job = schedule.scheduleJob('Refresh User Availability', genCronStrSundayMidnightUTC(30), refreshAppUserAvailability);
     logger.info('Scheduled job \'' + job.name + '\' for ' + job.nextInvocation());
+
+    // Schedule for every half hour of every day.
+    job = schedule.scheduleJob('Send Scheduled Delivery Reminders', '0,30 0-23 * * *', extractAndSendDeliveryReminders);
+    logger.info('Scheduled job \'' + job.name + '\' for ' + job.nextInvocation()); 
 
     // PLACE MORE SCHEDULE JOBS HERE --
 }

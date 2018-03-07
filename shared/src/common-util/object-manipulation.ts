@@ -59,4 +59,22 @@ export class ObjectManipulation {
             }
         }
     }
+
+
+    /**
+     * Sets all shallow members of an object to null.
+     * @param obj The object whose members will all be set to null.
+     *            NOTE: Internally Modified.
+     * @return The input object will nullified members.
+     */
+    public static nullifyShallowMembers(obj: any): any {
+
+        for (let property in obj) {
+            if (obj.hasOwnProperty(property)) {
+                obj[property] = null;
+            }
+        }
+
+        return obj;
+    }
 }
