@@ -35,28 +35,13 @@ export const logger = new(winston.Logger)({
 });
 
 
-// If in production mode (on Google Cloud), setup logger for Stackdriver logging.
-if (!DEVELOPER_MODE) {
-
-    logger.add(new LoggingWinston(), {
-        level: LOGGER_LEVEL,
-        prettyPrint: true,
-        colorize: false,
-        silent: DEVELOPER_MODE,
-        timestamp: true
-    })
-}
-// If in developer mode, then setup basic console logger.
-else {
-
-    logger.add(winston.transports.Console, {
-        level: LOGGER_LEVEL,
-        prettyPrint: true,
-        colorize: true,
-        silent: !DEVELOPER_MODE,
-        timestamp: false
-    });
-}
+logger.add(winston.transports.Console, {
+    level: LOGGER_LEVEL,
+    prettyPrint: true,
+    colorize: true,
+    silent: false,
+    timestamp: false
+});
 
 
 /**
