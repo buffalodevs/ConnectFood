@@ -1,6 +1,7 @@
 'use strict';
 import * as _ from 'lodash';
 import * as fs from 'fs';
+import { Express } from 'express';
 import { Storage, Bucket, File, BucketConfig, WriteStreamOptions } from '@google-cloud/storage';
 
 import { query, QueryResult } from '../../database-util/connection-pool';

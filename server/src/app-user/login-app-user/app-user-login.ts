@@ -1,6 +1,6 @@
 'use strict';
 import { logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
-import { connect, query, Client, QueryResult } from '../../database-util/connection-pool';
+import { connect, query, PoolClient, QueryResult } from '../../database-util/connection-pool';
 import { logger, prettyjsonRender } from '../../logging/logger';
 import { checkPassword } from '../common-app-user/password-util';
 import { SessionData, AppUser } from "../../common-util/session-data";

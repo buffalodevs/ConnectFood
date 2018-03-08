@@ -1,6 +1,6 @@
 'use strict';
 import { logSqlQueryExec, logSqlQueryResult } from '../../logging/sql-logger';
-import { query, QueryResult, connect, Client } from '../../database-util/connection-pool';
+import { query, QueryResult, connect, PoolClient } from '../../database-util/connection-pool';
 import { addArgPlaceholdersToQueryStr } from "../../database-util/prepared-statement-util";
 import { logger, prettyjsonRender } from "../../logging/logger";
 

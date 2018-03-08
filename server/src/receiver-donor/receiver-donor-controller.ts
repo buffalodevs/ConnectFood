@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Express, Request, Response } from 'express';
 import { logger, prettyjsonRender } from "./../logging/logger";
 
 import { SessionData } from "../common-util/session-data";

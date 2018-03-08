@@ -1,5 +1,5 @@
-import { PoolConfig, Pool, Client, Query, QueryResult } from 'pg';
-export * from 'pg';
+import { PoolConfig, Pool, PoolClient, Query, QueryResult } from 'pg';
+export { PoolClient, Query, QueryResult };
 
 require('dotenv');
 
@@ -46,6 +46,6 @@ export function query(text: string, values: Array<any> = null) : Promise <QueryR
  * To do this, call release() on the connection object returned by this method.
  * @return A Promise that will provide a client or connection object on success that can have queries executed on it.
  */ 
-export function connect() : Promise <Client> {
+export function connect() : Promise <PoolClient> {
     return POOL.connect();
 }
