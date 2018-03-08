@@ -49,14 +49,14 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-SET TIME ZONE 'UTC';
-SELECT * FROM addUpdateAppUserAvailability (
-    1,
-    array [
-        JSON_BUILD_OBJECT (
-            '_startTime',    timestampToUtcText(TO_TIMESTAMP('11/12/2017 6:00', 'mm/dd/yyyy HH24:MI')),
-            '_endTime',      timestampToUtcText(TO_TIMESTAMP('11/12/2017 23:00', 'mm/dd/yyyy HH24:MI'))
-        )
-    ],
-    'America/New_York'
-);
+-- SET TIME ZONE 'UTC';
+-- SELECT * FROM addUpdateAppUserAvailability (
+--     1,
+--     array [
+--         JSON_BUILD_OBJECT (
+--             '_startTime',    timestampToUtcText(TO_TIMESTAMP('11/12/2017 6:00', 'mm/dd/yyyy HH24:MI')),
+--             '_endTime',      timestampToUtcText(TO_TIMESTAMP('11/12/2017 23:00', 'mm/dd/yyyy HH24:MI'))
+--         )
+--     ],
+--     'America/New_York'
+-- );

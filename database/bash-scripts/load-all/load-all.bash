@@ -17,7 +17,7 @@ psql --set=sslmode=require -h $1 -p $2 -d $3 -U $4 \
     -f ../../tables/app-user/deliverer-info.sql \
     -f ../../tables/app-user/password/app-user-password.sql \
     -f ../../tables/app-user/password/app-user-password-recovery.sql \
-    -f ../../tables/app-user/availability/app-user-availability.sql \
+    -f ../../tables/app-user/availability/app-user-availability-map.sql \
     -f ../../tables/app-user/verification/unverified-app-user.sql \
  \
     -f ../../tables/food-listing/food-listing.sql \
@@ -25,7 +25,7 @@ psql --set=sslmode=require -h $1 -p $2 -d $3 -U $4 \
     -f ../../tables/food-listing/removed-food-listing.sql \
     -f ../../tables/food-listing/img/food-listing-img.sql \
     -f ../../tables/food-listing/availability/food-listing-availability-map.sql \
-    -f ../../tables/food-listing/filters/food-listing-filters-history.sql \
+    -f ../../tables/food-listing/filters/food-listing-filters.sql \
  \
     -f ../../tables/food-listing/claim-info/claim-info.sql \
     -f ../../tables/food-listing/claim-info/unclaim-info.sql \
@@ -44,6 +44,8 @@ psql --set=sslmode=require -h $1 -p $2 -d $3 -U $4 \
     -f ../../functions/date-time-util/timestamp-to-utc-text.sql \
     -f ../../functions/date-time-util/utc-text-to-timestamp.sql \
     -f ../../functions/date-time-util/to-weekday-of-week.sql \
+ \
+    -f ../../functions/availability/add-availability.sql \
  \
     -f ../../functions/app-user/verification/add-unverified-app-user.sql \
     -f ../../functions/app-user/verification/verify-app-user.sql \
