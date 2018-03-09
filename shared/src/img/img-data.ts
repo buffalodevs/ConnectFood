@@ -118,6 +118,6 @@ export class ImgData {
             }
         }
 
-        return cropUrlImg;
+        return cropUrlImg.substr(1); // Remove first '/'.
     }
 }
