@@ -14,6 +14,9 @@ AS $$
     DECLARE _availabilityKey    Availability.availabilityKey%TYPE;
 BEGIN
 
+    DELETE FROM AppUserAvailabilityMap
+    WHERE       AppUserAvailabilityMap.appUserKey = _appUserKey;
+
     -- First remove any existing availability elements or the given user (in case of update).
     DELETE FROM Availability
     WHERE       EXISTS (
@@ -22,9 +25,6 @@ BEGIN
                     WHERE   AppUserAvailabilityMap.availabilityKey = Availability.availabilityKey
                       AND   AppUserAvailabilityMap.appUserKey = _appUserKey
                 );
-
-    DELETE FROM AppUserAvailabilityMap
-    WHERE       AppUserAvailabilityMap.appUserKey = _appUserKey;
 
 
     -- Iterate through all time ranges in _timeRanges argument, and add them into AppUserAvailabilityMeta.
@@ -38,8 +38,8 @@ BEGIN
             _availabilityKey := addAvailability(_availabilityMetaTimeRanges[i], weekOffset, _timezone);
 
             -- Record Availability as App User Availability.
-            INSERT INTO AppUserAvailabilityMap (appUserKey, availabilityKey)
-            VALUES      (_appUserKey, _availabilityKey);
+            INSERT INTO AppUserAvailabilityMap (appUserKey, availabilityKey, weekRep)
+            VALUES      (_appUserKey, _availabilityKey, weekOffset);
 
         END LOOP;
 
@@ -56,6 +56,10 @@ $$ LANGUAGE plpgsql;
 --         JSON_BUILD_OBJECT (
 --             '_startTime',    timestampToUtcText(TO_TIMESTAMP('11/12/2017 6:00', 'mm/dd/yyyy HH24:MI')),
 --             '_endTime',      timestampToUtcText(TO_TIMESTAMP('11/12/2017 23:00', 'mm/dd/yyyy HH24:MI'))
+--         ),
+--         JSON_BUILD_OBJECT (
+--             '_startTime',    timestampToUtcText(TO_TIMESTAMP('11/13/2017 6:00', 'mm/dd/yyyy HH24:MI')),
+--             '_endTime',      timestampToUtcText(TO_TIMESTAMP('11/13/2017 23:00', 'mm/dd/yyyy HH24:MI'))
 --         )
 --     ],
 --     'America/New_York'

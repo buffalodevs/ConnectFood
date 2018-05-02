@@ -1,38 +1,17 @@
 import { Request, Response, Errback } from 'express';
 
 import { SessionData } from "../common-util/session-data";
-import { getDeliveries } from './get-deliveries';
 import { scheduleDelivery } from './schedule-delivery';
 import { cancelDelivery } from './cancel-delivery';
+import { updateDeliveryState } from './update-delivery-state';
 
-import { GetFoodListingsRequest, GetFoodListingsResponse, FoodListing } from '../../../shared/src/common-receiver-donor-deliverer/message/get-food-listings-message'
+import { GetFoodListingsRequest, GetFoodListingsResponse, FoodListing } from '../../../shared/src/common-user/message/get-food-listings-message'
 import { ScheduleDeliveryRequest } from '../../../shared/src/deliverer/message/schedule-delivery-message';
 import { ManageDeliveryRequest } from '../../../shared/src/deliverer/message/manage-delivery-message';
 import { CancelDeliveryRequest } from '../../../shared/src/deliverer/message/cancel-delivery-message';
 import { DateRange } from '../../../shared/src/date-time-util/date-range';
 import { GetPossibleDeliveryTimesResponse } from '../../../shared/src/deliverer/message/get-possible-delivery-times-message';
 import { FoodWebResponse } from '../../../shared/src/message-protocol/food-web-response';
-import { updateDeliveryState } from './update-delivery-state';
-
-
-export function handleGetDeliveries(request: Request, response: Response): void {
-    
-    response.setHeader('Content-Type', 'application/json');
-
-    const getDeliveriesRequest: GetFoodListingsRequest = request.body;
-    const sessionData: SessionData = SessionData.loadSessionData(request);
-
-    getDeliveries (
-        getDeliveriesRequest.filters,
-        sessionData.appUserKey,
-        sessionData.appUser.contactInfo.gpsCoordinate
-    ).then((deliveries: FoodListing[]) => {
-        response.send(new GetFoodListingsResponse(deliveries, true, 'Delivery Food Listings Successfully Retrieved'));
-    })
-    .catch((err: Error) => {
-        response.send(new GetFoodListingsResponse(null, false, err.message));
-    });
-}
 
 
 export function handleScheduleDelivery(request: Request, response: Response): void {

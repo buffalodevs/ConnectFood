@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { DateFormatterService } from '../../../common-util/services/date-formatter.service';
 import { DeliveryState, DeliveryUtil } from '../../../../../../shared/src/deliverer/delivery-util';
-import { FoodListing } from '../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
+import { FoodListing } from '../../../../../../shared/src/common-user/food-listing';
 
 export { DeliveryState };
 

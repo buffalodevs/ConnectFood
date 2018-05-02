@@ -11,7 +11,7 @@ import { AddFoodListingService } from './donate-services/add-food-listing.servic
 import { DEFAULT_IMG_URL } from '../../common-util/directives/default-img.directive';
 import { SlickImg } from '../../slick/slick-img-manager/slick-img';
 
-import { FoodListing } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
+import { FoodListing } from '../../../../../shared/src/common-user/food-listing';
 import { ImgCropConstants } from '../../../../../shared/src/img/img-crop-constants';
 
 

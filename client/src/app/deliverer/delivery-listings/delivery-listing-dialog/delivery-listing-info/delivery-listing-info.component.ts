@@ -9,7 +9,7 @@ import { ManageDeliveryService } from '../../delivery-services/manage-deliveries
 import { DateFormatterService } from '../../../../common-util/services/date-formatter.service';
 
 import { FoodWebResponse } from '../../../../../../../shared/src/message-protocol/food-web-response';
-import { FoodListing } from '../../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
+import { FoodListing } from '../../../../../../../shared/src/common-user/food-listing';
 
 
 @Component({

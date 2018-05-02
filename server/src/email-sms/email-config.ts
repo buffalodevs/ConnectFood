@@ -41,7 +41,7 @@ export class EmailConfig {
         /**
          * Mappings of variable name value pairs.
          * NOTE: These variable values will be injected into the HTML document where ever they appear in between two nestings of curly braces (e.g.: {{ variableName }})!
-         * NOTE: Do NOT surround variable names in curly braces, because this is implicitly taken care of!
+         * NOTE: Do NOT surround variable name key values in curly braces, because this is implicitly taken care of! Only use curly braces in HTML documents!
          */
         public injectionVariables: Map<string, any> = new Map<string, any>()
     ) {}

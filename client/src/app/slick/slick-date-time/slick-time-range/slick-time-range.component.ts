@@ -150,8 +150,16 @@ export class SlickTimeRangeComponent extends AbstractModelDrivenComponent implem
 
         if (timeRange != null) {
 
-            formValue.startDate = timeRange.startTime;
-            formValue.endDate = timeRange.endTime;
+            // If we are including the date portion of the time range, then simply write time range as is (with dates provided).
+            if (this.includeDate) {
+                formValue.startDate = timeRange.startTime;
+                formValue.endDate = timeRange.endTime;
+            }
+            // Otherwise, set dates of both start and end of range to today and carry over times to avoid range conflicts when ignoring the date.
+            else {
+                formValue.startDate = this.dateFormatter.setWallClockTimeForDate(new Date(), this.dateFormatter.dateToWallClockString(timeRange.startTime));
+                formValue.endDate = this.dateFormatter.setWallClockTimeForDate(new Date(), this.dateFormatter.dateToWallClockString(timeRange.endTime));
+            }
         }
 
         this.form.setValue(formValue);

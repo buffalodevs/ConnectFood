@@ -76,8 +76,6 @@
             "pythonPath": "c:/python27/python.exe",
             "args": ["../server/database/functions/app-user/get-app-user-session-data.sql"],
             "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
                 "RedirectOutput"
             ]
         }

@@ -4,7 +4,7 @@ import { addArgPlaceholdersToQueryStr } from '../database-util/prepared-statemen
 import { logSqlQueryExec, logSqlQueryResult } from './../logging/sql-logger';
 import { logger, prettyjsonRender } from '../logging/logger';
 import { SessionData } from '../common-util/session-data';
-import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotificationData } from './delivery-util/delivery-update-notification';
+import { notifyReceiverAndDonorOfDeliveryUpdate, DeliveryUpdateNotificationData } from '../change-notification-util/delivery-update-notification';
 import { DeliveryState } from './delivery-util';
 
 

@@ -1,6 +1,6 @@
 import * as moment from 'moment';
 import { DESERIALIZER } from "./../deserialization/deserialization";
-import { queryGetFoodListings } from '../common-receiver-donor-deliverer/get-food-listings-util';
+import { queryGetFoodListings } from '../common-user/get-food-listings';
 import { QueryResult } from '../database-util/connection-pool';
 import { sendSMS } from '../email-sms/sms';
 import { sendEmail, EmailConfig } from '../email-sms/email';
@@ -9,8 +9,8 @@ import { logger } from '../logging/logger';
 import { ObjectManipulation } from "../../../shared/src/common-util/object-manipulation";
 import { DateFormatter } from '../../../shared/src/date-time-util/date-formatter';
 import { AppUserType } from '../../../shared/src/app-user/app-user';
-import { FoodListing, FoodListingsStatus } from "../../../shared/src/common-receiver-donor-deliverer/food-listing";
-import { FoodListingFilters } from "../../../shared/src/common-receiver-donor-deliverer/food-listing-filters";
+import { FoodListing, FoodListingsStatus } from "../../../shared/src/common-user/food-listing";
+import { FoodListingFilters } from "../../../shared/src/common-user/food-listing-filters";
 
 
 export const DELIVERY_REMINDER_INTERVAL_HOURS: number = 1;
@@ -33,7 +33,7 @@ async function extractFoodListingsScheduledWithin(hours: number): Promise <Query
     filters = ObjectManipulation.nullifyShallowMembers(filters); // Remove default shared filters for client search.
     filters.scheduledDeliveryBefore = moment(new Date()).add(hours, 'hours').toDate();
 
-    return await queryGetFoodListings(filters, null);
+    return await queryGetFoodListings(filters, null, null);
 }
 
 

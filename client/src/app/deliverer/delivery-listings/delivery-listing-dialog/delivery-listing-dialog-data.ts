@@ -1,6 +1,6 @@
 import { SlickListDialogData } from "../../../slick/slick-filtered-list/slick-list/slick-list-dialog/slick-list-dialog";
-import { FoodListing } from "../../../../../../shared/src/common-receiver-donor-deliverer/food-listing";
-import { FoodListingFilters } from "../../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters";
+import { FoodListing } from "../../../../../../shared/src/common-user/food-listing";
+import { FoodListingFilters } from "../../../../../../shared/src/common-user/food-listing-filters";
 
 
 /**

@@ -4,8 +4,8 @@ import 'rxjs/add/operator/finally';
 
 import { CancelDeliveryService } from '../../delivery-services/cancel-delivery.service';
 
-import { FoodListing } from '../../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
-import { DeliveryState } from '../../../../../../../shared/src/common-receiver-donor-deliverer/delivery-info';
+import { FoodListing } from '../../../../../../../shared/src/common-user/food-listing';
+import { DeliveryState } from '../../../../../../../shared/src/common-user/delivery-info';
 
 
 @Component({

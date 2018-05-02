@@ -9,8 +9,8 @@ import { ConsumableListingCacheService } from '../../slick/slick-filtered-list/s
 import { DateFormatterService } from '../../common-util/services/date-formatter.service';
 import { DEFAULT_IMG_URL } from '../../common-util/directives/default-img.directive';
 
-import { FoodListing } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
-import { FoodListingFilters } from "../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters";
+import { FoodListing } from '../../../../../shared/src/common-user/food-listing';
+import { FoodListingFilters } from "../../../../../shared/src/common-user/food-listing-filters";
 
 
 @Component({
@@ -36,7 +36,7 @@ export class FoodListingsComponent extends SlickListComponent <FoodListing, Food
         router: Router,
         dialogService: MatDialog
     ) {
-        super('/receiverDonor/getFoodListings', elementRef, getListingsService, consumableListingCacheService, router, dialogService);
+        super('/commonUser/getFoodListings', elementRef, getListingsService, consumableListingCacheService, router, dialogService);
     }
 
 

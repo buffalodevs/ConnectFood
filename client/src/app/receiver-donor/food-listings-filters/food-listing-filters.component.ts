@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormControl } from '@angular/forms';
-import { MAX_DISTANCE_VALUES } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/max-distance';
-import { FoodListingFilters } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters';
+import { MAX_DISTANCE_VALUES } from '../../../../../shared/src/common-user/food-listing-domain/max-distance';
+import { FoodListingFilters } from '../../../../../shared/src/common-user/food-listing-filters';
 
 
 @Component({

@@ -9,8 +9,8 @@ import { GetListingsService } from '../../slick/slick-filtered-list/slick-list/s
 import { ConsumableListingCacheService } from '../../slick/slick-filtered-list/slick-list/services/consumable-listing-cache.service';
 import { DeliveryListingDialogData, DeliveryListingDialogComponent } from './delivery-listing-dialog/delivery-listing-dialog.component';
 
-import { FoodListing } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
-import { FoodListingFilters } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters';
+import { FoodListing } from '../../../../../shared/src/common-user/food-listing';
+import { FoodListingFilters } from '../../../../../shared/src/common-user/food-listing-filters';
 
 
 @Component({
@@ -33,7 +33,7 @@ export class DeliveryListingsComponent extends SlickListComponent <FoodListing, 
         public sessionDataService: SessionDataService, // Referenced in HTML template
         public deliveryUtilService: DeliveryUtilService
     ) {
-        super('/deliverer/getDeliveries', elementRef, getListingsService, consumableListingCacheService, router, dialogService);
+        super('/commonUser/getFoodListings', elementRef, getListingsService, consumableListingCacheService, router, dialogService);
 
         this.header = 'Delivery Listings';
         this.isCart = false;

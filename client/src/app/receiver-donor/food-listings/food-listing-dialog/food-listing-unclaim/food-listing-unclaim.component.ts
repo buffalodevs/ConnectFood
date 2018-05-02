@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/finally';
 
 import { ManageFoodListingService } from '../../food-listing-services/manage-food-listing.service';
-import { FoodListing } from './../../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
+import { FoodListing } from './../../../../../../../shared/src/common-user/food-listing';
 
 
 @Component({

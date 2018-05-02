@@ -66,10 +66,15 @@ AS $$
                                                                         INNER JOIN  Availability ON AppUserAvailabilityMap.availabilityKey = Availability.availabilityKey
                                                                         WHERE       AppUserAvailabilityMap.appUserKey = AppUser.appUserKey
                                                                         -- Ensure we only grab single week worth of dates for the user (prevent duplicate time ranges).
-                                                                        AND         LOWER(Availability.timeRange) < (CURRENT_DATE + (7 - EXTRACT(DOW FROM CURRENT_DATE)::INTEGER))
+                                                                        AND         AppUserAvailabilityMap.weekRep = 0
                                                                         ORDER BY    Availability.timeRange
                                                                     )
-                                                                )
+                                                                ),
+                                            'nextFiltersKey',   COALESCE ((
+                                                                    SELECT  MAX(foodListingFiltersKey) + 1
+                                                                    FROM    FoodListingFilters
+                                                                    WHERE   FoodListingFilters.appUserKey = _appUserKey
+                                                                ), 0)
                                         ),
                 'verificationToken',    UnverifiedAppUser.verificationToken
             )

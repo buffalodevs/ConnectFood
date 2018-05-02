@@ -3,7 +3,7 @@ import { FormControl, AbstractControl } from '@angular/forms';
 
 import { SessionDataService } from '../../common-util/services/session-data.service';
 
-import { FoodListingFilters, FoodListingsStatus, } from "../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters";
+import { FoodListingFilters, FoodListingsStatus, } from "../../../../../shared/src/common-user/food-listing-filters";
 import { AppUser, AppUserType } from "../../../../../shared/src/app-user/app-user";
 
 

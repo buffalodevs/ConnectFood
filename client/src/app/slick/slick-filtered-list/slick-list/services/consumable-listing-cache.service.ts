@@ -6,7 +6,6 @@ import 'rxjs/add/operator/map';
 import { ConsumableListingCache } from './consumable-listing-cache';
 import { RequestService } from '../../../../common-util/services/request.service';
 
-import { GetListingResponse } from '../../../../../../../shared/src/slick-list/message/slick-list-response';
 import { FoodWebResponse } from '../../../../../../../shared/src/message-protocol/food-web-response';
 
 

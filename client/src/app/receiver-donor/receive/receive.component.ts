@@ -4,8 +4,8 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 
 import { DateFormatterService } from '../../common-util/services/date-formatter.service';
 import { SpecificAvailabilityDialogComponent } from '../food-listings-filters/specifc-availability-dialog/specific-availability-dialog.component';
-import { FoodListingsStatus } from "../../../../../shared/src/common-receiver-donor-deliverer/food-listing";
-import { FoodListingFilters } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters';
+import { FoodListingsStatus } from "../../../../../shared/src/common-user/food-listing";
+import { FoodListingFilters } from '../../../../../shared/src/common-user/food-listing-filters';
 
 
 @Component({

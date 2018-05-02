@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, FormControl, ControlValueAccessor, NG_VALUE_ACC
 // import { ActivatedRoute } from "@angular/router";
 
 import { FoodTypesService } from "./food-types.service";
-import { FOOD_TYPE_VALUES } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/food-type';
+import { FOOD_TYPE_VALUES } from '../../../../../shared/src/common-user/food-listing-domain/food-type';
 
 
 @Component({

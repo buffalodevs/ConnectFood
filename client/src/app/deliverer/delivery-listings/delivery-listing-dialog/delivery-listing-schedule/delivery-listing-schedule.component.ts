@@ -5,8 +5,8 @@ import 'rxjs/add/operator/finally';
 import { ScheduleDeliveryService } from '../../delivery-services/schedule-delivery.service';
 import { DateFormatterService } from '../../../../common-util/services/date-formatter.service';
 
-import { FoodListing } from '../../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
-import { DeliveryState } from '../../../../../../../shared/src/common-receiver-donor-deliverer/delivery-info';
+import { FoodListing } from '../../../../../../../shared/src/common-user/food-listing';
+import { DeliveryState } from '../../../../../../../shared/src/common-user/delivery-info';
 
 
 @Component({

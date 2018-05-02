@@ -26,7 +26,8 @@ export class AppUser {
         public contactInfo: ContactInfo = new ContactInfo(),
         public organization: Organization = new Organization(),
         public delivererInfo: DelivererInfo = new DelivererInfo(),
-        availability: DateRange[] = null
+        availability: DateRange[] = null,
+        public nextFiltersKey: number = null
     ) {
         this.availability = availability;
     }

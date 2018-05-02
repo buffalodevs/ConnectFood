@@ -6,8 +6,8 @@ import 'rxjs/add/operator/map';
 import { RequestService } from "../../../common-util/services/request.service";
 import { SlickImg } from '../../../slick/slick-img-manager/slick-img';
 
-import { FoodListing } from "./../../../../../../shared/src/common-receiver-donor-deliverer/food-listing";
-import { AddFoodListingRequest, AddFoodListingResponse } from "./../../../../../../shared/src/receiver-donor/message/add-food-listing-message";
+import { FoodListing } from "./../../../../../../shared/src/common-user/food-listing";
+import { AddFoodListingRequest, AddFoodListingResponse } from "./../../../../../../shared/src/donor/message/add-food-listing-message";
 import { FoodWebResponse } from "./../../../../../../shared/src/message-protocol/food-web-response";
 
 
@@ -30,7 +30,7 @@ export class AddFoodListingService {
         // Extract image files and associated (crop) data from the Slick Image data.
         const imgFiles: File[] = this.prepareImgData(foodListingUpload, slickImgs);
         const body: AddFoodListingRequest = new AddFoodListingRequest(foodListingUpload);
-        const observer: Observable <AddFoodListingResponse> = <Observable <AddFoodListingResponse>>this._requestService.post('/receiverDonor/donor/addFoodListing', body, imgFiles);
+        const observer: Observable <AddFoodListingResponse> = <Observable <AddFoodListingResponse>>this._requestService.post('/donor/addFoodListing', body, imgFiles);
 
         return observer.map((addFoodListingResponse: AddFoodListingResponse) => {
 

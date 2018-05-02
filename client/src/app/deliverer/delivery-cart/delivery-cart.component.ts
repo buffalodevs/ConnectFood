@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, AbstractControl } from '@angular/forms';
 import { DeliveryUtilService } from '../delivery-listings/delivery-services/delivery-util.service';
-import { FoodListingsStatus, FoodListingFilters } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters';
+import { FoodListingsStatus, FoodListingFilters } from '../../../../../shared/src/common-user/food-listing-filters';
 
 
 @Component({

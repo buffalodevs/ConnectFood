@@ -80,7 +80,9 @@ psql --set=sslmode=require -h $1 -p $2 -d $3 -U $4 \
     -f ../../functions/food-listing/donate/update-food-listing.sql \
     -f ../../functions/food-listing/donate/remove-food-listing.sql \
  \
-    -f ../../functions/food-listing/get-food-listings/add-food-listing-filters.sql \
+    -f ../../functions/food-listing/filters/add-food-listing-filters.sql \
+    -f ../../functions/food-listing/filters/get-food-listing-filters.sql \
+ \
     -f ../../functions/food-listing/get-food-listings/gen-availability-overlap-filters.sql \
     -f ../../functions/food-listing/get-food-listings/get-food-listings.sql
 

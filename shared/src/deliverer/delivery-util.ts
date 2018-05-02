@@ -1,4 +1,4 @@
-import { DeliveryState } from '../common-receiver-donor-deliverer/delivery-info';
+import { DeliveryState } from '../common-user/delivery-info';
 export { DeliveryState };
 
 

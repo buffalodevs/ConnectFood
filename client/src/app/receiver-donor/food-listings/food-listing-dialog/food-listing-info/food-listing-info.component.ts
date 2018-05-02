@@ -6,7 +6,7 @@ import { DateFormatterService } from '../../../../common-util/services/date-form
 import { ResponsiveService } from '../../../../common-util/services/responsive.service';
 import { DEFAULT_IMG_URL } from '../../../../common-util/directives/default-img.directive';
 
-import { FoodListing } from './../../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
+import { FoodListing } from './../../../../../../../shared/src/common-user/food-listing';
 import { AppUser } from '../../../../../../../shared/src/app-user/app-user';
 import { ImgCropConstants } from '../../../../../../../shared/src/img/img-crop-constants';
 

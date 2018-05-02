@@ -25,13 +25,13 @@ import { handleLoginRequest,
          handleUpdateAppUserRequest,
          handleSignupVerification,
          handlePasswordRecovery } from './app-user/app-user-controller';
+import { handleGetFoodListings,
+         handleGetFoodListingFilters } from './common-user/common-user-controller';
 import { handleAddFoodListing,
-         handleRemoveFoodListing,
-         handleGetFoodListings,
-         handleClaimFoodListing,
-         handleUnclaimFoodListing } from './receiver-donor/receiver-donor-controller';
-import { handleGetDeliveries,
-         handleScheduleDelivery, 
+         handleRemoveFoodListing } from './donor/donor-controller';
+import { handleClaimFoodListing,
+         handleUnclaimFoodListing } from './receiver/receiver-controller';
+import { handleScheduleDelivery, 
          handleCancelDelivery,
          handleUpdateDeliveryState } from './deliverer/deliverer-controller';
 import { handleLogClientData } from './logging/client-data-logger';
@@ -69,22 +69,24 @@ app.get( '/appUser/verify',                             handleSignupVerification
 app.post('/appUser/recoverPassword',                    handlePasswordRecovery);
 app.post('/appUser/updateAppUser',                      SessionData.ensureSessionActive, handleUpdateAppUserRequest);
 
+// Common Donor-Receiver-Deliverer Controller Routes.
+app.post('/commonUser/getFoodListings',                 SessionData.ensureSessionActive, handleGetFoodListings);
+app.post('/commonUser/getFoodListingFilters',           SessionData.ensureSessionActive, handleGetFoodListingFilters);
 
-// Receiver-Donor Controller Routes.
-app.post('/receiverDonor/getFoodListings',              SessionData.ensureSessionActive, handleGetFoodListings);
-app.post('/receiverDonor/donor/addFoodListing',         SessionData.ensureSessionActive, handleAddFoodListing);
-app.post('/receiverDonor/donor/removeFoodListing',      SessionData.ensureSessionActive, handleRemoveFoodListing);
-app.post('/receiverDonor/receiver/claimFoodListing',    SessionData.ensureSessionActive, handleClaimFoodListing);
-app.post('/receiverDonor/receiver/unclaimFoodListing',  SessionData.ensureSessionActive, handleUnclaimFoodListing);
+// Donor Controller Routes.
+app.post('/donor/addFoodListing',                       SessionData.ensureSessionActive, handleAddFoodListing);
+app.post('/donor/removeFoodListing',                    SessionData.ensureSessionActive, handleRemoveFoodListing);
 
+// Receiver Controller Routes.
+app.post('/receiver/claimFoodListing',                  SessionData.ensureSessionActive, handleClaimFoodListing);
+app.post('/receiver/unclaimFoodListing',                SessionData.ensureSessionActive, handleUnclaimFoodListing);
 
 // Deliverer Controller Routes.
-app.post('/deliverer/getDeliveries',                    SessionData.ensureSessionActive, handleGetDeliveries);
 app.post('/deliverer/scheduleDelivery',                 SessionData.ensureSessionActive, handleScheduleDelivery);
 app.post('/deliverer/cancelDelivery',                   SessionData.ensureSessionActive, handleCancelDelivery);
 app.post('/deliverer/updateDeliveryState',              SessionData.ensureSessionActive, handleUpdateDeliveryState);
 
-
+// Logging Utility Routes.
 app.post('/logging/logClientData',                      handleLogClientData);
 
 
@@ -110,11 +112,11 @@ app.get('*', function (request, response) {
 // Do any database initialization that is necessary before we start servicing requests.
 bootstrapDatabase().then(() => {
 
+    // Schedule all cron type jobs.
     scheduleJobs();
 
     app.listen(app.get('port'), function() {
         // Log Message That Says When App is Up & Running.
         logger.info('Node app is running on port', app.get('port'));
-    }); 
-
+    });
 });

@@ -98,12 +98,15 @@ nav {
         left: 0px;
         display: block !important;
         max-height: 0px;
-        transition: max-height 0.25s ease-out;
-        -o-transition: max-height 0.25s ease-out;
-        -ms-transition: max-height 0.25s ease-out;
-        -moz-transition: max-height 0.25s ease-out;
-        -webkit-transition: max-height 0.25s ease-out;
         overflow: hidden;
+    }
+
+    .smooth-expand {
+        transition: max-height 0.33s linear;
+        -o-transition: max-height 0.33s linear;
+        -ms-transition: max-height 0.33s linear;
+        -moz-transition: max-height 0.33s linear;
+        -webkit-transition: max-height 0.33s linear;
     }
     
     .collapse.show {

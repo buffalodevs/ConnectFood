@@ -20,7 +20,7 @@ import { AppUserType } from '../../../../../shared/src/app-user/app-user';
 export class HeaderComponent {
 
     public AppUserType = AppUserType;
-    public isExpanded: boolean = false;
+    public isExpanded: boolean = false; // NOTE: Shouldn't set directly, but should use the toggleExpand, expand, and collapse methods below.
     
 
     public constructor (
@@ -41,5 +41,35 @@ export class HeaderComponent {
 
     public showLogin(): void {
         LoginComponent.display(this._dialog); 
+    }
+
+
+    public toggleExpand(navbarCollapse: HTMLDivElement): void {
+
+        if (this.isExpanded) {
+            this.collapse(navbarCollapse);
+        }
+        else {
+            this.expand(navbarCollapse);
+        }
+    }
+
+
+    public expand(navbarCollapse: HTMLDivElement): void {
+
+        if (navbarCollapse) {
+            navbarCollapse.classList.add('smooth-expand');
+        }
+
+        this.isExpanded = true;
+    }
+
+    public collapse(navbarCollapse: HTMLDivElement): void {
+
+        if (navbarCollapse) {
+            navbarCollapse.classList.remove('smooth-expand');
+        }
+
+        this.isExpanded = false;
     }
 }

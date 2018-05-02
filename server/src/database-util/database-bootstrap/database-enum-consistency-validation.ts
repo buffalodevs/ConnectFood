@@ -3,10 +3,10 @@ import { logger } from "../../logging/logger";
 import { prettyjsonRender } from "./../../logging/logger";
 
 import { AppUserType } from "../../../../shared/src/app-user/app-user-domain/app-user-type";
-import { FoodType } from "../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/food-type"
-import { VehicleType } from "../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/vehicle-type"
-import { FoodListingsStatus } from "../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/food-listings-status";
-import { DeliveryState } from "../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/delivery-state";
+import { FoodType } from "../../../../shared/src/common-user/food-listing-domain/food-type"
+import { VehicleType } from "../../../../shared/src/common-user/food-listing-domain/vehicle-type"
+import { FoodListingsStatus } from "../../../../shared/src/common-user/food-listing-domain/food-listings-status";
+import { DeliveryState } from "../../../../shared/src/common-user/food-listing-domain/delivery-state";
 import * as _ from "lodash";
 
 

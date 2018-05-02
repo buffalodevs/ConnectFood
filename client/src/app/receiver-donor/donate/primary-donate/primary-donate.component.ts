@@ -13,8 +13,8 @@ import { DateFormatterPipe } from "../../../common-util/pipes/date-formatter.pip
 import { SessionDataService } from '../../../common-util/services/session-data.service';
 
 import { Validation } from '../../../../../../shared/src/validation/validation';
-import { FoodListing } from '../../../../../../shared/src/common-receiver-donor-deliverer/food-listing';
-import { VEHICLE_TYPE_VALUES, VehicleType } from '../../../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/vehicle-type';
+import { FoodListing } from '../../../../../../shared/src/common-user/food-listing';
+import { VEHICLE_TYPE_VALUES, VehicleType } from '../../../../../../shared/src/common-user/food-listing-domain/vehicle-type';
 
 
 @Component({

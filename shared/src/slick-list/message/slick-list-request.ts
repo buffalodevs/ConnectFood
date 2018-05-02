@@ -11,10 +11,7 @@ export interface GetListingsRequest <FILTERS_T extends SlickListFilters> {
 }
 
 
-/**
- * Request object used to retrieve a single listing from the server.
- */
-export interface GetListingRequest {
+export interface GetFiltersRequest {
 
-    listingId: number | string;
+    filtersKey: number;
 }

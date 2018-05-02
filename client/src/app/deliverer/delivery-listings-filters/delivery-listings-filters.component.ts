@@ -1,10 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormControl, AbstractControl } from '@angular/forms';
 
-import { MAX_DISTANCE_VALUES } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/max-distance';
-import { MAX_ESTIMATED_WEIGHT_VALUES } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/max-estimated-weight';
-import { VEHICLE_TYPE_VALUES } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-domain/vehicle-type';
-import { FoodListingFilters } from '../../../../../shared/src/common-receiver-donor-deliverer/food-listing-filters';
+import { MAX_DISTANCE_VALUES } from '../../../../../shared/src/common-user/food-listing-domain/max-distance';
+import { MAX_ESTIMATED_WEIGHT_VALUES } from '../../../../../shared/src/common-user/food-listing-domain/max-estimated-weight';
+import { VEHICLE_TYPE_VALUES } from '../../../../../shared/src/common-user/food-listing-domain/vehicle-type';
+import { FoodListingFilters } from '../../../../../shared/src/common-user/food-listing-filters';
 
 
 @Component({
