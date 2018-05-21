@@ -69,7 +69,7 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
                 'email':                [null, [Validators.required, Validators.pattern(this.validationService.EMAIL_REGEX)]],
                 'organizationName':     [null, Validators.required],
                 'taxId':                [null, [Validators.required, Validators.pattern(this.validationService.TAX_ID_REGEX)]],
-                'driversLicenseState':  [null, [Validators.required, Validators.minLength(2), Validators.maxLength(2)]],
+                'driversLicenseState':  [null, [Validators.required, Validators.pattern(this.validationService.STATE_REGEX)]],
                 'driversLicenseID':     [null, [Validators.required, Validators.pattern(this.validationService.DRIVERS_LICENSE_ID_REGEX)]],
                 'firstName':            [null, Validators.required],
                 'lastName':             [null, Validators.required],
@@ -80,7 +80,7 @@ export class SignupComponent extends AbstractModelDrivenComponent implements OnI
             'contactInfo': this._formBuilder.group({
                 'address':              [null, Validators.required],
                 'city':                 [null, Validators.required],
-                'state':                [null, [Validators.required, Validators.minLength(2), Validators.maxLength(2)]],
+                'state':                [null, [Validators.required, Validators.pattern(this.validationService.STATE_REGEX)]],
                 'zip':                  [null, [Validators.required, Validators.pattern(this.validationService.ZIP_REGEX)]],
                 'phone':                [null, [Validators.required, Validators.pattern(this.validationService.PHONE_REGEX)]]
             }),

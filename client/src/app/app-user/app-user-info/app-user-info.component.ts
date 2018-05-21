@@ -84,8 +84,9 @@ export class AppUserInfoComponent extends AbstractModelDrivenComponent {
     private initAppUserFormElements(appUser: AppUser): void {
 
         const specificValidators: { [key: string]: ValidatorFn[] } = {
-            'email':            [ Validators.pattern(this.validationService.EMAIL_REGEX) ],
-            'contactInfo.zip':  [ Validators.pattern(this.validationService.ZIP_REGEX) ]
+            'email':                [ Validators.pattern(this.validationService.EMAIL_REGEX) ],
+            'contactInfo.state':    [ Validators.pattern(this.validationService.STATE_REGEX) ],
+            'contactInfo.zip':      [ Validators.pattern(this.validationService.ZIP_REGEX) ]
         } 
     
         this.form = this.genFormGroupFromObject(appUser, [ Validators.required ], specificValidators);
