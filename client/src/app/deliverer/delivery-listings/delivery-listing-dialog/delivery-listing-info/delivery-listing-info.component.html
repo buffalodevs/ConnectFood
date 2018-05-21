@@ -23,6 +23,11 @@
                     </mat-expansion-panel-header>
 
                     <div>
+                        <b>Delivery Status:</b>
+                        <div class="inline-block">{{ deliveryUtilService.getReadableDeliveryState(foodListing.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState) }}</div>
+                    </div>
+
+                    <div>
                         <b>Total Drive Distance:</b>
                         <div class="inline-block">{{ deliveryUtilService.calcTotalDrivingDistance(foodListing) }} miles</div>
                     </div>

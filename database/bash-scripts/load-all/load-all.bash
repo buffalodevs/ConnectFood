@@ -26,6 +26,7 @@ psql --set=sslmode=require -h $1 -p $2 -d $3 -U $4 \
     -f ../../tables/food-listing/img/food-listing-img.sql \
     -f ../../tables/food-listing/availability/food-listing-availability-map.sql \
     -f ../../tables/food-listing/filters/food-listing-filters.sql \
+    -f ../../tables/food-listing/filters/food-listing-filters-availability.sql \
  \
     -f ../../tables/food-listing/claim-info/claim-info.sql \
     -f ../../tables/food-listing/claim-info/unclaim-info.sql \
