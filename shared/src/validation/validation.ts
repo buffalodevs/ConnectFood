@@ -27,7 +27,7 @@ export class Validation {
     /**
      * Regular expression used for verifying that the state input is in a correct format.
      */
-    public readonly STATE_REGEX: RegExp = /^[a-zA-Z]{2}$/;
+    public readonly STATE_REGEX: RegExp = /^(AL|AK|AR|AZ|CA|CO|CT|DE|FL|GA|HI|ID|IA|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VT|WA|WI|WV|WY|Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|Delaware|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Ohio|Oklahoma|Oregon|Pennsylvania|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virginia|Washington|West Virginia)$/i;
 
     /**
      * Regular expression used for verifying 5 digit ZIP codes.

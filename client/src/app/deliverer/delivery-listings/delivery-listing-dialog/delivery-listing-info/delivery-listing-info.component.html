@@ -24,7 +24,7 @@
 
                     <div>
                         <b>Delivery Status:</b>
-                        <div class="inline-block">{{ deliveryUtilService.getReadableDeliveryState(foodListing.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState) }}</div>
+                        <div class="inline-block">{{ foodListing.getReadableDeliveryState() }}</div>
                     </div>
 
                     <div>
@@ -52,11 +52,6 @@
                     <div>
                         <b>Estimated Weight:</b>
                         <div class="inline-block">{{ foodListing.estimatedWeight }} lbs</div>
-                    </div>
-
-                    <div>
-                        <b>Delivery State:</b>
-                        <div class="inline-block">{{ deliveryUtilService.getReadableDeliveryState(foodListing.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState) }}</div>
                     </div>
 
                     <div *ngIf="foodListing.claimInfo.deliveryInfo.deliveryStateInfo.scheduledStartTime != null">

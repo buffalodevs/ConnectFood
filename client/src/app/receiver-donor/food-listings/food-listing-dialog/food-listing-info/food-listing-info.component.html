@@ -58,6 +58,11 @@
                         <food-types [ngModel]="foodListing.foodTypes" [displayOnly]="true" [condensedDisplay]="!responsiveService.widthGreaterThan(767)"></food-types>
                     </div>
 
+                    <div class="space-bottom">
+                        <div><b>Delivery Status</b></div>
+                        <span>{{ foodListing.getReadableDeliveryState() }}</span>
+                    </div>
+
                 </mat-expansion-panel>
 
             </div>

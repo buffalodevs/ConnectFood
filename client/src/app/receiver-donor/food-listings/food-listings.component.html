@@ -37,10 +37,19 @@
                             </div>
                         </div>
 
-                        <div class="space-bottom" *ngIf="isClaimedCart">
-                            <div><b>Deliverer</b></div>
-                            <span>{{ foodListing.getDelivererName() }}</span>
-                        </div>
+                        <ng-container *ngIf="isClaimedCart">
+
+                            <div class="space-bottom">
+                                <div><b>Deliverer</b></div>
+                                <span>{{ foodListing.getDelivererName() }}</span>
+                            </div>
+    
+                            <div class="space-bottom">
+                                <div><b>Delivery Status</b></div>
+                                <span>{{ foodListing.getReadableDeliveryState() }}</span>
+                            </div>
+
+                        </ng-container>
 
                     </div>
 
@@ -87,6 +96,11 @@
                         <div class="space-bottom">
                             <div><b>Deliverer</b></div>
                             <span>{{ foodListing.getDelivererName() }}</span>
+                        </div>
+
+                        <div class="space-bottom">
+                            <div><b>Delivery Status</b></div>
+                            <span>{{ foodListing.getReadableDeliveryState() }}</span>
                         </div>
 
                     </div>

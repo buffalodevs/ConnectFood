@@ -21,47 +21,37 @@ export class FoodListingInfoComponent {
     // Make this available to HTML Template.
     public readonly IMG_CROP_CONSTANTS: ImgCropConstants = new ImgCropConstants();
     public readonly DEFAULT_IMG_URL: string = DEFAULT_IMG_URL;
-    public readonly FOOD_LISTING_USER_ACCESSORS: string[];
-    public readonly FOOD_LISTING_USER_TITLES: string[];
+    public readonly FOOD_LISTING_USER_ACCESSORS: string[] = [ 'donorInfo', 'claimInfo.receiverInfo', 'claimInfo.deliveryInfo.delivererInfo' ];
+    public readonly FOOD_LISTING_USER_TITLES: string[] = [ 'Donor', 'Receiver', 'Deliverer' ];
 
-    @Input() public foodListing: FoodListing;
+    @Input() public foodListing: FoodListing = null;
     /**
      * Determines if this dialog is displaying Food Listing info for a Receiver's Cart. Default is false.
      */
-    @Input() public isClaimedCart: boolean;
+    @Input() public isClaimedCart: boolean = false;
     /**
      * Determines if this dialog is displaying Food Listing info for a Donor's Cart. Default is false.
      */
-    @Input() public isDonatedCart: boolean;
+    @Input() public isDonatedCart: boolean = false;
 
     /**
      * Emitted whenever a Food Listing is to be claimed.
      */
-    @Output() public toClaim: EventEmitter<void>;
+    @Output() public toClaim: EventEmitter<void> = new EventEmitter<void>();
     /**
      * Emitted whenever a Food Listing is to be unclaimed.
      */
-    @Output() public toUnclaim: EventEmitter<void>;
+    @Output() public toUnclaim: EventEmitter<void> = new EventEmitter<void>();
     /**
      * Emitted whenever a Food Listing is to be removed (un-donated).
      */
-    @Output() public toRemove: EventEmitter<void>;
+    @Output() public toRemove: EventEmitter<void> = new EventEmitter<void>();
 
 
     public constructor (
         public responsiveService: ResponsiveService,
         public dateFormatter: DateFormatterService
-    ) {
-        this.FOOD_LISTING_USER_ACCESSORS = [ 'donorInfo', 'claimInfo.receiverInfo', 'claimInfo.deliveryInfo.delivererInfo' ];
-        this.FOOD_LISTING_USER_TITLES = [ 'Donor', 'Receiver', 'Deliverer' ];
-
-        this.isClaimedCart = false;
-        this.isDonatedCart = false;
-
-        this.toClaim = new EventEmitter<void>();
-        this.toUnclaim = new EventEmitter<void>();
-        this.toRemove = new EventEmitter<void>();
-    }
+    ) {}
 
 
     /**

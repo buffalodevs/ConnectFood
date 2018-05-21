@@ -1,11 +1,12 @@
 import { deserializable, deepDeserializable } from '../deserialization/deserializer';
 import { ImgData } from "./../img/img-data";
 import { AppUser } from '../app-user/app-user';
-import { DeliveryStateInfo } from '../common-user/delivery-state-info';
+import { DeliveryStateInfo, DeliveryState } from '../common-user/delivery-state-info';
 import { ClaimInfo } from './claim-info';
 import { DeliveryInfo } from './delivery-info';
 import { DateRange } from '../date-time-util/date-range';
 import { FoodListingsStatus } from './food-listing-filters';
+import { DeliveryUtil } from '../deliverer/delivery-util';
 
 export { FoodListingsStatus }
 
@@ -109,5 +110,11 @@ export class FoodListing {
     public getDelivererName(): string {
         return this.hasDeliverer() ? ( this.claimInfo.deliveryInfo.delivererInfo.firstName + ' ' + this.claimInfo.deliveryInfo.delivererInfo.lastName )
                                    : 'None';
+    }
+
+    
+    public getReadableDeliveryState(): string {
+        return this.hasDeliverer() ? DeliveryUtil.getReadableDeliveryState(this.claimInfo.deliveryInfo.deliveryStateInfo.deliveryState)
+                                   : DeliveryUtil.getReadableDeliveryState(DeliveryState.unscheduled);
     }
 }
